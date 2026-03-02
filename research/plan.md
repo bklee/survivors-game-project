@@ -38,6 +38,7 @@ survivors-game-project/
 
 ### Phase 2: 핵심 전투 및 스웜 최적화 (Core Combat & Performance)
 
+- [x] **Task 2.0: 오픈소스 에셋 반영**: `0x72's 16x16 Dungeon Tileset II` 다운로드 및 스프라이트셋 적용 완료.
 - [x] **Task 2.1: 고성능 렌더링**: `Phaser.GameObjects.Blitter` 또는 Custom WebGL Pipeline을 이용한 적 스프라이트 최적화.
 - [x] **Task 2.2: 적 스폰 시스템**: '밤의 농도(Night Intensity)' 시스템 구현 (시간별 난이도 곡선).
 - [x] **Task 2.3: 물리 샌드박스**: Quadtree/Spatial Hashing 기반 고속 충돌 감지 및 밀쳐내기(Knockback) 로직.

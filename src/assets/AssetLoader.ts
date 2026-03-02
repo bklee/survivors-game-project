@@ -12,7 +12,11 @@ export class AssetLoader {
     }
 
     loadImages() {
-        // e.g. this.scene.load.image('bg', 'assets/bg.png');
+        // Load the downloaded 0x72 dungeon tileset as a generic 16x16 spritesheet
+        this.scene.load.spritesheet('dungeon', 'assets/0x72_DungeonTilesetII_v1.7.png', {
+            frameWidth: 16,
+            frameHeight: 16
+        });
     }
 
     loadAudio() {

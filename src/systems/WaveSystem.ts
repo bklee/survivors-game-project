@@ -61,6 +61,7 @@ export class NightDirector {
         Health.current[eid] = 10 * intensity;
         Health.max[eid] = 10 * intensity;
 
-        SpriteInfo.textureIndex[eid] = 1; // 1 for enemy frame
+        // Roughly frame 109 is a small monster (like a demon or slime) in 0x72
+        SpriteInfo.textureIndex[eid] = 109;
     }
 }
