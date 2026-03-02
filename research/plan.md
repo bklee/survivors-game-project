@@ -31,34 +31,34 @@ survivors-game-project/
 
 ### Phase 1: 아키텍처 및 기반 시스템 (Foundation & Infrastructure)
 
-- [ ] **Task 1.1: 개발 환경 구축**: Vite 기반 Phaser 3 + TypeScript 환경 구축 및 Husky/Lint 설정.
-- [ ] **Task 1.2: ECS 코어 설계**: `bit-ecs` 엔티티 레이아웃 정의 (SAB 연동 고려).
-- [ ] **Task 1.3: 입력 및 모바일 대응**: 가상 조이스틱 (Virtual Joystick) 및 멀티 터치 시스템.
-- [ ] **Task 1.4: 애셋 파이프라인**: Texture Atlas 로딩 및 동적 애니메이션 생성 시스템.
+- [x] **Task 1.1: 개발 환경 구축**: Vite 기반 Phaser 3 + TypeScript 환경 구축 및 Husky/Lint 설정.
+- [x] **Task 1.2: ECS 코어 설계**: `bit-ecs` 엔티티 레이아웃 정의 (SAB 연동 고려).
+- [x] **Task 1.3: 입력 및 모바일 대응**: 가상 조이스틱 (Virtual Joystick) 및 멀티 터치 시스템.
+- [x] **Task 1.4: 애셋 파이프라인**: Texture Atlas 로딩 및 동적 애니메이션 생성 시스템.
 
 ### Phase 2: 핵심 전투 및 스웜 최적화 (Core Combat & Performance)
 
-- [ ] **Task 2.1: 고성능 렌더링**: `Phaser.GameObjects.Blitter` 또는 Custom WebGL Pipeline을 이용한 적 스프라이트 최적화.
-- [ ] **Task 2.2: 적 스폰 시스템**: '밤의 농도(Night Intensity)' 시스템 구현 (시간별 난이도 곡선).
-- [ ] **Task 2.3: 물리 샌드박스**: Quadtree/Spatial Hashing 기반 고속 충돌 감지 및 밀쳐내기(Knockback) 로직.
+- [x] **Task 2.1: 고성능 렌더링**: `Phaser.GameObjects.Blitter` 또는 Custom WebGL Pipeline을 이용한 적 스프라이트 최적화.
+- [x] **Task 2.2: 적 스폰 시스템**: '밤의 농도(Night Intensity)' 시스템 구현 (시간별 난이도 곡선).
+- [x] **Task 2.3: 물리 샌드박스**: Quadtree/Spatial Hashing 기반 고속 충돌 감지 및 밀쳐내기(Knockback) 로직.
 
 ### Phase 3: 연금술 및 성장 시스템 (Alchemy & Progression)
 
-- [ ] **Task 3.1: 마법의 큐(Magical Queue)**: 원소(불, 얼음, 번개, 독) 수집 및 실시간 조합 연산.
-- [ ] **Task 3.2: 레벨업 시퀀스**: 가챠/카드 선택 UI 구현 및 오버액션 연출 (Slow-mo, Glow).
-- [ ] **Task 3.3: 영구적 성장**: IndexedDB 연동을 통한 해금(Unlocks) 및 스킬 트리 데이터 저장.
+- [x] **Task 3.1: 마법의 큐(Magical Queue)**: 원소(불, 얼음, 번개, 독) 수집 및 실시간 조합 연산.
+- [x] **Task 3.2: 레벨업 시퀀스**: 가챠/카드 선택 UI 구현 및 오버액션 연출 (Slow-mo, Glow).
+- [x] **Task 3.3: 영구적 성장**: IndexedDB 연동을 통한 해금(Unlocks) 및 스킬 트리 데이터 저장.
 
 ### Phase 4: 시각적 완성도 및 타격감 (Visual Juice & Polish)
 
-- [ ] **Task 4.1: Juice Pipeline**: Hit-stop, Screen Shake, White Flash, Squash & Stretch 시스템화.
-- [ ] **Task 4.2: 고성능 FX**: 파티클 시스템 최적화 및 Post-FX (Glitch, Bloom, ColorMatrix) 적용.
-- [ ] **Task 4.3: 캐릭터 특화**: Rabbit(Bunny-hop), Bear(Dance), Panda(Roll) 등 고유 애니메이션 및 기믹 구현.
+- [x] **Task 4.1: Juice Pipeline**: Hit-stop, Screen Shake, White Flash, Squash & Stretch 시스템화.
+- [x] **Task 4.2: 고성능 FX**: 파티클 시스템 최적화 및 Post-FX (Glitch, Bloom, ColorMatrix) 적용.
+- [x] **Task 4.3: 캐릭터 특화**: Rabbit(Bunny-hop), Bear(Dance), Panda(Roll) 등 고유 애니메이션 및 기믹 구현.
 
 ### Phase 5: 밸런싱 및 출시 준비 (Final Polish & Launch)
 
-- [ ] **Task 5.1: 오디오 시스템**: BGM 전환 및 타격음(SFX) 레이어링 (화면 밖 사운드 감쇠).
-- [ ] **Task 5.2: 성능 테스트**: 저사양 기기 대상 프로파일링 및 Adaptive Physics 브릿지 튜닝.
-- [ ] **Task 5.3: 튜토리얼 및 해금**: 초기 유저 경험 가이드 및 인게임 도감 완성.
+- [x] **Task 5.1: 오디오 시스템**: BGM 전환 및 타격음(SFX) 레이어링 (화면 밖 사운드 감쇠).
+- [x] **Task 5.2: 성능 테스트**: 저사양 기기 대상 프로파일링 및 Adaptive Physics 브릿지 튜닝.
+- [x] **Task 5.3: 튜토리얼 및 해금**: 초기 유저 경험 가이드 및 인게임 도감 완성.
 
 ---
 
