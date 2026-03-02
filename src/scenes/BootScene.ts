@@ -1,4 +1,5 @@
 import { Scene } from 'phaser';
+import { AssetLoader } from '../assets/AssetLoader';
 
 export class BootScene extends Scene {
     constructor() {
@@ -6,8 +7,8 @@ export class BootScene extends Scene {
     }
 
     preload() {
-        // Load some assets here
-        // this.load.image('logo', 'assets/logo.png');
+        const loader = new AssetLoader(this);
+        loader.loadImages();
     }
 
     create() {
