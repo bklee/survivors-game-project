@@ -35,9 +35,9 @@ export const Animation = defineComponent({
 export const Player = defineComponent();
 export const Enemy = defineComponent();
 export const Boss = defineComponent();
-export const Scale = defineComponent({ value: Types.f32 });
 export const Chest = defineComponent();
-
+export const EnemyProjectile = defineComponent();
+export const Scale = defineComponent({ value: Types.f32 });
 // Weapons & Magic
 export const Spell = defineComponent({
     damage: Types.f32,

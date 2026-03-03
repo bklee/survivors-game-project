@@ -1,6 +1,6 @@
-import { addEntity, addComponent, defineQuery } from 'bitecs';
+import { addEntity, addComponent, defineQuery, hasComponent } from 'bitecs';
 import { world } from '../core/World';
-import { Animation, Position, Velocity, Health, SpriteInfo, Enemy, Player, Boss } from '../components';
+import { Animation, Position, Velocity, Health, SpriteInfo, Enemy, Player, Boss, EnemyProjectile } from '../components';
 
 const enemyQuery = defineQuery([Enemy, Position, Velocity]);
 const playerQuery = defineQuery([Player, Position]);
@@ -19,6 +19,7 @@ export class NightDirector {
 
     private currentWaveIndex: number = 0;
     private lastSpawnTime: number = 0;
+    private bossBarrageTimer: number = 0;
 
     public update(dt: number) {
         this.timeElapsed += dt;
@@ -85,11 +86,24 @@ export class NightDirector {
 
             Velocity.x[eid] = (dx / distance) * speed;
             Velocity.y[eid] = (dy / distance) * speed;
+
+            // BOSS PATTERN: Barrage
+            if (hasComponent(world, Boss, eid)) {
+                this.bossBarrageTimer += dt;
+                if (this.bossBarrageTimer >= 4000) { // every 4 sec
+                    this.bossBarrageTimer = 0;
+                    this.spawnBarrage(Position.x[eid], Position.y[eid]);
+                }
+            }
+        }
+
+        // Enemy Projectiles movement
+        const projectiles = defineQuery([EnemyProjectile, Position, Velocity])(world);
+        for (let i = 0; i < projectiles.length; i++) {
+            // physics system handles move
         }
     }
     private spawnEnemy(intensity: number) {
-        // Find a spawn point edge of camera
-        // For now random position around 640, 360 center
         const angle = Math.random() * Math.PI * 2;
         const radius = 800;
         const spawnX = 640 + Math.cos(angle) * radius;
@@ -106,15 +120,27 @@ export class NightDirector {
         Position.x[eid] = spawnX;
         Position.y[eid] = spawnY;
 
-        const speed = 50 * intensity;
+        const typeRoll = Math.random();
+        let typeId = 10; // imp
+        let speed = 60 * intensity;
+        let hp = 10 * intensity;
+
+        if (typeRoll > 0.8) { // Orc (Tank)
+            typeId = 12;
+            speed = 40 * intensity;
+            hp = 40 * intensity;
+        } else if (typeRoll > 0.5) { // Skeleton (Fast)
+            typeId = 13;
+            speed = 90 * intensity;
+            hp = 5 * intensity;
+        }
+
         Velocity.x[eid] = Math.cos(angle) * speed;
         Velocity.y[eid] = Math.sin(angle) * speed;
+        Health.current[eid] = hp;
+        Health.max[eid] = hp;
 
-        Health.current[eid] = 10 * intensity;
-        Health.max[eid] = 10 * intensity;
-
-        // Imp Type ID
-        SpriteInfo.textureIndex[eid] = 10;
+        SpriteInfo.textureIndex[eid] = typeId;
         Animation.frameStart[eid] = 0;
         Animation.frameEnd[eid] = 3;
         Animation.frameRate[eid] = 8;
@@ -153,5 +179,22 @@ export class NightDirector {
         Animation.frameRate[eid] = 6;
         Animation.timer[eid] = 0;
 }
+    private spawnBarrage(x: number, y: number) {
+        const count = 12;
+        for (let i = 0; i < count; i++) {
+            const angle = (i / count) * Math.PI * 2;
+            const beid = addEntity(world);
+            addComponent(world, Position, beid);
+            addComponent(world, Velocity, beid);
+            addComponent(world, EnemyProjectile, beid);
+            addComponent(world, SpriteInfo, beid);
+
+            Position.x[beid] = x;
+            Position.y[beid] = y;
+            Velocity.x[beid] = Math.cos(angle) * 150;
+            Velocity.y[beid] = Math.sin(angle) * 150;
+            SpriteInfo.textureIndex[beid] = 104; // bullet
+        }
+    }
 
 }
