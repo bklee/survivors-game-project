@@ -145,6 +145,7 @@ export class MainScene extends Phaser.Scene {
         window.addEventListener('boss_spawned', () => this.startBGM('boss_bgm'));
         window.addEventListener('player_died', () => this.stopBGM());
         window.addEventListener('stage_clear', () => this.stopBGM());
+        this.spawnDungeonProps();
         console.log("Game started successfully!");
         const recipeHandler = (e: KeyboardEvent) => {
             if (e.code === 'KeyE') {
@@ -203,4 +204,30 @@ export class MainScene extends Phaser.Scene {
             this.currentBGM = undefined;
         }
     }
+
+    private spawnDungeonProps() {
+        const propCount = 150;
+        for (let i = 0; i < propCount; i++) {
+            const eid = addEntity(world);
+            addComponent(world, Position, eid);
+            addComponent(world, SpriteInfo, eid);
+            
+            Position.x[eid] = Math.random() * WORLD_WIDTH;
+            Position.y[eid] = Math.random() * WORLD_HEIGHT;
+            
+            const roll = Math.random();
+            if (roll > 0.8) {
+                SpriteInfo.textureIndex[eid] = 30; // crate
+            } else if (roll > 0.6) {
+                SpriteInfo.textureIndex[eid] = 31; // skull
+            } else if (roll > 0.3) {
+                SpriteInfo.textureIndex[eid] = 33; // column
+            } else {
+                SpriteInfo.textureIndex[eid] = 32; // spikes
+                addComponent(world, Animation, eid);
+                Animation.timer[eid] = Math.random() * 1000;
+            }
+        }
+    }
+
 }

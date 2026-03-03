@@ -27,6 +27,11 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
             else if (typeId === 20) charKey = 'gem';
             else if (typeId === 12) charKey = 'orc';
             else if (typeId === 13) charKey = 'skeleton';
+            else if (typeId === 30) charKey = 'prop_crate';
+            else if (typeId === 31) charKey = 'prop_skull';
+            else if (typeId === 32) charKey = 'prop_spikes';
+            else if (typeId === 33) charKey = 'prop_column';
+            else if (typeId === 13) charKey = 'skeleton';
             else if (typeId === 100) charKey = 'spell_fire';
             else if (typeId === 101) charKey = 'spell_ice';
             else if (typeId === 102) charKey = 'spell_gas';
@@ -42,8 +47,13 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
 
             // 3. Handle Animation Framing
             let frameName: string | number = '';
-            if (typeId >= 20 && typeId <= 104) {
+            if ((typeId >= 20 && typeId <= 31) || typeId === 33 || (typeId >= 100 && typeId <= 104)) {
                 frameName = charKey;
+            } else if (typeId === 32) { // spikes
+                const rate = 4;
+                const animIdx = Math.floor(Animation.timer[eid] * rate / 1000) % 4;
+                frameName = `prop_spikes_${animIdx}`;
+                Animation.timer[eid] += dt;
             } else {
                 const rate = Animation.frameRate[eid] || 8;
                 Animation.timer[eid] += dt;

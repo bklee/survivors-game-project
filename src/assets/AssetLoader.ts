@@ -92,8 +92,17 @@ export class AssetLoader {
         texture.add('spell_dud', 0, 288, 320, 16, 16);  // bomb_f0
         texture.add('enemy_bullet', 0, 313, 385, 6, 7); // tiny coin or dot
 
+        // Dungeon Props (Static)
+        texture.add('prop_crate', 0, 288, 408, 16, 24);
+        texture.add('prop_skull', 0, 288, 432, 16, 16);
+        texture.add('prop_column', 0, 80, 80, 16, 48);
+
+        // Dungeon Props (Animated - Spikes)
+        for (let i = 0; i < 4; i++) {
+            texture.add(`prop_spikes_${i}`, 0, 16 + (i * 16), 192, 16, 16);
+        }
+
         // Add XP gem frame (flask_red or similar)
         texture.add('gem', 0, 288, 352, 16, 16);
-}
-
+    }
 }
