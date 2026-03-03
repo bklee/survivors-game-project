@@ -1624,3 +1624,125 @@
 오후 5:19:38 [vite] (client) page reload src/systems/PhysicsSystem.ts
 오후 5:20:49 [vite] (client) page reload src/scenes/MainScene.ts
 오후 5:23:50 [vite] (client) page reload src/scenes/MainScene.ts
+오후 6:26:45 [vite] (client) page reload src/core/DungeonGenerator.ts
+오후 6:26:45 [vite] (client) Pre-transform error: Transform failed with 1 error:
+/Users/hangup2/apps/survivors-game-project/src/core/DungeonGenerator.ts:138:0: ERROR: Expected identifier but found end of file
+  Plugin: vite:esbuild
+  File: /Users/hangup2/apps/survivors-game-project/src/core/DungeonGenerator.ts:138:0
+  
+  Expected identifier but found end of file
+  136|          };
+  137|  }
+  138|  
+     |  ^
+  
+오후 6:26:45 [vite] Internal server error: Transform failed with 1 error:
+/Users/hangup2/apps/survivors-game-project/src/core/DungeonGenerator.ts:138:0: ERROR: Expected identifier but found end of file
+  Plugin: vite:esbuild
+  File: /Users/hangup2/apps/survivors-game-project/src/core/DungeonGenerator.ts:138:0
+  
+  Expected identifier but found end of file
+  136|          };
+  137|  }
+  138|  
+     |  ^
+  
+      at failureErrorWithLog (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:1467:15)
+      at /Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:736:50
+      at responseCallbacks.<computed> (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:603:9)
+      at handleIncomingPacket (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:658:12)
+      at Socket.readFromStdout (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:581:7)
+      at Socket.emit (node:events:508:28)
+      at addChunk (node:internal/streams/readable:559:12)
+      at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+      at Readable.push (node:internal/streams/readable:390:5)
+      at Pipe.onStreamRead (node:internal/stream_base_commons:189:23)
+오후 6:28:29 [vite] (client) page reload src/assets/AssetLoader.ts
+오후 6:28:29 [vite] Internal server error: Transform failed with 1 error:
+/Users/hangup2/apps/survivors-game-project/src/core/DungeonGenerator.ts:138:0: ERROR: Expected identifier but found end of file
+  Plugin: vite:esbuild
+  File: /Users/hangup2/apps/survivors-game-project/src/core/DungeonGenerator.ts:138:0
+  
+  Expected identifier but found end of file
+  136|          };
+  137|  }
+  138|  
+     |  ^
+  
+      at failureErrorWithLog (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:1467:15)
+      at /Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:736:50
+      at responseCallbacks.<computed> (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:603:9)
+      at handleIncomingPacket (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:658:12)
+      at Socket.readFromStdout (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:581:7)
+      at Socket.emit (node:events:508:28)
+      at addChunk (node:internal/streams/readable:559:12)
+      at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+      at Readable.push (node:internal/streams/readable:390:5)
+      at Pipe.onStreamRead (node:internal/stream_base_commons:189:23)
+오후 6:30:22 [vite] (client) page reload src/scenes/MainScene.ts
+오후 6:30:22 [vite] (client) Pre-transform error: Transform failed with 1 error:
+/Users/hangup2/apps/survivors-game-project/src/scenes/MainScene.ts:343:0: ERROR: Expected identifier but found end of file
+  Plugin: vite:esbuild
+  File: /Users/hangup2/apps/survivors-game-project/src/scenes/MainScene.ts:343:0
+  
+  Expected identifier but found end of file
+  341|      }
+  342|  }
+  343|  
+     |  ^
+  
+오후 6:30:22 [vite] Internal server error: Transform failed with 1 error:
+/Users/hangup2/apps/survivors-game-project/src/scenes/MainScene.ts:343:0: ERROR: Expected identifier but found end of file
+  Plugin: vite:esbuild
+  File: /Users/hangup2/apps/survivors-game-project/src/scenes/MainScene.ts:343:0
+  
+  Expected identifier but found end of file
+  341|      }
+  342|  }
+  343|  
+     |  ^
+  
+      at failureErrorWithLog (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:1467:15)
+      at /Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:736:50
+      at responseCallbacks.<computed> (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:603:9)
+      at handleIncomingPacket (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:658:12)
+      at Socket.readFromStdout (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:581:7)
+      at Socket.emit (node:events:508:28)
+      at addChunk (node:internal/streams/readable:559:12)
+      at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+      at Readable.push (node:internal/streams/readable:390:5)
+      at Pipe.onStreamRead (node:internal/stream_base_commons:189:23)
+오후 6:31:25 [vite] (client) page reload src/core/DungeonGenerator.ts
+오후 6:31:25 [vite] (client) Pre-transform error: Transform failed with 1 error:
+/Users/hangup2/apps/survivors-game-project/src/scenes/MainScene.ts:343:0: ERROR: Expected identifier but found end of file
+  Plugin: vite:esbuild
+  File: /Users/hangup2/apps/survivors-game-project/src/scenes/MainScene.ts:343:0
+  
+  Expected identifier but found end of file
+  341|      }
+  342|  }
+  343|  
+     |  ^
+  
+오후 6:31:25 [vite] Internal server error: Transform failed with 1 error:
+/Users/hangup2/apps/survivors-game-project/src/scenes/MainScene.ts:343:0: ERROR: Expected identifier but found end of file
+  Plugin: vite:esbuild
+  File: /Users/hangup2/apps/survivors-game-project/src/scenes/MainScene.ts:343:0
+  
+  Expected identifier but found end of file
+  341|      }
+  342|  }
+  343|  
+     |  ^
+  
+      at failureErrorWithLog (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:1467:15)
+      at /Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:736:50
+      at responseCallbacks.<computed> (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:603:9)
+      at handleIncomingPacket (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:658:12)
+      at Socket.readFromStdout (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:581:7)
+      at Socket.emit (node:events:508:28)
+      at addChunk (node:internal/streams/readable:559:12)
+      at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+      at Readable.push (node:internal/streams/readable:390:5)
+      at Pipe.onStreamRead (node:internal/stream_base_commons:189:23)
+오후 6:32:04 [vite] (client) page reload src/scenes/MainScene.ts
