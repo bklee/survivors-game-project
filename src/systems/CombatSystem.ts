@@ -25,7 +25,10 @@ export const createCombatSystem = (juice: JuicePipeline) => {
                 const dx = px - Position.x[eeid];
                 const dy = py - Position.y[eeid];
                 if (dx * dx + dy * dy < 20 * 20) {
-                    Health.current[playerEid] -= 10 * deltaSec; // per second
+                    Health.current[playerEid] -= 10 * deltaSec; 
+                    window.dispatchEvent(new CustomEvent('hp_updated', { 
+                        detail: { current: Health.current[playerEid], max: Health.max[playerEid] } 
+                    }));
                 }
             }
 
@@ -37,6 +40,9 @@ export const createCombatSystem = (juice: JuicePipeline) => {
                 const dy = py - Position.y[epid];
                 if (dx * dx + dy * dy < 15 * 15) {
                     Health.current[playerEid] -= 15;
+                    window.dispatchEvent(new CustomEvent('hp_updated', { 
+                        detail: { current: Health.current[playerEid], max: Health.max[playerEid] } 
+                    }));
                     removeEntity(world, epid);
                     juice.screenShake(0.01, 100);
                 }
@@ -45,6 +51,7 @@ export const createCombatSystem = (juice: JuicePipeline) => {
             // 3. Player Death Check
             if (Health.current[playerEid] <= 0) {
                 juice.whiteFlash(500);
+                window.dispatchEvent(new CustomEvent('player_died'));
                 console.log("GAME OVER");
             }
         }
@@ -70,6 +77,11 @@ export const createCombatSystem = (juice: JuicePipeline) => {
                 const dy = ty - sy;
                 if (dx * dx + dy * dy <= sRadius * sRadius) {
                     window.dispatchEvent(new CustomEvent('play_sound', { detail: 'hit' }));
+                    
+                    const typeId = SpriteInfo.textureIndex[eid];
+                    if (typeId === 100) juice.whiteFlash(20); 
+                    else if (typeId === 101) juice.hitStop(30); 
+                    
                     Health.current[targetId] -= Spell.damage[eid];
                     juice.damageNumber(tx, ty, Spell.damage[eid]);
                     juice.hitStop(20);

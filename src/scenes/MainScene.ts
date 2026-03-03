@@ -114,6 +114,18 @@ export class MainScene extends Phaser.Scene {
             window.removeEventListener('play_sound', soundHandler);
         });
 
+        const deathHandler = () => {
+            this.time.delayedCall(1000, () => {
+                this.scene.pause();
+                this.scene.launch('GameOverScene');
+            });
+        };
+
+        window.addEventListener('player_died', deathHandler);
+        this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+            window.removeEventListener('player_died', deathHandler);
+        });
+
         console.log("Game started successfully!");
     }
 
