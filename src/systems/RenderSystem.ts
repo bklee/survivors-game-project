@@ -24,6 +24,8 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
             else if (typeId === 11) charKey = 'demon';
             else if (typeId === 12) charKey = 'orc';
             else if (typeId === 13) charKey = 'skeleton';
+            else if (typeId === 14) charKey = 'orc'; // Elite Guard
+            else if (typeId === 15) charKey = 'gem'; // Big Treasure
             else if (typeId === 20) charKey = 'gem';
             else if (typeId === 30) charKey = 'prop_crate';
             else if (typeId === 31) charKey = 'prop_skull';
@@ -50,7 +52,7 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
 
             // 3. Handle Animation Framing
             let frameName: string | number = '';
-            if ((typeId >= 20 && typeId <= 31) || typeId === 33 || typeId === 34 || (typeId >= 100 && typeId <= 107)) {
+            if ((typeId >= 15 && typeId <= 31) || typeId === 33 || typeId === 34 || (typeId >= 100 && typeId <= 107)) {
                 frameName = charKey;
             } else if (typeId === 40) {
                 frameName = Interactive.isActivated[eid] ? 'lever_on' : 'lever_off';
@@ -68,7 +70,7 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                 frameName = `${charKey}_${state}_${currentFrameIdx}`;
             }
 
-            // 4. Handle Death Effect
+            // 4. Handle Death Effect (Vanishing)
             let currentAlpha = 1.0;
             if (hasComponent(world, Health, eid) && typeId < 30) {
                 if (Health.current[eid] <= 0) currentAlpha = 0.4;
@@ -80,6 +82,8 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                 if (typeId === 10) { newBob.tint = 0xffaaaa; newBob.alpha = 0.9; }
                 else if (typeId === 11) { newBob.tint = 0xff5555; }
                 else if (typeId === 12 || typeId === 13) { newBob.tint = 0xffffff; }
+                else if (typeId === 14) { newBob.tint = 0xffcc00; } // GOLDEN ELITE
+                else if (typeId === 15) { newBob.tint = 0x00ffff; } // CYAN TREASURE
                 else if (typeId === 34) { newBob.tint = 0xff0000; } 
                 else if (typeId === 104) { newBob.tint = 0xffff00; }
                 
@@ -90,7 +94,7 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                 bob.y = Position.y[eid];
                 bob.alpha = currentAlpha;
 
-                // Sprite Flipping based on movement
+                // Sprite Flipping
                 if (hasComponent(world, Velocity, eid)) {
                     if (Velocity.x[eid] < 0) bob.flipX = true;
                     else if (Velocity.x[eid] > 0) bob.flipX = false;

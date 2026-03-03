@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { defineQuery, addEntity, addComponent } from 'bitecs';
 import { world } from '../core/World';
-import { Position, Velocity, Player, SpriteInfo, Animation, Health, Interactive } from '../components';
+import { Position, Velocity, Player, SpriteInfo, Animation, Health, Interactive, Item, Enemy } from '../components';
 import { createPhysicsSystem } from '../systems/PhysicsSystem';
 import { createRenderSystem } from '../systems/RenderSystem';
 import { PlayerSystem } from '../systems/PlayerSystem';
@@ -52,8 +52,10 @@ export class MainScene extends Phaser.Scene {
         this.alchemySystem = new AlchemySystem();
         this.combatSystem = createCombatSystem(this.juicePipeline);
         this.spellSystem = new SpellSystem(this.alchemySystem);
-        this.spellSystem.selectedCharId = this.selectedCharId;
         this.itemSystem = new ItemSystem();
+        
+        // Pass selection to spell system
+        this.spellSystem.selectedCharId = this.selectedCharId;
 
         this.add.tileSprite(0, 0, WORLD_WIDTH, WORLD_HEIGHT, 'dungeon', 'floor')
             .setOrigin(0, 0)
@@ -61,7 +63,7 @@ export class MainScene extends Phaser.Scene {
 
         const blitter = this.add.blitter(0, 0, 'dungeon');
         
-        // Render System (Aura removed)
+        // Render System (No Aura)
         this.renderSystem = createRenderSystem(this, blitter);
 
         // Spawn Player Entity
@@ -77,7 +79,7 @@ export class MainScene extends Phaser.Scene {
         Position.x[this.playerId] = WORLD_WIDTH / 2;
         Position.y[this.playerId] = WORLD_HEIGHT / 2;
         
-        // Map Selection to Sprite Type
+        // Character Setup
         let typeId = 1; // Wizard
         if (this.selectedCharId === 'knight') typeId = 0;
         else if (this.selectedCharId === 'elf') typeId = 2;
@@ -244,7 +246,8 @@ export class MainScene extends Phaser.Scene {
     }
 
     private spawnDungeonProps() {
-        const propCount = 100;
+        // Random static props
+        const propCount = 80;
         for (let i = 0; i < propCount; i++) {
             const eid = addEntity(world);
             addComponent(world, Position, eid);
@@ -263,9 +266,12 @@ export class MainScene extends Phaser.Scene {
             }
         }
 
-        for (let i = 0; i < 10; i++) {
-            const lx = Math.random() * WORLD_WIDTH;
-            const ly = Math.random() * WORLD_HEIGHT;
+        // Special Treasure Clusters
+        for (let i = 0; i < 8; i++) {
+            const lx = Math.random() * (WORLD_WIDTH - 400) + 200;
+            const ly = Math.random() * (WORLD_HEIGHT - 400) + 200;
+            
+            // Lever
             const lever = addEntity(world);
             addComponent(world, Position, lever);
             addComponent(world, SpriteInfo, lever);
@@ -274,13 +280,40 @@ export class MainScene extends Phaser.Scene {
             SpriteInfo.textureIndex[lever] = 40;
             Interactive.id[lever] = i;
 
+            // Locked Door
             const door = addEntity(world);
             addComponent(world, Position, door);
             addComponent(world, SpriteInfo, door);
             addComponent(world, Interactive, door);
-            Position.x[door] = lx + 100; Position.y[door] = ly;
+            Position.x[door] = lx + 120; Position.y[door] = ly;
             SpriteInfo.textureIndex[door] = 41;
             Interactive.id[door] = i;
+
+            // Treasure behind door
+            const treasure = addEntity(world);
+            addComponent(world, Position, treasure);
+            addComponent(world, SpriteInfo, treasure);
+            addComponent(world, Item, treasure);
+            Position.x[treasure] = lx + 200; Position.y[treasure] = ly;
+            SpriteInfo.textureIndex[treasure] = 15; // Elite Treasure
+            Item.xpValue[treasure] = 1000;
+            Item.magnetized[treasure] = 0;
+
+            // 2 Guards
+            for (let g = 0; g < 2; g++) {
+                const guard = addEntity(world);
+                addComponent(world, Position, guard);
+                addComponent(world, Velocity, guard);
+                addComponent(world, Health, guard);
+                addComponent(world, SpriteInfo, guard);
+                addComponent(world, Animation, guard);
+                addComponent(world, Enemy, guard);
+                Position.x[guard] = lx + 200 + (Math.random() - 0.5) * 60;
+                Position.y[guard] = ly + (Math.random() - 0.5) * 60;
+                SpriteInfo.textureIndex[guard] = 14; // Elite Orc
+                Health.current[guard] = 150; Health.max[guard] = 150;
+                Animation.frameRate[guard] = 8;
+            }
         }
     }
 }
