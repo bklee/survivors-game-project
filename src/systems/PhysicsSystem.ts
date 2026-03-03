@@ -2,8 +2,8 @@ import { defineQuery } from 'bitecs';
 import { Position, Velocity, Enemy } from '../components';
 import { world } from '../core/World';
 import { SpatialHash } from '../core/SpatialHash';
-
 import { isHitStopped } from '../fx/JuicePipeline';
+import { WORLD_WIDTH, WORLD_HEIGHT } from '../constants/GameConfig';
 
 // Simple movement physics query
 const physicsQuery = defineQuery([Position, Velocity]);
@@ -22,6 +22,13 @@ export const createPhysicsSystem = () => {
 
                 Position.x[eid] += Velocity.x[eid] * deltaSec;
                 Position.y[eid] += Velocity.y[eid] * deltaSec;
+
+                // Clamp to world bounds
+                if (Position.x[eid] < 0) Position.x[eid] = 0;
+                else if (Position.x[eid] > WORLD_WIDTH) Position.x[eid] = WORLD_WIDTH;
+
+                if (Position.y[eid] < 0) Position.y[eid] = 0;
+                else if (Position.y[eid] > WORLD_HEIGHT) Position.y[eid] = WORLD_HEIGHT;
             }
         }
 

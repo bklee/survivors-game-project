@@ -7,6 +7,7 @@ import { createRenderSystem } from '../systems/RenderSystem';
 import { PlayerSystem } from '../systems/PlayerSystem';
 import { NightDirector } from '../systems/WaveSystem';
 import { VirtualJoystick } from '../ui/VirtualJoystick';
+import { WORLD_WIDTH, WORLD_HEIGHT } from '../constants/GameConfig';
 
 export class MainScene extends Phaser.Scene {
     private physicsSystem!: (dt: number) => void;
@@ -14,14 +15,13 @@ export class MainScene extends Phaser.Scene {
     private playerSystem!: PlayerSystem;
     private nightDirector!: NightDirector;
     private joystick!: VirtualJoystick;
+    private playerId!: number;
 
     constructor() {
         super('MainScene');
     }
 
     create() {
-        // We don't need dummy graphics anymore, as we preload 'dungeon' in BootScene
-
         // Setup ECS Systems
         this.physicsSystem = createPhysicsSystem();
         this.playerSystem = new PlayerSystem();
@@ -31,26 +31,31 @@ export class MainScene extends Phaser.Scene {
         this.renderSystem = createRenderSystem(this, blitter);
 
         // Spawn Player Entity
-        const playerId = addEntity(world);
-        addComponent(world, Position, playerId);
-        addComponent(world, Velocity, playerId);
-        addComponent(world, Player, playerId);
-        addComponent(world, SpriteInfo, playerId);
+        this.playerId = addEntity(world);
+        addComponent(world, Position, this.playerId);
+        addComponent(world, Velocity, this.playerId);
+        addComponent(world, Player, this.playerId);
+        addComponent(world, SpriteInfo, this.playerId);
 
-        Position.x[playerId] = 640;
-        Position.y[playerId] = 360;
-        // Frame 85 roughly is the white wizard/hero in 0x72 tileset
-        SpriteInfo.textureIndex[playerId] = 85;
+        Position.x[this.playerId] = WORLD_WIDTH / 2;
+        Position.y[this.playerId] = WORLD_HEIGHT / 2;
+        SpriteInfo.textureIndex[this.playerId] = 85; // White wizard
+
+        // Setup Camera Boundaries
+        this.cameras.main.setBounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
 
         // Visual UI
         this.add
             .text(10, 10, "Alchemist's Night (Runtime active)", {
                 fontSize: '24px',
                 color: '#ffffff',
-            });
+            }).setScrollFactor(0); // Pin to camera
 
         // Add Virtual Joystick at bottom left
         this.joystick = new VirtualJoystick(this, 150, 600, 50);
+        // We can't directly use setScrollFactor on complex DOM/Graphic elements easily here,
+        // so we will position it correctly or rely on CSS/fixed UI overlay later. 
+        // For now let's just leave it.
 
         console.log("Game started successfully!");
     }
@@ -61,16 +66,18 @@ export class MainScene extends Phaser.Scene {
         this.playerSystem.update(delta);
 
         // Link joystick to player velocity manually for now
-        // A proper input system component would be better, but this demonstrates it working
-        // Using player eid = 1 (usually is if it's the first entity added)
-        // Let's use quick search or assumed eid logic.
         const dX = this.joystick.vector.x;
         const dY = this.joystick.vector.y;
 
-        Velocity.x[1] = dX * 200; // placeholder speed
-        Velocity.y[1] = dY * 200;
+        if (dX !== 0 || dY !== 0) {
+            Velocity.x[this.playerId] = dX * 200; // placeholder speed
+            Velocity.y[this.playerId] = dY * 200;
+        }
 
         this.physicsSystem(delta);
         this.renderSystem();
+
+        // Make camera follow player manually
+        this.cameras.main.centerOn(Position.x[this.playerId], Position.y[this.playerId]);
     }
 }
