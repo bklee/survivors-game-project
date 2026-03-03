@@ -2,13 +2,16 @@ import { defineQuery } from 'bitecs';
 import { Position, Velocity } from '../components';
 import { world } from '../core/World';
 
+import { isHitStopped } from '../fx/JuicePipeline';
+
 // Simple movement physics query
 const physicsQuery = defineQuery([Position, Velocity]);
 
 export const createPhysicsSystem = () => {
     return (dt: number) => {
+        if (isHitStopped) return; // Freeze simulation during Hit Stop
+
         const ents = physicsQuery(world);
-        // dt is assumed to be in seconds or we convert it
         const deltaSec = dt / 1000;
 
         for (let i = 0; i < ents.length; i++) {
