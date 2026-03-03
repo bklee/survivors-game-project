@@ -1597,3 +1597,6 @@
       at Pipe.onStreamRead (node:internal/stream_base_commons:189:23)
 오후 12:17:49 [vite] (client) page reload src/components/index.ts
 오후 12:18:20 [vite] (client) page reload src/scenes/MainScene.ts
+오후 12:21:22 [vite] (client) page reload src/scenes/MainScene.ts
+오후 12:21:58 [vite] (client) page reload src/systems/RenderSystem.ts
+오후 12:22:35 [vite] (client) page reload src/scenes/UpgradeScene.ts
