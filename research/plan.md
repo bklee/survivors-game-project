@@ -76,8 +76,19 @@ survivors-game-project/
 - [x] **Task 7.3: 플레이어 이동 기믹**: Rabbit(Hop), Panda(Roll) 등 캐릭터별 이동/회피 물리 연산 완성
 - [x] **Task 7.4: 적 AI 고도화**: 단순 중앙 이동이 아닌 실시간 플레이어 추적(Tracking) 및 넉백(Knockback) 처리
 
-### Phase 8: 게임 플레이 루프 (XP, Loot & Leveling) - Current Sprint
+### Phase 8: 게임 플레이 루프 (XP, Loot & Leveling) - Completed Sprint
 
+- [x] **Task 8.1: 전투 파이프라인 활성화**: MainScene에 CombatSystem 및 SpellSystem을 연결, Spacebar 스펠 발사(발사체 방향 로직 포함) 연동
+- [x] **Task 8.2: 아이템 드롭 (XP Gems)**: 적 사망 시 경험치 보석(Gem) 생성 및 플레이어 근접 시 자석(Magnet) 효과
+- [x] **Task 8.3: 레벨업 및 성장 로직**: 경험치 획득 시 게이지 상승, 특정 수치 도달 시 게임 일시 정지 후 스킬 선택창 띄우기
+
+### Phase 9: HUD 및 레벨업 UI 구축 (HUD & Level Up Draft) - Current Sprint
+
+- [ ] **Task 9.1: HUD 연금술 큐 시각화**: `MainScene` 화면 하단에 현재 쌓인 원소 큐를 시각적 아이콘으로 표시
+- [ ] **Task 9.2: 레벨업 씬 (UpgradeScene) 생성**: 레벨업 시 화면을 덮는 반투명 팝업(Draft) 씬 생성 및 `MainScene` 일시 정지 연동
+- [ ] **Task 9.3: 스킬 카드 선택 로직**: 3개의 무작위 업그레이드(공격력 증가, 원소 쿨타임 감소 등)를 카드 형태로 보여주고 클릭 시 적용
+
+---
 - [ ] **Task 8.1: 전투 파이프라인 활성화**: MainScene에 CombatSystem 및 SpellSystem을 연결, Spacebar 스펠 발사(발사체 방향 로직 포함) 연동
 - [ ] **Task 8.2: 아이템 드롭 (XP Gems)**: 적 사망 시 경험치 보석(Gem) 생성 및 플레이어 근접 시 자석(Magnet) 효과
 - [ ] **Task 8.3: 레벨업 및 성장 로직**: 경험치 획득 시 게이지 상승, 특정 수치 도달 시 게임 일시 정지 후 스킬 선택창 띄우기
