@@ -11,27 +11,27 @@ interface UpgradeOption {
 const UPGRADE_POOL: UpgradeOption[] = [
     {
         id: 'dmg_up',
-        label: 'Damage Up',
-        desc: 'Increases all spell damage by 15%',
-        apply: () => { globalStats.damageMult += 0.15; }
+        label: 'Alchemy Potency',
+        desc: 'Increases all spell damage by 20%',
+        apply: () => { globalStats.damageMult += 0.20; }
     },
     {
         id: 'spd_up',
-        label: 'Swiftness',
+        label: 'Fleet Footwork',
         desc: 'Increases movement speed by 15%',
         apply: () => { globalStats.moveSpeedMult += 0.15; }
     },
     {
         id: 'cdr_up',
-        label: 'Haste',
-        desc: 'Reduces spell cooldowns by 10%',
-        apply: () => { globalStats.cooldownMult *= 0.9; }
+        label: "Wizard's Focus",
+        desc: 'Reduces alchemy cooldowns by 15%',
+        apply: () => { globalStats.cooldownMult *= 0.85; }
     },
     {
         id: 'magnet_up',
-        label: 'Magnetism',
-        desc: 'Increases item pickup radius by 25%',
-        apply: () => { globalStats.pickupRadiusMult += 0.25; }
+        label: 'Aetheric Pull',
+        desc: 'Increases item pickup radius by 40%',
+        apply: () => { globalStats.pickupRadiusMult += 0.40; }
     }
 ];
 

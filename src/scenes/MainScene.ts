@@ -38,7 +38,8 @@ export class MainScene extends Phaser.Scene {
 
     init(data: { characterId: string }) {
         if (data && data.characterId) {
-            this.selectedCharId = data.characterId;
+            this.selectedCharId = data.characterId.toLowerCase();
+            console.log('Battlefield: Using character', this.selectedCharId);
         }
     }
 
@@ -58,11 +59,9 @@ export class MainScene extends Phaser.Scene {
             .setDepth(-2);
 
         const blitter = this.add.blitter(0, 0, 'dungeon');
-        const playerAura = this.add.graphics();
-        playerAura.fillStyle(0x00ffff, 0.3);
-        playerAura.fillCircle(0, 0, 16);
         
-        this.renderSystem = createRenderSystem(this, blitter, playerAura);
+        // Render System (Aura removed)
+        this.renderSystem = createRenderSystem(this, blitter);
 
         // Spawn Player Entity
         this.playerId = addEntity(world);
@@ -77,11 +76,12 @@ export class MainScene extends Phaser.Scene {
         Position.x[this.playerId] = WORLD_WIDTH / 2;
         Position.y[this.playerId] = WORLD_HEIGHT / 2;
         
-        // Initialize Player based on selection
-        const charData = CHARACTERS[this.selectedCharId.toUpperCase()] || CHARACTERS.WIZARD;
-        let typeId = 1; 
+        // Map Selection to Sprite Type
+        let typeId = 1; // Wizard
         if (this.selectedCharId === 'knight') typeId = 0;
         else if (this.selectedCharId === 'elf') typeId = 2;
+
+        const charData = CHARACTERS[this.selectedCharId.toUpperCase()] || CHARACTERS.WIZARD;
 
         SpriteInfo.textureIndex[this.playerId] = typeId; 
         Animation.frameStart[this.playerId] = 0;
@@ -212,6 +212,16 @@ export class MainScene extends Phaser.Scene {
                         detail: { current: Health.current[this.playerId], max: Health.max[this.playerId] } 
                     }));
                 }
+            } else if (typeId === 34) { // Explosive Barrel
+                if (distSq < 40 * 40 && Interactive.isActivated[eid] === 0) {
+                    Interactive.isActivated[eid] = 1;
+                    this.juicePipeline.whiteFlash(100);
+                    this.juicePipeline.screenShake(0.05, 300);
+                    Health.current[this.playerId] -= 30; 
+                    window.dispatchEvent(new CustomEvent('hp_updated', { 
+                        detail: { current: Health.current[this.playerId], max: Health.max[this.playerId] } 
+                    }));
+                }
             }
         }
     }
@@ -242,6 +252,7 @@ export class MainScene extends Phaser.Scene {
             Position.y[eid] = Math.random() * WORLD_HEIGHT;
             const roll = Math.random();
             if (roll > 0.8) SpriteInfo.textureIndex[eid] = 30; // crate
+            else if (roll > 0.7) SpriteInfo.textureIndex[eid] = 34; // explosive barrel
             else if (roll > 0.6) SpriteInfo.textureIndex[eid] = 31; // skull
             else if (roll > 0.3) SpriteInfo.textureIndex[eid] = 33; // column
             else {

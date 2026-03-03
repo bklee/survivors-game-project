@@ -4,10 +4,9 @@ import { Animation, Position, SpriteInfo, Velocity, Health, Interactive } from '
 import { world } from '../core/World';
 
 const renderQuery = defineQuery([Position, SpriteInfo]);
-
 const bobs: (Phaser.GameObjects.Bob | undefined)[] = [];
 
-export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObjects.Blitter, playerAura: Phaser.GameObjects.Graphics) => {
+export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObjects.Blitter) => {
     return (dt: number) => {
         const ents = renderQuery(world);
 
@@ -30,6 +29,7 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
             else if (typeId === 31) charKey = 'prop_skull';
             else if (typeId === 32) charKey = 'prop_spikes';
             else if (typeId === 33) charKey = 'prop_column';
+            else if (typeId === 34) charKey = 'prop_crate'; // Used for barrel too
             else if (typeId === 40) charKey = 'lever';
             else if (typeId === 41) charKey = 'door';
             else if (typeId === 100) charKey = 'spell_fire';
@@ -49,7 +49,7 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
             let frameName: string | number = '';
             
             // Static or special state frames
-            if ((typeId >= 20 && typeId <= 31) || typeId === 33 || (typeId >= 100 && typeId <= 104)) {
+            if ((typeId >= 20 && typeId <= 31) || typeId === 33 || typeId === 34 || (typeId >= 100 && typeId <= 104)) {
                 frameName = charKey;
             } else if (typeId === 40) { // Lever
                 frameName = Interactive.isActivated[eid] ? 'lever_on' : 'lever_off';
@@ -81,7 +81,9 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                 const newBob = blitter.create(Position.x[eid], Position.y[eid], frameName);
                 if (typeId === 10) { newBob.tint = 0xffaaaa; newBob.alpha = 0.9; }
                 else if (typeId === 11) { newBob.tint = 0xff5555; }
+                else if (typeId === 34) { newBob.tint = 0xff0000; } // Barrel is RED
                 else if (typeId === 104) { newBob.tint = 0xffff00; }
+                
                 newBob.alpha = currentAlpha;
                 bobs[eid] = newBob;
             } else {
@@ -91,11 +93,6 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                 try {
                     bob.setFrame(frameName);
                 } catch (e) {}
-
-                // Player Aura
-                if (typeId >= 0 && typeId <= 2) {
-                    playerAura.setPosition(bob.x + 8, bob.y + 14);
-                }
             }
         }
     };
