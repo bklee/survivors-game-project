@@ -783,3 +783,136 @@
 오전 11:59:09 [vite] (client) page reload src/scenes/MainScene.ts
 오후 12:02:14 [vite] (client) page reload src/scenes/CharacterSelectScene.ts
 오후 12:02:32 [vite] (client) page reload src/constants/CharacterConfig.ts
+오후 12:03:39 [vite] (client) page reload src/scenes/MainScene.ts
+오후 12:04:42 [vite] (client) page reload src/main.ts
+오후 12:04:52 [vite] (client) page reload src/scenes/MainScene.ts
+오후 12:05:48 [vite] (client) page reload src/scenes/RecipeScene.ts
+오후 12:05:48 [vite] (client) Pre-transform error: Transform failed with 1 error:
+/Users/hangup2/apps/survivors-game-project/src/scenes/RecipeScene.ts:51:12: ERROR: Expected ";" but found "close"
+  Plugin: vite:esbuild
+  File: /Users/hangup2/apps/survivors-game-project/src/scenes/RecipeScene.ts:51:12
+  
+  Expected ";" but found "close"
+  49 |      }
+  50 |  
+  51 |      private close() {
+     |              ^
+  52 |          this.scene.resume('MainScene');
+  53 |          this.scene.stop('RecipeScene');
+  
+오후 12:05:48 [vite] Internal server error: Transform failed with 1 error:
+/Users/hangup2/apps/survivors-game-project/src/scenes/RecipeScene.ts:51:12: ERROR: Expected ";" but found "close"
+  Plugin: vite:esbuild
+  File: /Users/hangup2/apps/survivors-game-project/src/scenes/RecipeScene.ts:51:12
+  
+  Expected ";" but found "close"
+  49 |      }
+  50 |  
+  51 |      private close() {
+     |              ^
+  52 |          this.scene.resume('MainScene');
+  53 |          this.scene.stop('RecipeScene');
+  
+      at failureErrorWithLog (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:1467:15)
+      at /Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:736:50
+      at responseCallbacks.<computed> (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:603:9)
+      at handleIncomingPacket (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:658:12)
+      at Socket.readFromStdout (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:581:7)
+      at Socket.emit (node:events:508:28)
+      at addChunk (node:internal/streams/readable:559:12)
+      at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+      at Readable.push (node:internal/streams/readable:390:5)
+      at Pipe.onStreamRead (node:internal/stream_base_commons:189:23)
+오후 12:06:06 [vite] Internal server error: Transform failed with 1 error:
+/Users/hangup2/apps/survivors-game-project/src/scenes/RecipeScene.ts:51:12: ERROR: Expected ";" but found "close"
+  Plugin: vite:esbuild
+  File: /Users/hangup2/apps/survivors-game-project/src/scenes/RecipeScene.ts:51:12
+  
+  Expected ";" but found "close"
+  49 |      }
+  50 |  
+  51 |      private close() {
+     |              ^
+  52 |          this.scene.resume('MainScene');
+  53 |          this.scene.stop('RecipeScene');
+  
+      at failureErrorWithLog (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:1467:15)
+      at /Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:736:50
+      at responseCallbacks.<computed> (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:603:9)
+      at handleIncomingPacket (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:658:12)
+      at Socket.readFromStdout (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:581:7)
+      at Socket.emit (node:events:508:28)
+      at addChunk (node:internal/streams/readable:559:12)
+      at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+      at Readable.push (node:internal/streams/readable:390:5)
+      at Pipe.onStreamRead (node:internal/stream_base_commons:189:23)
+오후 12:06:07 [vite] Internal server error: Transform failed with 1 error:
+/Users/hangup2/apps/survivors-game-project/src/scenes/RecipeScene.ts:51:12: ERROR: Expected ";" but found "close"
+  Plugin: vite:esbuild
+  File: /Users/hangup2/apps/survivors-game-project/src/scenes/RecipeScene.ts:51:12
+  
+  Expected ";" but found "close"
+  49 |      }
+  50 |  
+  51 |      private close() {
+     |              ^
+  52 |          this.scene.resume('MainScene');
+  53 |          this.scene.stop('RecipeScene');
+  
+      at failureErrorWithLog (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:1467:15)
+      at /Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:736:50
+      at responseCallbacks.<computed> (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:603:9)
+      at handleIncomingPacket (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:658:12)
+      at Socket.readFromStdout (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:581:7)
+      at Socket.emit (node:events:508:28)
+      at addChunk (node:internal/streams/readable:559:12)
+      at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+      at Readable.push (node:internal/streams/readable:390:5)
+      at Pipe.onStreamRead (node:internal/stream_base_commons:189:23)
+오후 12:06:08 [vite] Internal server error: Transform failed with 1 error:
+/Users/hangup2/apps/survivors-game-project/src/scenes/RecipeScene.ts:51:12: ERROR: Expected ";" but found "close"
+  Plugin: vite:esbuild
+  File: /Users/hangup2/apps/survivors-game-project/src/scenes/RecipeScene.ts:51:12
+  
+  Expected ";" but found "close"
+  49 |      }
+  50 |  
+  51 |      private close() {
+     |              ^
+  52 |          this.scene.resume('MainScene');
+  53 |          this.scene.stop('RecipeScene');
+  
+      at failureErrorWithLog (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:1467:15)
+      at /Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:736:50
+      at responseCallbacks.<computed> (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:603:9)
+      at handleIncomingPacket (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:658:12)
+      at Socket.readFromStdout (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:581:7)
+      at Socket.emit (node:events:508:28)
+      at addChunk (node:internal/streams/readable:559:12)
+      at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+      at Readable.push (node:internal/streams/readable:390:5)
+      at Pipe.onStreamRead (node:internal/stream_base_commons:189:23)
+오후 12:06:08 [vite] Internal server error: Transform failed with 1 error:
+/Users/hangup2/apps/survivors-game-project/src/scenes/RecipeScene.ts:51:12: ERROR: Expected ";" but found "close"
+  Plugin: vite:esbuild
+  File: /Users/hangup2/apps/survivors-game-project/src/scenes/RecipeScene.ts:51:12
+  
+  Expected ";" but found "close"
+  49 |      }
+  50 |  
+  51 |      private close() {
+     |              ^
+  52 |          this.scene.resume('MainScene');
+  53 |          this.scene.stop('RecipeScene');
+  
+      at failureErrorWithLog (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:1467:15)
+      at /Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:736:50
+      at responseCallbacks.<computed> (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:603:9)
+      at handleIncomingPacket (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:658:12)
+      at Socket.readFromStdout (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:581:7)
+      at Socket.emit (node:events:508:28)
+      at addChunk (node:internal/streams/readable:559:12)
+      at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+      at Readable.push (node:internal/streams/readable:390:5)
+      at Pipe.onStreamRead (node:internal/stream_base_commons:189:23)
+오후 12:06:17 [vite] (client) page reload src/scenes/RecipeScene.ts

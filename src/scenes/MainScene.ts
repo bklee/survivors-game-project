@@ -87,7 +87,7 @@ export class MainScene extends Phaser.Scene {
         Health.current[this.playerId] = charData.baseStats.health;
         Health.max[this.playerId] = charData.baseStats.health;
         
-        // Update global stats for damage
+        // Ensure global stats reflect character damage
         import('../core/PlayerStats').then(m => {
             m.globalStats.damageMult = charData.baseStats.damage;
         });
@@ -139,6 +139,16 @@ export class MainScene extends Phaser.Scene {
         });
 
         console.log("Game started successfully!");
+        const recipeHandler = (e: KeyboardEvent) => {
+            if (e.code === 'KeyE') {
+                this.scene.pause();
+                this.scene.launch('RecipeScene');
+            }
+        };
+        window.addEventListener('keydown', recipeHandler);
+        this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+            window.removeEventListener('keydown', recipeHandler);
+        });
     }
 
     update(_time: number, delta: number) {
