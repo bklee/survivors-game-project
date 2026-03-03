@@ -89,6 +89,13 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                 bob.x = Position.x[eid];
                 bob.y = Position.y[eid];
                 bob.alpha = currentAlpha;
+
+                // Sprite Flipping based on movement
+                if (hasComponent(world, Velocity, eid)) {
+                    if (Velocity.x[eid] < 0) bob.flipX = true;
+                    else if (Velocity.x[eid] > 0) bob.flipX = false;
+                }
+
                 try { bob.setFrame(frameName); } catch (e) {}
             }
         }
