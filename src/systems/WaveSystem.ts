@@ -1,4 +1,4 @@
-import { addEntity, addComponent, defineQuery, hasComponent } from 'bitecs';
+import { addEntity, addComponent, defineQuery, hasComponent, removeEntity } from 'bitecs';
 import { world } from '../core/World';
 import { Animation, Position, Velocity, Health, SpriteInfo, Enemy, Player, Boss, EnemyProjectile } from '../components';
 
@@ -143,6 +143,30 @@ export class NightDirector {
             Velocity.x[beid] = Math.cos(angle) * 150;
             Velocity.y[beid] = Math.sin(angle) * 150;
             SpriteInfo.textureIndex[beid] = 104;
+        }
+    }
+    public resetForNextStage() {
+        console.log("Resetting for next stage... Increasing intensity!");
+        this.timeElapsed = 0;
+        this.currentWaveIndex = 0;
+        this.bossSpawned = false;
+        this.spawnPauseUntil = 0;
+        this.lastSpawnTime = 0;
+
+        // Increase global difficulty
+        this.waveConfig.forEach(cfg => {
+            cfg.intensity += 1;
+            cfg.spawnInterval = Math.max(50, cfg.spawnInterval - 50); // spawn faster
+        });
+
+        // Clear existing enemies and projectiles
+        const enemies = enemyQuery(world);
+        for (let i = 0; i < enemies.length; i++) {
+            removeEntity(world, enemies[i]);
+        }
+        const projectiles = defineQuery([EnemyProjectile, Position])(world);
+        for (let i = 0; i < projectiles.length; i++) {
+            removeEntity(world, projectiles[i]);
         }
     }
 }

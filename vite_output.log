@@ -1612,3 +1612,7 @@
 오후 12:39:08 [vite] (client) page reload src/systems/RenderSystem.ts
 오후 12:40:44 [vite] (client) page reload src/systems/RenderSystem.ts
 오후 12:42:09 [vite] (client) page reload src/scenes/MainScene.ts
+오후 4:57:41 [vite] (client) page reload src/scenes/UIScene.ts
+오후 5:00:11 [vite] (client) page reload src/scenes/MainScene.ts
+오후 5:01:58 [vite] (client) page reload src/systems/WaveSystem.ts
+오후 5:02:52 [vite] (client) page reload src/systems/WaveSystem.ts

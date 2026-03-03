@@ -55,6 +55,11 @@ export class UIScene extends Phaser.Scene {
         this.add.rectangle(mmX, mmY, this.MINIMAP_SIZE + 4, this.MINIMAP_SIZE + 4, 0xffffff, 0.2).setOrigin(1, 0);
         this.add.rectangle(mmX - 2, mmY + 2, this.MINIMAP_SIZE, this.MINIMAP_SIZE, 0x000000, 0.5).setOrigin(1, 0);
         this.minimapGraphics = this.add.graphics();
+        // Initially hide UI elements
+        this.minimapGraphics.setVisible(false);
+        this.xpText.setVisible(false);
+        this.queueText.setVisible(false);
+        this.hpBar.setVisible(false);
 
         // Alerts
         this.bossWarningText = this.add.text(640, 360, 'BOSS APPROACHING!', {
@@ -72,6 +77,14 @@ export class UIScene extends Phaser.Scene {
             stroke: '#000000',
             strokeThickness: 10,
         }).setOrigin(0.5, 0.5).setVisible(false);
+
+        // Listen for game start to show UI
+        window.addEventListener('game_started', () => {
+            this.minimapGraphics.setVisible(true);
+            this.xpText.setVisible(true);
+            this.queueText.setVisible(true);
+            this.hpBar.setVisible(true);
+        });
 
         // Listen for global events
         window.addEventListener('xp_collected', this.handleXp as EventListener);
@@ -172,7 +185,8 @@ export class UIScene extends Phaser.Scene {
             ease: 'Back.easeOut',
             onComplete: () => {
                 this.time.delayedCall(3000, () => {
-                    window.location.reload();
+                    this.stageClearText.setVisible(false);
+                    window.dispatchEvent(new CustomEvent('next_stage'));
                 });
             }
         });

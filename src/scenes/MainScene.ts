@@ -79,7 +79,7 @@ export class MainScene extends Phaser.Scene {
         Position.x[this.playerId] = WORLD_WIDTH / 2;
         Position.y[this.playerId] = WORLD_HEIGHT / 2;
         
-        // Character Setup
+        // Map Selection
         let typeId = 1; // Wizard
         if (this.selectedCharId === 'knight') typeId = 0;
         else if (this.selectedCharId === 'elf') typeId = 2;
@@ -95,6 +95,13 @@ export class MainScene extends Phaser.Scene {
         Health.current[this.playerId] = charData.baseStats.health;
         Health.max[this.playerId] = charData.baseStats.health;
         
+        // Fire initial HP event
+        setTimeout(() => {
+            window.dispatchEvent(new CustomEvent('hp_updated', { 
+                detail: { current: Health.current[this.playerId], max: Health.max[this.playerId] } 
+            }));
+        }, 100);
+
         import('../core/PlayerStats').then(m => {
             m.globalStats.damageMult = charData.baseStats.damage;
         });
@@ -151,13 +158,26 @@ export class MainScene extends Phaser.Scene {
             window.removeEventListener('keydown', recipeHandler);
         });
 
+        // Endless mode transition listener
+        const nextStageHandler = () => {
+            console.log("Advancing to next stage...");
+            this.nightDirector.resetForNextStage();
+            this.startBGM('main_bgm');
+        };
+        window.addEventListener('next_stage', nextStageHandler);
+        this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+            window.removeEventListener('next_stage', nextStageHandler);
+        });
+
         this.startBGM('main_bgm');
         window.addEventListener('boss_spawned', () => this.startBGM('boss_bgm'));
         window.addEventListener('player_died', () => this.stopBGM());
         window.addEventListener('stage_clear', () => this.stopBGM());
 
         this.spawnDungeonProps();
-        console.log("Game started successfully!");
+        
+        // Let UI know we're ready
+        window.dispatchEvent(new CustomEvent('game_started'));
     }
 
     update(_time: number, delta: number) {
