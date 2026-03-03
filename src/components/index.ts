@@ -21,7 +21,14 @@ export const Health = defineComponent({
 // Linking ECS entities with Phaser Sprites/GameObjects
 export const SpriteInfo = defineComponent({
     textureIndex: Types.ui8, // e.g. 0: player, 1: enemyA, etc.
-    // other visual data could be added here
+});
+
+// ECS Animation for Blitter
+export const Animation = defineComponent({
+    frameStart: Types.ui16,
+    frameEnd: Types.ui16,
+    frameRate: Types.f32, // Frames per second
+    timer: Types.f32,     // Internal timer accumulator
 });
 
 // Marker components for specific types

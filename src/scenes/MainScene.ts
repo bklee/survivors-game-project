@@ -16,7 +16,7 @@ import { ItemSystem } from '../systems/ItemSystem';
 
 export class MainScene extends Phaser.Scene {
     private physicsSystem!: (dt: number) => void;
-    private renderSystem!: () => void;
+    private renderSystem!: (dt: number) => void;
     private playerSystem!: PlayerSystem;
     private nightDirector!: NightDirector;
     private joystick!: VirtualJoystick;
@@ -59,63 +59,9 @@ export class MainScene extends Phaser.Scene {
 
         // Setup Camera Boundaries
         this.cameras.main.setBounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
+        this.cameras.main.setZoom(2.5);
 
-        // Visual UI
-        this.add
-            .text(10, 10, "Alchemist's Night (Runtime active)", {
-                fontSize: '24px',
-                color: '#ffffff',
-            }).setScrollFactor(0); // Pin to camera
-
-        const xpText = this.add
-            .text(10, 40, "Level: 1 | XP: 0/100", {
-                fontSize: '20px',
-                color: '#ffff00',
-            }).setScrollFactor(0);
-
-        let currentLevel = 1;
-        let currentXp = 0;
-        let xpToNextLevel = 100;
-
-        const xpHandler = ((e: CustomEvent<number>) => {
-            currentXp += e.detail;
-            if (currentXp >= xpToNextLevel) {
-                currentLevel++;
-                currentXp -= xpToNextLevel;
-                xpToNextLevel = Math.floor(xpToNextLevel * 1.5);
-                
-                // Show Level Up Juice
-                this.juicePipeline.whiteFlash(200);
-                this.juicePipeline.screenShake(0.02, 300);
-                console.log(`LEVEL UP! Now Level ${currentLevel}`);
-                
-                this.scene.pause();
-                this.scene.launch('UpgradeScene');
-            }
-            xpText.setText(`Level: ${currentLevel} | XP: ${Math.floor(currentXp)}/${xpToNextLevel}`);
-        }) as EventListener;
-
-        window.addEventListener('xp_collected', xpHandler);
-        this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
-            window.removeEventListener('xp_collected', xpHandler);
-        });
-        const queueText = this.add
-            .text(640, 680, "Queue: [ ]", {
-                fontSize: '24px',
-                color: '#00ffff',
-            })
-            .setOrigin(0.5, 0.5)
-            .setScrollFactor(0);
-
-        const queueHandler = ((e: CustomEvent<Element[]>) => {
-            const elements = e.detail;
-            queueText.setText(`Queue: [ ${elements.join(' + ')} ]`);
-        }) as EventListener;
-
-        window.addEventListener('alchemyQueueUpdated', queueHandler);
-        this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
-            window.removeEventListener('alchemyQueueUpdated', queueHandler);
-        });
+        // We migrated UI to UIScene, removing it from here.
         // Add Virtual Joystick at bottom left
         this.joystick = new VirtualJoystick(this, 150, 600, 50);
         // We can't directly use setScrollFactor on complex DOM/Graphic elements easily here,
@@ -157,7 +103,7 @@ export class MainScene extends Phaser.Scene {
         this.physicsSystem(delta);
         this.combatSystem(delta);
         this.itemSystem.update(delta);
-        this.renderSystem();
+        this.renderSystem(delta);
 
         // Make camera follow player manually
         this.cameras.main.centerOn(Position.x[this.playerId], Position.y[this.playerId]);

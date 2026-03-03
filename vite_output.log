@@ -10,3 +10,15 @@
 오전 11:00:49 [vite] (client) page reload src/scenes/MainScene.ts
 오전 11:01:52 [vite] (client) page reload src/scenes/MainScene.ts
 오전 11:01:59 [vite] (client) page reload src/main.ts
+오전 11:15:21 [vite] (client) page reload src/scenes/UpgradeScene.ts
+오전 11:16:16 [vite] (client) page reload src/systems/SpellSystem.ts
+오전 11:16:54 [vite] (client) page reload src/systems/PlayerSystem.ts
+오전 11:17:34 [vite] (client) page reload src/systems/ItemSystem.ts
+오전 11:18:18 [vite] (client) page reload src/systems/ItemSystem.ts
+오전 11:21:14 [vite] (client) page reload src/components/index.ts
+오전 11:22:10 [vite] (client) page reload src/systems/RenderSystem.ts
+오전 11:22:21 [vite] (client) page reload src/scenes/MainScene.ts
+오전 11:22:32 [vite] (client) page reload src/systems/PlayerSystem.ts
+오전 11:22:40 [vite] (client) page reload src/systems/WaveSystem.ts
+오전 11:24:53 [vite] (client) page reload src/main.ts
+오전 11:25:28 [vite] (client) page reload src/scenes/MainScene.ts

@@ -1,5 +1,5 @@
-import { defineQuery } from 'bitecs';
-import { Position, Velocity, Player } from '../components';
+import { addComponent, defineQuery, hasComponent } from 'bitecs';
+import { Animation, Position, Velocity, Player, SpriteInfo } from '../components';
 import { world } from '../core/World';
 import { globalStats } from '../core/PlayerStats';
 
@@ -46,6 +46,19 @@ export class PlayerSystem {
         const ents = playerQuery(world);
         for (let i = 0; i < ents.length; i++) {
             const eid = ents[i];
+
+            if (!hasComponent(world, Animation, eid)) {
+                addComponent(world, Animation, eid);
+                Animation.frameStart[eid] = 85;
+                Animation.frameEnd[eid] = 88;
+                Animation.frameRate[eid] = 10;
+                Animation.timer[eid] = 0;
+            }
+
+            if (SpriteInfo.textureIndex[eid] < Animation.frameStart[eid] || SpriteInfo.textureIndex[eid] > Animation.frameEnd[eid]) {
+                SpriteInfo.textureIndex[eid] = Animation.frameStart[eid];
+            }
+
             let speed = 200;
 
             switch (this.character) {
