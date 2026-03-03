@@ -89,9 +89,8 @@ export class MainScene extends Phaser.Scene {
                 this.juicePipeline.screenShake(0.02, 300);
                 console.log(`LEVEL UP! Now Level ${currentLevel}`);
                 
-                // Pause for draft choice (Future task)
-                // this.scene.pause(); 
-                // this.scene.launch('UpgradeScene');
+                this.scene.pause();
+                this.scene.launch('UpgradeScene');
             }
             xpText.setText(`Level: ${currentLevel} | XP: ${Math.floor(currentXp)}/${xpToNextLevel}`);
         }) as EventListener;
@@ -99,6 +98,23 @@ export class MainScene extends Phaser.Scene {
         window.addEventListener('xp_collected', xpHandler);
         this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
             window.removeEventListener('xp_collected', xpHandler);
+        });
+        const queueText = this.add
+            .text(640, 680, "Queue: [ ]", {
+                fontSize: '24px',
+                color: '#00ffff',
+            })
+            .setOrigin(0.5, 0.5)
+            .setScrollFactor(0);
+
+        const queueHandler = ((e: CustomEvent<Element[]>) => {
+            const elements = e.detail;
+            queueText.setText(`Queue: [ ${elements.join(' + ')} ]`);
+        }) as EventListener;
+
+        window.addEventListener('alchemyQueueUpdated', queueHandler);
+        this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+            window.removeEventListener('alchemyQueueUpdated', queueHandler);
         });
         // Add Virtual Joystick at bottom left
         this.joystick = new VirtualJoystick(this, 150, 600, 50);

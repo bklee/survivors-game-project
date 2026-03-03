@@ -3,7 +3,6 @@ import Phaser from 'phaser';
 export class AudioManager {
     private scene: Phaser.Scene;
     private bgm!: Phaser.Sound.BaseSound;
-    private sfxPool: Map<string, Phaser.Sound.BaseSound[]> = new Map();
 
     constructor(scene: Phaser.Scene) {
         this.scene = scene;
