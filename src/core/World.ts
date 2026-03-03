@@ -1,3 +1,3 @@
-import { createWorld, addEntity, addComponent, removeEntity } from 'bitecs';
+import { createWorld } from 'bitecs';
 
 export const world = createWorld();

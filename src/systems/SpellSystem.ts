@@ -3,11 +3,13 @@ import { Position, Velocity, Spell, Player, SpriteInfo } from '../components';
 import { world } from '../core/World';
 import { AlchemySystem } from '../alchemy/AlchemySystem';
 
-const playerQuery = defineQuery([Player, Position]);
+const playerQuery = defineQuery([Player, Position, Velocity]);
 
 export class SpellSystem {
     private alchemy: AlchemySystem;
     private spellCooldowns: Map<string, number> = new Map();
+    private lastFacingX = 1;
+    private lastFacingY = 0;
 
     constructor(alchemy: AlchemySystem) {
         this.alchemy = alchemy;
@@ -39,6 +41,18 @@ export class SpellSystem {
 
         const px = Position.x[playerEid];
         const py = Position.y[playerEid];
+        const pvx = Velocity.x[playerEid];
+        const pvy = Velocity.y[playerEid];
+
+        const playerSpeedSq = pvx * pvx + pvy * pvy;
+        if (playerSpeedSq > 0.0001) {
+            const playerSpeed = Math.sqrt(playerSpeedSq);
+            this.lastFacingX = pvx / playerSpeed;
+            this.lastFacingY = pvy / playerSpeed;
+        }
+
+        const directionX = this.lastFacingX;
+        const directionY = this.lastFacingY;
 
         // Ensure we don't spam if we add auto-casting later
         if ((this.spellCooldowns.get(spellId) ?? 0) > 0) return;
@@ -47,7 +61,7 @@ export class SpellSystem {
         // Simple mapping to spawn entities
         switch (spellId) {
             case 'fireball':
-                this.spawnProjectile(px, py, 400, 0, 50, 20, 1); // straight right for now
+                this.spawnProjectile(px, py, directionX * 400, directionY * 400, 50, 20, 1);
                 break;
             case 'ice_nova':
                 this.spawnAoE(px, py, 150, 30, 1000, 999);
@@ -61,7 +75,7 @@ export class SpellSystem {
                 break;
             default:
                 // Fallback for superconduct, toxic_cloud, etc.
-                this.spawnProjectile(px, py, 300, 0, 30, 30, 3);
+                this.spawnProjectile(px, py, directionX * 300, directionY * 300, 30, 30, 3);
                 break;
         }
     }

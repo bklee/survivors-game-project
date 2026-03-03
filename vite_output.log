@@ -1,0 +1,12 @@
+
+> survivors-game-project@1.0.0 dev
+> vite
+
+
+  VITE v6.4.1  ready in 78 ms
+
+  ➜  Local:   http://localhost:3000/
+  ➜  Network: use --host to expose
+오전 11:00:49 [vite] (client) page reload src/scenes/MainScene.ts
+오전 11:01:52 [vite] (client) page reload src/scenes/MainScene.ts
+오전 11:01:59 [vite] (client) page reload src/main.ts

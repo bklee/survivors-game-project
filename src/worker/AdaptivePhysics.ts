@@ -1,7 +1,5 @@
 export class AdaptivePhysics {
     private mode: 'SAB' | 'TRANSFER' | 'MAIN';
-    // worker reference if using TRANSFER
-    private worker: Worker | null = null;
 
     constructor() {
         if (typeof SharedArrayBuffer !== 'undefined' && window.crossOriginIsolated) {
@@ -25,7 +23,7 @@ export class AdaptivePhysics {
         }
     }
 
-    private processPhysics(dt: number, data: Float32Array) {
+    private processPhysics(_dt: number, _data: Float32Array) {
         // Fallback main thread physics loop
     }
 }
