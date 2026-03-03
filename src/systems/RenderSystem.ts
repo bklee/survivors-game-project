@@ -1,10 +1,11 @@
 import Phaser from 'phaser';
 import { defineQuery, hasComponent } from 'bitecs';
-import { Animation, Position, SpriteInfo, Velocity, Health, Interactive } from '../components';
+import { Animation, Position, SpriteInfo, Velocity, Health, Interactive, Rotation } from '../components';
 import { world } from '../core/World';
 
 const renderQuery = defineQuery([Position, SpriteInfo]);
 const bobs: (Phaser.GameObjects.Bob | undefined)[] = [];
+const sprites: (Phaser.GameObjects.Sprite | undefined)[] = [];
 
 export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObjects.Blitter) => {
     return (dt: number) => {
@@ -32,7 +33,7 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
             else if (typeId === 31) charKey = 'prop_skull';
             else if (typeId === 32) charKey = 'prop_spikes';
             else if (typeId === 33) charKey = 'prop_column';
-            else if (typeId === 34) charKey = 'prop_crate'; 
+            else if (typeId === 34) charKey = 'prop_crate';
             else if (typeId === 40) charKey = 'lever';
             else if (typeId === 41) charKey = 'door';
             else if (typeId === 100) charKey = 'spell_fire';
@@ -43,6 +44,9 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
             else if (typeId === 105) charKey = 'weapon_sword';
             else if (typeId === 106) charKey = 'weapon_arrow';
             else if (typeId === 107) charKey = 'weapon_staff';
+            else if (typeId === 108) charKey = 'weapon_bow';
+
+            const requiresSprite = typeId >= 100 || hasComponent(world, Rotation, eid);
 
             // 2. Identify State (Idle vs Run)
             let state = 'idle';
@@ -77,38 +81,67 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                 if (Health.current[eid] <= 0) currentAlpha = 0.4;
             }
 
-            // 5. Render or Create Bob
-            if (!bob) {
-                let finalFrame: string | number = frameName;
-                if (!blitter.texture.has(frameName.toString())) {
-                    finalFrame = 0; 
+            // 5. Render Bob or Sprite
+            let finalFrame: string | number = frameName;
+            if (!blitter.texture.has(frameName.toString()) && charKey !== 'weapon_bow') {
+                finalFrame = 0;
+            }
+
+            if (requiresSprite) {
+                let sprite = sprites[eid];
+                if (!sprite) {
+                    if (charKey === 'weapon_bow') {
+                        sprite = _scene.add.sprite(Position.x[eid], Position.y[eid], 'weapon_bow');
+                    } else {
+                        sprite = _scene.add.sprite(Position.x[eid], Position.y[eid], 'dungeon', finalFrame);
+                    }
+                    sprite.setDepth(10);
+                    sprites[eid] = sprite;
+                } else {
+                    sprite.x = Position.x[eid];
+                    sprite.y = Position.y[eid];
+                    sprite.alpha = currentAlpha;
+                    if (charKey !== 'weapon_bow') {
+                        sprite.setFrame(finalFrame);
+                    }
                 }
 
-                const newBob = blitter.create(Position.x[eid], Position.y[eid], finalFrame);
-                if (typeId === 10) { newBob.tint = 0xffaaaa; newBob.alpha = 0.9; }
-                else if (typeId === 11) { newBob.tint = 0xff5555; }
-                else if (typeId === 12 || typeId === 13) { newBob.tint = 0xffffff; }
-                else if (typeId === 14) { newBob.tint = 0xffcc00; } 
-                else if (typeId === 15) { newBob.tint = 0x00ffff; } 
-                else if (typeId === 34) { newBob.tint = 0xff0000; } 
-                else if (typeId === 104) { newBob.tint = 0xffff00; }
-                
-                newBob.alpha = currentAlpha;
-                bobs[eid] = newBob;
+                if (hasComponent(world, Rotation, eid)) {
+                    sprite.rotation = Rotation.angle[eid];
+                }
+
+                if (typeId === 104) { sprite.tint = 0xffff00; }
             } else {
-                bob.x = Position.x[eid];
-                bob.y = Position.y[eid];
-                bob.alpha = currentAlpha;
+                const frameObj = blitter.texture.get(finalFrame.toString());
+                const hw = frameObj && frameObj.name !== '__BASE' ? frameObj.halfWidth : 8;
+                const hh = frameObj && frameObj.name !== '__BASE' ? frameObj.halfHeight : 8;
+                const targetX = Position.x[eid] - hw;
+                const targetY = Position.y[eid] - hh;
 
-                // Sprite Flipping
-                if (hasComponent(world, Velocity, eid)) {
-                    if (Velocity.x[eid] < 0) bob.flipX = true;
-                    else if (Velocity.x[eid] > 0) bob.flipX = false;
-                }
+                if (!bob) {
+                    const newBob = blitter.create(targetX, targetY, finalFrame);
+                    if (typeId === 10) { newBob.tint = 0xffaaaa; newBob.alpha = 0.9; }
+                    else if (typeId === 11) { newBob.tint = 0xff5555; }
+                    else if (typeId === 12 || typeId === 13) { newBob.tint = 0xffffff; }
+                    else if (typeId === 14) { newBob.tint = 0xffcc00; }
+                    else if (typeId === 15) { newBob.tint = 0x00ffff; }
+                    else if (typeId === 34) { newBob.tint = 0xff0000; }
 
-                // Safe setFrame
-                if (blitter.texture.has(frameName.toString())) {
-                    try { bob.setFrame(frameName); } catch (e) {}
+                    newBob.alpha = currentAlpha;
+                    bobs[eid] = newBob;
+                } else {
+                    bob.x = targetX;
+                    bob.y = targetY;
+                    bob.alpha = currentAlpha;
+
+                    if (hasComponent(world, Velocity, eid)) {
+                        if (Velocity.x[eid] < 0) bob.flipX = true;
+                        else if (Velocity.x[eid] > 0) bob.flipX = false;
+                    }
+
+                    if (blitter.texture.has(frameName.toString())) {
+                        try { bob.setFrame(frameName); } catch (e) { }
+                    }
                 }
             }
         }
@@ -119,6 +152,14 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
             if (b && !activeEids.has(i)) {
                 b.destroy();
                 bobs[i] = undefined;
+            }
+        }
+
+        for (let i = 0; i < sprites.length; i++) {
+            const s = sprites[i];
+            if (s && !activeEids.has(i)) {
+                s.destroy();
+                sprites[i] = undefined;
             }
         }
     };

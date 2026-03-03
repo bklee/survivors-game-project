@@ -8,10 +8,12 @@ export class UIScene extends Phaser.Scene {
     private xpText!: Phaser.GameObjects.Text;
     private queueText!: Phaser.GameObjects.Text;
     private hpBar!: Phaser.GameObjects.Rectangle;
+    private hpText!: Phaser.GameObjects.Text;
     private uiContainer!: Phaser.GameObjects.Container;
     private bossWarningText!: Phaser.GameObjects.Text;
     private bossWarningTween?: Phaser.Tweens.Tween;
     private stageClearText!: Phaser.GameObjects.Text;
+    private dungeonMap: number[][] = [];
 
     private currentLevel = 1;
     private currentXp = 0;
@@ -42,27 +44,26 @@ export class UIScene extends Phaser.Scene {
             color: '#ffff00',
         });
 
-        // HP Bar
+        // HP Bar - Fix: scales from left
         const hpBg = this.add.rectangle(440, 30, 400, 20, 0x333333).setOrigin(0, 0.5);
         this.hpBar = this.add.rectangle(440, 30, 400, 20, 0x00ff00).setOrigin(0, 0.5);
+        this.hpText = this.add.text(640, 30, '100 / 100', { fontSize: '14px', color: '#ffffff' }).setOrigin(0.5, 0.5);
 
+        // Queue HUD
         this.queueText = this.add.text(640, 680, "Queue: [ ]", {
             fontSize: '24px',
             color: '#00ffff',
         }).setOrigin(0.5, 0.5);
 
+        // Minimap
         const mmX = 1280 - 10;
         const mmY = 10;
         const mmBg1 = this.add.rectangle(mmX, mmY, this.MINIMAP_SIZE + 4, this.MINIMAP_SIZE + 4, 0xffffff, 0.2).setOrigin(1, 0);
         const mmBg2 = this.add.rectangle(mmX - 2, mmY + 2, this.MINIMAP_SIZE, this.MINIMAP_SIZE, 0x000000, 0.5).setOrigin(1, 0);
         this.minimapGraphics = this.add.graphics();
 
-        this.uiContainer.add([title, this.xpText, hpBg, this.hpBar, this.queueText, mmBg1, mmBg2, this.minimapGraphics]);
+        this.uiContainer.add([title, this.xpText, hpBg, this.hpBar, this.hpText, this.queueText, mmBg1, mmBg2, this.minimapGraphics]);
         this.uiContainer.setVisible(false);
-        this.minimapGraphics.setVisible(false);
-        this.xpText.setVisible(false);
-        this.queueText.setVisible(false);
-        this.hpBar.setVisible(false);
 
         // Alerts
         this.bossWarningText = this.add.text(640, 360, 'BOSS APPROACHING!', {
@@ -93,6 +94,9 @@ export class UIScene extends Phaser.Scene {
         window.addEventListener('hp_updated', this.handleHp as EventListener);
         window.addEventListener('stage_clear', this.handleStageClear as EventListener);
         window.addEventListener('player_died', () => this.sound.stopAll());
+        window.addEventListener('map_generated', ((e: CustomEvent<number[][]>) => {
+            this.dungeonMap = e.detail;
+        }) as EventListener);
 
         this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
             window.removeEventListener('xp_collected', this.handleXp as EventListener);
@@ -110,8 +114,25 @@ export class UIScene extends Phaser.Scene {
 
     private updateMinimap() {
         this.minimapGraphics.clear();
+        
+        if (this.dungeonMap.length === 0) return;
         const offsetX = 1280 - 12 - this.MINIMAP_SIZE;
         const offsetY = 12;
+
+        // Draw Map (Dark gray)
+        this.minimapGraphics.fillStyle(0x444444, 0.5);
+        for (let y = 0; y < this.dungeonMap.length; y++) {
+            for (let x = 0; x < this.dungeonMap[0].length; x++) {
+                if (this.dungeonMap[y][x] === 1) { // 1 is FLOOR
+                    this.minimapGraphics.fillRect(
+                        offsetX + x * 16 * this.SCALE, 
+                        offsetY + y * 16 * this.SCALE, 
+                        Math.max(1, 16 * this.SCALE), 
+                        Math.max(1, 16 * this.SCALE)
+                    );
+                }
+            }
+        }
 
         const players = this.playerQuery(world);
         const enemies = this.enemyQuery(world);
@@ -124,6 +145,7 @@ export class UIScene extends Phaser.Scene {
             const y = offsetY + (Position.y[eid] * this.SCALE);
             this.minimapGraphics.fillRect(x, y, 2, 2);
         }
+
         // Draw Player
         if (players.length > 0) {
             const peid = players[0];
@@ -152,7 +174,11 @@ export class UIScene extends Phaser.Scene {
     private handleHp = (e: CustomEvent<{current: number, max: number}>) => {
         const { current, max } = e.detail;
         const percent = Phaser.Math.Clamp(current / max, 0, 1);
-        this.hpBar.width = 400 * percent;
+        
+        // Use displayWidth to scale from the left (assuming origin is 0)
+        this.hpBar.displayWidth = 400 * percent;
+        this.hpText.setText(`${Math.ceil(current)} / ${max}`);
+        
         if (percent > 0.5) this.hpBar.setFillStyle(0x00ff00);
         else if (percent > 0.2) this.hpBar.setFillStyle(0xffff00);
         else this.hpBar.setFillStyle(0xff0000);
@@ -175,36 +201,24 @@ export class UIScene extends Phaser.Scene {
     }
 
     private handleStageClear = () => {
-        // Create a reward popup panel
-        const panel = this.add.rectangle(640, 360, 600, 300, 0x000000, 0.9)
-            .setStrokeStyle(4, 0xffd700);
-        
-        this.stageClearText.setDepth(10).setVisible(true);
-        this.stageClearText.setPosition(640, 280);
-
-        const rewardText = this.add.text(640, 400, 'REWARD ACQUIRED!\nAll Stats +10%', {
+        // Reward UI
+        const panel = this.add.rectangle(640, 360, 600, 300, 0x000000, 0.9).setStrokeStyle(4, 0xffd700);
+        this.stageClearText.setVisible(true).setPosition(640, 300);
+        const reward = this.add.text(640, 400, "BATTLE REWARD:\nALL STATS +10%", {
             fontSize: '32px', color: '#00ff00', align: 'center', fontStyle: 'bold'
-        }).setOrigin(0.5).setDepth(10);
-
-        this.uiContainer.add([panel, rewardText]);
-
-        import('../core/PlayerStats').then(m => {
-            m.globalStats.damageMult *= 1.1;
-            m.globalStats.moveSpeedMult *= 1.1;
-        });
+        }).setOrigin(0.5);
 
         this.tweens.add({
-            targets: [panel, this.stageClearText, rewardText],
-            scale: { from: 0.5, to: 1.2 },
+            targets: [panel, this.stageClearText, reward],
+            scale: { from: 0.8, to: 1 },
             alpha: { from: 0, to: 1 },
-            duration: 800,
+            duration: 500,
             ease: 'Back.easeOut',
             onComplete: () => {
                 this.time.delayedCall(3500, () => {
                     panel.destroy();
-                    rewardText.destroy();
+                    reward.destroy();
                     this.stageClearText.setVisible(false);
-                    this.stageClearText.setPosition(640, 360); // reset
                     window.dispatchEvent(new CustomEvent('next_stage'));
                 });
             }

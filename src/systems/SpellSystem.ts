@@ -1,5 +1,5 @@
 import { addEntity, addComponent, defineQuery } from 'bitecs';
-import { Position, Velocity, Spell, Player, SpriteInfo } from '../components';
+import { Position, Velocity, Spell, Player, SpriteInfo, Rotation } from '../components';
 import { world } from '../core/World';
 import { AlchemySystem } from '../alchemy/AlchemySystem';
 import { globalStats } from '../core/PlayerStats';
@@ -15,7 +15,7 @@ export class SpellSystem {
 
     constructor(alchemy: AlchemySystem) {
         this.alchemy = alchemy;
-        
+
         window.addEventListener('keydown', (e) => {
             if (e.code === 'Space') {
                 const spellId = this.alchemy.triggerCombo();
@@ -53,6 +53,7 @@ export class SpellSystem {
 
         if ((this.spellCooldowns.get(spellId) ?? 0) > 0) return;
         this.spellCooldowns.set(spellId, 500 * globalStats.cooldownMult);
+        window.dispatchEvent(new CustomEvent('combo_cast'));
         // Visual FX Trigger
         window.dispatchEvent(new CustomEvent('combo_cast'));
 
@@ -72,36 +73,57 @@ export class SpellSystem {
     }
 
     private spawnKnightAttack(x: number, y: number, dx: number, dy: number) {
-        // Close range arc swing
+        // Close range arc swing (Sword)
         const eid = this.createBaseSpell(x + dx * 20, y + dy * 20, 105);
         Spell.damage[eid] = 60 * globalStats.damageMult;
         Spell.radius[eid] = 60; // wide swing
-        Spell.duration[eid] = 200; // very short lived
+        Spell.duration[eid] = 150; // very short lived
         Spell.pierce[eid] = 10; // hits many
-        Velocity.x[eid] = dx * 50; 
-        Velocity.y[eid] = dy * 50;
+        Velocity.x[eid] = dx * 5;
+        Velocity.y[eid] = dy * 5;
+        Rotation.angle[eid] = Math.atan2(dy, dx);
     }
 
     private spawnElfAttack(x: number, y: number, dx: number, dy: number) {
-        // Fast piercing arrows
-        const eid = this.createBaseSpell(x, y, 106);
+        // Fast piercing arrows (Bow)
+        const eid = this.createBaseSpell(x, y, 108);
         Spell.damage[eid] = 30 * globalStats.damageMult;
         Spell.radius[eid] = 15;
         Spell.duration[eid] = 1500;
         Spell.pierce[eid] = 3;
-        Velocity.x[eid] = dx * 700; 
+        Velocity.x[eid] = dx * 700;
         Velocity.y[eid] = dy * 700;
+        Rotation.angle[eid] = Math.atan2(dy, dx);
     }
 
     private spawnWizardAttack(x: number, y: number, dx: number, dy: number) {
-        // Elemental magic projectiles
-        const eid = this.createBaseSpell(x, y, 107);
+        // Draw the weapon in hand for a short time
+        const staffEid = addEntity(world);
+        addComponent(world, Position, staffEid);
+        addComponent(world, Velocity, staffEid);
+        addComponent(world, SpriteInfo, staffEid);
+        addComponent(world, Rotation, staffEid);
+        Position.x[staffEid] = x + dx * 10;
+        Position.y[staffEid] = y + dy * 10;
+        SpriteInfo.textureIndex[staffEid] = 107; // weapon_staff
+        Rotation.angle[staffEid] = Math.atan2(dy, dx);
+        Velocity.x[staffEid] = dx * 10;
+        Velocity.y[staffEid] = dy * 10;
+        // Cleaned up after short time (needs lifespan - will implement shortly)
+        addComponent(world, Spell, staffEid); // Tagging as spell for temp tracking
+        Spell.duration[staffEid] = 200;
+        Spell.damage[staffEid] = 0;
+
+
+        // Elemental magic AoE cast distance
+        const castDist = 100; // Casting range
+        const eid = this.createBaseSpell(x + dx * castDist, y + dy * castDist, 100); // 100 is spell_fire or similar
         Spell.damage[eid] = 45 * globalStats.damageMult;
-        Spell.radius[eid] = 25;
-        Spell.duration[eid] = 2000;
-        Spell.pierce[eid] = 1;
-        Velocity.x[eid] = dx * 400; 
-        Velocity.y[eid] = dy * 400;
+        Spell.radius[eid] = 60; // Large AoE radius
+        Spell.duration[eid] = 500;
+        Spell.pierce[eid] = 255; // Hits everything in area
+        Velocity.x[eid] = 0; // AoE doesn't move
+        Velocity.y[eid] = 0;
     }
 
     private createBaseSpell(x: number, y: number, typeId: number): number {
@@ -110,6 +132,7 @@ export class SpellSystem {
         addComponent(world, Velocity, eid);
         addComponent(world, Spell, eid);
         addComponent(world, SpriteInfo, eid);
+        addComponent(world, Rotation, eid);
         Position.x[eid] = x;
         Position.y[eid] = y;
         SpriteInfo.textureIndex[eid] = typeId;

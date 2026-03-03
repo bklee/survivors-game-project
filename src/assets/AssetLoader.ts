@@ -16,12 +16,14 @@ export class AssetLoader {
         // Load the 0x72 dungeon tileset as a raw image
         this.scene.load.image('dungeon', 'assets/0x72_DungeonTilesetII_v1.7.png');
         this.scene.load.image('walls', 'assets/atlas_walls_high-16x32.png');
+        this.scene.load.image('weapon_bow', 'assets/frames/weapon_bow.png');
     }
 
     loadAudio() {
         // BGM
-        this.scene.load.audio('main_bgm', 'assets/audio/main_bgm.mp3');
-        this.scene.load.audio('boss_bgm', 'assets/audio/boss_bgm.mp3');
+        this.scene.load.audio('select_bgm', 'assets/audio/select_bgm.wav');
+        this.scene.load.audio('main_bgm', 'assets/audio/main_bgm.wav');
+        this.scene.load.audio('boss_bgm', 'assets/audio/boss_bgm.wav');
 
         // SFX
         this.scene.load.audio('fire_cast', 'assets/audio/fire_cast.mp3');
@@ -46,18 +48,18 @@ export class AssetLoader {
         Object.values(CHARACTERS).forEach(char => {
             // Idle frames
             for (let i = 0; i < char.frames.idle.count; i++) {
-                texture.add(`${char.id}_idle_${i}`, 0, 
-                    char.frames.idle.x + (i * 16), 
-                    char.frames.idle.y, 
-                    char.frames.idle.w, 
+                texture.add(`${char.id}_idle_${i}`, 0,
+                    char.frames.idle.x + (i * 16),
+                    char.frames.idle.y,
+                    char.frames.idle.w,
                     char.frames.idle.h);
             }
             // Run frames
             for (let i = 0; i < char.frames.run.count; i++) {
-                texture.add(`${char.id}_run_${i}`, 0, 
-                    char.frames.run.x + (i * 16), 
-                    char.frames.run.y, 
-                    char.frames.run.w, 
+                texture.add(`${char.id}_run_${i}`, 0,
+                    char.frames.run.x + (i * 16),
+                    char.frames.run.y,
+                    char.frames.run.w,
                     char.frames.run.h);
             }
         });
@@ -68,7 +70,7 @@ export class AssetLoader {
             texture.add(`demon_idle_${i}`, 0, 16 + (i * 32), 428, 32, 36);
             texture.add(`demon_run_${i}`, 0, 144 + (i * 32), 428, 32, 36);
         }
-        
+
         // Orc (16x23)
         for (let i = 0; i < 4; i++) {
             texture.add(`orc_idle_${i}`, 0, 368 + (i * 16), 177, 16, 23);
@@ -91,8 +93,8 @@ export class AssetLoader {
         texture.add('spell_ice', 0, 304, 336, 16, 16);  // flask_big_blue
         texture.add('spell_gas', 0, 320, 336, 16, 16);  // flask_big_green
         texture.add('spell_dud', 0, 288, 320, 16, 16);  // bomb_f0
-        texture.add('enemy_bullet', 0, 313, 385, 6, 7); 
-        
+        texture.add('enemy_bullet', 0, 313, 385, 6, 7);
+
         // Weapons
         texture.add('weapon_sword', 0, 339, 98, 10, 29);
         texture.add('weapon_arrow', 0, 324, 202, 7, 21);
@@ -129,6 +131,6 @@ export class AssetLoader {
             wallTex.add('wall_bl', 0, 16, 0, 16, 32);
             wallTex.add('wall_br', 0, 48, 0, 16, 32);
         }
-}
+    }
 
 }

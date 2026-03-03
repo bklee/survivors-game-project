@@ -9,6 +9,7 @@ export class BootScene extends Scene {
     preload() {
         const loader = new AssetLoader(this);
         loader.loadImages();
+        loader.loadAudio();
     }
 
     create() {
