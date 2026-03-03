@@ -1,6 +1,7 @@
 import { defineQuery } from 'bitecs';
 import { Position, Velocity, Player } from '../components';
 import { world } from '../core/World';
+import { globalStats } from '../core/PlayerStats';
 
 // For simplicity, a very basic player state
 export enum PlayerCharacter {
@@ -59,6 +60,8 @@ export class PlayerSystem {
                     speed = this.isDashing ? 600 : 180;
                     break;
             }
+
+            speed *= globalStats.moveSpeedMult;
 
             const mag = Math.sqrt(inputX * inputX + inputY * inputY);
             if (mag > 0) {

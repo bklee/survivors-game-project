@@ -2,7 +2,7 @@ import { addEntity, addComponent, defineQuery } from 'bitecs';
 import { Position, Velocity, Spell, Player, SpriteInfo } from '../components';
 import { world } from '../core/World';
 import { AlchemySystem } from '../alchemy/AlchemySystem';
-
+import { globalStats } from '../core/PlayerStats';
 const playerQuery = defineQuery([Player, Position, Velocity]);
 
 export class SpellSystem {
@@ -56,7 +56,7 @@ export class SpellSystem {
 
         // Ensure we don't spam if we add auto-casting later
         if ((this.spellCooldowns.get(spellId) ?? 0) > 0) return;
-        this.spellCooldowns.set(spellId, 500); // 500ms global cast cd
+        this.spellCooldowns.set(spellId, 500 * globalStats.cooldownMult); // apply CDR
 
         // Simple mapping to spawn entities
         switch (spellId) {
@@ -92,7 +92,7 @@ export class SpellSystem {
         Velocity.x[eid] = vx;
         Velocity.y[eid] = vy;
 
-        Spell.damage[eid] = damage;
+        Spell.damage[eid] = damage * globalStats.damageMult;
         Spell.radius[eid] = radius;
         Spell.duration[eid] = 2000; // 2 sec life
         Spell.pierce[eid] = pierce;
@@ -112,7 +112,7 @@ export class SpellSystem {
         Velocity.x[eid] = 0;
         Velocity.y[eid] = 0;
 
-        Spell.damage[eid] = damage;
+        Spell.damage[eid] = damage * globalStats.damageMult;
         Spell.radius[eid] = radius;
         Spell.duration[eid] = duration;
         Spell.pierce[eid] = pierce;

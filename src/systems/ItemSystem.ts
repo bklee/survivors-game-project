@@ -2,6 +2,7 @@ import { defineQuery, removeEntity } from 'bitecs';
 import { Position, Velocity, Item, Player } from '../components';
 import { world } from '../core/World';
 import { isHitStopped } from '../fx/JuicePipeline';
+import { globalStats } from '../core/PlayerStats';
 
 const itemQuery = defineQuery([Position, Velocity, Item]);
 const playerQuery = defineQuery([Position, Player]);
@@ -34,8 +35,11 @@ export class ItemSystem {
             const dy = py - iy;
             const distSq = dx * dx + dy * dy;
 
+            const currentMagnetRadius = this.magnetRadius * globalStats.pickupRadiusMult;
+            const currentPickupRadius = this.pickupRadius * globalStats.pickupRadiusMult;
+
             // If within pickup radius
-            if (distSq <= this.pickupRadius * this.pickupRadius) {
+            if (distSq <= currentPickupRadius * currentPickupRadius) {
                 // Collect
                 this.totalXpCollected += Item.xpValue[eid];
                 window.dispatchEvent(new CustomEvent('xp_collected', { detail: Item.xpValue[eid] }));
@@ -44,7 +48,7 @@ export class ItemSystem {
             }
 
             // If within magnet radius, set magnetized flag
-            if (distSq <= this.magnetRadius * this.magnetRadius) {
+            if (distSq <= currentMagnetRadius * currentMagnetRadius) {
                 Item.magnetized[eid] = 1;
             }
 
