@@ -1,6 +1,9 @@
-import { addEntity, addComponent } from 'bitecs';
+import { addEntity, addComponent, defineQuery } from 'bitecs';
 import { world } from '../core/World';
-import { Position, Velocity, Health, SpriteInfo, Enemy } from '../components';
+import { Position, Velocity, Health, SpriteInfo, Enemy, Player } from '../components';
+
+const enemyQuery = defineQuery([Enemy, Position, Velocity]);
+const playerQuery = defineQuery([Player, Position]);
 
 export class NightDirector {
     private timeElapsed: number = 0; // ms
@@ -39,6 +42,35 @@ export class NightDirector {
             }
             this.lastSpawnTime += spawnCount * currentWave.spawnInterval;
         }
+
+        const players = playerQuery(world);
+        if (players.length === 0) {
+            return;
+        }
+
+        const playerEid = players[0];
+        const playerX = Position.x[playerEid];
+        const playerY = Position.y[playerEid];
+        const enemies = enemyQuery(world);
+
+        for (let i = 0; i < enemies.length; i++) {
+            const eid = enemies[i];
+            const dx = playerX - Position.x[eid];
+            const dy = playerY - Position.y[eid];
+            const distance = Math.hypot(dx, dy);
+
+            if (distance === 0) {
+                Velocity.x[eid] = 0;
+                Velocity.y[eid] = 0;
+                continue;
+            }
+
+            const currentSpeed = Math.hypot(Velocity.x[eid], Velocity.y[eid]);
+            const speed = currentSpeed > 0 ? currentSpeed : 50;
+
+            Velocity.x[eid] = (dx / distance) * speed;
+            Velocity.y[eid] = (dy / distance) * speed;
+        }
     }
     private spawnEnemy(intensity: number) {
         // Find a spawn point edge of camera
@@ -58,10 +90,9 @@ export class NightDirector {
         Position.x[eid] = spawnX;
         Position.y[eid] = spawnY;
 
-        // Walk towards center (simplified)
         const speed = 50 * intensity;
-        Velocity.x[eid] = -Math.cos(angle) * speed;
-        Velocity.y[eid] = -Math.sin(angle) * speed;
+        Velocity.x[eid] = Math.cos(angle) * speed;
+        Velocity.y[eid] = Math.sin(angle) * speed;
 
         Health.current[eid] = 10 * intensity;
         Health.max[eid] = 10 * intensity;
