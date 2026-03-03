@@ -2,14 +2,14 @@ import Phaser from 'phaser';
 
 export class VFXSystem {
     private scene: Phaser.Scene;
-    private particleManager!: Phaser.GameObjects.Particles.ParticleEmitterManager;
-    private defaultEmitter!: Phaser.GameObjects.Particles.ParticleEmitter;
+    private defaultEmitter?: Phaser.GameObjects.Particles.ParticleEmitter;
 
     constructor(scene: Phaser.Scene) {
         this.scene = scene;
         this.initPostFX();
-        // Assume 'spark' texture is loaded
-        // this.initParticles();
+        if (this.scene.textures.exists('spark')) {
+            this.initParticles();
+        }
     }
 
     private initPostFX() {
@@ -17,7 +17,7 @@ export class VFXSystem {
     }
 
     private initParticles() {
-        this.particleManager = this.scene.add.particles(0, 0, 'spark', {
+        this.defaultEmitter = this.scene.add.particles(0, 0, 'spark', {
             speed: { min: -100, max: 100 },
             angle: { min: 0, max: 360 },
             scale: { start: 1, end: 0 },
@@ -25,28 +25,26 @@ export class VFXSystem {
             lifespan: 300,
             emitting: false,
         });
-
-        // Example for Phaser 3.60+ which doesn't use `add.particles(x, y, ...)` in the old way
-        // Modern approach:
-        // this.particleManager = this.scene.add.particles(0, 0, 'spark', {...});
-        // We'll trust Phaser API documentation
     }
 
     public glichScreen(duration: number = 500) {
-        const fx = this.scene.cameras.main.postFX?.addGlitch();
+        const postFX = this.scene.cameras.main.postFX as
+            | { addGlitch?: () => { reveal: number }; remove: (effect: unknown) => void }
+            | undefined;
+        const fx = postFX?.addGlitch?.();
         if (fx) {
             this.scene.tweens.add({
                 targets: fx,
                 reveal: 1,
                 duration: duration,
-                onComplete: () => this.scene.cameras.main.postFX?.remove(fx),
+                onComplete: () => postFX?.remove(fx),
             });
         }
     }
 
     public playSparks(x: number, y: number, count: number = 10) {
-        if (this.particleManager) {
-            this.particleManager.emitParticleAt(x, y, count);
+        if (this.defaultEmitter) {
+            this.defaultEmitter.emitParticleAt(x, y, count);
         }
     }
 }

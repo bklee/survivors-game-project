@@ -1,26 +1,46 @@
 import Phaser from 'phaser';
 
+export let isHitStopped = false;
+
 export class JuicePipeline {
     private scene: Phaser.Scene;
+    private hitStopTimer?: Phaser.Time.TimerEvent;
+    private hitStopEndTime = 0;
+    private damageTextPool: Phaser.GameObjects.Text[] = [];
+    private damageTextPoolIndex = 0;
+    private readonly damageTextStyle: Phaser.Types.GameObjects.Text.TextStyle = {
+        fontSize: '24px',
+        color: '#ff0000',
+        stroke: '#ffffff',
+        strokeThickness: 2,
+        fontFamily: 'monospace, sans-serif',
+        fontStyle: 'bold',
+    };
+    private static readonly DAMAGE_TEXT_POOL_SIZE = 256;
 
     constructor(scene: Phaser.Scene) {
         this.scene = scene;
+        this.scene.events.once(Phaser.Scenes.Events.SHUTDOWN, this.handleSceneShutdown, this);
     }
 
     public hitStop(durationMS: number) {
-        // A simple way to do hit stop is pause updates to specific systems for duration
-        // Or pause phaser's internal time temporarily
-        this.scene.time.timeScale = 0;
-        this.scene.time.delayedCall(durationMS, () => {
-            // Wait this doesn't work well if timeScale is 0 because delayedCall uses the same timer.
-            // A better way is using native setTimeout or a realtime timer plugin.
-            this.scene.time.timeScale = 1;
-        });
+        if (durationMS <= 0) {
+            return;
+        }
 
-        // Safe fallback using native setTimeout
-        setTimeout(() => {
-            this.scene.time.timeScale = 1;
-        }, durationMS);
+        const now = this.scene.time.now;
+        this.hitStopEndTime = Math.max(this.hitStopEndTime, now + durationMS);
+        isHitStopped = true;
+
+        if (this.hitStopTimer) {
+            this.hitStopTimer.remove(false);
+        }
+
+        this.hitStopTimer = this.scene.time.delayedCall(this.hitStopEndTime - now, () => {
+            isHitStopped = false;
+            this.hitStopTimer = undefined;
+            this.hitStopEndTime = 0;
+        });
     }
 
     public screenShake(intensity: number = 0.01, duration: number = 100) {
@@ -43,16 +63,14 @@ export class JuicePipeline {
     }
 
     public damageNumber(x: number, y: number, amount: number) {
-        // Pooling text objects would be better, but this is a stub
-        const text = this.scene.add
-            .text(x, y, amount.toString(), {
-                fontSize: '24px',
-                color: '#ff0000',
-                stroke: '#ffffff',
-                strokeThickness: 2,
-                fontFamily: 'monospace, sans-serif',
-                fontStyle: 'bold',
-            })
+        const text = this.getDamageText();
+        text
+            .setText(amount.toString())
+            .setPosition(x, y)
+            .setAlpha(1)
+            .setScale(1)
+            .setVisible(true)
+            .setActive(true)
             .setOrigin(0.5);
 
         this.scene.tweens.add({
@@ -61,7 +79,44 @@ export class JuicePipeline {
             alpha: 0,
             duration: 800,
             ease: 'Cubic.easeOut',
-            onComplete: () => text.destroy(),
+            onComplete: () => {
+                text.setVisible(false).setActive(false);
+            },
         });
+    }
+
+    private getDamageText(): Phaser.GameObjects.Text {
+        if (this.damageTextPool.length < JuicePipeline.DAMAGE_TEXT_POOL_SIZE) {
+            const text = this.scene.add
+                .text(0, 0, '', this.damageTextStyle)
+                .setVisible(false)
+                .setActive(false)
+                .setOrigin(0.5);
+            this.damageTextPool.push(text);
+            return text;
+        }
+
+        const text = this.damageTextPool[this.damageTextPoolIndex];
+        this.damageTextPoolIndex =
+            (this.damageTextPoolIndex + 1) % JuicePipeline.DAMAGE_TEXT_POOL_SIZE;
+        this.scene.tweens.killTweensOf(text);
+        return text;
+    }
+
+    private handleSceneShutdown() {
+        if (this.hitStopTimer) {
+            this.hitStopTimer.remove(false);
+            this.hitStopTimer = undefined;
+        }
+        if (isHitStopped) {
+            isHitStopped = false;
+        }
+        this.hitStopEndTime = 0;
+
+        for (const text of this.damageTextPool) {
+            text.destroy();
+        }
+        this.damageTextPool = [];
+        this.damageTextPoolIndex = 0;
     }
 }
