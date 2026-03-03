@@ -1341,3 +1341,259 @@
       at Readable.push (node:internal/streams/readable:390:5)
       at Pipe.onStreamRead (node:internal/stream_base_commons:189:23)
 오후 12:13:55 [vite] (client) page reload src/scenes/MainScene.ts
+오후 12:14:17 [vite] (client) page reload public/assets/oga.html
+오후 12:15:41 [vite] (client) page reload src/assets/AssetLoader.ts
+오후 12:15:51 [vite] (client) page reload src/components/index.ts
+오후 12:15:51 [vite] (client) Pre-transform error: Transform failed with 1 error:
+/Users/hangup2/apps/survivors-game-project/src/components/index.ts:54:7: ERROR: Expected ":" but found "const"
+  Plugin: vite:esbuild
+  File: /Users/hangup2/apps/survivors-game-project/src/components/index.ts:54:7
+  
+  Expected ":" but found "const"
+  52 |      magnetized: Types.ui8, // 1 = flying towards player
+  53 |  // Interactive (Levers, Doors, Traps)
+  54 |  export const Interactive = defineComponent({
+     |         ^
+  55 |      isActivated: Types.ui8, // 0: off, 1: on
+  56 |      id: Types.ui16,         // to link lever with door
+  
+오후 12:15:51 [vite] (client) Pre-transform error: Transform failed with 1 error:
+/Users/hangup2/apps/survivors-game-project/src/components/index.ts:54:7: ERROR: Expected ":" but found "const"
+  Plugin: vite:esbuild
+  File: /Users/hangup2/apps/survivors-game-project/src/components/index.ts:54:7
+  
+  Expected ":" but found "const"
+  52 |      magnetized: Types.ui8, // 1 = flying towards player
+  53 |  // Interactive (Levers, Doors, Traps)
+  54 |  export const Interactive = defineComponent({
+     |         ^
+  55 |      isActivated: Types.ui8, // 0: off, 1: on
+  56 |      id: Types.ui16,         // to link lever with door
+  
+오후 12:15:51 [vite] (client) Pre-transform error: Transform failed with 1 error:
+/Users/hangup2/apps/survivors-game-project/src/components/index.ts:54:7: ERROR: Expected ":" but found "const"
+  Plugin: vite:esbuild
+  File: /Users/hangup2/apps/survivors-game-project/src/components/index.ts:54:7
+  
+  Expected ":" but found "const"
+  52 |      magnetized: Types.ui8, // 1 = flying towards player
+  53 |  // Interactive (Levers, Doors, Traps)
+  54 |  export const Interactive = defineComponent({
+     |         ^
+  55 |      isActivated: Types.ui8, // 0: off, 1: on
+  56 |      id: Types.ui16,         // to link lever with door
+  
+오후 12:15:51 [vite] (client) Pre-transform error: Transform failed with 1 error:
+/Users/hangup2/apps/survivors-game-project/src/components/index.ts:54:7: ERROR: Expected ":" but found "const"
+  Plugin: vite:esbuild
+  File: /Users/hangup2/apps/survivors-game-project/src/components/index.ts:54:7
+  
+  Expected ":" but found "const"
+  52 |      magnetized: Types.ui8, // 1 = flying towards player
+  53 |  // Interactive (Levers, Doors, Traps)
+  54 |  export const Interactive = defineComponent({
+     |         ^
+  55 |      isActivated: Types.ui8, // 0: off, 1: on
+  56 |      id: Types.ui16,         // to link lever with door
+  
+오후 12:15:51 [vite] (client) Pre-transform error: Transform failed with 1 error:
+/Users/hangup2/apps/survivors-game-project/src/components/index.ts:54:7: ERROR: Expected ":" but found "const"
+  Plugin: vite:esbuild
+  File: /Users/hangup2/apps/survivors-game-project/src/components/index.ts:54:7
+  
+  Expected ":" but found "const"
+  52 |      magnetized: Types.ui8, // 1 = flying towards player
+  53 |  // Interactive (Levers, Doors, Traps)
+  54 |  export const Interactive = defineComponent({
+     |         ^
+  55 |      isActivated: Types.ui8, // 0: off, 1: on
+  56 |      id: Types.ui16,         // to link lever with door
+  
+오후 12:15:51 [vite] (client) Pre-transform error: Transform failed with 1 error:
+/Users/hangup2/apps/survivors-game-project/src/components/index.ts:54:7: ERROR: Expected ":" but found "const"
+  Plugin: vite:esbuild
+  File: /Users/hangup2/apps/survivors-game-project/src/components/index.ts:54:7
+  
+  Expected ":" but found "const"
+  52 |      magnetized: Types.ui8, // 1 = flying towards player
+  53 |  // Interactive (Levers, Doors, Traps)
+  54 |  export const Interactive = defineComponent({
+     |         ^
+  55 |      isActivated: Types.ui8, // 0: off, 1: on
+  56 |      id: Types.ui16,         // to link lever with door
+  
+오후 12:15:51 [vite] (client) Pre-transform error: Transform failed with 1 error:
+/Users/hangup2/apps/survivors-game-project/src/components/index.ts:54:7: ERROR: Expected ":" but found "const"
+  Plugin: vite:esbuild
+  File: /Users/hangup2/apps/survivors-game-project/src/components/index.ts:54:7
+  
+  Expected ":" but found "const"
+  52 |      magnetized: Types.ui8, // 1 = flying towards player
+  53 |  // Interactive (Levers, Doors, Traps)
+  54 |  export const Interactive = defineComponent({
+     |         ^
+  55 |      isActivated: Types.ui8, // 0: off, 1: on
+  56 |      id: Types.ui16,         // to link lever with door
+  
+오후 12:15:51 [vite] (client) Pre-transform error: Transform failed with 1 error:
+/Users/hangup2/apps/survivors-game-project/src/components/index.ts:54:7: ERROR: Expected ":" but found "const"
+  Plugin: vite:esbuild
+  File: /Users/hangup2/apps/survivors-game-project/src/components/index.ts:54:7
+  
+  Expected ":" but found "const"
+  52 |      magnetized: Types.ui8, // 1 = flying towards player
+  53 |  // Interactive (Levers, Doors, Traps)
+  54 |  export const Interactive = defineComponent({
+     |         ^
+  55 |      isActivated: Types.ui8, // 0: off, 1: on
+  56 |      id: Types.ui16,         // to link lever with door
+  
+오후 12:15:51 [vite] Internal server error: Transform failed with 1 error:
+/Users/hangup2/apps/survivors-game-project/src/components/index.ts:54:7: ERROR: Expected ":" but found "const"
+  Plugin: vite:esbuild
+  File: /Users/hangup2/apps/survivors-game-project/src/components/index.ts:54:7
+  
+  Expected ":" but found "const"
+  52 |      magnetized: Types.ui8, // 1 = flying towards player
+  53 |  // Interactive (Levers, Doors, Traps)
+  54 |  export const Interactive = defineComponent({
+     |         ^
+  55 |      isActivated: Types.ui8, // 0: off, 1: on
+  56 |      id: Types.ui16,         // to link lever with door
+  
+      at failureErrorWithLog (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:1467:15)
+      at /Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:736:50
+      at responseCallbacks.<computed> (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:603:9)
+      at handleIncomingPacket (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:658:12)
+      at Socket.readFromStdout (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:581:7)
+      at Socket.emit (node:events:508:28)
+      at addChunk (node:internal/streams/readable:559:12)
+      at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+      at Readable.push (node:internal/streams/readable:390:5)
+      at Pipe.onStreamRead (node:internal/stream_base_commons:189:23)
+오후 12:16:21 [vite] (client) page reload src/systems/RenderSystem.ts
+오후 12:16:22 [vite] (client) Pre-transform error: Transform failed with 1 error:
+/Users/hangup2/apps/survivors-game-project/src/components/index.ts:54:7: ERROR: Expected ":" but found "const"
+  Plugin: vite:esbuild
+  File: /Users/hangup2/apps/survivors-game-project/src/components/index.ts:54:7
+  
+  Expected ":" but found "const"
+  52 |      magnetized: Types.ui8, // 1 = flying towards player
+  53 |  // Interactive (Levers, Doors, Traps)
+  54 |  export const Interactive = defineComponent({
+     |         ^
+  55 |      isActivated: Types.ui8, // 0: off, 1: on
+  56 |      id: Types.ui16,         // to link lever with door
+  
+오후 12:16:22 [vite] (client) Pre-transform error: Transform failed with 1 error:
+/Users/hangup2/apps/survivors-game-project/src/components/index.ts:54:7: ERROR: Expected ":" but found "const"
+  Plugin: vite:esbuild
+  File: /Users/hangup2/apps/survivors-game-project/src/components/index.ts:54:7
+  
+  Expected ":" but found "const"
+  52 |      magnetized: Types.ui8, // 1 = flying towards player
+  53 |  // Interactive (Levers, Doors, Traps)
+  54 |  export const Interactive = defineComponent({
+     |         ^
+  55 |      isActivated: Types.ui8, // 0: off, 1: on
+  56 |      id: Types.ui16,         // to link lever with door
+  
+오후 12:16:22 [vite] Internal server error: Transform failed with 1 error:
+/Users/hangup2/apps/survivors-game-project/src/components/index.ts:54:7: ERROR: Expected ":" but found "const"
+  Plugin: vite:esbuild
+  File: /Users/hangup2/apps/survivors-game-project/src/components/index.ts:54:7
+  
+  Expected ":" but found "const"
+  52 |      magnetized: Types.ui8, // 1 = flying towards player
+  53 |  // Interactive (Levers, Doors, Traps)
+  54 |  export const Interactive = defineComponent({
+     |         ^
+  55 |      isActivated: Types.ui8, // 0: off, 1: on
+  56 |      id: Types.ui16,         // to link lever with door
+  
+      at failureErrorWithLog (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:1467:15)
+      at /Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:736:50
+      at responseCallbacks.<computed> (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:603:9)
+      at handleIncomingPacket (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:658:12)
+      at Socket.readFromStdout (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:581:7)
+      at Socket.emit (node:events:508:28)
+      at addChunk (node:internal/streams/readable:559:12)
+      at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+      at Readable.push (node:internal/streams/readable:390:5)
+      at Pipe.onStreamRead (node:internal/stream_base_commons:189:23)
+오후 12:16:31 [vite] (client) page reload src/scenes/MainScene.ts
+오후 12:16:32 [vite] (client) Pre-transform error: Transform failed with 1 error:
+/Users/hangup2/apps/survivors-game-project/src/components/index.ts:54:7: ERROR: Expected ":" but found "const"
+  Plugin: vite:esbuild
+  File: /Users/hangup2/apps/survivors-game-project/src/components/index.ts:54:7
+  
+  Expected ":" but found "const"
+  52 |      magnetized: Types.ui8, // 1 = flying towards player
+  53 |  // Interactive (Levers, Doors, Traps)
+  54 |  export const Interactive = defineComponent({
+     |         ^
+  55 |      isActivated: Types.ui8, // 0: off, 1: on
+  56 |      id: Types.ui16,         // to link lever with door
+  
+오후 12:16:32 [vite] Internal server error: Transform failed with 1 error:
+/Users/hangup2/apps/survivors-game-project/src/components/index.ts:54:7: ERROR: Expected ":" but found "const"
+  Plugin: vite:esbuild
+  File: /Users/hangup2/apps/survivors-game-project/src/components/index.ts:54:7
+  
+  Expected ":" but found "const"
+  52 |      magnetized: Types.ui8, // 1 = flying towards player
+  53 |  // Interactive (Levers, Doors, Traps)
+  54 |  export const Interactive = defineComponent({
+     |         ^
+  55 |      isActivated: Types.ui8, // 0: off, 1: on
+  56 |      id: Types.ui16,         // to link lever with door
+  
+      at failureErrorWithLog (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:1467:15)
+      at /Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:736:50
+      at responseCallbacks.<computed> (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:603:9)
+      at handleIncomingPacket (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:658:12)
+      at Socket.readFromStdout (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:581:7)
+      at Socket.emit (node:events:508:28)
+      at addChunk (node:internal/streams/readable:559:12)
+      at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+      at Readable.push (node:internal/streams/readable:390:5)
+      at Pipe.onStreamRead (node:internal/stream_base_commons:189:23)
+오후 12:17:17 [vite] (client) page reload src/scenes/MainScene.ts
+오후 12:17:17 [vite] (client) Pre-transform error: Transform failed with 1 error:
+/Users/hangup2/apps/survivors-game-project/src/components/index.ts:54:7: ERROR: Expected ":" but found "const"
+  Plugin: vite:esbuild
+  File: /Users/hangup2/apps/survivors-game-project/src/components/index.ts:54:7
+  
+  Expected ":" but found "const"
+  52 |      magnetized: Types.ui8, // 1 = flying towards player
+  53 |  // Interactive (Levers, Doors, Traps)
+  54 |  export const Interactive = defineComponent({
+     |         ^
+  55 |      isActivated: Types.ui8, // 0: off, 1: on
+  56 |      id: Types.ui16,         // to link lever with door
+  
+오후 12:17:17 [vite] Internal server error: Transform failed with 1 error:
+/Users/hangup2/apps/survivors-game-project/src/components/index.ts:54:7: ERROR: Expected ":" but found "const"
+  Plugin: vite:esbuild
+  File: /Users/hangup2/apps/survivors-game-project/src/components/index.ts:54:7
+  
+  Expected ":" but found "const"
+  52 |      magnetized: Types.ui8, // 1 = flying towards player
+  53 |  // Interactive (Levers, Doors, Traps)
+  54 |  export const Interactive = defineComponent({
+     |         ^
+  55 |      isActivated: Types.ui8, // 0: off, 1: on
+  56 |      id: Types.ui16,         // to link lever with door
+  
+      at failureErrorWithLog (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:1467:15)
+      at /Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:736:50
+      at responseCallbacks.<computed> (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:603:9)
+      at handleIncomingPacket (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:658:12)
+      at Socket.readFromStdout (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:581:7)
+      at Socket.emit (node:events:508:28)
+      at addChunk (node:internal/streams/readable:559:12)
+      at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+      at Readable.push (node:internal/streams/readable:390:5)
+      at Pipe.onStreamRead (node:internal/stream_base_commons:189:23)
+오후 12:17:49 [vite] (client) page reload src/components/index.ts
+오후 12:18:20 [vite] (client) page reload src/scenes/MainScene.ts

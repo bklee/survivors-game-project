@@ -102,7 +102,13 @@ export class AssetLoader {
             texture.add(`prop_spikes_${i}`, 0, 16 + (i * 16), 192, 16, 16);
         }
 
-        // Add XP gem frame (flask_red or similar)
+        // Interactive (Levers & Doors)
+        texture.add('lever_off', 0, 256, 448, 16, 16);
+        texture.add('lever_on', 0, 272, 448, 16, 16);
+        texture.add('door_closed', 0, 160, 144, 32, 32);
+        texture.add('door_open', 0, 224, 144, 32, 32);
+
+        // Add XP gem frame
         texture.add('gem', 0, 288, 352, 16, 16);
     }
 }

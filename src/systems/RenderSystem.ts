@@ -1,11 +1,10 @@
 import Phaser from 'phaser';
 import { defineQuery, hasComponent } from 'bitecs';
-import { Animation, Position, SpriteInfo, Velocity, Health } from '../components';
+import { Animation, Position, SpriteInfo, Velocity, Health, Interactive } from '../components';
 import { world } from '../core/World';
 
 const renderQuery = defineQuery([Position, SpriteInfo]);
 
-// Map entity IDs to Blitter Bobs using a dense array instead of a Map for performance
 const bobs: (Phaser.GameObjects.Bob | undefined)[] = [];
 
 export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObjects.Blitter, playerAura: Phaser.GameObjects.Graphics) => {
@@ -24,14 +23,15 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
             else if (typeId === 2) charKey = 'elf';
             else if (typeId === 10) charKey = 'imp';
             else if (typeId === 11) charKey = 'demon';
-            else if (typeId === 20) charKey = 'gem';
             else if (typeId === 12) charKey = 'orc';
             else if (typeId === 13) charKey = 'skeleton';
+            else if (typeId === 20) charKey = 'gem';
             else if (typeId === 30) charKey = 'prop_crate';
             else if (typeId === 31) charKey = 'prop_skull';
             else if (typeId === 32) charKey = 'prop_spikes';
             else if (typeId === 33) charKey = 'prop_column';
-            else if (typeId === 13) charKey = 'skeleton';
+            else if (typeId === 40) charKey = 'lever';
+            else if (typeId === 41) charKey = 'door';
             else if (typeId === 100) charKey = 'spell_fire';
             else if (typeId === 101) charKey = 'spell_ice';
             else if (typeId === 102) charKey = 'spell_gas';
@@ -47,45 +47,42 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
 
             // 3. Handle Animation Framing
             let frameName: string | number = '';
+            
+            // Static or special state frames
             if ((typeId >= 20 && typeId <= 31) || typeId === 33 || (typeId >= 100 && typeId <= 104)) {
                 frameName = charKey;
-            } else if (typeId === 32) { // spikes
+            } else if (typeId === 40) { // Lever
+                frameName = Interactive.isActivated[eid] ? 'lever_on' : 'lever_off';
+            } else if (typeId === 41) { // Door
+                frameName = Interactive.isActivated[eid] ? 'door_open' : 'door_closed';
+            } else if (typeId === 32) { // Spikes
                 const rate = 4;
                 const animIdx = Math.floor(Animation.timer[eid] * rate / 1000) % 4;
                 frameName = `prop_spikes_${animIdx}`;
                 Animation.timer[eid] += dt;
             } else {
+                // Character Animations
                 const rate = Animation.frameRate[eid] || 8;
                 Animation.timer[eid] += dt;
-                const frameDuration = 1000 / rate;
-                
-                // Calculate current frame index in the cycle (0-3 usually)
-                const currentFrameIdx = Math.floor(Animation.timer[eid] / frameDuration) % 4;
+                const currentFrameIdx = Math.floor(Animation.timer[eid] / (1000 / rate)) % 4;
                 frameName = `${charKey}_${state}_${currentFrameIdx}`;
             }
+
             // 4. Handle Death Effect (Vanishing)
             let currentAlpha = 1.0;
-            if (hasComponent(world, Health, eid)) {
+            if (hasComponent(world, Health, eid) && typeId < 30) {
                 if (Health.current[eid] <= 0) {
-                    currentAlpha = 0.4; // fade out
+                    currentAlpha = 0.4;
                 }
             }
-            // 4. Render or Create Bob
+
+            // 5. Render or Create Bob
             if (!bob) {
                 const newBob = blitter.create(Position.x[eid], Position.y[eid], frameName);
-                
-                // Distinctions
-                if (typeId === 10) { // imp
-                    newBob.tint = 0xffaaaa;
-                    newBob.alpha = 0.9;
-                } else if (typeId === 11) { // demon
-                    newBob.tint = 0xff5555;
-                } else if (typeId === 104) { // enemy bullet
-                    newBob.tint = 0xffff00; // yellow
-                }
-                
+                if (typeId === 10) { newBob.tint = 0xffaaaa; newBob.alpha = 0.9; }
+                else if (typeId === 11) { newBob.tint = 0xff5555; }
+                else if (typeId === 104) { newBob.tint = 0xffff00; }
                 newBob.alpha = currentAlpha;
-                
                 bobs[eid] = newBob;
             } else {
                 bob.x = Position.x[eid];
@@ -93,11 +90,9 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                 bob.alpha = currentAlpha;
                 try {
                     bob.setFrame(frameName);
-                } catch (e) {
-                    // fallback if frame name missing
-                }
+                } catch (e) {}
 
-                // Player Aura (linked to any player type 0, 1, 2)
+                // Player Aura
                 if (typeId >= 0 && typeId <= 2) {
                     playerAura.setPosition(bob.x + 8, bob.y + 14);
                 }
