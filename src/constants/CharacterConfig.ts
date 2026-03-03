@@ -18,8 +18,8 @@ export const CHARACTERS: Record<string, CharacterData> = {
         id: 'knight',
         baseStats: { health: 120, speed: 180, damage: 1.2 },
         frames: {
-            idle: { x: 128, y: 100, w: 16, h: 28, count: 4 },
-            run: { x: 192, y: 100, w: 16, h: 28, count: 4 },
+            idle: { x: 128, y: 68, w: 16, h: 28, count: 4 },
+            run: { x: 192, y: 68, w: 16, h: 28, count: 4 },
         }
     },
     WIZARD: {
@@ -27,8 +27,8 @@ export const CHARACTERS: Record<string, CharacterData> = {
         id: 'wizard',
         baseStats: { health: 80, speed: 200, damage: 1.5 },
         frames: {
-            idle: { x: 128, y: 164, w: 16, h: 28, count: 4 },
-            run: { x: 192, y: 164, w: 16, h: 28, count: 4 },
+            idle: { x: 128, y: 132, w: 16, h: 28, count: 4 },
+            run: { x: 192, y: 132, w: 16, h: 28, count: 4 },
         }
     },
     ELF: {
@@ -36,8 +36,8 @@ export const CHARACTERS: Record<string, CharacterData> = {
         id: 'elf',
         baseStats: { health: 100, speed: 220, damage: 1.1 },
         frames: {
-            idle: { x: 128, y: 36, w: 16, h: 28, count: 4 },
-            run: { x: 192, y: 36, w: 16, h: 28, count: 4 },
+            idle: { x: 128, y: 4, w: 16, h: 28, count: 4 },
+            run: { x: 192, y: 4, w: 16, h: 28, count: 4 },
         }
     }
 };
