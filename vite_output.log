@@ -1616,3 +1616,11 @@
 오후 5:00:11 [vite] (client) page reload src/scenes/MainScene.ts
 오후 5:01:58 [vite] (client) page reload src/systems/WaveSystem.ts
 오후 5:02:52 [vite] (client) page reload src/systems/WaveSystem.ts
+오후 5:10:41 [vite] (client) page reload src/scenes/UIScene.ts
+오후 5:12:31 [vite] (client) page reload src/assets/AssetLoader.ts
+오후 5:13:40 [vite] (client) page reload src/systems/PhysicsSystem.ts
+오후 5:17:41 [vite] (client) page reload src/systems/RenderSystem.ts
+오후 5:19:03 [vite] (client) page reload src/scenes/MainScene.ts
+오후 5:19:38 [vite] (client) page reload src/systems/PhysicsSystem.ts
+오후 5:20:49 [vite] (client) page reload src/scenes/MainScene.ts
+오후 5:23:50 [vite] (client) page reload src/scenes/MainScene.ts

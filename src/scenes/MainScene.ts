@@ -15,6 +15,7 @@ import { AlchemySystem, Element } from '../alchemy/AlchemySystem';
 import { createCombatSystem } from '../systems/CombatSystem';
 import { SpellSystem } from '../systems/SpellSystem';
 import { ItemSystem } from '../systems/ItemSystem';
+import { DungeonGenerator } from '../core/DungeonGenerator';
 
 export class MainScene extends Phaser.Scene {
     private physicsSystem!: (dt: number) => void;
@@ -31,6 +32,7 @@ export class MainScene extends Phaser.Scene {
     private selectedCharId: string = 'wizard';
     private autoQueueIntervalId?: number;
     private currentBGM?: Phaser.Sound.BaseSound;
+    private dungeon!: DungeonGenerator;
 
     constructor() {
         super('MainScene');
@@ -45,7 +47,7 @@ export class MainScene extends Phaser.Scene {
 
     create() {
         // Setup ECS Systems
-        this.physicsSystem = createPhysicsSystem();
+        this.physicsSystem = createPhysicsSystem(this.dungeon);
         this.playerSystem = new PlayerSystem();
         this.nightDirector = new NightDirector();
         this.juicePipeline = new JuicePipeline(this);

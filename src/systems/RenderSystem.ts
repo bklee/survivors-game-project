@@ -103,5 +103,16 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                 try { bob.setFrame(frameName); } catch (e) {}
             }
         }
+        // Residue cleanup
+        // We know which EIDs were processed this frame. 
+        // Let's build a Set of active ones.
+        const activeEids = new Set(ents);
+        for (let i = 0; i < bobs.length; i++) {
+            const b = bobs[i];
+            if (b && !activeEids.has(i)) {
+                b.destroy();
+                bobs[i] = undefined;
+            }
+        }
     };
 };
