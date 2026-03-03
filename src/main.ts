@@ -1,3 +1,4 @@
+import './errorLogger';
 import Phaser from 'phaser';
 import { BootScene } from './scenes/BootScene';
 import { MainScene } from './scenes/MainScene';

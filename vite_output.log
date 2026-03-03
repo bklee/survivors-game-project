@@ -1746,3 +1746,5 @@
       at Readable.push (node:internal/streams/readable:390:5)
       at Pipe.onStreamRead (node:internal/stream_base_commons:189:23)
 오후 6:32:04 [vite] (client) page reload src/scenes/MainScene.ts
+오후 6:38:48 [vite] (client) page reload src/main.ts
+오후 6:48:24 [vite] (client) page reload src/scenes/MainScene.ts

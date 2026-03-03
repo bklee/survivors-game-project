@@ -46,6 +46,7 @@ export class MainScene extends Phaser.Scene {
     }
 
     create() {
+        this.dungeon = new DungeonGenerator();
         // Setup ECS Systems
         this.physicsSystem = createPhysicsSystem(this.dungeon);
         this.playerSystem = new PlayerSystem();
