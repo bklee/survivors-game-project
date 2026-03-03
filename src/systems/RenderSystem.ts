@@ -25,6 +25,10 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
             else if (typeId === 10) charKey = 'imp';
             else if (typeId === 11) charKey = 'demon';
             else if (typeId === 20) charKey = 'gem';
+            else if (typeId === 100) charKey = 'spell_fire';
+            else if (typeId === 101) charKey = 'spell_ice';
+            else if (typeId === 102) charKey = 'spell_gas';
+            else if (typeId === 103) charKey = 'spell_dud';
 
             // 2. Identify State (Idle vs Run)
             let state = 'idle';
@@ -35,8 +39,8 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
 
             // 3. Handle Animation Framing
             let frameName: string | number = '';
-            if (charKey === 'gem') {
-                frameName = 'gem';
+            if (typeId >= 20 && typeId <= 103) {
+                frameName = charKey;
             } else {
                 const rate = Animation.frameRate[eid] || 8;
                 Animation.timer[eid] += dt;

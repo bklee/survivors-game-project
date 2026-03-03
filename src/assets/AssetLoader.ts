@@ -18,7 +18,11 @@ export class AssetLoader {
     }
 
     loadAudio() {
-        // e.g. this.scene.load.audio('hit', 'assets/hit.wav');
+        this.scene.load.audio('fire_cast', 'assets/audio/fire_cast.mp3');
+        this.scene.load.audio('ice_cast', 'assets/audio/ice_cast.mp3');
+        this.scene.load.audio('poison_cast', 'assets/audio/poison_cast.mp3');
+        this.scene.load.audio('hit', 'assets/audio/hit.mp3');
+        this.scene.load.audio('level_up', 'assets/audio/level_up.mp3');
     }
 
     loadTextureAtlas() {
@@ -64,8 +68,14 @@ export class AssetLoader {
             texture.add(`imp_idle_${i}`, 0, 368 + (i * 16), 64, 16, 16);
             texture.add(`imp_run_${i}`, 0, 432 + (i * 16), 64, 16, 16);
         }
+        // Add Spell Frames
+        texture.add('spell_fire', 0, 288, 336, 16, 16); // flask_big_red
+        texture.add('spell_ice', 0, 304, 336, 16, 16);  // flask_big_blue
+        texture.add('spell_gas', 0, 320, 336, 16, 16);  // flask_big_green
+        texture.add('spell_dud', 0, 288, 320, 16, 16);  // bomb_f0
 
         // Add XP gem frame (flask_red or similar)
         texture.add('gem', 0, 288, 352, 16, 16);
-    }
+}
+
 }

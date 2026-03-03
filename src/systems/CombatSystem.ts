@@ -38,6 +38,8 @@ export const createCombatSystem = (juice: JuicePipeline) => {
                 if (distSq <= sRadius * sRadius) {
                     // HIT!
                     Health.current[targetId] -= Spell.damage[eid];
+                    window.dispatchEvent(new CustomEvent('play_sound', { detail: 'hit' }));
+                    Health.current[targetId] -= Spell.damage[eid];
                     
                     // Visual Juice
                     juice.damageNumber(tx, ty, Spell.damage[eid]);
