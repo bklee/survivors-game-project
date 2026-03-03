@@ -1,5 +1,5 @@
-import { defineQuery, removeEntity } from 'bitecs';
-import { Position, Spell, Health } from '../components';
+import { defineQuery, removeEntity, addEntity, addComponent } from 'bitecs';
+import { Position, Spell, Health, Item, Velocity, SpriteInfo } from '../components';
 import { world } from '../core/World';
 import { JuicePipeline } from '../fx/JuicePipeline';
 import { enemySpatialHash } from './PhysicsSystem';
@@ -45,6 +45,26 @@ export const createCombatSystem = (juice: JuicePipeline) => {
                     
                     if (Health.current[targetId] <= 0) {
                         // Dead
+                        
+                        // Drop XP Gem
+                        const dropId = addEntity(world);
+                        addComponent(world, Position, dropId);
+                        addComponent(world, Velocity, dropId);
+                        addComponent(world, Item, dropId);
+                        addComponent(world, SpriteInfo, dropId);
+
+                        Position.x[dropId] = tx;
+                        Position.y[dropId] = ty;
+                        
+                        // Random pop out
+                        Velocity.x[dropId] = (Math.random() - 0.5) * 100;
+                        Velocity.y[dropId] = (Math.random() - 0.5) * 100;
+
+                        Item.xpValue[dropId] = 10;
+                        Item.magnetized[dropId] = 0;
+                        
+                        SpriteInfo.textureIndex[dropId] = 40; // Some small gem sprite
+
                         removeEntity(world, targetId);
                     }
 
