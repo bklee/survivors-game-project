@@ -8,6 +8,7 @@ import { PlayerSystem } from '../systems/PlayerSystem';
 import { NightDirector } from '../systems/WaveSystem';
 import { VirtualJoystick } from '../ui/VirtualJoystick';
 import { WORLD_WIDTH, WORLD_HEIGHT } from '../constants/GameConfig';
+import { CHARACTERS } from '../constants/CharacterConfig';
 
 import { JuicePipeline } from '../fx/JuicePipeline';
 import { AlchemySystem, Element } from '../alchemy/AlchemySystem';
@@ -27,10 +28,16 @@ export class MainScene extends Phaser.Scene {
     private combatSystem!: (dt: number) => void;
     private spellSystem!: SpellSystem;
     private itemSystem!: ItemSystem;
+    private selectedCharId: string = 'wizard';
     private autoQueueIntervalId?: number;
 
     constructor() {
         super('MainScene');
+    }
+    init(data: { characterId: string }) {
+        if (data && data.characterId) {
+            this.selectedCharId = data.characterId;
+        }
     }
 
     create() {
@@ -64,21 +71,26 @@ export class MainScene extends Phaser.Scene {
         addComponent(world, Animation, this.playerId);
         addComponent(world, Health, this.playerId);
 
-        Position.x[this.playerId] = WORLD_WIDTH / 2;
-        Position.y[this.playerId] = WORLD_HEIGHT / 2;
-        Health.current[this.playerId] = 100;
-        Health.max[this.playerId] = 100;
-        addComponent(world, Animation, this.playerId);
-
-        Position.x[this.playerId] = WORLD_WIDTH / 2;
-        Position.y[this.playerId] = WORLD_HEIGHT / 2;
+        // Initialize Player based on selection
+        const charData = CHARACTERS[this.selectedCharId.toUpperCase()] || CHARACTERS.WIZARD;
         
-        // Initial frame for Wizard (Type ID: 1)
-        SpriteInfo.textureIndex[this.playerId] = 1; 
+        let typeId = 1; // Wizard
+        if (this.selectedCharId === 'knight') typeId = 0;
+        else if (this.selectedCharId === 'elf') typeId = 2;
+
+        SpriteInfo.textureIndex[this.playerId] = typeId; 
         Animation.frameStart[this.playerId] = 0;
         Animation.frameEnd[this.playerId] = 3;
-        Animation.frameRate[this.playerId] = 8;
+        Animation.frameRate[this.playerId] = 10;
         Animation.timer[this.playerId] = 0;
+
+        Health.current[this.playerId] = charData.baseStats.health;
+        Health.max[this.playerId] = charData.baseStats.health;
+        
+        // Update global stats for damage
+        import('../core/PlayerStats').then(m => {
+            m.globalStats.damageMult = charData.baseStats.damage;
+        });
         // Setup Camera Boundaries
         this.cameras.main.setBounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
         this.cameras.main.setZoom(2.5);

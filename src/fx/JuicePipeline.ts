@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { VFXSystem } from './VFXSystem';
 
 export let isHitStopped = false;
 
@@ -8,6 +9,7 @@ export class JuicePipeline {
     private hitStopEndTime = 0;
     private damageTextPool: Phaser.GameObjects.Text[] = [];
     private damageTextPoolIndex = 0;
+    public vfx: VFXSystem;
     private readonly damageTextStyle: Phaser.Types.GameObjects.Text.TextStyle = {
         fontSize: '24px',
         color: '#ff0000',
@@ -21,6 +23,7 @@ export class JuicePipeline {
     constructor(scene: Phaser.Scene) {
         this.scene = scene;
         this.scene.events.once(Phaser.Scenes.Events.SHUTDOWN, this.handleSceneShutdown, this);
+        this.vfx = new VFXSystem(scene);
     }
 
     public hitStop(durationMS: number) {

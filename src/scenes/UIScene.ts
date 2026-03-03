@@ -6,6 +6,7 @@ export class UIScene extends Phaser.Scene {
     private queueText!: Phaser.GameObjects.Text;
     private hpBar!: Phaser.GameObjects.Rectangle;
     private bossWarningText!: Phaser.GameObjects.Text;
+    private stageClearText!: Phaser.GameObjects.Text;
     private bossWarningTween?: Phaser.Tweens.Tween;
 
     private currentLevel = 1;
@@ -45,7 +46,16 @@ export class UIScene extends Phaser.Scene {
             stroke: '#000000',
             strokeThickness: 8,
         }).setOrigin(0.5, 0.5).setVisible(false);
+        this.stageClearText = this.add.text(640, 360, 'STAGE CLEAR!', {
+            fontSize: '96px',
+            color: '#ffff00',
+            fontStyle: 'bold',
+            stroke: '#000000',
+            strokeThickness: 10,
+        }).setOrigin(0.5, 0.5).setVisible(false);
 
+        // Listen for global events
+        window.addEventListener('stage_clear', this.handleStageClear as EventListener);
         // Listen for global events
         window.addEventListener('xp_collected', this.handleXp as EventListener);
         window.addEventListener('alchemyQueueUpdated', this.handleQueue as EventListener);
@@ -57,6 +67,7 @@ export class UIScene extends Phaser.Scene {
             window.removeEventListener('alchemyQueueUpdated', this.handleQueue as EventListener);
             window.removeEventListener('boss_spawned', this.handleBossSpawn as EventListener);
             window.removeEventListener('hp_updated', this.handleHp as EventListener);
+            window.removeEventListener('stage_clear', this.handleStageClear as EventListener);
             this.bossWarningTween?.stop();
         });
     }
@@ -106,4 +117,21 @@ export class UIScene extends Phaser.Scene {
             this.bossWarningText.setAlpha(1);
         });
     }
+
+    private handleStageClear = () => {
+        this.stageClearText.setVisible(true);
+        this.tweens.add({
+            targets: this.stageClearText,
+            scale: { from: 0.5, to: 1.2 },
+            alpha: { from: 0, to: 1 },
+            duration: 800,
+            ease: 'Back.easeOut',
+            onComplete: () => {
+                this.time.delayedCall(3000, () => {
+                    window.location.reload();
+                });
+            }
+        });
+    }
+
 }
