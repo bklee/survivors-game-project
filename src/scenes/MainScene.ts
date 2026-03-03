@@ -8,6 +8,11 @@ import { PlayerSystem } from '../systems/PlayerSystem';
 import { NightDirector } from '../systems/WaveSystem';
 import { VirtualJoystick } from '../ui/VirtualJoystick';
 import { WORLD_WIDTH, WORLD_HEIGHT } from '../constants/GameConfig';
+import { JuicePipeline } from '../fx/JuicePipeline';
+import { AlchemySystem, Element } from '../alchemy/AlchemySystem';
+import { createCombatSystem } from '../systems/CombatSystem';
+import { SpellSystem } from '../systems/SpellSystem';
+import { ItemSystem } from '../systems/ItemSystem';
 
 export class MainScene extends Phaser.Scene {
     private physicsSystem!: (dt: number) => void;
@@ -16,6 +21,12 @@ export class MainScene extends Phaser.Scene {
     private nightDirector!: NightDirector;
     private joystick!: VirtualJoystick;
     private playerId!: number;
+    private juicePipeline!: JuicePipeline;
+    private alchemySystem!: AlchemySystem;
+    private combatSystem!: (dt: number) => void;
+    private spellSystem!: SpellSystem;
+    private itemSystem!: ItemSystem;
+    private autoQueueIntervalId?: number;
 
     constructor() {
         super('MainScene');
@@ -26,6 +37,11 @@ export class MainScene extends Phaser.Scene {
         this.physicsSystem = createPhysicsSystem();
         this.playerSystem = new PlayerSystem();
         this.nightDirector = new NightDirector();
+        this.juicePipeline = new JuicePipeline(this);
+        this.alchemySystem = new AlchemySystem();
+        this.combatSystem = createCombatSystem(this.juicePipeline);
+        this.spellSystem = new SpellSystem(this.alchemySystem);
+        this.itemSystem = new ItemSystem();
 
         const blitter = this.add.blitter(0, 0, 'dungeon');
         this.renderSystem = createRenderSystem(this, blitter);
@@ -51,16 +67,62 @@ export class MainScene extends Phaser.Scene {
                 color: '#ffffff',
             }).setScrollFactor(0); // Pin to camera
 
+        const xpText = this.add
+            .text(10, 40, "Level: 1 | XP: 0/100", {
+                fontSize: '20px',
+                color: '#ffff00',
+            }).setScrollFactor(0);
+
+        let currentLevel = 1;
+        let currentXp = 0;
+        let xpToNextLevel = 100;
+
+        const xpHandler = ((e: CustomEvent<number>) => {
+            currentXp += e.detail;
+            if (currentXp >= xpToNextLevel) {
+                currentLevel++;
+                currentXp -= xpToNextLevel;
+                xpToNextLevel = Math.floor(xpToNextLevel * 1.5);
+                
+                // Show Level Up Juice
+                this.juicePipeline.whiteFlash(200);
+                this.juicePipeline.screenShake(0.02, 300);
+                console.log(`LEVEL UP! Now Level ${currentLevel}`);
+                
+                // Pause for draft choice (Future task)
+                // this.scene.pause(); 
+                // this.scene.launch('UpgradeScene');
+            }
+            xpText.setText(`Level: ${currentLevel} | XP: ${Math.floor(currentXp)}/${xpToNextLevel}`);
+        }) as EventListener;
+
+        window.addEventListener('xp_collected', xpHandler);
+        this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+            window.removeEventListener('xp_collected', xpHandler);
+        });
         // Add Virtual Joystick at bottom left
         this.joystick = new VirtualJoystick(this, 150, 600, 50);
         // We can't directly use setScrollFactor on complex DOM/Graphic elements easily here,
         // so we will position it correctly or rely on CSS/fixed UI overlay later. 
         // For now let's just leave it.
 
+        const randomElements: Element[] = [Element.FIRE, Element.ICE, Element.LIGHTNING, Element.POISON];
+        this.autoQueueIntervalId = window.setInterval(() => {
+            const randomElement = randomElements[Math.floor(Math.random() * randomElements.length)];
+            this.alchemySystem.addElement(randomElement);
+        }, 1000);
+
+        this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+            if (this.autoQueueIntervalId !== undefined) {
+                window.clearInterval(this.autoQueueIntervalId);
+                this.autoQueueIntervalId = undefined;
+            }
+        });
+
         console.log("Game started successfully!");
     }
 
-    update(time: number, delta: number) {
+    update(_time: number, delta: number) {
         // Process Systems
         this.nightDirector.update(delta);
         this.playerSystem.update(delta);
@@ -74,7 +136,11 @@ export class MainScene extends Phaser.Scene {
             Velocity.y[this.playerId] = dY * 200;
         }
 
+        this.spellSystem.update(delta);
+
         this.physicsSystem(delta);
+        this.combatSystem(delta);
+        this.itemSystem.update(delta);
         this.renderSystem();
 
         // Make camera follow player manually

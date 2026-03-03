@@ -35,3 +35,9 @@ export const Spell = defineComponent({
     duration: Types.f32, // remaining lifespan in ms
     pierce: Types.ui8, // how many enemies it can hit
 });
+
+// Drops (XP gems, health potions, gold)
+export const Item = defineComponent({
+    xpValue: Types.f32,
+    magnetized: Types.ui8, // 1 = flying towards player
+});
