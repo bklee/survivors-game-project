@@ -22,3 +22,94 @@
 오전 11:22:40 [vite] (client) page reload src/systems/WaveSystem.ts
 오전 11:24:53 [vite] (client) page reload src/main.ts
 오전 11:25:28 [vite] (client) page reload src/scenes/MainScene.ts
+오전 11:28:51 [vite] (client) page reload src/systems/RenderSystem.ts
+오전 11:29:46 [vite] (client) page reload src/scenes/MainScene.ts
+오전 11:30:32 [vite] (client) page reload src/systems/RenderSystem.ts
+오전 11:30:32 [vite] (client) Pre-transform error: Transform failed with 1 error:
+/Users/hangup2/apps/survivors-game-project/src/systems/RenderSystem.ts:61:0: ERROR: Unexpected end of file
+  Plugin: vite:esbuild
+  File: /Users/hangup2/apps/survivors-game-project/src/systems/RenderSystem.ts:61:0
+  
+  Unexpected end of file
+  59 |      };
+  60 |  };
+  61 |  
+     |  ^
+  
+오전 11:30:32 [vite] Internal server error: Transform failed with 1 error:
+/Users/hangup2/apps/survivors-game-project/src/systems/RenderSystem.ts:61:0: ERROR: Unexpected end of file
+  Plugin: vite:esbuild
+  File: /Users/hangup2/apps/survivors-game-project/src/systems/RenderSystem.ts:61:0
+  
+  Unexpected end of file
+  59 |      };
+  60 |  };
+  61 |  
+     |  ^
+  
+      at failureErrorWithLog (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:1467:15)
+      at /Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:736:50
+      at responseCallbacks.<computed> (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:603:9)
+      at handleIncomingPacket (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:658:12)
+      at Socket.readFromStdout (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:581:7)
+      at Socket.emit (node:events:508:28)
+      at addChunk (node:internal/streams/readable:559:12)
+      at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+      at Readable.push (node:internal/streams/readable:390:5)
+      at Pipe.onStreamRead (node:internal/stream_base_commons:189:23)
+오전 11:30:56 [vite] (client) page reload src/systems/RenderSystem.ts
+오전 11:30:56 [vite] (client) Pre-transform error: Transform failed with 1 error:
+/Users/hangup2/apps/survivors-game-project/src/systems/RenderSystem.ts:61:0: ERROR: Unexpected end of file
+  Plugin: vite:esbuild
+  File: /Users/hangup2/apps/survivors-game-project/src/systems/RenderSystem.ts:61:0
+  
+  Unexpected end of file
+  59 |      };
+  60 |  };
+  61 |  
+     |  ^
+  
+오전 11:30:56 [vite] Internal server error: Transform failed with 1 error:
+/Users/hangup2/apps/survivors-game-project/src/systems/RenderSystem.ts:61:0: ERROR: Unexpected end of file
+  Plugin: vite:esbuild
+  File: /Users/hangup2/apps/survivors-game-project/src/systems/RenderSystem.ts:61:0
+  
+  Unexpected end of file
+  59 |      };
+  60 |  };
+  61 |  
+     |  ^
+  
+      at failureErrorWithLog (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:1467:15)
+      at /Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:736:50
+      at responseCallbacks.<computed> (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:603:9)
+      at handleIncomingPacket (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:658:12)
+      at Socket.readFromStdout (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:581:7)
+      at Socket.emit (node:events:508:28)
+      at addChunk (node:internal/streams/readable:559:12)
+      at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+      at Readable.push (node:internal/streams/readable:390:5)
+      at Pipe.onStreamRead (node:internal/stream_base_commons:189:23)
+오전 11:31:12 [vite] (client) page reload src/systems/RenderSystem.ts
+오전 11:33:29 [vite] (client) page reload src/components/index.ts
+오전 11:34:49 [vite] (client) page reload src/components/index.ts
+오전 11:35:05 [vite] (client) page reload src/systems/WaveSystem.ts
+오전 11:35:12 [vite] (client) page reload src/systems/RenderSystem.ts
+오전 11:35:24 [vite] (client) page reload public/assets/oga.html
+오전 11:35:25 [vite] (client) page reload src/scenes/UIScene.ts
+오전 11:35:33 [vite] (client) page reload src/systems/WaveSystem.ts
+오전 11:38:06 [vite] (client) page reload src/systems/CombatSystem.ts
+오전 11:41:29 [vite] (client) page reload src/assets/AssetLoader.ts
+오전 11:41:46 [vite] (client) page reload src/assets/AssetLoader.ts
+오전 11:41:53 [vite] (client) page reload src/scenes/BootScene.ts
+오전 11:42:10 [vite] (client) page reload src/scenes/MainScene.ts
+오전 11:42:38 [vite] (client) page reload src/systems/RenderSystem.ts
+오전 11:42:49 [vite] (client) page reload src/systems/WaveSystem.ts
+오전 11:43:00 [vite] (client) page reload src/systems/CombatSystem.ts
+오전 11:43:08 [vite] (client) page reload src/systems/PlayerSystem.ts
+오전 11:43:24 [vite] (client) page reload src/scenes/BootScene.ts
+오전 11:43:33 [vite] (client) page reload src/systems/WaveSystem.ts
+오전 11:43:53 [vite] (client) page reload src/systems/RenderSystem.ts
+오전 11:44:05 [vite] (client) page reload src/scenes/MainScene.ts
+오전 11:44:09 [vite] (client) page reload src/systems/PlayerSystem.ts
+오전 11:44:31 [vite] (client) page reload src/scenes/MainScene.ts

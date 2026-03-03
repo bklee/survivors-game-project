@@ -1,13 +1,14 @@
 import Phaser from 'phaser';
 import { addEntity, addComponent } from 'bitecs';
 import { world } from '../core/World';
-import { Position, Velocity, Player, SpriteInfo } from '../components';
+import { Position, Velocity, Player, SpriteInfo, Animation } from '../components';
 import { createPhysicsSystem } from '../systems/PhysicsSystem';
 import { createRenderSystem } from '../systems/RenderSystem';
 import { PlayerSystem } from '../systems/PlayerSystem';
 import { NightDirector } from '../systems/WaveSystem';
 import { VirtualJoystick } from '../ui/VirtualJoystick';
 import { WORLD_WIDTH, WORLD_HEIGHT } from '../constants/GameConfig';
+
 import { JuicePipeline } from '../fx/JuicePipeline';
 import { AlchemySystem, Element } from '../alchemy/AlchemySystem';
 import { createCombatSystem } from '../systems/CombatSystem';
@@ -43,8 +44,11 @@ export class MainScene extends Phaser.Scene {
         this.spellSystem = new SpellSystem(this.alchemySystem);
         this.itemSystem = new ItemSystem();
 
+        this.add.tileSprite(0, 0, WORLD_WIDTH, WORLD_HEIGHT, 'dungeon', 'floor')
+            .setOrigin(0, 0)
+            .setDepth(-2);
+
         const blitter = this.add.blitter(0, 0, 'dungeon');
-        
         const playerAura = this.add.graphics();
         playerAura.fillStyle(0x00ffff, 0.3);
         playerAura.fillCircle(0, 0, 16);
@@ -57,11 +61,17 @@ export class MainScene extends Phaser.Scene {
         addComponent(world, Velocity, this.playerId);
         addComponent(world, Player, this.playerId);
         addComponent(world, SpriteInfo, this.playerId);
+        addComponent(world, Animation, this.playerId);
 
         Position.x[this.playerId] = WORLD_WIDTH / 2;
         Position.y[this.playerId] = WORLD_HEIGHT / 2;
-        SpriteInfo.textureIndex[this.playerId] = 85; // White wizard
-
+        
+        // Initial frame for Wizard (Type ID: 1)
+        SpriteInfo.textureIndex[this.playerId] = 1; 
+        Animation.frameStart[this.playerId] = 0;
+        Animation.frameEnd[this.playerId] = 3;
+        Animation.frameRate[this.playerId] = 8;
+        Animation.timer[this.playerId] = 0;
         // Setup Camera Boundaries
         this.cameras.main.setBounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
         this.cameras.main.setZoom(2.5);

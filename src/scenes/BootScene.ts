@@ -12,6 +12,9 @@ export class BootScene extends Scene {
     }
 
     create() {
+        const loader = new AssetLoader(this);
+        loader.defineFrames();
         this.scene.start('MainScene');
-    }
+}
+
 }

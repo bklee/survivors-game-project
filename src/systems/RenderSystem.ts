@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { defineQuery, hasComponent } from 'bitecs';
-import { Animation, Position, SpriteInfo } from '../components';
+import { Animation, Position, SpriteInfo, Velocity } from '../components';
 import { world } from '../core/World';
 
 const renderQuery = defineQuery([Position, SpriteInfo]);
@@ -12,48 +12,66 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
     return (dt: number) => {
         const ents = renderQuery(world);
 
-        // Add bobs if they don't exist
         for (let i = 0; i < ents.length; i++) {
             const eid = ents[i];
             const bob = bobs[eid];
+            const typeId = SpriteInfo.textureIndex[eid];
 
+            // 1. Identify Character / Entity Type
+            let charKey = '';
+            if (typeId === 0) charKey = 'knight';
+            else if (typeId === 1) charKey = 'wizard';
+            else if (typeId === 2) charKey = 'elf';
+            else if (typeId === 10) charKey = 'imp';
+            else if (typeId === 11) charKey = 'demon';
+            else if (typeId === 20) charKey = 'gem';
+
+            // 2. Identify State (Idle vs Run)
+            let state = 'idle';
+            if (hasComponent(world, Velocity, eid)) {
+                const speedSq = Velocity.x[eid] * Velocity.x[eid] + Velocity.y[eid] * Velocity.y[eid];
+                if (speedSq > 100) state = 'run';
+            }
+
+            // 3. Handle Animation Framing
+            let frameName: string | number = '';
+            if (charKey === 'gem') {
+                frameName = 'gem';
+            } else {
+                const rate = Animation.frameRate[eid] || 8;
+                Animation.timer[eid] += dt;
+                const frameDuration = 1000 / rate;
+                
+                // Calculate current frame index in the cycle (0-3 usually)
+                const currentFrameIdx = Math.floor(Animation.timer[eid] / frameDuration) % 4;
+                frameName = `${charKey}_${state}_${currentFrameIdx}`;
+            }
+
+            // 4. Render or Create Bob
             if (!bob) {
-                // Determine frame from SpriteInfo if needed, defaulting to 0
-                const frameId = SpriteInfo.textureIndex[eid];
-                const newBob = blitter.create(Position.x[eid], Position.y[eid], frameId);
-
-                // Tint enemies slightly red to distinguish them from the player
-                if (frameId >= 109 && frameId <= 112) {
-                    newBob.tint = 0xff5555;
+                const newBob = blitter.create(Position.x[eid], Position.y[eid], frameName);
+                
+                // Distinctions
+                if (typeId === 10) { // imp
+                    newBob.tint = 0xffaaaa;
                     newBob.alpha = 0.9;
+                } else if (typeId === 11) { // demon
+                    newBob.tint = 0xff5555;
                 }
-
+                
                 bobs[eid] = newBob;
             } else {
-                if (hasComponent(world, Animation, eid) && Animation.frameRate[eid] > 0) {
-                    Animation.timer[eid] += dt;
-
-                    const frameDuration = 1000 / Animation.frameRate[eid];
-                    if (Animation.timer[eid] > frameDuration) {
-                        Animation.timer[eid] -= frameDuration;
-
-                        const frameStart = Animation.frameStart[eid];
-                        const frameEnd = Animation.frameEnd[eid];
-                        const currentFrame = SpriteInfo.textureIndex[eid];
-                        const nextFrame = currentFrame >= frameEnd ? frameStart : currentFrame + 1;
-
-                        SpriteInfo.textureIndex[eid] = nextFrame;
-                        bob.setFrame(nextFrame);
-                    }
-                }
-
-                // Update position
                 bob.x = Position.x[eid];
                 bob.y = Position.y[eid];
+                try {
+                    bob.setFrame(frameName);
+                } catch (e) {
+                    // fallback if frame name missing
+                }
 
-                // If this is the player (white wizard frames), move the aura there too
-                if (SpriteInfo.textureIndex[eid] >= 85 && SpriteInfo.textureIndex[eid] <= 88) {
-                    playerAura.setPosition(bob.x + 8, bob.y + 8); // center it slightly
+                // Player Aura (linked to any player type 0, 1, 2)
+                if (typeId >= 0 && typeId <= 2) {
+                    playerAura.setPosition(bob.x + 8, bob.y + 14);
                 }
             }
         }
