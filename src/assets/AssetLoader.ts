@@ -116,5 +116,10 @@ export class AssetLoader {
 
         // Add XP gem frame
         texture.add('gem', 0, 288, 352, 16, 16);
+        // Define wall frame from the walls atlas
+        const wallTex = this.scene.textures.get('walls');
+        if (wallTex) {
+            wallTex.add('wall_0', 0, 0, 0, 16, 32);
+        }
     }
 }

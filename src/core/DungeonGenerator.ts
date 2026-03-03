@@ -120,14 +120,20 @@ export class DungeonGenerator {
 
     public getRandomFloorPixel(): {x: number, y: number} {
         let tx, ty;
+        let attempts = 0;
         do {
             tx = Math.floor(Math.random() * MAP_WIDTH);
             ty = Math.floor(Math.random() * MAP_HEIGHT);
+            attempts++;
+            if (attempts > 1000) {
+                return { x: (MAP_WIDTH * TILE_SIZE) / 2, y: (MAP_HEIGHT * TILE_SIZE) / 2 };
+            }
         } while (this.map[ty][tx] !== TileType.FLOOR);
         
         return {
             x: tx * TILE_SIZE + TILE_SIZE/2,
             y: ty * TILE_SIZE + TILE_SIZE/2
         };
-    }
+}
+
 }

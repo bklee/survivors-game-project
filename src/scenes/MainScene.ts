@@ -274,8 +274,9 @@ export class MainScene extends Phaser.Scene {
             const eid = addEntity(world);
             addComponent(world, Position, eid);
             addComponent(world, SpriteInfo, eid);
-            Position.x[eid] = Math.random() * WORLD_WIDTH;
-            Position.y[eid] = Math.random() * WORLD_HEIGHT;
+            const pos = this.dungeon.getRandomFloorPixel();
+            Position.x[eid] = pos.x;
+            Position.y[eid] = pos.y;
             const roll = Math.random();
             if (roll > 0.8) SpriteInfo.textureIndex[eid] = 30; // crate
             else if (roll > 0.7) SpriteInfo.textureIndex[eid] = 34; // explosive barrel
@@ -290,8 +291,9 @@ export class MainScene extends Phaser.Scene {
 
         // Special Treasure Clusters
         for (let i = 0; i < 8; i++) {
-            const lx = Math.random() * (WORLD_WIDTH - 400) + 200;
-            const ly = Math.random() * (WORLD_HEIGHT - 400) + 200;
+            const pos = this.dungeon.getRandomFloorPixel();
+            const lx = pos.x;
+            const ly = pos.y;
             
             // Lever
             const lever = addEntity(world);
@@ -307,7 +309,7 @@ export class MainScene extends Phaser.Scene {
             addComponent(world, Position, door);
             addComponent(world, SpriteInfo, door);
             addComponent(world, Interactive, door);
-            Position.x[door] = lx + 120; Position.y[door] = ly;
+            Position.x[door] = lx + 50; Position.y[door] = ly;
             SpriteInfo.textureIndex[door] = 41;
             Interactive.id[door] = i;
 
@@ -316,7 +318,7 @@ export class MainScene extends Phaser.Scene {
             addComponent(world, Position, treasure);
             addComponent(world, SpriteInfo, treasure);
             addComponent(world, Item, treasure);
-            Position.x[treasure] = lx + 200; Position.y[treasure] = ly;
+            Position.x[treasure] = lx + 100; Position.y[treasure] = ly;
             SpriteInfo.textureIndex[treasure] = 15; // Elite Treasure
             Item.xpValue[treasure] = 1000;
             Item.magnetized[treasure] = 0;
@@ -330,12 +332,13 @@ export class MainScene extends Phaser.Scene {
                 addComponent(world, SpriteInfo, guard);
                 addComponent(world, Animation, guard);
                 addComponent(world, Enemy, guard);
-                Position.x[guard] = lx + 200 + (Math.random() - 0.5) * 60;
+                Position.x[guard] = lx + 100 + (Math.random() - 0.5) * 60;
                 Position.y[guard] = ly + (Math.random() - 0.5) * 60;
                 SpriteInfo.textureIndex[guard] = 14; // Elite Orc
                 Health.current[guard] = 150; Health.max[guard] = 150;
                 Animation.frameRate[guard] = 8;
             }
-        }
     }
+}
+
 }
