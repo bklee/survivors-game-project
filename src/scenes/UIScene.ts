@@ -8,6 +8,7 @@ export class UIScene extends Phaser.Scene {
     private xpText!: Phaser.GameObjects.Text;
     private queueText!: Phaser.GameObjects.Text;
     private hpBar!: Phaser.GameObjects.Rectangle;
+    private uiContainer!: Phaser.GameObjects.Container;
     private bossWarningText!: Phaser.GameObjects.Text;
     private bossWarningTween?: Phaser.Tweens.Tween;
     private stageClearText!: Phaser.GameObjects.Text;
@@ -29,7 +30,9 @@ export class UIScene extends Phaser.Scene {
     }
 
     create() {
-        this.add.text(10, 10, "Alchemist's Night", {
+        this.uiContainer = this.add.container(0, 0);
+
+        const title = this.add.text(10, 10, "Alchemist's Night", {
             fontSize: '24px',
             color: '#ffffff',
         });
@@ -39,23 +42,22 @@ export class UIScene extends Phaser.Scene {
             color: '#ffff00',
         });
 
-        // HP Bar
-        this.add.rectangle(640, 30, 400, 20, 0x333333).setOrigin(0.5);
+        const hpBg = this.add.rectangle(640, 30, 400, 20, 0x333333).setOrigin(0.5);
         this.hpBar = this.add.rectangle(640, 30, 400, 20, 0x00ff00).setOrigin(0.5);
 
-        // Queue HUD
         this.queueText = this.add.text(640, 680, "Queue: [ ]", {
             fontSize: '24px',
             color: '#00ffff',
         }).setOrigin(0.5, 0.5);
 
-        // Minimap
         const mmX = 1280 - 10;
         const mmY = 10;
-        this.add.rectangle(mmX, mmY, this.MINIMAP_SIZE + 4, this.MINIMAP_SIZE + 4, 0xffffff, 0.2).setOrigin(1, 0);
-        this.add.rectangle(mmX - 2, mmY + 2, this.MINIMAP_SIZE, this.MINIMAP_SIZE, 0x000000, 0.5).setOrigin(1, 0);
+        const mmBg1 = this.add.rectangle(mmX, mmY, this.MINIMAP_SIZE + 4, this.MINIMAP_SIZE + 4, 0xffffff, 0.2).setOrigin(1, 0);
+        const mmBg2 = this.add.rectangle(mmX - 2, mmY + 2, this.MINIMAP_SIZE, this.MINIMAP_SIZE, 0x000000, 0.5).setOrigin(1, 0);
         this.minimapGraphics = this.add.graphics();
-        // Initially hide UI elements
+
+        this.uiContainer.add([title, this.xpText, hpBg, this.hpBar, this.queueText, mmBg1, mmBg2, this.minimapGraphics]);
+        this.uiContainer.setVisible(false);
         this.minimapGraphics.setVisible(false);
         this.xpText.setVisible(false);
         this.queueText.setVisible(false);
@@ -80,10 +82,7 @@ export class UIScene extends Phaser.Scene {
 
         // Listen for game start to show UI
         window.addEventListener('game_started', () => {
-            this.minimapGraphics.setVisible(true);
-            this.xpText.setVisible(true);
-            this.queueText.setVisible(true);
-            this.hpBar.setVisible(true);
+            this.uiContainer.setVisible(true);
         });
 
         // Listen for global events
