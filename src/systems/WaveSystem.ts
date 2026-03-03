@@ -1,6 +1,6 @@
 import { addEntity, addComponent, defineQuery } from 'bitecs';
 import { world } from '../core/World';
-import { Position, Velocity, Health, SpriteInfo, Enemy, Player } from '../components';
+import { Animation, Position, Velocity, Health, SpriteInfo, Enemy, Player } from '../components';
 
 const enemyQuery = defineQuery([Enemy, Position, Velocity]);
 const playerQuery = defineQuery([Player, Position]);
@@ -85,6 +85,7 @@ export class NightDirector {
         addComponent(world, Velocity, eid);
         addComponent(world, Health, eid);
         addComponent(world, SpriteInfo, eid);
+        addComponent(world, Animation, eid);
         addComponent(world, Enemy, eid);
 
         Position.x[eid] = spawnX;
@@ -99,5 +100,9 @@ export class NightDirector {
 
         // Roughly frame 109 is a small monster (like a demon or slime) in 0x72
         SpriteInfo.textureIndex[eid] = 109;
+        Animation.frameStart[eid] = 109;
+        Animation.frameEnd[eid] = 112;
+        Animation.frameRate[eid] = 8;
+        Animation.timer[eid] = 0;
     }
 }
