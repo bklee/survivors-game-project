@@ -61,26 +61,26 @@ export class SpellSystem {
         // Simple mapping to spawn entities
         switch (spellId) {
             case 'fireball':
-                this.spawnProjectile(px, py, directionX * 400, directionY * 400, 50, 20, 1);
+                this.spawnProjectile(px, py, directionX * 400, directionY * 400, 50, 20, 1, 100);
+                window.dispatchEvent(new CustomEvent('play_sound', { detail: 'fire_cast' }));
                 break;
             case 'ice_nova':
-                this.spawnAoE(px, py, 150, 30, 1000, 999);
+                this.spawnAoE(px, py, 150, 30, 1000, 999, 101);
+                window.dispatchEvent(new CustomEvent('play_sound', { detail: 'ice_cast' }));
                 break;
             case 'explosive_gas':
-                this.spawnAoE(px, py, 200, 100, 200, 999);
+                this.spawnAoE(px, py, 200, 100, 200, 999, 102);
+                window.dispatchEvent(new CustomEvent('play_sound', { detail: 'poison_cast' }));
                 break;
             case 'backfire':
-                // Take damage or drop a weak dud
-                this.spawnAoE(px, py, 50, 1, 100, 999);
+                this.spawnAoE(px, py, 50, 1, 100, 999, 103);
                 break;
             default:
-                // Fallback for superconduct, toxic_cloud, etc.
-                this.spawnProjectile(px, py, directionX * 300, directionY * 300, 30, 30, 3);
+                this.spawnProjectile(px, py, directionX * 300, directionY * 300, 30, 30, 3, 100);
                 break;
         }
     }
-
-    private spawnProjectile(x: number, y: number, vx: number, vy: number, damage: number, radius: number, pierce: number) {
+    private spawnProjectile(x: number, y: number, vx: number, vy: number, damage: number, radius: number, pierce: number, typeId: number) {
         const eid = addEntity(world);
         addComponent(world, Position, eid);
         addComponent(world, Velocity, eid);
@@ -94,16 +94,16 @@ export class SpellSystem {
 
         Spell.damage[eid] = damage * globalStats.damageMult;
         Spell.radius[eid] = radius;
-        Spell.duration[eid] = 2000; // 2 sec life
+        Spell.duration[eid] = 2000;
         Spell.pierce[eid] = pierce;
         
-        SpriteInfo.textureIndex[eid] = 120; // Some magic sprite index
+        SpriteInfo.textureIndex[eid] = typeId;
     }
 
-    private spawnAoE(x: number, y: number, radius: number, damage: number, duration: number, pierce: number) {
+    private spawnAoE(x: number, y: number, radius: number, damage: number, duration: number, pierce: number, typeId: number) {
         const eid = addEntity(world);
         addComponent(world, Position, eid);
-        addComponent(world, Velocity, eid); // AoE stays still
+        addComponent(world, Velocity, eid);
         addComponent(world, Spell, eid);
         addComponent(world, SpriteInfo, eid);
 
@@ -117,6 +117,6 @@ export class SpellSystem {
         Spell.duration[eid] = duration;
         Spell.pierce[eid] = pierce;
         
-        SpriteInfo.textureIndex[eid] = 121; // Some aura sprite index
+        SpriteInfo.textureIndex[eid] = typeId;
     }
 }

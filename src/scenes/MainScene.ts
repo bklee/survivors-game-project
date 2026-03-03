@@ -96,6 +96,17 @@ export class MainScene extends Phaser.Scene {
             }
         });
 
+        const soundHandler = ((e: CustomEvent<string>) => {
+            if (this.cache.audio.exists(e.detail)) {
+                this.sound.play(e.detail, { volume: 0.5 });
+            }
+        }) as EventListener;
+
+        window.addEventListener('play_sound', soundHandler);
+        this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+            window.removeEventListener('play_sound', soundHandler);
+        });
+
         console.log("Game started successfully!");
     }
 

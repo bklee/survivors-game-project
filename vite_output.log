@@ -113,3 +113,293 @@
 오전 11:44:05 [vite] (client) page reload src/scenes/MainScene.ts
 오전 11:44:09 [vite] (client) page reload src/systems/PlayerSystem.ts
 오전 11:44:31 [vite] (client) page reload src/scenes/MainScene.ts
+오전 11:46:53 [vite] (client) page reload src/assets/AssetLoader.ts
+오전 11:46:53 [vite] (client) Pre-transform error: Transform failed with 1 error:
+/Users/hangup2/apps/survivors-game-project/src/assets/AssetLoader.ts:80:0: ERROR: Expected identifier but found end of file
+  Plugin: vite:esbuild
+  File: /Users/hangup2/apps/survivors-game-project/src/assets/AssetLoader.ts:80:0
+  
+  Expected identifier but found end of file
+  78 |          texture.add('gem', 0, 288, 352, 16, 16);
+  79 |  }
+  80 |  
+     |  ^
+  
+오전 11:46:53 [vite] Internal server error: Transform failed with 1 error:
+/Users/hangup2/apps/survivors-game-project/src/assets/AssetLoader.ts:80:0: ERROR: Expected identifier but found end of file
+  Plugin: vite:esbuild
+  File: /Users/hangup2/apps/survivors-game-project/src/assets/AssetLoader.ts:80:0
+  
+  Expected identifier but found end of file
+  78 |          texture.add('gem', 0, 288, 352, 16, 16);
+  79 |  }
+  80 |  
+     |  ^
+  
+      at failureErrorWithLog (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:1467:15)
+      at /Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:736:50
+      at responseCallbacks.<computed> (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:603:9)
+      at handleIncomingPacket (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:658:12)
+      at Socket.readFromStdout (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:581:7)
+      at Socket.emit (node:events:508:28)
+      at addChunk (node:internal/streams/readable:559:12)
+      at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+      at Readable.push (node:internal/streams/readable:390:5)
+      at Pipe.onStreamRead (node:internal/stream_base_commons:189:23)
+오전 11:47:03 [vite] (client) page reload src/systems/SpellSystem.ts
+오전 11:47:03 [vite] (client) Pre-transform error: Transform failed with 1 error:
+/Users/hangup2/apps/survivors-game-project/src/systems/SpellSystem.ts:83:12: ERROR: Expected ";" but found "spawnProjectile"
+  Plugin: vite:esbuild
+  File: /Users/hangup2/apps/survivors-game-project/src/systems/SpellSystem.ts:83:12
+  
+  Expected ";" but found "spawnProjectile"
+  81 |      }
+  82 |  
+  83 |      private spawnProjectile(x: number, y: number, vx: number, vy: number, damage: number, radius: number, pierce: number, typeId: number) {
+     |              ^
+  84 |          const eid = addEntity(world);
+  85 |          addComponent(world, Position, eid);
+  
+오전 11:47:03 [vite] Internal server error: Transform failed with 1 error:
+/Users/hangup2/apps/survivors-game-project/src/assets/AssetLoader.ts:80:0: ERROR: Expected identifier but found end of file
+  Plugin: vite:esbuild
+  File: /Users/hangup2/apps/survivors-game-project/src/assets/AssetLoader.ts:80:0
+  
+  Expected identifier but found end of file
+  78 |          texture.add('gem', 0, 288, 352, 16, 16);
+  79 |  }
+  80 |  
+     |  ^
+  
+      at failureErrorWithLog (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:1467:15)
+      at /Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:736:50
+      at responseCallbacks.<computed> (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:603:9)
+      at handleIncomingPacket (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:658:12)
+      at Socket.readFromStdout (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:581:7)
+      at Socket.emit (node:events:508:28)
+      at addChunk (node:internal/streams/readable:559:12)
+      at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+      at Readable.push (node:internal/streams/readable:390:5)
+      at Pipe.onStreamRead (node:internal/stream_base_commons:189:23)
+오전 11:47:03 [vite] Internal server error: Transform failed with 1 error:
+/Users/hangup2/apps/survivors-game-project/src/systems/SpellSystem.ts:83:12: ERROR: Expected ";" but found "spawnProjectile"
+  Plugin: vite:esbuild
+  File: /Users/hangup2/apps/survivors-game-project/src/systems/SpellSystem.ts:83:12
+  
+  Expected ";" but found "spawnProjectile"
+  81 |      }
+  82 |  
+  83 |      private spawnProjectile(x: number, y: number, vx: number, vy: number, damage: number, radius: number, pierce: number, typeId: number) {
+     |              ^
+  84 |          const eid = addEntity(world);
+  85 |          addComponent(world, Position, eid);
+  
+      at failureErrorWithLog (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:1467:15)
+      at /Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:736:50
+      at responseCallbacks.<computed> (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:603:9)
+      at handleIncomingPacket (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:658:12)
+      at Socket.readFromStdout (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:581:7)
+      at Socket.emit (node:events:508:28)
+      at addChunk (node:internal/streams/readable:559:12)
+      at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+      at Readable.push (node:internal/streams/readable:390:5)
+      at Pipe.onStreamRead (node:internal/stream_base_commons:189:23)
+오전 11:47:13 [vite] (client) page reload src/systems/RenderSystem.ts
+오전 11:47:13 [vite] (client) Pre-transform error: Transform failed with 1 error:
+/Users/hangup2/apps/survivors-game-project/src/systems/SpellSystem.ts:83:12: ERROR: Expected ";" but found "spawnProjectile"
+  Plugin: vite:esbuild
+  File: /Users/hangup2/apps/survivors-game-project/src/systems/SpellSystem.ts:83:12
+  
+  Expected ";" but found "spawnProjectile"
+  81 |      }
+  82 |  
+  83 |      private spawnProjectile(x: number, y: number, vx: number, vy: number, damage: number, radius: number, pierce: number, typeId: number) {
+     |              ^
+  84 |          const eid = addEntity(world);
+  85 |          addComponent(world, Position, eid);
+  
+오전 11:47:13 [vite] Internal server error: Transform failed with 1 error:
+/Users/hangup2/apps/survivors-game-project/src/assets/AssetLoader.ts:80:0: ERROR: Expected identifier but found end of file
+  Plugin: vite:esbuild
+  File: /Users/hangup2/apps/survivors-game-project/src/assets/AssetLoader.ts:80:0
+  
+  Expected identifier but found end of file
+  78 |          texture.add('gem', 0, 288, 352, 16, 16);
+  79 |  }
+  80 |  
+     |  ^
+  
+      at failureErrorWithLog (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:1467:15)
+      at /Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:736:50
+      at responseCallbacks.<computed> (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:603:9)
+      at handleIncomingPacket (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:658:12)
+      at Socket.readFromStdout (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:581:7)
+      at Socket.emit (node:events:508:28)
+      at addChunk (node:internal/streams/readable:559:12)
+      at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+      at Readable.push (node:internal/streams/readable:390:5)
+      at Pipe.onStreamRead (node:internal/stream_base_commons:189:23)
+오전 11:47:13 [vite] Internal server error: Transform failed with 1 error:
+/Users/hangup2/apps/survivors-game-project/src/systems/SpellSystem.ts:83:12: ERROR: Expected ";" but found "spawnProjectile"
+  Plugin: vite:esbuild
+  File: /Users/hangup2/apps/survivors-game-project/src/systems/SpellSystem.ts:83:12
+  
+  Expected ";" but found "spawnProjectile"
+  81 |      }
+  82 |  
+  83 |      private spawnProjectile(x: number, y: number, vx: number, vy: number, damage: number, radius: number, pierce: number, typeId: number) {
+     |              ^
+  84 |          const eid = addEntity(world);
+  85 |          addComponent(world, Position, eid);
+  
+      at failureErrorWithLog (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:1467:15)
+      at /Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:736:50
+      at responseCallbacks.<computed> (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:603:9)
+      at handleIncomingPacket (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:658:12)
+      at Socket.readFromStdout (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:581:7)
+      at Socket.emit (node:events:508:28)
+      at addChunk (node:internal/streams/readable:559:12)
+      at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+      at Readable.push (node:internal/streams/readable:390:5)
+      at Pipe.onStreamRead (node:internal/stream_base_commons:189:23)
+오전 11:47:17 [vite] (client) page reload src/systems/CombatSystem.ts
+오전 11:47:17 [vite] (client) Pre-transform error: Transform failed with 1 error:
+/Users/hangup2/apps/survivors-game-project/src/systems/SpellSystem.ts:83:12: ERROR: Expected ";" but found "spawnProjectile"
+  Plugin: vite:esbuild
+  File: /Users/hangup2/apps/survivors-game-project/src/systems/SpellSystem.ts:83:12
+  
+  Expected ";" but found "spawnProjectile"
+  81 |      }
+  82 |  
+  83 |      private spawnProjectile(x: number, y: number, vx: number, vy: number, damage: number, radius: number, pierce: number, typeId: number) {
+     |              ^
+  84 |          const eid = addEntity(world);
+  85 |          addComponent(world, Position, eid);
+  
+오전 11:47:17 [vite] Internal server error: Transform failed with 1 error:
+/Users/hangup2/apps/survivors-game-project/src/assets/AssetLoader.ts:80:0: ERROR: Expected identifier but found end of file
+  Plugin: vite:esbuild
+  File: /Users/hangup2/apps/survivors-game-project/src/assets/AssetLoader.ts:80:0
+  
+  Expected identifier but found end of file
+  78 |          texture.add('gem', 0, 288, 352, 16, 16);
+  79 |  }
+  80 |  
+     |  ^
+  
+      at failureErrorWithLog (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:1467:15)
+      at /Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:736:50
+      at responseCallbacks.<computed> (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:603:9)
+      at handleIncomingPacket (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:658:12)
+      at Socket.readFromStdout (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:581:7)
+      at Socket.emit (node:events:508:28)
+      at addChunk (node:internal/streams/readable:559:12)
+      at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+      at Readable.push (node:internal/streams/readable:390:5)
+      at Pipe.onStreamRead (node:internal/stream_base_commons:189:23)
+오전 11:47:17 [vite] Internal server error: Transform failed with 1 error:
+/Users/hangup2/apps/survivors-game-project/src/systems/SpellSystem.ts:83:12: ERROR: Expected ";" but found "spawnProjectile"
+  Plugin: vite:esbuild
+  File: /Users/hangup2/apps/survivors-game-project/src/systems/SpellSystem.ts:83:12
+  
+  Expected ";" but found "spawnProjectile"
+  81 |      }
+  82 |  
+  83 |      private spawnProjectile(x: number, y: number, vx: number, vy: number, damage: number, radius: number, pierce: number, typeId: number) {
+     |              ^
+  84 |          const eid = addEntity(world);
+  85 |          addComponent(world, Position, eid);
+  
+      at failureErrorWithLog (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:1467:15)
+      at /Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:736:50
+      at responseCallbacks.<computed> (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:603:9)
+      at handleIncomingPacket (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:658:12)
+      at Socket.readFromStdout (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:581:7)
+      at Socket.emit (node:events:508:28)
+      at addChunk (node:internal/streams/readable:559:12)
+      at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+      at Readable.push (node:internal/streams/readable:390:5)
+      at Pipe.onStreamRead (node:internal/stream_base_commons:189:23)
+오전 11:47:29 [vite] (client) page reload src/scenes/MainScene.ts
+오전 11:47:30 [vite] (client) Pre-transform error: Transform failed with 1 error:
+/Users/hangup2/apps/survivors-game-project/src/systems/SpellSystem.ts:83:12: ERROR: Expected ";" but found "spawnProjectile"
+  Plugin: vite:esbuild
+  File: /Users/hangup2/apps/survivors-game-project/src/systems/SpellSystem.ts:83:12
+  
+  Expected ";" but found "spawnProjectile"
+  81 |      }
+  82 |  
+  83 |      private spawnProjectile(x: number, y: number, vx: number, vy: number, damage: number, radius: number, pierce: number, typeId: number) {
+     |              ^
+  84 |          const eid = addEntity(world);
+  85 |          addComponent(world, Position, eid);
+  
+오전 11:47:30 [vite] Internal server error: Transform failed with 1 error:
+/Users/hangup2/apps/survivors-game-project/src/assets/AssetLoader.ts:80:0: ERROR: Expected identifier but found end of file
+  Plugin: vite:esbuild
+  File: /Users/hangup2/apps/survivors-game-project/src/assets/AssetLoader.ts:80:0
+  
+  Expected identifier but found end of file
+  78 |          texture.add('gem', 0, 288, 352, 16, 16);
+  79 |  }
+  80 |  
+     |  ^
+  
+      at failureErrorWithLog (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:1467:15)
+      at /Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:736:50
+      at responseCallbacks.<computed> (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:603:9)
+      at handleIncomingPacket (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:658:12)
+      at Socket.readFromStdout (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:581:7)
+      at Socket.emit (node:events:508:28)
+      at addChunk (node:internal/streams/readable:559:12)
+      at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+      at Readable.push (node:internal/streams/readable:390:5)
+      at Pipe.onStreamRead (node:internal/stream_base_commons:189:23)
+오전 11:47:30 [vite] Internal server error: Transform failed with 1 error:
+/Users/hangup2/apps/survivors-game-project/src/systems/SpellSystem.ts:83:12: ERROR: Expected ";" but found "spawnProjectile"
+  Plugin: vite:esbuild
+  File: /Users/hangup2/apps/survivors-game-project/src/systems/SpellSystem.ts:83:12
+  
+  Expected ";" but found "spawnProjectile"
+  81 |      }
+  82 |  
+  83 |      private spawnProjectile(x: number, y: number, vx: number, vy: number, damage: number, radius: number, pierce: number, typeId: number) {
+     |              ^
+  84 |          const eid = addEntity(world);
+  85 |          addComponent(world, Position, eid);
+  
+      at failureErrorWithLog (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:1467:15)
+      at /Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:736:50
+      at responseCallbacks.<computed> (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:603:9)
+      at handleIncomingPacket (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:658:12)
+      at Socket.readFromStdout (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:581:7)
+      at Socket.emit (node:events:508:28)
+      at addChunk (node:internal/streams/readable:559:12)
+      at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+      at Readable.push (node:internal/streams/readable:390:5)
+      at Pipe.onStreamRead (node:internal/stream_base_commons:189:23)
+오전 11:47:40 [vite] (client) page reload src/assets/AssetLoader.ts
+오전 11:47:40 [vite] Internal server error: Transform failed with 1 error:
+/Users/hangup2/apps/survivors-game-project/src/systems/SpellSystem.ts:83:12: ERROR: Expected ";" but found "spawnProjectile"
+  Plugin: vite:esbuild
+  File: /Users/hangup2/apps/survivors-game-project/src/systems/SpellSystem.ts:83:12
+  
+  Expected ";" but found "spawnProjectile"
+  81 |      }
+  82 |  
+  83 |      private spawnProjectile(x: number, y: number, vx: number, vy: number, damage: number, radius: number, pierce: number, typeId: number) {
+     |              ^
+  84 |          const eid = addEntity(world);
+  85 |          addComponent(world, Position, eid);
+  
+      at failureErrorWithLog (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:1467:15)
+      at /Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:736:50
+      at responseCallbacks.<computed> (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:603:9)
+      at handleIncomingPacket (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:658:12)
+      at Socket.readFromStdout (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:581:7)
+      at Socket.emit (node:events:508:28)
+      at addChunk (node:internal/streams/readable:559:12)
+      at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+      at Readable.push (node:internal/streams/readable:390:5)
+      at Pipe.onStreamRead (node:internal/stream_base_commons:189:23)
+오전 11:47:46 [vite] (client) page reload src/systems/SpellSystem.ts
