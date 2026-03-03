@@ -29,6 +29,20 @@ export class CharacterSelectScene extends Phaser.Scene {
                 .setStrokeStyle(3, 0x444444)
                 .setInteractive({ useHandCursor: true });
 
+            // Display Character Sprite
+            const sprite = this.add.sprite(x, y - 50, 'dungeon', `${char.id}_idle_0`)
+                .setScale(4); // make it big on the card
+
+            // Add simple idle animation for the UI
+            this.tweens.add({
+                targets: sprite,
+                y: y - 60,
+                duration: 1000,
+                yoyo: true,
+                repeat: -1,
+                ease: 'Sine.easeInOut'
+            });
+
             this.add.text(x, y - 150, char.name, {
                 fontSize: '32px',
                 color: '#ffd700',
@@ -36,7 +50,7 @@ export class CharacterSelectScene extends Phaser.Scene {
             }).setOrigin(0.5);
 
             const statsText = `HP: ${char.baseStats.health}\nSPD: ${char.baseStats.speed}\nDMG: x${char.baseStats.damage}`;
-            this.add.text(x, y + 50, statsText, {
+            this.add.text(x, y + 100, statsText, {
                 fontSize: '24px',
                 color: '#aaaaaa',
                 align: 'center'
@@ -46,8 +60,14 @@ export class CharacterSelectScene extends Phaser.Scene {
                 this.scene.start('MainScene', { characterId: id });
             });
 
-            card.on('pointerover', () => card.setStrokeStyle(4, 0x00ffff));
-            card.on('pointerout', () => card.setStrokeStyle(3, 0x444444));
+            card.on('pointerover', () => {
+                card.setStrokeStyle(4, 0x00ffff);
+                sprite.setTint(0x00ffff);
+            });
+            card.on('pointerout', () => {
+                card.setStrokeStyle(3, 0x444444);
+                sprite.clearTint();
+            });
         });
     }
 }
