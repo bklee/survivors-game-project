@@ -920,3 +920,424 @@
 오후 12:08:32 [vite] (client) page reload src/scenes/MainScene.ts
 오후 12:09:15 [vite] (client) page reload src/scenes/UIScene.ts
 오후 12:10:00 [vite] (client) page reload src/scenes/UIScene.ts
+오후 12:12:27 [vite] (client) page reload src/assets/AssetLoader.ts
+오후 12:12:27 [vite] (client) Pre-transform error: Transform failed with 1 error:
+/Users/hangup2/apps/survivors-game-project/src/assets/AssetLoader.ts:110:0: ERROR: Unexpected "}"
+  Plugin: vite:esbuild
+  File: /Users/hangup2/apps/survivors-game-project/src/assets/AssetLoader.ts:110:0
+  
+  Unexpected "}"
+  108|  }
+  109|  
+  110|  }
+     |  ^
+  
+오후 12:12:27 [vite] Internal server error: Transform failed with 1 error:
+/Users/hangup2/apps/survivors-game-project/src/assets/AssetLoader.ts:110:0: ERROR: Unexpected "}"
+  Plugin: vite:esbuild
+  File: /Users/hangup2/apps/survivors-game-project/src/assets/AssetLoader.ts:110:0
+  
+  Unexpected "}"
+  108|  }
+  109|  
+  110|  }
+     |  ^
+  
+      at failureErrorWithLog (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:1467:15)
+      at /Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:736:50
+      at responseCallbacks.<computed> (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:603:9)
+      at handleIncomingPacket (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:658:12)
+      at Socket.readFromStdout (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:581:7)
+      at Socket.emit (node:events:508:28)
+      at addChunk (node:internal/streams/readable:559:12)
+      at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+      at Readable.push (node:internal/streams/readable:390:5)
+      at Pipe.onStreamRead (node:internal/stream_base_commons:189:23)
+오후 12:12:45 [vite] Internal server error: Transform failed with 1 error:
+/Users/hangup2/apps/survivors-game-project/src/assets/AssetLoader.ts:110:0: ERROR: Unexpected "}"
+  Plugin: vite:esbuild
+  File: /Users/hangup2/apps/survivors-game-project/src/assets/AssetLoader.ts:110:0
+  
+  Unexpected "}"
+  108|  }
+  109|  
+  110|  }
+     |  ^
+  
+      at failureErrorWithLog (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:1467:15)
+      at /Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:736:50
+      at responseCallbacks.<computed> (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:603:9)
+      at handleIncomingPacket (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:658:12)
+      at Socket.readFromStdout (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:581:7)
+      at Socket.emit (node:events:508:28)
+      at addChunk (node:internal/streams/readable:559:12)
+      at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+      at Readable.push (node:internal/streams/readable:390:5)
+      at Pipe.onStreamRead (node:internal/stream_base_commons:189:23)
+오후 12:12:50 [vite] (client) page reload src/systems/RenderSystem.ts
+오후 12:12:50 [vite] Internal server error: Transform failed with 1 error:
+/Users/hangup2/apps/survivors-game-project/src/assets/AssetLoader.ts:110:0: ERROR: Unexpected "}"
+  Plugin: vite:esbuild
+  File: /Users/hangup2/apps/survivors-game-project/src/assets/AssetLoader.ts:110:0
+  
+  Unexpected "}"
+  108|  }
+  109|  
+  110|  }
+     |  ^
+  
+      at failureErrorWithLog (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:1467:15)
+      at /Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:736:50
+      at responseCallbacks.<computed> (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:603:9)
+      at handleIncomingPacket (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:658:12)
+      at Socket.readFromStdout (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:581:7)
+      at Socket.emit (node:events:508:28)
+      at addChunk (node:internal/streams/readable:559:12)
+      at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+      at Readable.push (node:internal/streams/readable:390:5)
+      at Pipe.onStreamRead (node:internal/stream_base_commons:189:23)
+오후 12:13:20 [vite] (client) page reload src/scenes/MainScene.ts
+오후 12:13:20 [vite] (client) Pre-transform error: Transform failed with 1 error:
+/Users/hangup2/apps/survivors-game-project/src/scenes/MainScene.ts:208:12: ERROR: Expected ";" but found "spawnDungeonProps"
+  Plugin: vite:esbuild
+  File: /Users/hangup2/apps/survivors-game-project/src/scenes/MainScene.ts:208:12
+  
+  Expected ";" but found "spawnDungeonProps"
+  206|      }
+  207|  }
+  208|      private spawnDungeonProps() {
+     |              ^
+  209|          const propCount = 150;
+  210|          for (let i = 0; i < propCount; i++) {
+  
+오후 12:13:20 [vite] Internal server error: Transform failed with 1 error:
+/Users/hangup2/apps/survivors-game-project/src/scenes/MainScene.ts:208:12: ERROR: Expected ";" but found "spawnDungeonProps"
+  Plugin: vite:esbuild
+  File: /Users/hangup2/apps/survivors-game-project/src/scenes/MainScene.ts:208:12
+  
+  Expected ";" but found "spawnDungeonProps"
+  206|      }
+  207|  }
+  208|      private spawnDungeonProps() {
+     |              ^
+  209|          const propCount = 150;
+  210|          for (let i = 0; i < propCount; i++) {
+  
+      at failureErrorWithLog (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:1467:15)
+      at /Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:736:50
+      at responseCallbacks.<computed> (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:603:9)
+      at handleIncomingPacket (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:658:12)
+      at Socket.readFromStdout (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:581:7)
+      at Socket.emit (node:events:508:28)
+      at addChunk (node:internal/streams/readable:559:12)
+      at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+      at Readable.push (node:internal/streams/readable:390:5)
+      at Pipe.onStreamRead (node:internal/stream_base_commons:189:23)
+오후 12:13:20 [vite] Internal server error: Transform failed with 1 error:
+/Users/hangup2/apps/survivors-game-project/src/assets/AssetLoader.ts:110:0: ERROR: Unexpected "}"
+  Plugin: vite:esbuild
+  File: /Users/hangup2/apps/survivors-game-project/src/assets/AssetLoader.ts:110:0
+  
+  Unexpected "}"
+  108|  }
+  109|  
+  110|  }
+     |  ^
+  
+      at failureErrorWithLog (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:1467:15)
+      at /Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:736:50
+      at responseCallbacks.<computed> (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:603:9)
+      at handleIncomingPacket (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:658:12)
+      at Socket.readFromStdout (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:581:7)
+      at Socket.emit (node:events:508:28)
+      at addChunk (node:internal/streams/readable:559:12)
+      at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+      at Readable.push (node:internal/streams/readable:390:5)
+      at Pipe.onStreamRead (node:internal/stream_base_commons:189:23)
+오후 12:13:40 [vite] Internal server error: Transform failed with 1 error:
+/Users/hangup2/apps/survivors-game-project/src/scenes/MainScene.ts:208:12: ERROR: Expected ";" but found "spawnDungeonProps"
+  Plugin: vite:esbuild
+  File: /Users/hangup2/apps/survivors-game-project/src/scenes/MainScene.ts:208:12
+  
+  Expected ";" but found "spawnDungeonProps"
+  206|      }
+  207|  }
+  208|      private spawnDungeonProps() {
+     |              ^
+  209|          const propCount = 150;
+  210|          for (let i = 0; i < propCount; i++) {
+  
+      at failureErrorWithLog (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:1467:15)
+      at /Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:736:50
+      at responseCallbacks.<computed> (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:603:9)
+      at handleIncomingPacket (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:658:12)
+      at Socket.readFromStdout (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:581:7)
+      at Socket.emit (node:events:508:28)
+      at addChunk (node:internal/streams/readable:559:12)
+      at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+      at Readable.push (node:internal/streams/readable:390:5)
+      at Pipe.onStreamRead (node:internal/stream_base_commons:189:23)
+오후 12:13:40 [vite] Internal server error: Transform failed with 1 error:
+/Users/hangup2/apps/survivors-game-project/src/assets/AssetLoader.ts:110:0: ERROR: Unexpected "}"
+  Plugin: vite:esbuild
+  File: /Users/hangup2/apps/survivors-game-project/src/assets/AssetLoader.ts:110:0
+  
+  Unexpected "}"
+  108|  }
+  109|  
+  110|  }
+     |  ^
+  
+      at failureErrorWithLog (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:1467:15)
+      at /Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:736:50
+      at responseCallbacks.<computed> (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:603:9)
+      at handleIncomingPacket (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:658:12)
+      at Socket.readFromStdout (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:581:7)
+      at Socket.emit (node:events:508:28)
+      at addChunk (node:internal/streams/readable:559:12)
+      at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+      at Readable.push (node:internal/streams/readable:390:5)
+      at Pipe.onStreamRead (node:internal/stream_base_commons:189:23)
+오후 12:13:41 [vite] Internal server error: Transform failed with 1 error:
+/Users/hangup2/apps/survivors-game-project/src/scenes/MainScene.ts:208:12: ERROR: Expected ";" but found "spawnDungeonProps"
+  Plugin: vite:esbuild
+  File: /Users/hangup2/apps/survivors-game-project/src/scenes/MainScene.ts:208:12
+  
+  Expected ";" but found "spawnDungeonProps"
+  206|      }
+  207|  }
+  208|      private spawnDungeonProps() {
+     |              ^
+  209|          const propCount = 150;
+  210|          for (let i = 0; i < propCount; i++) {
+  
+      at failureErrorWithLog (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:1467:15)
+      at /Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:736:50
+      at responseCallbacks.<computed> (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:603:9)
+      at handleIncomingPacket (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:658:12)
+      at Socket.readFromStdout (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:581:7)
+      at Socket.emit (node:events:508:28)
+      at addChunk (node:internal/streams/readable:559:12)
+      at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+      at Readable.push (node:internal/streams/readable:390:5)
+      at Pipe.onStreamRead (node:internal/stream_base_commons:189:23)
+오후 12:13:41 [vite] Internal server error: Transform failed with 1 error:
+/Users/hangup2/apps/survivors-game-project/src/assets/AssetLoader.ts:110:0: ERROR: Unexpected "}"
+  Plugin: vite:esbuild
+  File: /Users/hangup2/apps/survivors-game-project/src/assets/AssetLoader.ts:110:0
+  
+  Unexpected "}"
+  108|  }
+  109|  
+  110|  }
+     |  ^
+  
+      at failureErrorWithLog (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:1467:15)
+      at /Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:736:50
+      at responseCallbacks.<computed> (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:603:9)
+      at handleIncomingPacket (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:658:12)
+      at Socket.readFromStdout (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:581:7)
+      at Socket.emit (node:events:508:28)
+      at addChunk (node:internal/streams/readable:559:12)
+      at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+      at Readable.push (node:internal/streams/readable:390:5)
+      at Pipe.onStreamRead (node:internal/stream_base_commons:189:23)
+오후 12:13:41 [vite] (client) page reload src/assets/AssetLoader.ts
+오후 12:13:41 [vite] (client) Pre-transform error: Transform failed with 1 error:
+/Users/hangup2/apps/survivors-game-project/src/scenes/MainScene.ts:208:12: ERROR: Expected ";" but found "spawnDungeonProps"
+  Plugin: vite:esbuild
+  File: /Users/hangup2/apps/survivors-game-project/src/scenes/MainScene.ts:208:12
+  
+  Expected ";" but found "spawnDungeonProps"
+  206|      }
+  207|  }
+  208|      private spawnDungeonProps() {
+     |              ^
+  209|          const propCount = 150;
+  210|          for (let i = 0; i < propCount; i++) {
+  
+오후 12:13:41 [vite] Internal server error: Transform failed with 1 error:
+/Users/hangup2/apps/survivors-game-project/src/scenes/MainScene.ts:208:12: ERROR: Expected ";" but found "spawnDungeonProps"
+  Plugin: vite:esbuild
+  File: /Users/hangup2/apps/survivors-game-project/src/scenes/MainScene.ts:208:12
+  
+  Expected ";" but found "spawnDungeonProps"
+  206|      }
+  207|  }
+  208|      private spawnDungeonProps() {
+     |              ^
+  209|          const propCount = 150;
+  210|          for (let i = 0; i < propCount; i++) {
+  
+      at failureErrorWithLog (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:1467:15)
+      at /Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:736:50
+      at responseCallbacks.<computed> (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:603:9)
+      at handleIncomingPacket (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:658:12)
+      at Socket.readFromStdout (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:581:7)
+      at Socket.emit (node:events:508:28)
+      at addChunk (node:internal/streams/readable:559:12)
+      at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+      at Readable.push (node:internal/streams/readable:390:5)
+      at Pipe.onStreamRead (node:internal/stream_base_commons:189:23)
+오후 12:13:42 [vite] Internal server error: Transform failed with 1 error:
+/Users/hangup2/apps/survivors-game-project/src/scenes/MainScene.ts:208:12: ERROR: Expected ";" but found "spawnDungeonProps"
+  Plugin: vite:esbuild
+  File: /Users/hangup2/apps/survivors-game-project/src/scenes/MainScene.ts:208:12
+  
+  Expected ";" but found "spawnDungeonProps"
+  206|      }
+  207|  }
+  208|      private spawnDungeonProps() {
+     |              ^
+  209|          const propCount = 150;
+  210|          for (let i = 0; i < propCount; i++) {
+  
+      at failureErrorWithLog (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:1467:15)
+      at /Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:736:50
+      at responseCallbacks.<computed> (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:603:9)
+      at handleIncomingPacket (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:658:12)
+      at Socket.readFromStdout (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:581:7)
+      at Socket.emit (node:events:508:28)
+      at addChunk (node:internal/streams/readable:559:12)
+      at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+      at Readable.push (node:internal/streams/readable:390:5)
+      at Pipe.onStreamRead (node:internal/stream_base_commons:189:23)
+오후 12:13:42 [vite] Internal server error: Transform failed with 1 error:
+/Users/hangup2/apps/survivors-game-project/src/scenes/MainScene.ts:208:12: ERROR: Expected ";" but found "spawnDungeonProps"
+  Plugin: vite:esbuild
+  File: /Users/hangup2/apps/survivors-game-project/src/scenes/MainScene.ts:208:12
+  
+  Expected ";" but found "spawnDungeonProps"
+  206|      }
+  207|  }
+  208|      private spawnDungeonProps() {
+     |              ^
+  209|          const propCount = 150;
+  210|          for (let i = 0; i < propCount; i++) {
+  
+      at failureErrorWithLog (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:1467:15)
+      at /Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:736:50
+      at responseCallbacks.<computed> (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:603:9)
+      at handleIncomingPacket (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:658:12)
+      at Socket.readFromStdout (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:581:7)
+      at Socket.emit (node:events:508:28)
+      at addChunk (node:internal/streams/readable:559:12)
+      at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+      at Readable.push (node:internal/streams/readable:390:5)
+      at Pipe.onStreamRead (node:internal/stream_base_commons:189:23)
+오후 12:13:42 [vite] Internal server error: Transform failed with 1 error:
+/Users/hangup2/apps/survivors-game-project/src/scenes/MainScene.ts:208:12: ERROR: Expected ";" but found "spawnDungeonProps"
+  Plugin: vite:esbuild
+  File: /Users/hangup2/apps/survivors-game-project/src/scenes/MainScene.ts:208:12
+  
+  Expected ";" but found "spawnDungeonProps"
+  206|      }
+  207|  }
+  208|      private spawnDungeonProps() {
+     |              ^
+  209|          const propCount = 150;
+  210|          for (let i = 0; i < propCount; i++) {
+  
+      at failureErrorWithLog (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:1467:15)
+      at /Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:736:50
+      at responseCallbacks.<computed> (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:603:9)
+      at handleIncomingPacket (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:658:12)
+      at Socket.readFromStdout (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:581:7)
+      at Socket.emit (node:events:508:28)
+      at addChunk (node:internal/streams/readable:559:12)
+      at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+      at Readable.push (node:internal/streams/readable:390:5)
+      at Pipe.onStreamRead (node:internal/stream_base_commons:189:23)
+오후 12:13:42 [vite] Internal server error: Transform failed with 1 error:
+/Users/hangup2/apps/survivors-game-project/src/scenes/MainScene.ts:208:12: ERROR: Expected ";" but found "spawnDungeonProps"
+  Plugin: vite:esbuild
+  File: /Users/hangup2/apps/survivors-game-project/src/scenes/MainScene.ts:208:12
+  
+  Expected ";" but found "spawnDungeonProps"
+  206|      }
+  207|  }
+  208|      private spawnDungeonProps() {
+     |              ^
+  209|          const propCount = 150;
+  210|          for (let i = 0; i < propCount; i++) {
+  
+      at failureErrorWithLog (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:1467:15)
+      at /Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:736:50
+      at responseCallbacks.<computed> (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:603:9)
+      at handleIncomingPacket (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:658:12)
+      at Socket.readFromStdout (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:581:7)
+      at Socket.emit (node:events:508:28)
+      at addChunk (node:internal/streams/readable:559:12)
+      at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+      at Readable.push (node:internal/streams/readable:390:5)
+      at Pipe.onStreamRead (node:internal/stream_base_commons:189:23)
+오후 12:13:43 [vite] Internal server error: Transform failed with 1 error:
+/Users/hangup2/apps/survivors-game-project/src/scenes/MainScene.ts:208:12: ERROR: Expected ";" but found "spawnDungeonProps"
+  Plugin: vite:esbuild
+  File: /Users/hangup2/apps/survivors-game-project/src/scenes/MainScene.ts:208:12
+  
+  Expected ";" but found "spawnDungeonProps"
+  206|      }
+  207|  }
+  208|      private spawnDungeonProps() {
+     |              ^
+  209|          const propCount = 150;
+  210|          for (let i = 0; i < propCount; i++) {
+  
+      at failureErrorWithLog (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:1467:15)
+      at /Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:736:50
+      at responseCallbacks.<computed> (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:603:9)
+      at handleIncomingPacket (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:658:12)
+      at Socket.readFromStdout (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:581:7)
+      at Socket.emit (node:events:508:28)
+      at addChunk (node:internal/streams/readable:559:12)
+      at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+      at Readable.push (node:internal/streams/readable:390:5)
+      at Pipe.onStreamRead (node:internal/stream_base_commons:189:23)
+오후 12:13:43 [vite] Internal server error: Transform failed with 1 error:
+/Users/hangup2/apps/survivors-game-project/src/scenes/MainScene.ts:208:12: ERROR: Expected ";" but found "spawnDungeonProps"
+  Plugin: vite:esbuild
+  File: /Users/hangup2/apps/survivors-game-project/src/scenes/MainScene.ts:208:12
+  
+  Expected ";" but found "spawnDungeonProps"
+  206|      }
+  207|  }
+  208|      private spawnDungeonProps() {
+     |              ^
+  209|          const propCount = 150;
+  210|          for (let i = 0; i < propCount; i++) {
+  
+      at failureErrorWithLog (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:1467:15)
+      at /Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:736:50
+      at responseCallbacks.<computed> (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:603:9)
+      at handleIncomingPacket (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:658:12)
+      at Socket.readFromStdout (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:581:7)
+      at Socket.emit (node:events:508:28)
+      at addChunk (node:internal/streams/readable:559:12)
+      at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+      at Readable.push (node:internal/streams/readable:390:5)
+      at Pipe.onStreamRead (node:internal/stream_base_commons:189:23)
+오후 12:13:43 [vite] Internal server error: Transform failed with 1 error:
+/Users/hangup2/apps/survivors-game-project/src/scenes/MainScene.ts:208:12: ERROR: Expected ";" but found "spawnDungeonProps"
+  Plugin: vite:esbuild
+  File: /Users/hangup2/apps/survivors-game-project/src/scenes/MainScene.ts:208:12
+  
+  Expected ";" but found "spawnDungeonProps"
+  206|      }
+  207|  }
+  208|      private spawnDungeonProps() {
+     |              ^
+  209|          const propCount = 150;
+  210|          for (let i = 0; i < propCount; i++) {
+  
+      at failureErrorWithLog (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:1467:15)
+      at /Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:736:50
+      at responseCallbacks.<computed> (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:603:9)
+      at handleIncomingPacket (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:658:12)
+      at Socket.readFromStdout (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:581:7)
+      at Socket.emit (node:events:508:28)
+      at addChunk (node:internal/streams/readable:559:12)
+      at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+      at Readable.push (node:internal/streams/readable:390:5)
+      at Pipe.onStreamRead (node:internal/stream_base_commons:189:23)
+오후 12:13:55 [vite] (client) page reload src/scenes/MainScene.ts
