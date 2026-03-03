@@ -20,34 +20,41 @@ export const Health = defineComponent({
 
 // Linking ECS entities with Phaser Sprites/GameObjects
 export const SpriteInfo = defineComponent({
-    textureIndex: Types.ui16, // e.g. 0: player, 1: enemyA, etc.
+    textureIndex: Types.ui16, 
 });
 
 // ECS Animation for Blitter
 export const Animation = defineComponent({
     frameStart: Types.ui16,
     frameEnd: Types.ui16,
-    frameRate: Types.f32, // Frames per second
-    timer: Types.f32,     // Internal timer accumulator
+    frameRate: Types.f32,
+    timer: Types.f32,
 });
 
 // Marker components for specific types
 export const Player = defineComponent();
 export const Enemy = defineComponent();
 export const Boss = defineComponent();
-export const Chest = defineComponent();
 export const EnemyProjectile = defineComponent();
+export const Chest = defineComponent();
 export const Scale = defineComponent({ value: Types.f32 });
+
 // Weapons & Magic
 export const Spell = defineComponent({
     damage: Types.f32,
-    radius: Types.f32, // hit radius
-    duration: Types.f32, // remaining lifespan in ms
-    pierce: Types.ui8, // how many enemies it can hit
+    radius: Types.f32,
+    duration: Types.f32,
+    pierce: Types.ui8,
 });
 
-// Drops (XP gems, health potions, gold)
+// Drops
 export const Item = defineComponent({
     xpValue: Types.f32,
-    magnetized: Types.ui8, // 1 = flying towards player
+    magnetized: Types.ui8,
+});
+
+// Interactive (Levers, Doors)
+export const Interactive = defineComponent({
+    isActivated: Types.ui8, // 0: off, 1: on
+    id: Types.ui16,         // link lever with door
 });

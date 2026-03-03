@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
-import { addEntity, addComponent } from 'bitecs';
+import { defineQuery, addEntity, addComponent } from 'bitecs';
 import { world } from '../core/World';
-import { Position, Velocity, Player, SpriteInfo, Animation, Health } from '../components';
+import { Position, Velocity, Player, SpriteInfo, Animation, Health, Interactive } from '../components';
 import { createPhysicsSystem } from '../systems/PhysicsSystem';
 import { createRenderSystem } from '../systems/RenderSystem';
 import { PlayerSystem } from '../systems/PlayerSystem';
@@ -35,6 +35,7 @@ export class MainScene extends Phaser.Scene {
     constructor() {
         super('MainScene');
     }
+
     init(data: { characterId: string }) {
         if (data && data.characterId) {
             this.selectedCharId = data.characterId;
@@ -72,10 +73,13 @@ export class MainScene extends Phaser.Scene {
         addComponent(world, Animation, this.playerId);
         addComponent(world, Health, this.playerId);
 
+        // START AT CENTER
+        Position.x[this.playerId] = WORLD_WIDTH / 2;
+        Position.y[this.playerId] = WORLD_HEIGHT / 2;
+        
         // Initialize Player based on selection
         const charData = CHARACTERS[this.selectedCharId.toUpperCase()] || CHARACTERS.WIZARD;
-        
-        let typeId = 1; // Wizard
+        let typeId = 1; 
         if (this.selectedCharId === 'knight') typeId = 0;
         else if (this.selectedCharId === 'elf') typeId = 2;
 
@@ -88,20 +92,14 @@ export class MainScene extends Phaser.Scene {
         Health.current[this.playerId] = charData.baseStats.health;
         Health.max[this.playerId] = charData.baseStats.health;
         
-        // Ensure global stats reflect character damage
         import('../core/PlayerStats').then(m => {
             m.globalStats.damageMult = charData.baseStats.damage;
         });
-        // Setup Camera Boundaries
+
         this.cameras.main.setBounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
         this.cameras.main.setZoom(2.5);
 
-        // We migrated UI to UIScene, removing it from here.
-        // Add Virtual Joystick at bottom left
         this.joystick = new VirtualJoystick(this, 150, 600, 50);
-        // We can't directly use setScrollFactor on complex DOM/Graphic elements easily here,
-        // so we will position it correctly or rely on CSS/fixed UI overlay later. 
-        // For now let's just leave it.
 
         const randomElements: Element[] = [Element.FIRE, Element.ICE, Element.LIGHTNING, Element.POISON];
         this.autoQueueIntervalId = window.setInterval(() => {
@@ -139,14 +137,6 @@ export class MainScene extends Phaser.Scene {
             window.removeEventListener('player_died', deathHandler);
         });
 
-        // Initialize Sound System (BGM)
-        this.startBGM('main_bgm');
-
-        window.addEventListener('boss_spawned', () => this.startBGM('boss_bgm'));
-        window.addEventListener('player_died', () => this.stopBGM());
-        window.addEventListener('stage_clear', () => this.stopBGM());
-        this.spawnDungeonProps();
-        console.log("Game started successfully!");
         const recipeHandler = (e: KeyboardEvent) => {
             if (e.code === 'KeyE') {
                 this.scene.pause();
@@ -157,41 +147,78 @@ export class MainScene extends Phaser.Scene {
         this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
             window.removeEventListener('keydown', recipeHandler);
         });
+
+        this.startBGM('main_bgm');
+        window.addEventListener('boss_spawned', () => this.startBGM('boss_bgm'));
+        window.addEventListener('player_died', () => this.stopBGM());
+        window.addEventListener('stage_clear', () => this.stopBGM());
+
+        this.spawnDungeonProps();
+        console.log("Game started successfully!");
     }
 
     update(_time: number, delta: number) {
-        // Process Systems
         this.nightDirector.update(delta);
         this.playerSystem.update(delta);
 
-        // Link joystick to player velocity manually for now
         const dX = this.joystick.vector.x;
         const dY = this.joystick.vector.y;
-
         if (dX !== 0 || dY !== 0) {
-            Velocity.x[this.playerId] = dX * 200; // placeholder speed
+            Velocity.x[this.playerId] = dX * 200;
             Velocity.y[this.playerId] = dY * 200;
         }
 
         this.spellSystem.update(delta);
-
         this.physicsSystem(delta);
         this.combatSystem(delta);
         this.itemSystem.update(delta);
         this.renderSystem(delta);
 
-        // Make camera follow player manually
+        this.handleInteractions(delta);
+
         const px = Position.x[this.playerId];
         const py = Position.y[this.playerId];
         this.cameras.main.centerOn(px, py);
     }
+
+    private handleInteractions(_dt: number) {
+        const px = Position.x[this.playerId];
+        const py = Position.y[this.playerId];
+        const interactives = defineQuery([Position, Interactive])(world);
+        
+        for (let i = 0; i < interactives.length; i++) {
+            const eid = interactives[i];
+            const typeId = SpriteInfo.textureIndex[eid];
+            const dx = px - Position.x[eid];
+            const dy = py - Position.y[eid];
+            const distSq = dx * dx + dy * dy;
+
+            if (typeId === 40) { // Lever
+                if (distSq < 40 * 40 && Interactive.isActivated[eid] === 0) {
+                    Interactive.isActivated[eid] = 1;
+                    window.dispatchEvent(new CustomEvent('play_sound', { detail: 'hit' }));
+                    for (let j = 0; j < interactives.length; j++) {
+                        const target = interactives[j];
+                        if (SpriteInfo.textureIndex[target] === 41 && Interactive.id[target] === Interactive.id[eid]) {
+                            Interactive.isActivated[target] = 1;
+                        }
+                    }
+                }
+            } else if (typeId === 32) { // Spikes
+                const animIdx = Math.floor(Animation.timer[eid] * 4 / 1000) % 4;
+                if (distSq < 20 * 20 && animIdx >= 2) {
+                    Health.current[this.playerId] -= 0.1; 
+                    window.dispatchEvent(new CustomEvent('hp_updated', { 
+                        detail: { current: Health.current[this.playerId], max: Health.max[this.playerId] } 
+                    }));
+                }
+            }
+        }
+    }
+
     private startBGM(key: string) {
         if (this.currentBGM && this.currentBGM.key === key) return;
-        
-        if (this.currentBGM) {
-            this.currentBGM.stop();
-        }
-
+        if (this.currentBGM) this.currentBGM.stop();
         if (this.cache.audio.exists(key)) {
             this.currentBGM = this.sound.add(key, { loop: true, volume: 0.3 });
             this.currentBGM.play();
@@ -206,28 +233,42 @@ export class MainScene extends Phaser.Scene {
     }
 
     private spawnDungeonProps() {
-        const propCount = 150;
+        const propCount = 100;
         for (let i = 0; i < propCount; i++) {
             const eid = addEntity(world);
             addComponent(world, Position, eid);
             addComponent(world, SpriteInfo, eid);
-            
             Position.x[eid] = Math.random() * WORLD_WIDTH;
             Position.y[eid] = Math.random() * WORLD_HEIGHT;
-            
             const roll = Math.random();
-            if (roll > 0.8) {
-                SpriteInfo.textureIndex[eid] = 30; // crate
-            } else if (roll > 0.6) {
-                SpriteInfo.textureIndex[eid] = 31; // skull
-            } else if (roll > 0.3) {
-                SpriteInfo.textureIndex[eid] = 33; // column
-            } else {
+            if (roll > 0.8) SpriteInfo.textureIndex[eid] = 30; // crate
+            else if (roll > 0.6) SpriteInfo.textureIndex[eid] = 31; // skull
+            else if (roll > 0.3) SpriteInfo.textureIndex[eid] = 33; // column
+            else {
                 SpriteInfo.textureIndex[eid] = 32; // spikes
                 addComponent(world, Animation, eid);
                 Animation.timer[eid] = Math.random() * 1000;
             }
         }
-    }
 
+        for (let i = 0; i < 10; i++) {
+            const lx = Math.random() * WORLD_WIDTH;
+            const ly = Math.random() * WORLD_HEIGHT;
+            const lever = addEntity(world);
+            addComponent(world, Position, lever);
+            addComponent(world, SpriteInfo, lever);
+            addComponent(world, Interactive, lever);
+            Position.x[lever] = lx; Position.y[lever] = ly;
+            SpriteInfo.textureIndex[lever] = 40;
+            Interactive.id[lever] = i;
+
+            const door = addEntity(world);
+            addComponent(world, Position, door);
+            addComponent(world, SpriteInfo, door);
+            addComponent(world, Interactive, door);
+            Position.x[door] = lx + 100; Position.y[door] = ly;
+            SpriteInfo.textureIndex[door] = 41;
+            Interactive.id[door] = i;
+        }
+    }
 }

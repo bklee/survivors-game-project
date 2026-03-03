@@ -2,196 +2,53 @@
 
 ## 1. 프로젝트 아키텍처 (Project Architecture)
 
-성능과 모바일 호환성의 균형을 위해 **Phaser 3**를 메인 프레임워크로 사용하되, 대규모 스웜(10k+) 렌더링은 **Custom WebGL Pipeline (Instanced Rendering)**을 통해 Phaser의 객체 오버헤드를 우회하고, 물리 연산은 기기 환경에 따라 **Adaptive Worker Bridge** 아키텍처를 채택함.
+성능과 모바일 호환성의 균형을 위해 **Phaser 3**를 메인 프레임워크로 사용하되, 대규모 스웜(10k+) 렌더링은 **Blitter API** 및 고밀도 Array 기반 ECS 매핑을 통해 최적화함.
 
-**생산성 최적화**: 오픈소스 Vampire Survivors 템플릿(Reddit/GitHub)의 검증된 로직 패턴을 레퍼런스로 활용하여 핵심 엔진 구현 속도를 높이고, 그 위에 본 프로젝트만의 고성능 ECS 및 연금술 시스템을 레이어링함.
-
-### 폴더 구조
-
-```text
-survivors-game-project/
-├── src/
-│   ├── main.ts             # Phaser 게임 설정 및 초기화
-│   ├── scenes/             # Phaser Scene (MainScene, UIScene, LoadingScene 등)
-│   ├── core/               # ECS 엔진 (bit-ecs), 공유 메모리 관리
-│   ├── systems/            # ECS 시스템 (이동, 물리 연산, 충돌, 스폰)
-│   ├── components/         # ECS 컴포넌트 (Position, Velocity, SpriteInfo, Health)
-│   ├── alchemy/            # 연금술 조합 및 레시피 시스템 (Logic only)
-│   ├── assets/             # 애셋 로더 및 상수 정의
-│   ├── ui/                 # Phaser UI 요소, HUD, 메뉴 컴포넌트
-│   ├── fx/                 # Post FX 및 파티클 시스템
-│   ├── audio/              # 사운드 매니저 및 공간 오디오 로직
-│   └── worker/             # 고성능 연산을 위한 Web Worker (Physics/AI)
-├── public/                 # 정적 리소스 (images, sounds, videos)
-├── design/                 # 원본 디자인 소스 및 목업
-└── research/               # 분석 문서, 계획서, 밸런스 데이터
-```
+---
 
 ## 2. 주요 구현 단계 (Detailed Milestones)
 
-### Phase 1: 아키텍처 및 기반 시스템 (Foundation & Infrastructure)
+### Phase 1~5: 기반 구축 (Completed)
+- [x] 개발 환경 (Vite + TS) 및 ECS (bit-ecs) 코어 설계 완료.
+- [x] 가상 조이스틱 및 입력 시스템 구축.
+- [x] 0x72 던전 타일셋 애셋 파이프라인 구축.
 
-- [x] **Task 1.1: 개발 환경 구축**: Vite 기반 Phaser 3 + TypeScript 환경 구축 및 Husky/Lint 설정.
-- [x] **Task 1.2: ECS 코어 설계**: `bit-ecs` 엔티티 레이아웃 정의 (SAB 연동 고려).
-- [x] **Task 1.3: 입력 및 모바일 대응**: 가상 조이스틱 (Virtual Joystick) 및 멀티 터치 시스템.
-- [x] **Task 1.4: 애셋 파이프라인**: Texture Atlas 로딩 및 동적 애니메이션 생성 시스템.
+### Phase 6: 대규모 최적화 및 연출 강화 (Completed)
+- [x] **스웜 최적화**: RenderSystem의 Map 룩업을 Array 룩업으로 교체 (1만개 엔티티 성능 확보).
+- [x] **연금술 큐 고도화**: 시너지 레시피(폭발 가스, 초전도 등) 로직 완성.
+- [x] **시각적 타격감(Juice)**: Hit Stop(ECS 연동), Screen Shake, Damage Numbers Pooling.
 
-### Phase 2: 핵심 전투 및 스웜 최적화 (Core Combat & Performance)
+### Phase 7~8: 핵심 전투 루프 및 성장 (Completed)
+- [x] **전투 충돌 시스템**: Spatial Hash 기반 고속 AABB 충돌 처리.
+- [x] **무기 시스템**: Alchemy 조합 결과에 따른 투사체/장판 스폰 연동.
+- [x] **적 AI 고도화**: 실시간 플레이어 추적(Tracking) 및 넉백 로직.
+- [x] **경험치 및 레벨업**: XP Gems 드롭, 자석(Magnet) 효과, 레벨업 시퀀스.
 
-- [x] **Task 2.0: 오픈소스 에셋 반영**: `0x72's 16x16 Dungeon Tileset II` 다운로드 및 스프라이트셋 적용 완료.
-- [x] **Task 2.1: 고성능 렌더링**: `Phaser.GameObjects.Blitter` 또는 Custom WebGL Pipeline을 이용한 적 스프라이트 최적화.
-- [x] **Task 2.2: 적 스폰 시스템**: '밤의 농도(Night Intensity)' 시스템 구현 (시간별 난이도 곡선).
-- [x] **Task 2.3: 물리 샌드박스**: Quadtree/Spatial Hashing 기반 고속 충돌 감지 및 밀쳐내기(Knockback) 로직.
+### Phase 9~10: UI/UX 및 비주얼 개편 (Completed)
+- [x] **HUD 구축**: 실시간 HP Bar, 연금술 큐 시각화.
+- [x] **레벨업 드래프트**: UpgradeScene을 통한 무작위 스탯 강화 카드 선택.
+- [x] **캐릭터 UI 개편**: Knight, Wizard, Elf 고유 비주얼(Series F) 및 전장 스프라이트 연동.
+- [x] **연금술 도감**: 'E' 키를 통한 조합법 사전(RecipeScene) 구현.
 
-### Phase 3: 연금술 및 성장 시스템 (Alchemy & Progression)
+### Phase 11: 환경 및 BGM (Completed)
+- [x] **던전 오버홀**: 4000x4000 전체 월드 타일링 및 150개 이상의 소품(Crate, Skull, Column) 배치.
+- [x] **BGM 루프**: 메인 테마 및 보스전 테마 자동 루프 및 상황별 전환 시스템.
+- [x] **사망 연출**: 플레이어 사망 시 Vanishing 효과 및 GameOverScene 연동.
 
-- [x] **Task 3.1: 마법의 큐(Magical Queue)**: 원소(불, 얼음, 번개, 독) 수집 및 실시간 조합 연산.
-- [x] **Task 3.2: 레벨업 시퀀스**: 가챠/카드 선택 UI 구현 및 오버액션 연출 (Slow-mo, Glow).
-- [x] **Task 3.3: 영구적 성장**: IndexedDB 연동을 통한 해금(Unlocks) 및 스킬 트리 데이터 저장.
-
-### Phase 4: 시각적 완성도 및 타격감 (Visual Juice & Polish)
-
-- [x] **Task 4.1: Juice Pipeline**: Hit-stop, Screen Shake, White Flash, Squash & Stretch 시스템화.
-- [x] **Task 4.2: 고성능 FX**: 파티클 시스템 최적화 및 Post-FX (Glitch, Bloom, ColorMatrix) 적용.
-- [x] **Task 4.3: 캐릭터 특화**: Rabbit(Bunny-hop), Bear(Dance), Panda(Roll) 등 고유 애니메이션 및 기믹 구현.
-
-### Phase 5: 밸런싱 및 출시 준비 (Final Polish & Launch)
-
-- [x] **Task 5.1: 오디오 시스템**: BGM 전환 및 타격음(SFX) 레이어링 (화면 밖 사운드 감쇠).
-- [x] **Task 5.2: 성능 테스트**: 저사양 기기 대상 프로파일링 및 Adaptive Physics 브릿지 튜닝.
-- [x] **Task 5.3: 튜토리얼 및 해금**: 초기 유저 경험 가이드 및 인게임 도감 완성.
-
-### Phase 6: 대규모 최적화 및 연출 강화 (Current Sprint)
-
-- [x] **Task 6.1: 스웜 렌더링 최적화**: WaveSystem 및 RenderSystem 병목 분석, Instanced Rendering/Blitter 고도화 (10k+ 엔티티 목표)
-- [x] **Task 6.2: 연금술 큐 고도화**: AlchemySystem 조합 로직 확장 및 시너지 레시피(폭발 가스, 초전도 등) 실제 구현
-- [x] **Task 6.3: 시각적 타격감(Juice)**: Hit Stop, Screen Shake, Damage Numbers(Batching) 파이프라인 연동
-- [x] **Task 6.4: 메타 프로그레시브 연동**: IndexedDB 기반 해금 및 스킬 트리 데이터 구조 구현
-- [x] **Task 6.5: 메모리 및 컴포넌트 최적화**: ECS 컴포넌트 풀링 정리, 불필요한 객체 생성/메모리 릭 방지
-
-### Phase 7: 핵심 전투 루프 (Core Combat Loop) - Current Sprint
-
-- [x] **Task 7.1: 전투 충돌 시스템**: Quadtree 혹은 Spatial Hash 기반의 고속 AABB 충돌 처리 (스펠 vs 적, 적 vs 플레이어)
-- [x] **Task 7.2: 무기 및 스펠 시스템**: `AlchemySystem` 조합 결과를 실제 인게임 엔티티(투사체, 광역 장판 등)로 스폰 및 데미지 로직 연결
-- [x] **Task 7.3: 플레이어 이동 기믹**: Rabbit(Hop), Panda(Roll) 등 캐릭터별 이동/회피 물리 연산 완성
-- [x] **Task 7.4: 적 AI 고도화**: 단순 중앙 이동이 아닌 실시간 플레이어 추적(Tracking) 및 넉백(Knockback) 처리
-
-### Phase 8: 게임 플레이 루프 (XP, Loot & Leveling) - Completed Sprint
-
-- [x] **Task 8.1: 전투 파이프라인 활성화**: MainScene에 CombatSystem 및 SpellSystem을 연결, Spacebar 스펠 발사(발사체 방향 로직 포함) 연동
-- [x] **Task 8.2: 아이템 드롭 (XP Gems)**: 적 사망 시 경험치 보석(Gem) 생성 및 플레이어 근접 시 자석(Magnet) 효과
-- [x] **Task 8.3: 레벨업 및 성장 로직**: 경험치 획득 시 게이지 상승, 특정 수치 도달 시 게임 일시 정지 후 스킬 선택창 띄우기
-
-### Phase 9: HUD 및 레벨업 UI 구축 (HUD & Level Up Draft) - Current Sprint
-
-- [ ] **Task 9.1: HUD 연금술 큐 시각화**: `MainScene` 화면 하단에 현재 쌓인 원소 큐를 시각적 아이콘으로 표시
-- [ ] **Task 9.2: 레벨업 씬 (UpgradeScene) 생성**: 레벨업 시 화면을 덮는 반투명 팝업(Draft) 씬 생성 및 `MainScene` 일시 정지 연동
-- [ ] **Task 9.3: 스킬 카드 선택 로직**: 3개의 무작위 업그레이드(공격력 증가, 원소 쿨타임 감소 등)를 카드 형태로 보여주고 클릭 시 적용
-
----
-- [ ] **Task 8.1: 전투 파이프라인 활성화**: MainScene에 CombatSystem 및 SpellSystem을 연결, Spacebar 스펠 발사(발사체 방향 로직 포함) 연동
-- [ ] **Task 8.2: 아이템 드롭 (XP Gems)**: 적 사망 시 경험치 보석(Gem) 생성 및 플레이어 근접 시 자석(Magnet) 효과
-- [ ] **Task 8.3: 레벨업 및 성장 로직**: 경험치 획득 시 게이지 상승, 특정 수치 도달 시 게임 일시 정지 후 스킬 선택창 띄우기
+### Phase 12: 상호작용 및 게임성 강화 (Current Sprint)
+- [ ] **함정 시스템**: 가시 함정(Spikes) 접촉 시 실제 데미지 판정 및 무적 시간(I-frame) 로직.
+- [ ] **인터랙티브 오브젝트**: 문(Door)과 이를 여는 레버(Lever) 시스템 구현.
+- [ ] **적 웨이브 세분화**: 몹 종류별 고유 스프라이트 및 이동 패턴 차별화 (진행 중).
 
 ---
 
 ## 3. 핵심 시스템 상세 설계 (Deep System Design)
 
-### A. 원소 조합 (Alchemy Combo) 인터페이스
+### A. 공간 해시 충돌 (Spatial Hash Collision)
+수천 개의 엔티티 간 거리 계산을 방지하기 위해 64px 그리드 기반의 `SpatialHash`를 사용하여 근접한 적들만 검사함.
 
-플레이어가 입력한 원소를 버퍼링하고, 조합 성공 시 시각적 피드백을 극대화함.
-
-- **Buffer**: 최대 3~4개의 원소를 담는 순환 큐.
-- **Trigger**: Space 키 또는 전용 버튼 클릭 시 조합 시도.
-- **Fail Over**: 조합 실패 시 '폭발(Backfire)' 데미지를 주거나 기본 마법 발사.
-
-### B. 밤의 농도 (Night Intensity) - 난이도 시스템
-
-단순한 시간 경과가 아닌, 특정 조건에 따라 게임 환경이 변화함.
-
-- **Level 1 (Dawn)**: 약한 적, 느린 속도.
-- **Level 3 (Midnight)**: 화면에 안개가 끼거나 적들의 눈이 붉어지며 이동 속도 대폭 증가.
-- **Boss Sequence**: 특정 시간(예: 10분) 도달 시 배경음악이 멈추고 보스 등장 연출.
-
-### C. 오버액션(Juice) 파이프라인 상세
-
-- **Hit Stop**: `scene.time.paused = true`가 아닌, ECS 시스템 업데이트를 수 밀리초간 정지하여 부드러운 멈춤 구현.
-- **Squash & Stretch**: Tween이 아닌 Shader 단계에서 Vertex 변형을 통한 고성능 연출.
-- **Damage Numbers**: 폰트 아틀라스를 이용한 Batch Rendering으로 수백 개의 데미지 텍스트 출력 최적화.
-
-### D. 캐릭터별 고유 애니메이션 기믹
-
-- **Rabbit (Bunny)**: 단순 이동이 아닌 점프 곡선(`sin` 파형)을 그리며 이동. 착지 시 충격파 발생.
-- **Bear (Dancing)**: 제자리 공격 시 춤추는 모션과 함께 주변 범위 데미지.
-- **Panda (Rolling)**: 대시 기능이 구르기로 대체되며 경로상의 적에게 데미지.
-
-### E. UI/UX 디자인 시스템 및 정보 구조 (Information Architecture)
-
-픽셀 아트 감성을 유지하면서도 현대적인 모바일 가독성을 확보함.
-
-- **시각적 우선순위**:
-    1. **플레이어 체력(HP)**: 가장 크고 직관적인 게이지로 중앙 하단 또는 플레이어 상단 배치.
-    2. **경험치/레벨**: 상단 전체를 가로지르는 슬림한 바 형태로 지속적인 성장감 부여.
-    3. **연금술 큐**: 선택된 원소를 플레이어 주변 혹은 우측 하단에 상징적인 아이콘으로 표시.
-- **Nine-slice Rendering**: Phaser 3의 `NineSlice` 객체를 사용하여 메뉴, 버튼, 업그레이드 선택창의 크기가 변해도 픽셀 왜곡 없이 깔끔한 픽셀 아트 GUI 유지.
-- **레이어 분리**: 게임 엔진 연산과 무관하게 UI 전용 Scene을 별도(Parallel)로 구동하여 프레임 드랍 발생 시에도 부드러운 버튼 반응성 보장.
-
----
-
-## 4. 기술적 상세 및 코드 패턴 (Technical Specs)
-
-### A. Adaptive Physics Bridge (멀티스레딩)
-
-```typescript
-export class PhysicsBridge {
-    private mode: 'SAB' | 'TRANSFER' | 'MAIN';
-    constructor() {
-        if (typeof SharedArrayBuffer !== 'undefined' && window.crossOriginIsolated) {
-            this.mode = 'SAB'; // 최고 성능 (Direct Memory Access)
-        } else if (window.Worker) {
-            this.mode = 'TRANSFER'; // 범용 멀티스레드 (Message Passing)
-        } else {
-            this.mode = 'MAIN'; // 단일 스레드 폴백
-        }
-    }
-}
-```
-
-### B. VFX 및 포스트 프로세싱 (FX API)
-
-Phaser 3.60+의 전용 FX API를 활용한 오버액션 구현:
-
-```typescript
-const fx = this.cameras.main.postFX.addGlitch();
-this.cameras.main.postFX.addColorMatrix().negative();
-this.tweens.add({
-  targets: fx,
-  reveal: 1,
-  duration: 500,
-  onComplete: () => this.cameras.main.postFX.clear()
-});
-```
-
-### C. 오디오 레이어링 전략
-
-- **Priority System**: 동시에 수백 개의 사운드가 재생되지 않도록 중요도에 따라 사운드 컷오프.
-- **Dynamic Reverb**: '밤의 농도'가 짙어질수록 소리에 리버브를 추가하여 몽환적인 분위기 연출.
-
----
-
-## 5. 테스트 및 품질 관리 (QA & Performance)
-
-### A. 성능 타겟 (Target Performance)
-
-- **High-end (Desktop/iPhone 15)**: 60 FPS (10,000 entities)
-- **Mid-range (Galaxy S22)**: 60 FPS (3,000 entities)
-- **Low-end (Older devices)**: 30 FPS (1,000 entities)
-
-### B. 프로파일링 도구
-
-- **Phaser Debug**: FPS, draw calls, texture memory.
-- **Chrome DevTools**: Worker CPU usage, memory leaks (SAB focus).
-- **Custom Telemetry**: 인게임 밸런스 지표 (평균 생존 시간, 최다 조합 등) 로깅.
+### B. 연금술 조합 알고리즘 (Recipe Matcher)
+큐에 담긴 원소 리스트의 부분 집합(Subset)을 검사하여 가장 긴(고급) 레시피를 우선적으로 발동함.
 
 ---
 
