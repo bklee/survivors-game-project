@@ -44,7 +44,7 @@ export class DungeonGenerator {
             }
 
             const newRoom: Room = { x, y, w, h };
-            
+
             let failed = false;
             // Don't check intersection for the first room
             if (i > 0) {
@@ -69,7 +69,7 @@ export class DungeonGenerator {
 
     private intersects(a: Room, b: Room): boolean {
         return (a.x <= b.x + b.w && a.x + a.w >= b.x &&
-                a.y <= b.y + b.h && a.y + a.h >= b.y);
+            a.y <= b.y + b.h && a.y + a.h >= b.y);
     }
 
     private createRoom(r: Room) {
@@ -102,8 +102,8 @@ export class DungeonGenerator {
         for (let x = min; x <= max; x++) {
             // Make corridor 3 tiles wide for better movement
             if (this.map[y]) this.map[y][x] = TileType.FLOOR;
-            if (this.map[y+1]) this.map[y+1][x] = TileType.FLOOR;
-            if (this.map[y-1]) this.map[y-1][x] = TileType.FLOOR;
+            if (this.map[y + 1]) this.map[y + 1][x] = TileType.FLOOR;
+            if (this.map[y - 1]) this.map[y - 1][x] = TileType.FLOOR;
         }
     }
 
@@ -114,8 +114,8 @@ export class DungeonGenerator {
             // 3 tiles wide
             if (this.map[y]) {
                 this.map[y][x] = TileType.FLOOR;
-                this.map[y][x+1] = TileType.FLOOR;
-                this.map[y][x-1] = TileType.FLOOR;
+                this.map[y][x + 1] = TileType.FLOOR;
+                this.map[y][x - 1] = TileType.FLOOR;
             }
         }
     }
@@ -127,7 +127,20 @@ export class DungeonGenerator {
         return this.map[ty][tx] === TileType.FLOOR;
     }
 
-    public getRandomFloorPixel(): {x: number, y: number} {
+    private hasClearance(tx: number, ty: number): boolean {
+        if (tx <= 1 || tx >= MAP_WIDTH - 2 || ty <= 1 || ty >= MAP_HEIGHT - 2) return false;
+        return this.map[ty][tx] === TileType.FLOOR &&
+            this.map[ty - 1][tx] === TileType.FLOOR &&
+            this.map[ty + 1][tx] === TileType.FLOOR &&
+            this.map[ty][tx - 1] === TileType.FLOOR &&
+            this.map[ty][tx + 1] === TileType.FLOOR &&
+            this.map[ty - 1][tx - 1] === TileType.FLOOR &&
+            this.map[ty - 1][tx + 1] === TileType.FLOOR &&
+            this.map[ty + 1][tx - 1] === TileType.FLOOR &&
+            this.map[ty + 1][tx + 1] === TileType.FLOOR;
+    }
+
+    public getRandomFloorPixel(): { x: number, y: number } {
         let tx, ty;
         let attempts = 0;
         do {
@@ -137,40 +150,56 @@ export class DungeonGenerator {
             if (attempts > 1000) {
                 return { x: (MAP_WIDTH * TILE_SIZE) / 2, y: (MAP_HEIGHT * TILE_SIZE) / 2 };
             }
-        } while (this.map[ty][tx] !== TileType.FLOOR);
-        
+        } while (!this.hasClearance(tx, ty));
+
         return {
-            x: tx * TILE_SIZE + TILE_SIZE/2,
-            y: ty * TILE_SIZE + TILE_SIZE/2
+            x: tx * TILE_SIZE + TILE_SIZE / 2,
+            y: ty * TILE_SIZE + TILE_SIZE / 2
         };
     }
 
-    public getFloorPixelNear(xPixel: number, yPixel: number, maxRadius: number): {x: number, y: number} {
+    public isFloorRect(xPixel: number, yPixel: number, width: number, height: number): boolean {
+        const minX = Math.floor((xPixel - width / 2) / TILE_SIZE);
+        const maxX = Math.floor((xPixel + width / 2) / TILE_SIZE);
+        const minY = Math.floor((yPixel - height / 2) / TILE_SIZE);
+        const maxY = Math.floor((yPixel + height / 2) / TILE_SIZE);
+
+        for (let checkX = minX; checkX <= maxX; checkX++) {
+            for (let checkY = minY; checkY <= maxY; checkY++) {
+                if (checkX < 0 || checkX >= MAP_WIDTH || checkY < 0 || checkY >= MAP_HEIGHT) return false;
+                if (this.map[checkY][checkX] !== TileType.FLOOR) return false;
+            }
+        }
+        return true;
+    }
+
+    public getFloorPixelNear(xPixel: number, yPixel: number, minRadius: number, maxRadius: number): { x: number, y: number } {
         let tx, ty;
         let attempts = 0;
-        
+
         const centerTx = Math.floor(xPixel / TILE_SIZE);
         const centerTy = Math.floor(yPixel / TILE_SIZE);
-        const tileRadius = Math.floor(maxRadius / TILE_SIZE);
+        const minTileRadius = Math.floor(minRadius / TILE_SIZE);
+        const maxTileRadius = Math.floor(maxRadius / TILE_SIZE);
 
         do {
             const angle = Math.random() * Math.PI * 2;
-            const r = Math.random() * tileRadius;
+            const r = minTileRadius + Math.random() * (maxTileRadius - minTileRadius);
             tx = Math.floor(centerTx + Math.cos(angle) * r);
             ty = Math.floor(centerTy + Math.sin(angle) * r);
-            
+
             tx = Math.max(0, Math.min(MAP_WIDTH - 1, tx));
             ty = Math.max(0, Math.min(MAP_HEIGHT - 1, ty));
-            
+
             attempts++;
             if (attempts > 100) {
                 return this.getRandomFloorPixel();
             }
-        } while (this.map[ty][tx] !== TileType.FLOOR);
-        
+        } while (!this.hasClearance(tx, ty));
+
         return {
-            x: tx * TILE_SIZE + TILE_SIZE/2,
-            y: ty * TILE_SIZE + TILE_SIZE/2
+            x: tx * TILE_SIZE + TILE_SIZE / 2,
+            y: ty * TILE_SIZE + TILE_SIZE / 2
         };
     }
 

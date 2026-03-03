@@ -9,6 +9,11 @@ export class CharacterSelectScene extends Phaser.Scene {
     create() {
         const { width, height } = this.scale;
 
+        // Play Selection BGM
+        if (this.cache.audio.exists('select_bgm')) {
+            this.sound.play('select_bgm', { loop: true, volume: 0.4 });
+        }
+
         this.add.text(width / 2, 100, 'CHOOSE YOUR ALCHEMIST', {
             fontSize: '48px',
             color: '#ffffff',
@@ -31,9 +36,8 @@ export class CharacterSelectScene extends Phaser.Scene {
 
             // Display Character Sprite
             const sprite = this.add.sprite(x, y - 50, 'dungeon', `${char.id}_idle_0`)
-                .setScale(4); // make it big on the card
+                .setScale(4); 
 
-            // Add simple idle animation for the UI
             this.tweens.add({
                 targets: sprite,
                 y: y - 60,
@@ -57,6 +61,7 @@ export class CharacterSelectScene extends Phaser.Scene {
             }).setOrigin(0.5);
 
             card.on('pointerdown', () => {
+                this.sound.stopAll(); // Stop selection BGM
                 this.scene.start('MainScene', { characterId: id });
             });
 

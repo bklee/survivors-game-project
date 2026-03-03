@@ -1,8 +1,8 @@
 import { addEntity, addComponent, defineQuery, hasComponent, removeEntity } from 'bitecs';
 import { world } from '../core/World';
-import { Animation, Position, Velocity, Health, SpriteInfo, Enemy, Player, Boss, EnemyProjectile } from '../components';
-
+import { Animation, Position, Velocity, Health, SpriteInfo, Enemy, Player, Boss, EnemyProjectile, Lifespan } from '../components';
 import { DungeonGenerator } from '../core/DungeonGenerator';
+
 const enemyQuery = defineQuery([Enemy, Position, Velocity]);
 const playerQuery = defineQuery([Player, Position]);
 
@@ -13,15 +13,17 @@ export class NightDirector {
     private spawnPauseUntil = 0;
     private bossSpawnPauseDuration = 4000;
     private bossBarrageTimer: number = 0;
+    private globalDifficultyMultiplier = 1.0;
     private waveConfig = [
         { time: 0, spawnInterval: 1000, intensity: 1 },
-        { time: 60000, spawnInterval: 500, intensity: 2 }, 
-        { time: 300000, spawnInterval: 100, intensity: 3 }, 
+        { time: 60000, spawnInterval: 500, intensity: 2 },
+        { time: 300000, spawnInterval: 100, intensity: 3 },
     ];
 
     private currentWaveIndex: number = 0;
     private lastSpawnTime: number = 0;
     private dungeon: DungeonGenerator;
+
     constructor(dungeon: DungeonGenerator) {
         this.dungeon = dungeon;
     }
@@ -59,7 +61,7 @@ export class NightDirector {
         const playerEid = players[0];
         const playerX = Position.x[playerEid];
         const playerY = Position.y[playerEid];
-        
+
         const enemies = enemyQuery(world);
         for (let i = 0; i < enemies.length; i++) {
             const eid = enemies[i];
@@ -101,13 +103,17 @@ export class NightDirector {
             py = Position.y[players[0]];
         }
 
-        const pos = this.dungeon.getFloorPixelNear(px, py, 800);
+        const pos = this.dungeon.getFloorPixelNear(px, py, 300, 800);
         Position.x[eid] = pos.x;
         Position.y[eid] = pos.y;
+
         const typeRoll = Math.random();
-        let typeId = 10; let speed = 60 * intensity; let hp = 10 * intensity;
-        if (typeRoll > 0.8) { typeId = 12; speed = 40 * intensity; hp = 40 * intensity; }
-        else if (typeRoll > 0.5) { typeId = 13; speed = 90 * intensity; hp = 5 * intensity; }
+        let typeId = 10;
+        let speed = 60 * intensity * this.globalDifficultyMultiplier;
+        let hp = 10 * intensity * this.globalDifficultyMultiplier;
+
+        if (typeRoll > 0.8) { typeId = 12; speed = 40 * intensity * this.globalDifficultyMultiplier; hp = 40 * intensity * this.globalDifficultyMultiplier; }
+        else if (typeRoll > 0.5) { typeId = 13; speed = 90 * intensity * this.globalDifficultyMultiplier; hp = 5 * intensity * this.globalDifficultyMultiplier; }
 
         const angle = Math.random() * Math.PI * 2;
         Velocity.x[eid] = Math.cos(angle) * speed;
@@ -137,13 +143,15 @@ export class NightDirector {
             py = Position.y[players[0]];
         }
 
-        const pos = this.dungeon.getFloorPixelNear(px, py, 900);
+        const pos = this.dungeon.getFloorPixelNear(px, py, 400, 900);
         Position.x[eid] = pos.x;
         Position.y[eid] = pos.y;
+
         const angle = Math.random() * Math.PI * 2;
         Velocity.x[eid] = Math.cos(angle) * 35;
         Velocity.y[eid] = Math.sin(angle) * 35;
-        Health.current[eid] = 500; Health.max[eid] = 500;
+        Health.current[eid] = 500 * this.globalDifficultyMultiplier;
+        Health.max[eid] = 500 * this.globalDifficultyMultiplier;
         SpriteInfo.textureIndex[eid] = 11;
         Animation.frameRate[eid] = 6;
         Animation.timer[eid] = 0;
@@ -158,9 +166,11 @@ export class NightDirector {
             addComponent(world, Velocity, beid);
             addComponent(world, EnemyProjectile, beid);
             addComponent(world, SpriteInfo, beid);
+            addComponent(world, Lifespan, beid);
             Position.x[beid] = x; Position.y[beid] = y;
             Velocity.x[beid] = Math.cos(angle) * 150;
             Velocity.y[beid] = Math.sin(angle) * 150;
+            Lifespan.duration[beid] = 1200; // Limits attack to a specific radius range (1.2s * 150 = 180px radius)
             SpriteInfo.textureIndex[beid] = 104;
         }
     }
@@ -171,14 +181,13 @@ export class NightDirector {
         this.bossSpawned = false;
         this.spawnPauseUntil = 0;
         this.lastSpawnTime = 0;
+        this.globalDifficultyMultiplier += 0.25;
 
-        // Increase global difficulty
         this.waveConfig.forEach(cfg => {
             cfg.intensity += 1;
-            cfg.spawnInterval = Math.max(50, cfg.spawnInterval - 50); // spawn faster
+            cfg.spawnInterval = Math.max(50, cfg.spawnInterval - 50);
         });
 
-        // Clear existing enemies and projectiles
         const enemies = enemyQuery(world);
         for (let i = 0; i < enemies.length; i++) {
             removeEntity(world, enemies[i]);

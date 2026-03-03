@@ -24,11 +24,12 @@ export const createPhysicsSystem = (dungeon: DungeonGenerator) => {
                 const nextX = Position.x[eid] + Velocity.x[eid] * deltaSec;
                 const nextY = Position.y[eid] + Velocity.y[eid] * deltaSec;
 
-                // Wall Collision check
-                if (dungeon.isFloor(nextX, Position.y[eid])) {
+                // Wall Collision check with Bounding Box
+                // Setting collision size to 12x12
+                if (dungeon.isFloorRect(nextX, Position.y[eid], 12, 12)) {
                     Position.x[eid] = nextX;
                 }
-                if (dungeon.isFloor(Position.x[eid], nextY)) {
+                if (dungeon.isFloorRect(Position.x[eid], nextY, 12, 12)) {
                     Position.y[eid] = nextY;
                 }
 

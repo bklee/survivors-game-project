@@ -20,7 +20,7 @@ export const Health = defineComponent({
 
 // Linking ECS entities with Phaser Sprites/GameObjects
 export const SpriteInfo = defineComponent({
-    textureIndex: Types.ui16, 
+    textureIndex: Types.ui16,
 });
 
 // ECS Animation for Blitter
@@ -58,3 +58,13 @@ export const Interactive = defineComponent({
     isActivated: Types.ui8, // 0: off, 1: on
     id: Types.ui16,         // link lever with door
 });
+
+// Lifespan for projectiles and temporary entities
+export const Lifespan = defineComponent({
+    duration: Types.f32,
+});
+
+export const Rotation = defineComponent({
+    angle: Types.f32
+});
+
