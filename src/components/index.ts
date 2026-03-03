@@ -27,3 +27,11 @@ export const SpriteInfo = defineComponent({
 // Marker components for specific types
 export const Player = defineComponent();
 export const Enemy = defineComponent();
+
+// Weapons & Magic
+export const Spell = defineComponent({
+    damage: Types.f32,
+    radius: Types.f32, // hit radius
+    duration: Types.f32, // remaining lifespan in ms
+    pierce: Types.ui8, // how many enemies it can hit
+});
