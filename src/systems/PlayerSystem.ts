@@ -1,4 +1,5 @@
 import { addComponent, defineQuery, hasComponent } from 'bitecs';
+import { CHARACTERS } from '../constants/CharacterConfig';
 import { Animation, Position, Velocity, Player } from '../components';
 import { world } from '../core/World';
 import { globalStats } from '../core/PlayerStats';
@@ -59,13 +60,13 @@ export class PlayerSystem {
             switch (this.character) {
                 case PlayerCharacter.RABBIT:
                     const hopPhase = Math.sin(this.stateTime / 100);
-                    speed = 200 + (hopPhase > 0 ? hopPhase * 100 : 0);
+                    speed = CHARACTERS.WIZARD.baseStats.speed + (hopPhase > 0 ? hopPhase * 100 : 0);
                     break;
                 case PlayerCharacter.BEAR:
-                    speed = 150;
+                    speed = CHARACTERS.KNIGHT.baseStats.speed;
                     break;
                 case PlayerCharacter.PANDA:
-                    speed = this.isDashing ? 600 : 180;
+                    speed = this.isDashing ? 600 : CHARACTERS.ELF.baseStats.speed;
                     break;
             }
 

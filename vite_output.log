@@ -663,3 +663,121 @@
 오전 11:55:16 [vite] (client) page reload src/systems/CombatSystem.ts
 오전 11:55:31 [vite] (client) page reload src/scenes/MainScene.ts
 오전 11:55:51 [vite] (client) page reload src/scenes/UIScene.ts
+오전 11:57:09 [vite] (client) page reload src/main.ts
+오전 11:57:20 [vite] (client) page reload src/scenes/BootScene.ts
+오전 11:57:44 [vite] (client) page reload src/scenes/MainScene.ts
+오전 11:58:02 [vite] (client) page reload src/systems/PlayerSystem.ts
+오전 11:58:12 [vite] (client) page reload src/systems/CombatSystem.ts
+오전 11:58:29 [vite] (client) page reload src/scenes/UIScene.ts
+오전 11:58:29 [vite] (client) Pre-transform error: Transform failed with 1 error:
+/Users/hangup2/apps/survivors-game-project/src/scenes/UIScene.ts:121:12: ERROR: Expected ";" but found "handleStageClear"
+  Plugin: vite:esbuild
+  File: /Users/hangup2/apps/survivors-game-project/src/scenes/UIScene.ts:121:12
+  
+  Expected ";" but found "handleStageClear"
+  119|      }
+  120|  }
+  121|      private handleStageClear = () => {
+     |              ^
+  122|          this.stageClearText.setVisible(true);
+  123|          this.tweens.add({
+  
+오전 11:58:29 [vite] Internal server error: Transform failed with 1 error:
+/Users/hangup2/apps/survivors-game-project/src/scenes/UIScene.ts:121:12: ERROR: Expected ";" but found "handleStageClear"
+  Plugin: vite:esbuild
+  File: /Users/hangup2/apps/survivors-game-project/src/scenes/UIScene.ts:121:12
+  
+  Expected ";" but found "handleStageClear"
+  119|      }
+  120|  }
+  121|      private handleStageClear = () => {
+     |              ^
+  122|          this.stageClearText.setVisible(true);
+  123|          this.tweens.add({
+  
+      at failureErrorWithLog (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:1467:15)
+      at /Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:736:50
+      at responseCallbacks.<computed> (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:603:9)
+      at handleIncomingPacket (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:658:12)
+      at Socket.readFromStdout (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:581:7)
+      at Socket.emit (node:events:508:28)
+      at addChunk (node:internal/streams/readable:559:12)
+      at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+      at Readable.push (node:internal/streams/readable:390:5)
+      at Pipe.onStreamRead (node:internal/stream_base_commons:189:23)
+오전 11:58:47 [vite] (client) page reload src/fx/JuicePipeline.ts
+오전 11:58:47 [vite] (client) Pre-transform error: Transform failed with 1 error:
+/Users/hangup2/apps/survivors-game-project/src/scenes/UIScene.ts:121:12: ERROR: Expected ";" but found "handleStageClear"
+  Plugin: vite:esbuild
+  File: /Users/hangup2/apps/survivors-game-project/src/scenes/UIScene.ts:121:12
+  
+  Expected ";" but found "handleStageClear"
+  119|      }
+  120|  }
+  121|      private handleStageClear = () => {
+     |              ^
+  122|          this.stageClearText.setVisible(true);
+  123|          this.tweens.add({
+  
+오전 11:58:47 [vite] Internal server error: Transform failed with 1 error:
+/Users/hangup2/apps/survivors-game-project/src/scenes/UIScene.ts:121:12: ERROR: Expected ";" but found "handleStageClear"
+  Plugin: vite:esbuild
+  File: /Users/hangup2/apps/survivors-game-project/src/scenes/UIScene.ts:121:12
+  
+  Expected ";" but found "handleStageClear"
+  119|      }
+  120|  }
+  121|      private handleStageClear = () => {
+     |              ^
+  122|          this.stageClearText.setVisible(true);
+  123|          this.tweens.add({
+  
+      at failureErrorWithLog (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:1467:15)
+      at /Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:736:50
+      at responseCallbacks.<computed> (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:603:9)
+      at handleIncomingPacket (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:658:12)
+      at Socket.readFromStdout (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:581:7)
+      at Socket.emit (node:events:508:28)
+      at addChunk (node:internal/streams/readable:559:12)
+      at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+      at Readable.push (node:internal/streams/readable:390:5)
+      at Pipe.onStreamRead (node:internal/stream_base_commons:189:23)
+오전 11:58:50 [vite] (client) page reload src/systems/CombatSystem.ts
+오전 11:58:51 [vite] (client) Pre-transform error: Transform failed with 1 error:
+/Users/hangup2/apps/survivors-game-project/src/scenes/UIScene.ts:121:12: ERROR: Expected ";" but found "handleStageClear"
+  Plugin: vite:esbuild
+  File: /Users/hangup2/apps/survivors-game-project/src/scenes/UIScene.ts:121:12
+  
+  Expected ";" but found "handleStageClear"
+  119|      }
+  120|  }
+  121|      private handleStageClear = () => {
+     |              ^
+  122|          this.stageClearText.setVisible(true);
+  123|          this.tweens.add({
+  
+오전 11:58:51 [vite] Internal server error: Transform failed with 1 error:
+/Users/hangup2/apps/survivors-game-project/src/scenes/UIScene.ts:121:12: ERROR: Expected ";" but found "handleStageClear"
+  Plugin: vite:esbuild
+  File: /Users/hangup2/apps/survivors-game-project/src/scenes/UIScene.ts:121:12
+  
+  Expected ";" but found "handleStageClear"
+  119|      }
+  120|  }
+  121|      private handleStageClear = () => {
+     |              ^
+  122|          this.stageClearText.setVisible(true);
+  123|          this.tweens.add({
+  
+      at failureErrorWithLog (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:1467:15)
+      at /Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:736:50
+      at responseCallbacks.<computed> (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:603:9)
+      at handleIncomingPacket (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:658:12)
+      at Socket.readFromStdout (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:581:7)
+      at Socket.emit (node:events:508:28)
+      at addChunk (node:internal/streams/readable:559:12)
+      at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+      at Readable.push (node:internal/streams/readable:390:5)
+      at Pipe.onStreamRead (node:internal/stream_base_commons:189:23)
+오전 11:59:02 [vite] (client) page reload src/scenes/UIScene.ts
+오전 11:59:09 [vite] (client) page reload src/scenes/MainScene.ts

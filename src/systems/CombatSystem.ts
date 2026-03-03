@@ -79,14 +79,25 @@ export const createCombatSystem = (juice: JuicePipeline) => {
                     window.dispatchEvent(new CustomEvent('play_sound', { detail: 'hit' }));
                     
                     const typeId = SpriteInfo.textureIndex[eid];
-                    if (typeId === 100) juice.whiteFlash(20); 
-                    else if (typeId === 101) juice.hitStop(30); 
-                    
+                    if (typeId === 100) {
+                        juice.whiteFlash(20); 
+                        juice.vfx.playFireHit(tx, ty);
+                    } else if (typeId === 101) {
+                        juice.hitStop(30); 
+                        juice.vfx.playIceHit(tx, ty);
+                    } else if (typeId === 102) {
+                        juice.vfx.playPoisonHit(tx, ty);
+                    }
                     Health.current[targetId] -= Spell.damage[eid];
                     juice.damageNumber(tx, ty, Spell.damage[eid]);
                     juice.hitStop(20);
                     
                     if (Health.current[targetId] <= 0) {
+                        const isBoss = hasComponent(world, Boss, targetId);
+                        if (isBoss) {
+                            window.dispatchEvent(new CustomEvent('stage_clear'));
+                        }
+
                         const dropId = addEntity(world);
                         addComponent(world, Position, dropId);
                         addComponent(world, Velocity, dropId);
