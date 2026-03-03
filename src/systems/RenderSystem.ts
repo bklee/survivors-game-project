@@ -79,16 +79,16 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                 const newBob = blitter.create(Position.x[eid], Position.y[eid], frameName);
                 if (typeId === 10) { newBob.tint = 0xffaaaa; newBob.alpha = 0.9; }
                 else if (typeId === 11) { newBob.tint = 0xff5555; }
+                else if (typeId === 12 || typeId === 13) { newBob.tint = 0xffffff; }
                 else if (typeId === 34) { newBob.tint = 0xff0000; } 
                 else if (typeId === 104) { newBob.tint = 0xffff00; }
+                
                 newBob.alpha = currentAlpha;
                 bobs[eid] = newBob;
             } else {
                 bob.x = Position.x[eid];
                 bob.y = Position.y[eid];
                 bob.alpha = currentAlpha;
-
-
                 try { bob.setFrame(frameName); } catch (e) {}
             }
         }

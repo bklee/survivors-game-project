@@ -1,4 +1,7 @@
 import Phaser from 'phaser';
+import { defineQuery } from 'bitecs';
+import { world } from '../core/World';
+import { Position, Player, Enemy } from '../components';
 import { Element } from '../alchemy/AlchemySystem';
 
 export class UIScene extends Phaser.Scene {
@@ -12,6 +15,14 @@ export class UIScene extends Phaser.Scene {
     private currentLevel = 1;
     private currentXp = 0;
     private xpToNextLevel = 100;
+
+    // Minimap
+    private minimapGraphics!: Phaser.GameObjects.Graphics;
+    private readonly MINIMAP_SIZE = 150;
+    private readonly SCALE = 150 / 4000; 
+    
+    private playerQuery = defineQuery([Player, Position]);
+    private enemyQuery = defineQuery([Enemy, Position]);
 
     constructor() {
         super({ key: 'UIScene', active: true }); 
@@ -37,6 +48,13 @@ export class UIScene extends Phaser.Scene {
             fontSize: '24px',
             color: '#00ffff',
         }).setOrigin(0.5, 0.5);
+
+        // Minimap
+        const mmX = 1280 - 10;
+        const mmY = 10;
+        this.add.rectangle(mmX, mmY, this.MINIMAP_SIZE + 4, this.MINIMAP_SIZE + 4, 0xffffff, 0.2).setOrigin(1, 0);
+        this.add.rectangle(mmX - 2, mmY + 2, this.MINIMAP_SIZE, this.MINIMAP_SIZE, 0x000000, 0.5).setOrigin(1, 0);
+        this.minimapGraphics = this.add.graphics();
 
         // Alerts
         this.bossWarningText = this.add.text(640, 360, 'BOSS APPROACHING!', {
@@ -71,6 +89,37 @@ export class UIScene extends Phaser.Scene {
             window.removeEventListener('stage_clear', this.handleStageClear as EventListener);
             this.bossWarningTween?.stop();
         });
+    }
+
+    update() {
+        this.updateMinimap();
+    }
+
+    private updateMinimap() {
+        this.minimapGraphics.clear();
+        const offsetX = 1280 - 12 - this.MINIMAP_SIZE;
+        const offsetY = 12;
+
+        const players = this.playerQuery(world);
+        const enemies = this.enemyQuery(world);
+
+        // Draw Enemies
+        this.minimapGraphics.fillStyle(0xff0000, 0.8);
+        for (let i = 0; i < enemies.length; i++) {
+            const eid = enemies[i];
+            const x = offsetX + (Position.x[eid] * this.SCALE);
+            const y = offsetY + (Position.y[eid] * this.SCALE);
+            this.minimapGraphics.fillRect(x, y, 2, 2);
+        }
+
+        // Draw Player
+        if (players.length > 0) {
+            const peid = players[0];
+            const px = offsetX + (Position.x[peid] * this.SCALE);
+            const py = offsetY + (Position.y[peid] * this.SCALE);
+            this.minimapGraphics.fillStyle(0xffffff, 1);
+            this.minimapGraphics.fillCircle(px, py, 3);
+        }
     }
 
     private handleXp = (e: CustomEvent<number>) => {
