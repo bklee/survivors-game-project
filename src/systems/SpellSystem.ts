@@ -3,6 +3,7 @@ import { Position, Velocity, Spell, Player, SpriteInfo } from '../components';
 import { world } from '../core/World';
 import { AlchemySystem } from '../alchemy/AlchemySystem';
 import { globalStats } from '../core/PlayerStats';
+
 const playerQuery = defineQuery([Player, Position, Velocity]);
 
 export class SpellSystem {
@@ -10,11 +11,11 @@ export class SpellSystem {
     private spellCooldowns: Map<string, number> = new Map();
     private lastFacingX = 1;
     private lastFacingY = 0;
+    public selectedCharId: string = 'wizard';
 
     constructor(alchemy: AlchemySystem) {
         this.alchemy = alchemy;
         
-        // Listen for alchemy cast event from UI or keyboard
         window.addEventListener('keydown', (e) => {
             if (e.code === 'Space') {
                 const spellId = this.alchemy.triggerCombo();
@@ -26,7 +27,6 @@ export class SpellSystem {
     }
 
     public update(dt: number) {
-        // Decrease cooldowns
         for (const [spell, time] of this.spellCooldowns.entries()) {
             if (time > 0) {
                 this.spellCooldowns.set(spell, time - dt);
@@ -51,72 +51,66 @@ export class SpellSystem {
             this.lastFacingY = pvy / playerSpeed;
         }
 
-        const directionX = this.lastFacingX;
-        const directionY = this.lastFacingY;
-
-        // Ensure we don't spam if we add auto-casting later
         if ((this.spellCooldowns.get(spellId) ?? 0) > 0) return;
-        this.spellCooldowns.set(spellId, 500 * globalStats.cooldownMult); // apply CDR
+        this.spellCooldowns.set(spellId, 500 * globalStats.cooldownMult);
 
-        // Simple mapping to spawn entities
-        switch (spellId) {
-            case 'fireball':
-                this.spawnProjectile(px, py, directionX * 400, directionY * 400, 50, 20, 1, 100);
-                window.dispatchEvent(new CustomEvent('play_sound', { detail: 'fire_cast' }));
-                break;
-            case 'ice_nova':
-                this.spawnAoE(px, py, 150, 30, 1000, 999, 101);
-                window.dispatchEvent(new CustomEvent('play_sound', { detail: 'ice_cast' }));
-                break;
-            case 'explosive_gas':
-                this.spawnAoE(px, py, 200, 100, 200, 999, 102);
-                window.dispatchEvent(new CustomEvent('play_sound', { detail: 'poison_cast' }));
-                break;
-            case 'backfire':
-                this.spawnAoE(px, py, 50, 1, 100, 999, 103);
-                break;
-            default:
-                this.spawnProjectile(px, py, directionX * 300, directionY * 300, 30, 30, 3, 100);
-                break;
+        // Apply Sound
+        if (spellId.includes('fire')) window.dispatchEvent(new CustomEvent('play_sound', { detail: 'fire_cast' }));
+        else if (spellId.includes('ice')) window.dispatchEvent(new CustomEvent('play_sound', { detail: 'ice_cast' }));
+        else if (spellId.includes('gas')) window.dispatchEvent(new CustomEvent('play_sound', { detail: 'poison_cast' }));
+
+        // Class-Based Attack Delivery
+        if (this.selectedCharId === 'knight') {
+            this.spawnKnightAttack(px, py, this.lastFacingX, this.lastFacingY);
+        } else if (this.selectedCharId === 'elf') {
+            this.spawnElfAttack(px, py, this.lastFacingX, this.lastFacingY);
+        } else {
+            this.spawnWizardAttack(px, py, this.lastFacingX, this.lastFacingY);
         }
     }
-    private spawnProjectile(x: number, y: number, vx: number, vy: number, damage: number, radius: number, pierce: number, typeId: number) {
-        const eid = addEntity(world);
-        addComponent(world, Position, eid);
-        addComponent(world, Velocity, eid);
-        addComponent(world, Spell, eid);
-        addComponent(world, SpriteInfo, eid);
 
-        Position.x[eid] = x;
-        Position.y[eid] = y;
-        Velocity.x[eid] = vx;
-        Velocity.y[eid] = vy;
-
-        Spell.damage[eid] = damage * globalStats.damageMult;
-        Spell.radius[eid] = radius;
-        Spell.duration[eid] = 2000;
-        Spell.pierce[eid] = pierce;
-        
-        SpriteInfo.textureIndex[eid] = typeId;
+    private spawnKnightAttack(x: number, y: number, dx: number, dy: number) {
+        // Close range arc swing
+        const eid = this.createBaseSpell(x + dx * 20, y + dy * 20, 105);
+        Spell.damage[eid] = 60 * globalStats.damageMult;
+        Spell.radius[eid] = 60; // wide swing
+        Spell.duration[eid] = 200; // very short lived
+        Spell.pierce[eid] = 10; // hits many
+        Velocity.x[eid] = dx * 50; 
+        Velocity.y[eid] = dy * 50;
     }
 
-    private spawnAoE(x: number, y: number, radius: number, damage: number, duration: number, pierce: number, typeId: number) {
+    private spawnElfAttack(x: number, y: number, dx: number, dy: number) {
+        // Fast piercing arrows
+        const eid = this.createBaseSpell(x, y, 106);
+        Spell.damage[eid] = 30 * globalStats.damageMult;
+        Spell.radius[eid] = 15;
+        Spell.duration[eid] = 1500;
+        Spell.pierce[eid] = 3;
+        Velocity.x[eid] = dx * 700; 
+        Velocity.y[eid] = dy * 700;
+    }
+
+    private spawnWizardAttack(x: number, y: number, dx: number, dy: number) {
+        // Elemental magic projectiles
+        const eid = this.createBaseSpell(x, y, 107);
+        Spell.damage[eid] = 45 * globalStats.damageMult;
+        Spell.radius[eid] = 25;
+        Spell.duration[eid] = 2000;
+        Spell.pierce[eid] = 1;
+        Velocity.x[eid] = dx * 400; 
+        Velocity.y[eid] = dy * 400;
+    }
+
+    private createBaseSpell(x: number, y: number, typeId: number): number {
         const eid = addEntity(world);
         addComponent(world, Position, eid);
         addComponent(world, Velocity, eid);
         addComponent(world, Spell, eid);
         addComponent(world, SpriteInfo, eid);
-
         Position.x[eid] = x;
         Position.y[eid] = y;
-        Velocity.x[eid] = 0;
-        Velocity.y[eid] = 0;
-
-        Spell.damage[eid] = damage * globalStats.damageMult;
-        Spell.radius[eid] = radius;
-        Spell.duration[eid] = duration;
-        Spell.pierce[eid] = pierce;
-        
         SpriteInfo.textureIndex[eid] = typeId;
+        return eid;
     }
 }
