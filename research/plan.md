@@ -71,10 +71,16 @@ survivors-game-project/
 
 ### Phase 7: 핵심 전투 루프 (Core Combat Loop) - Current Sprint
 
-- [ ] **Task 7.1: 전투 충돌 시스템**: Quadtree 혹은 Spatial Hash 기반의 고속 AABB 충돌 처리 (스펠 vs 적, 적 vs 플레이어)
-- [ ] **Task 7.2: 무기 및 스펠 시스템**: `AlchemySystem` 조합 결과를 실제 인게임 엔티티(투사체, 광역 장판 등)로 스폰 및 데미지 로직 연결
-- [ ] **Task 7.3: 플레이어 이동 기믹**: Rabbit(Hop), Panda(Roll) 등 캐릭터별 이동/회피 물리 연산 완성
-- [ ] **Task 7.4: 적 AI 고도화**: 단순 중앙 이동이 아닌 실시간 플레이어 추적(Tracking) 및 넉백(Knockback) 처리
+- [x] **Task 7.1: 전투 충돌 시스템**: Quadtree 혹은 Spatial Hash 기반의 고속 AABB 충돌 처리 (스펠 vs 적, 적 vs 플레이어)
+- [x] **Task 7.2: 무기 및 스펠 시스템**: `AlchemySystem` 조합 결과를 실제 인게임 엔티티(투사체, 광역 장판 등)로 스폰 및 데미지 로직 연결
+- [x] **Task 7.3: 플레이어 이동 기믹**: Rabbit(Hop), Panda(Roll) 등 캐릭터별 이동/회피 물리 연산 완성
+- [x] **Task 7.4: 적 AI 고도화**: 단순 중앙 이동이 아닌 실시간 플레이어 추적(Tracking) 및 넉백(Knockback) 처리
+
+### Phase 8: 게임 플레이 루프 (XP, Loot & Leveling) - Current Sprint
+
+- [ ] **Task 8.1: 전투 파이프라인 활성화**: MainScene에 CombatSystem 및 SpellSystem을 연결, Spacebar 스펠 발사(발사체 방향 로직 포함) 연동
+- [ ] **Task 8.2: 아이템 드롭 (XP Gems)**: 적 사망 시 경험치 보석(Gem) 생성 및 플레이어 근접 시 자석(Magnet) 효과
+- [ ] **Task 8.3: 레벨업 및 성장 로직**: 경험치 획득 시 게이지 상승, 특정 수치 도달 시 게임 일시 정지 후 스킬 선택창 띄우기
 
 ---
 
