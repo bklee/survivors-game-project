@@ -6,15 +6,15 @@ export class UIScene extends Phaser.Scene {
     private queueText!: Phaser.GameObjects.Text;
     private hpBar!: Phaser.GameObjects.Rectangle;
     private bossWarningText!: Phaser.GameObjects.Text;
-    private stageClearText!: Phaser.GameObjects.Text;
     private bossWarningTween?: Phaser.Tweens.Tween;
+    private stageClearText!: Phaser.GameObjects.Text;
 
     private currentLevel = 1;
     private currentXp = 0;
     private xpToNextLevel = 100;
 
     constructor() {
-        super({ key: 'UIScene', active: true }); // Automatically starts alongside others
+        super({ key: 'UIScene', active: true }); 
     }
 
     create() {
@@ -27,18 +27,18 @@ export class UIScene extends Phaser.Scene {
             fontSize: '20px',
             color: '#ffff00',
         });
-        // HP Bar Background
+
+        // HP Bar
         this.add.rectangle(640, 30, 400, 20, 0x333333).setOrigin(0.5);
         this.hpBar = this.add.rectangle(640, 30, 400, 20, 0x00ff00).setOrigin(0.5);
 
-        // Listen for global events
-
-        // Fixed at bottom center of 1280x720 canvas
+        // Queue HUD
         this.queueText = this.add.text(640, 680, "Queue: [ ]", {
             fontSize: '24px',
             color: '#00ffff',
         }).setOrigin(0.5, 0.5);
 
+        // Alerts
         this.bossWarningText = this.add.text(640, 360, 'BOSS APPROACHING!', {
             fontSize: '72px',
             color: '#ff0000',
@@ -46,6 +46,7 @@ export class UIScene extends Phaser.Scene {
             stroke: '#000000',
             strokeThickness: 8,
         }).setOrigin(0.5, 0.5).setVisible(false);
+
         this.stageClearText = this.add.text(640, 360, 'STAGE CLEAR!', {
             fontSize: '96px',
             color: '#ffff00',
@@ -55,12 +56,12 @@ export class UIScene extends Phaser.Scene {
         }).setOrigin(0.5, 0.5).setVisible(false);
 
         // Listen for global events
-        window.addEventListener('stage_clear', this.handleStageClear as EventListener);
-        // Listen for global events
         window.addEventListener('xp_collected', this.handleXp as EventListener);
         window.addEventListener('alchemyQueueUpdated', this.handleQueue as EventListener);
         window.addEventListener('boss_spawned', this.handleBossSpawn as EventListener);
         window.addEventListener('hp_updated', this.handleHp as EventListener);
+        window.addEventListener('stage_clear', this.handleStageClear as EventListener);
+        window.addEventListener('player_died', () => this.sound.stopAll());
 
         this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
             window.removeEventListener('xp_collected', this.handleXp as EventListener);
@@ -78,7 +79,6 @@ export class UIScene extends Phaser.Scene {
             this.currentLevel++;
             this.currentXp -= this.xpToNextLevel;
             this.xpToNextLevel = Math.floor(this.xpToNextLevel * 1.5);
-            // Note: Pause/Juice logic is still handled in MainScene.
         }
         this.xpText.setText(`Level: ${this.currentLevel} | XP: ${Math.floor(this.currentXp)}/${this.xpToNextLevel}`);
     }
@@ -87,12 +87,11 @@ export class UIScene extends Phaser.Scene {
         const elements = e.detail;
         this.queueText.setText(`Queue: [ ${elements.join(' + ')} ]`);
     }
+
     private handleHp = (e: CustomEvent<{current: number, max: number}>) => {
         const { current, max } = e.detail;
         const percent = Phaser.Math.Clamp(current / max, 0, 1);
         this.hpBar.width = 400 * percent;
-        
-        // Color shift: Green -> Yellow -> Red
         if (percent > 0.5) this.hpBar.setFillStyle(0x00ff00);
         else if (percent > 0.2) this.hpBar.setFillStyle(0xffff00);
         else this.hpBar.setFillStyle(0xff0000);
@@ -102,7 +101,6 @@ export class UIScene extends Phaser.Scene {
         this.bossWarningTween?.stop();
         this.bossWarningText.setVisible(true);
         this.bossWarningText.setAlpha(1);
-
         this.bossWarningTween = this.tweens.add({
             targets: this.bossWarningText,
             alpha: 0.2,
@@ -110,11 +108,8 @@ export class UIScene extends Phaser.Scene {
             yoyo: true,
             repeat: 20,
         });
-
         this.time.delayedCall(3000, () => {
-            this.bossWarningTween?.stop();
             this.bossWarningText.setVisible(false);
-            this.bossWarningText.setAlpha(1);
         });
     }
 
@@ -132,6 +127,6 @@ export class UIScene extends Phaser.Scene {
                 });
             }
         });
+        this.sound.stopAll();
     }
-
 }
