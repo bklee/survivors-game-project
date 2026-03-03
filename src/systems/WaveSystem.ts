@@ -1,12 +1,16 @@
 import { addEntity, addComponent, defineQuery } from 'bitecs';
 import { world } from '../core/World';
-import { Animation, Position, Velocity, Health, SpriteInfo, Enemy, Player } from '../components';
+import { Animation, Position, Velocity, Health, SpriteInfo, Enemy, Player, Boss } from '../components';
 
 const enemyQuery = defineQuery([Enemy, Position, Velocity]);
 const playerQuery = defineQuery([Player, Position]);
 
 export class NightDirector {
     private timeElapsed: number = 0; // ms
+    private bossSpawnThreshold = 30000;
+    private bossSpawned = false;
+    private spawnPauseUntil = 0;
+    private bossSpawnPauseDuration = 4000;
     private waveConfig = [
         { time: 0, spawnInterval: 1000, intensity: 1 },
         { time: 60000, spawnInterval: 500, intensity: 2 }, // 1 min (Dawn)
@@ -31,8 +35,19 @@ export class NightDirector {
 
         const currentWave = this.waveConfig[this.currentWaveIndex];
 
+        if (!this.bossSpawned && this.timeElapsed >= this.bossSpawnThreshold) {
+            this.spawnBoss();
+            this.bossSpawned = true;
+            this.spawnPauseUntil = this.timeElapsed + this.bossSpawnPauseDuration;
+            this.lastSpawnTime = this.spawnPauseUntil;
+            window.dispatchEvent(new CustomEvent('boss_spawned'));
+        }
+
         // Should we spawn enemies? (Handle bursts)
-        if (this.timeElapsed - this.lastSpawnTime > currentWave.spawnInterval) {
+        if (
+            this.timeElapsed >= this.spawnPauseUntil
+            && this.timeElapsed - this.lastSpawnTime > currentWave.spawnInterval
+        ) {
             // Calculate how many enemies we should have spawned since last time to avoid missing spawns
             const timePassed = this.timeElapsed - this.lastSpawnTime;
             const spawnCount = Math.floor(timePassed / currentWave.spawnInterval);
@@ -98,11 +113,45 @@ export class NightDirector {
         Health.current[eid] = 10 * intensity;
         Health.max[eid] = 10 * intensity;
 
-        // Roughly frame 109 is a small monster (like a demon or slime) in 0x72
-        SpriteInfo.textureIndex[eid] = 109;
-        Animation.frameStart[eid] = 109;
-        Animation.frameEnd[eid] = 112;
+        // Imp Type ID
+        SpriteInfo.textureIndex[eid] = 10;
+        Animation.frameStart[eid] = 0;
+        Animation.frameEnd[eid] = 3;
         Animation.frameRate[eid] = 8;
         Animation.timer[eid] = 0;
     }
+
+    private spawnBoss() {
+        const angle = Math.random() * Math.PI * 2;
+        const radius = 900;
+        const spawnX = 640 + Math.cos(angle) * radius;
+        const spawnY = 360 + Math.sin(angle) * radius;
+
+        const eid = addEntity(world);
+        addComponent(world, Position, eid);
+        addComponent(world, Velocity, eid);
+        addComponent(world, Health, eid);
+        addComponent(world, SpriteInfo, eid);
+        addComponent(world, Animation, eid);
+        addComponent(world, Enemy, eid);
+        addComponent(world, Boss, eid);
+
+        Position.x[eid] = spawnX;
+        Position.y[eid] = spawnY;
+
+        const speed = 35;
+        Velocity.x[eid] = Math.cos(angle) * speed;
+        Velocity.y[eid] = Math.sin(angle) * speed;
+
+        Health.current[eid] = 500;
+        Health.max[eid] = 500;
+
+        // Demon Type ID
+        SpriteInfo.textureIndex[eid] = 11;
+        Animation.frameStart[eid] = 0;
+        Animation.frameEnd[eid] = 3;
+        Animation.frameRate[eid] = 6;
+        Animation.timer[eid] = 0;
+}
+
 }

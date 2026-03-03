@@ -1,5 +1,5 @@
-import { defineQuery, removeEntity, addEntity, addComponent } from 'bitecs';
-import { Position, Spell, Health, Item, Velocity, SpriteInfo } from '../components';
+import { defineQuery, removeEntity, addEntity, addComponent, hasComponent } from 'bitecs';
+import { Position, Spell, Health, Item, Velocity, SpriteInfo, Boss } from '../components';
 import { world } from '../core/World';
 import { JuicePipeline } from '../fx/JuicePipeline';
 import { enemySpatialHash } from './PhysicsSystem';
@@ -60,10 +60,18 @@ export const createCombatSystem = (juice: JuicePipeline) => {
                         Velocity.x[dropId] = (Math.random() - 0.5) * 100;
                         Velocity.y[dropId] = (Math.random() - 0.5) * 100;
 
-                        Item.xpValue[dropId] = 10;
+                        if (hasComponent(world, Boss, targetId)) {
+                            // Boss drop: Massive XP and special icon
+                            Item.xpValue[dropId] = 500;
+                            SpriteInfo.textureIndex[dropId] = 20; // Gem Type ID
+                            console.log("BOSS DEFEATED! Massive XP dropped.");
+                        } else {
+                            // Regular enemy drop
+                            Item.xpValue[dropId] = 10;
+                            SpriteInfo.textureIndex[dropId] = 20; // Gem Type ID
+                        }
+
                         Item.magnetized[dropId] = 0;
-                        
-                        SpriteInfo.textureIndex[dropId] = 40; // Some small gem sprite
 
                         removeEntity(world, targetId);
                     }
