@@ -30,6 +30,7 @@ export class MainScene extends Phaser.Scene {
     private itemSystem!: ItemSystem;
     private selectedCharId: string = 'wizard';
     private autoQueueIntervalId?: number;
+    private currentBGM?: Phaser.Sound.BaseSound;
 
     constructor() {
         super('MainScene');
@@ -138,6 +139,12 @@ export class MainScene extends Phaser.Scene {
             window.removeEventListener('player_died', deathHandler);
         });
 
+        // Initialize Sound System (BGM)
+        this.startBGM('main_bgm');
+
+        window.addEventListener('boss_spawned', () => this.startBGM('boss_bgm'));
+        window.addEventListener('player_died', () => this.stopBGM());
+        window.addEventListener('stage_clear', () => this.stopBGM());
         console.log("Game started successfully!");
         const recipeHandler = (e: KeyboardEvent) => {
             if (e.code === 'KeyE') {
@@ -176,5 +183,24 @@ export class MainScene extends Phaser.Scene {
         const px = Position.x[this.playerId];
         const py = Position.y[this.playerId];
         this.cameras.main.centerOn(px, py);
+    }
+    private startBGM(key: string) {
+        if (this.currentBGM && this.currentBGM.key === key) return;
+        
+        if (this.currentBGM) {
+            this.currentBGM.stop();
+        }
+
+        if (this.cache.audio.exists(key)) {
+            this.currentBGM = this.sound.add(key, { loop: true, volume: 0.3 });
+            this.currentBGM.play();
+        }
+    }
+
+    private stopBGM() {
+        if (this.currentBGM) {
+            this.currentBGM.stop();
+            this.currentBGM = undefined;
+        }
     }
 }

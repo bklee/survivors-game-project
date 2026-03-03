@@ -18,6 +18,11 @@ export class AssetLoader {
     }
 
     loadAudio() {
+        // BGM
+        this.scene.load.audio('main_bgm', 'assets/audio/main_bgm.mp3');
+        this.scene.load.audio('boss_bgm', 'assets/audio/boss_bgm.mp3');
+
+        // SFX
         this.scene.load.audio('fire_cast', 'assets/audio/fire_cast.mp3');
         this.scene.load.audio('ice_cast', 'assets/audio/ice_cast.mp3');
         this.scene.load.audio('poison_cast', 'assets/audio/poison_cast.mp3');
