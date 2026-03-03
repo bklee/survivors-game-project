@@ -1,33 +1,31 @@
 import Phaser from 'phaser';
-import { defineQuery, ComponentRef } from 'bitecs';
+import { defineQuery } from 'bitecs';
 import { Position, SpriteInfo } from '../components';
 import { world } from '../core/World';
 
 const renderQuery = defineQuery([Position, SpriteInfo]);
 
-// Map entity IDs to Blitter Bobs
-const bobs = new Map<number, Phaser.GameObjects.Bob>();
+// Map entity IDs to Blitter Bobs using a dense array instead of a Map for performance
+const bobs: (Phaser.GameObjects.Bob | undefined)[] = [];
 
-export const createRenderSystem = (scene: Phaser.Scene, blitter: Phaser.GameObjects.Blitter) => {
+export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObjects.Blitter) => {
     return () => {
         const ents = renderQuery(world);
 
         // Add bobs if they don't exist
         for (let i = 0; i < ents.length; i++) {
             const eid = ents[i];
+            const bob = bobs[eid];
 
-            if (!bobs.has(eid)) {
+            if (!bob) {
                 // Determine frame from SpriteInfo if needed, defaulting to 0
                 const frameId = SpriteInfo.textureIndex[eid];
-                const bob = blitter.create(Position.x[eid], Position.y[eid], frameId);
-                bobs.set(eid, bob);
+                const newBob = blitter.create(Position.x[eid], Position.y[eid], frameId);
+                bobs[eid] = newBob;
             } else {
                 // Update position
-                const bob = bobs.get(eid);
-                if (bob) {
-                    bob.x = Position.x[eid];
-                    bob.y = Position.y[eid];
-                }
+                bob.x = Position.x[eid];
+                bob.y = Position.y[eid];
             }
         }
     };

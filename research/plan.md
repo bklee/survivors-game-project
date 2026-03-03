@@ -61,7 +61,17 @@ survivors-game-project/
 - [x] **Task 5.2: 성능 테스트**: 저사양 기기 대상 프로파일링 및 Adaptive Physics 브릿지 튜닝.
 - [x] **Task 5.3: 튜토리얼 및 해금**: 초기 유저 경험 가이드 및 인게임 도감 완성.
 
+### Phase 6: 대규모 최적화 및 연출 강화 (Current Sprint)
+
+- [ ] **Task 6.1: 스웜 렌더링 최적화**: WaveSystem 및 RenderSystem 병목 분석, Instanced Rendering/Blitter 고도화 (10k+ 엔티티 목표)
+- [ ] **Task 6.2: 연금술 큐 고도화**: AlchemySystem 조합 로직 확장 및 시너지 레시피(폭발 가스, 초전도 등) 실제 구현
+- [ ] **Task 6.3: 시각적 타격감(Juice)**: Hit Stop, Screen Shake, Damage Numbers(Batching) 파이프라인 연동
+- [ ] **Task 6.4: 메타 프로그레시브 연동**: IndexedDB 기반 해금 및 스킬 트리 데이터 구조 구현
+- [ ] **Task 6.5: 메모리 및 컴포넌트 최적화**: ECS 컴포넌트 풀링 정리, 불필요한 객체 생성/메모리 릭 방지
+
 ---
+
+## 3. 핵심 시스템 상세 설계 (Deep System Design)
 
 ## 3. 핵심 시스템 상세 설계 (Deep System Design)
 

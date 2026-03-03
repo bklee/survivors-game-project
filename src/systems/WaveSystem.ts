@@ -28,13 +28,18 @@ export class NightDirector {
 
         const currentWave = this.waveConfig[this.currentWaveIndex];
 
-        // Should we spawn an enemy?
+        // Should we spawn enemies? (Handle bursts)
         if (this.timeElapsed - this.lastSpawnTime > currentWave.spawnInterval) {
-            this.spawnEnemy(currentWave.intensity);
-            this.lastSpawnTime = this.timeElapsed;
+            // Calculate how many enemies we should have spawned since last time to avoid missing spawns
+            const timePassed = this.timeElapsed - this.lastSpawnTime;
+            const spawnCount = Math.floor(timePassed / currentWave.spawnInterval);
+            
+            for (let i = 0; i < spawnCount; i++) {
+                this.spawnEnemy(currentWave.intensity);
+            }
+            this.lastSpawnTime += spawnCount * currentWave.spawnInterval;
         }
     }
-
     private spawnEnemy(intensity: number) {
         // Find a spawn point edge of camera
         // For now random position around 640, 360 center
