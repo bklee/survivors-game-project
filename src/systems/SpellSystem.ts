@@ -53,6 +53,8 @@ export class SpellSystem {
 
         if ((this.spellCooldowns.get(spellId) ?? 0) > 0) return;
         this.spellCooldowns.set(spellId, 500 * globalStats.cooldownMult);
+        // Visual FX Trigger
+        window.dispatchEvent(new CustomEvent('combo_cast'));
 
         // Apply Sound
         if (spellId.includes('fire')) window.dispatchEvent(new CustomEvent('play_sound', { detail: 'fire_cast' }));

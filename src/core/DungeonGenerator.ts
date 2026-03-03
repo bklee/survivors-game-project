@@ -1,6 +1,6 @@
 export const TILE_SIZE = 16;
-export const MAP_WIDTH = 100; // 1600px
-export const MAP_HEIGHT = 100; // 1600px
+export const MAP_WIDTH = 250; // 4000px
+export const MAP_HEIGHT = 250; // 4000px
 
 export enum TileType {
     WALL = 0,
@@ -34,16 +34,25 @@ export class DungeonGenerator {
         for (let i = 0; i < numRooms; i++) {
             const w = Math.floor(Math.random() * (maxSize - minSize + 1)) + minSize;
             const h = Math.floor(Math.random() * (maxSize - minSize + 1)) + minSize;
-            const x = Math.floor(Math.random() * (MAP_WIDTH - w - 2)) + 1;
-            const y = Math.floor(Math.random() * (MAP_HEIGHT - h - 2)) + 1;
+            let x = Math.floor(Math.random() * (MAP_WIDTH - w - 2)) + 1;
+            let y = Math.floor(Math.random() * (MAP_HEIGHT - h - 2)) + 1;
+
+            // Force first room to be exactly at the center
+            if (i === 0) {
+                x = Math.floor(MAP_WIDTH / 2) - Math.floor(w / 2);
+                y = Math.floor(MAP_HEIGHT / 2) - Math.floor(h / 2);
+            }
 
             const newRoom: Room = { x, y, w, h };
             
             let failed = false;
-            for (const otherRoom of this.rooms) {
-                if (this.intersects(newRoom, otherRoom)) {
-                    failed = true;
-                    break;
+            // Don't check intersection for the first room
+            if (i > 0) {
+                for (const otherRoom of this.rooms) {
+                    if (this.intersects(newRoom, otherRoom)) {
+                        failed = true;
+                        break;
+                    }
                 }
             }
 
@@ -134,6 +143,35 @@ export class DungeonGenerator {
             x: tx * TILE_SIZE + TILE_SIZE/2,
             y: ty * TILE_SIZE + TILE_SIZE/2
         };
-}
+    }
+
+    public getFloorPixelNear(xPixel: number, yPixel: number, maxRadius: number): {x: number, y: number} {
+        let tx, ty;
+        let attempts = 0;
+        
+        const centerTx = Math.floor(xPixel / TILE_SIZE);
+        const centerTy = Math.floor(yPixel / TILE_SIZE);
+        const tileRadius = Math.floor(maxRadius / TILE_SIZE);
+
+        do {
+            const angle = Math.random() * Math.PI * 2;
+            const r = Math.random() * tileRadius;
+            tx = Math.floor(centerTx + Math.cos(angle) * r);
+            ty = Math.floor(centerTy + Math.sin(angle) * r);
+            
+            tx = Math.max(0, Math.min(MAP_WIDTH - 1, tx));
+            ty = Math.max(0, Math.min(MAP_HEIGHT - 1, ty));
+            
+            attempts++;
+            if (attempts > 100) {
+                return this.getRandomFloorPixel();
+            }
+        } while (this.map[ty][tx] !== TileType.FLOOR);
+        
+        return {
+            x: tx * TILE_SIZE + TILE_SIZE/2,
+            y: ty * TILE_SIZE + TILE_SIZE/2
+        };
+    }
 
 }

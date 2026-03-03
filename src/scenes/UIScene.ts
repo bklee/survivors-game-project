@@ -42,8 +42,9 @@ export class UIScene extends Phaser.Scene {
             color: '#ffff00',
         });
 
-        const hpBg = this.add.rectangle(640, 30, 400, 20, 0x333333).setOrigin(0.5);
-        this.hpBar = this.add.rectangle(640, 30, 400, 20, 0x00ff00).setOrigin(0.5);
+        // HP Bar
+        const hpBg = this.add.rectangle(440, 30, 400, 20, 0x333333).setOrigin(0, 0.5);
+        this.hpBar = this.add.rectangle(440, 30, 400, 20, 0x00ff00).setOrigin(0, 0.5);
 
         this.queueText = this.add.text(640, 680, "Queue: [ ]", {
             fontSize: '24px',
@@ -123,7 +124,6 @@ export class UIScene extends Phaser.Scene {
             const y = offsetY + (Position.y[eid] * this.SCALE);
             this.minimapGraphics.fillRect(x, y, 2, 2);
         }
-
         // Draw Player
         if (players.length > 0) {
             const peid = players[0];
@@ -175,16 +175,36 @@ export class UIScene extends Phaser.Scene {
     }
 
     private handleStageClear = () => {
-        this.stageClearText.setVisible(true);
+        // Create a reward popup panel
+        const panel = this.add.rectangle(640, 360, 600, 300, 0x000000, 0.9)
+            .setStrokeStyle(4, 0xffd700);
+        
+        this.stageClearText.setDepth(10).setVisible(true);
+        this.stageClearText.setPosition(640, 280);
+
+        const rewardText = this.add.text(640, 400, 'REWARD ACQUIRED!\nAll Stats +10%', {
+            fontSize: '32px', color: '#00ff00', align: 'center', fontStyle: 'bold'
+        }).setOrigin(0.5).setDepth(10);
+
+        this.uiContainer.add([panel, rewardText]);
+
+        import('../core/PlayerStats').then(m => {
+            m.globalStats.damageMult *= 1.1;
+            m.globalStats.moveSpeedMult *= 1.1;
+        });
+
         this.tweens.add({
-            targets: this.stageClearText,
+            targets: [panel, this.stageClearText, rewardText],
             scale: { from: 0.5, to: 1.2 },
             alpha: { from: 0, to: 1 },
             duration: 800,
             ease: 'Back.easeOut',
             onComplete: () => {
-                this.time.delayedCall(3000, () => {
+                this.time.delayedCall(3500, () => {
+                    panel.destroy();
+                    rewardText.destroy();
                     this.stageClearText.setVisible(false);
+                    this.stageClearText.setPosition(640, 360); // reset
                     window.dispatchEvent(new CustomEvent('next_stage'));
                 });
             }

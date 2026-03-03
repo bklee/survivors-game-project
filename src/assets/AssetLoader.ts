@@ -119,7 +119,16 @@ export class AssetLoader {
         // Define wall frame from the walls atlas
         const wallTex = this.scene.textures.get('walls');
         if (wallTex) {
-            wallTex.add('wall_0', 0, 0, 0, 16, 32);
+            wallTex.add('wall_top', 0, 32, 96, 16, 32);
+            wallTex.add('wall_bottom', 0, 32, 0, 16, 32);
+            wallTex.add('wall_left', 0, 16, 32, 16, 32);
+            wallTex.add('wall_right', 0, 48, 32, 16, 32);
+            wallTex.add('wall_inner', 0, 32, 32, 16, 32);
+            wallTex.add('wall_tl', 0, 16, 96, 16, 32);
+            wallTex.add('wall_tr', 0, 48, 96, 16, 32);
+            wallTex.add('wall_bl', 0, 16, 0, 16, 32);
+            wallTex.add('wall_br', 0, 48, 0, 16, 32);
         }
-    }
+}
+
 }

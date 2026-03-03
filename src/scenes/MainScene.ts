@@ -15,7 +15,7 @@ import { AlchemySystem, Element } from '../alchemy/AlchemySystem';
 import { createCombatSystem } from '../systems/CombatSystem';
 import { SpellSystem } from '../systems/SpellSystem';
 import { ItemSystem } from '../systems/ItemSystem';
-import { DungeonGenerator } from '../core/DungeonGenerator';
+import { DungeonGenerator, MAP_WIDTH, MAP_HEIGHT, TILE_SIZE, TileType } from '../core/DungeonGenerator';
 
 export class MainScene extends Phaser.Scene {
     private physicsSystem!: (dt: number) => void;
@@ -46,30 +46,45 @@ export class MainScene extends Phaser.Scene {
     }
 
     create() {
+        // 1. Initialize Dungeon FIRST
         this.dungeon = new DungeonGenerator();
-        // Setup ECS Systems
+
+        // 2. Setup ECS Systems
         this.physicsSystem = createPhysicsSystem(this.dungeon);
         this.playerSystem = new PlayerSystem();
-        this.nightDirector = new NightDirector();
+        this.nightDirector = new NightDirector(this.dungeon);
         this.juicePipeline = new JuicePipeline(this);
         this.alchemySystem = new AlchemySystem();
         this.combatSystem = createCombatSystem(this.juicePipeline);
         this.spellSystem = new SpellSystem(this.alchemySystem);
         this.itemSystem = new ItemSystem();
         
-        // Pass selection to spell system
         this.spellSystem.selectedCharId = this.selectedCharId;
 
+        // 3. Render Background
         this.add.tileSprite(0, 0, WORLD_WIDTH, WORLD_HEIGHT, 'dungeon', 'floor')
             .setOrigin(0, 0)
-            .setDepth(-2);
+            .setDepth(-3);
 
-        const blitter = this.add.blitter(0, 0, 'dungeon');
-        
-        // Render System (No Aura)
-        this.renderSystem = createRenderSystem(this, blitter);
+        // 4. Render Walls (Optimized via Blitter)
+        const wallBlitter = this.add.blitter(0, 0, 'walls').setDepth(-2);
+        for (let y = 0; y < MAP_HEIGHT; y++) {
+            for (let x = 0; x < MAP_WIDTH; x++) {
+                if (this.dungeon.map[y][x] === TileType.WALL) {
+                    let frame = 'wall_top'; // Default
+                    const bottom = y < MAP_HEIGHT - 1 ? this.dungeon.map[y+1][x] : TileType.WALL;
+                    if (bottom === TileType.FLOOR) frame = 'wall_top';
+                    else frame = 'wall_inner';
 
-        // Spawn Player Entity
+                    wallBlitter.create(x * TILE_SIZE, y * TILE_SIZE, frame);
+                }
+            }
+        }
+
+        const charBlitter = this.add.blitter(0, 0, 'dungeon').setDepth(0);
+        this.renderSystem = createRenderSystem(this, charBlitter);
+
+        // 5. Spawn Player at valid floor
         this.playerId = addEntity(world);
         addComponent(world, Position, this.playerId);
         addComponent(world, Velocity, this.playerId);
@@ -78,27 +93,20 @@ export class MainScene extends Phaser.Scene {
         addComponent(world, Animation, this.playerId);
         addComponent(world, Health, this.playerId);
 
-        // START AT CENTER
-        Position.x[this.playerId] = WORLD_WIDTH / 2;
-        Position.y[this.playerId] = WORLD_HEIGHT / 2;
+        const startPos = this.dungeon.getRandomFloorPixel();
+        Position.x[this.playerId] = startPos.x;
+        Position.y[this.playerId] = startPos.y;
         
-        // Map Selection
-        let typeId = 1; // Wizard
-        if (this.selectedCharId === 'knight') typeId = 0;
-        else if (this.selectedCharId === 'elf') typeId = 2;
+        let charTypeId = 1; 
+        if (this.selectedCharId === 'knight') charTypeId = 0;
+        else if (this.selectedCharId === 'elf') charTypeId = 2;
 
         const charData = CHARACTERS[this.selectedCharId.toUpperCase()] || CHARACTERS.WIZARD;
-
-        SpriteInfo.textureIndex[this.playerId] = typeId; 
-        Animation.frameStart[this.playerId] = 0;
-        Animation.frameEnd[this.playerId] = 3;
+        SpriteInfo.textureIndex[this.playerId] = charTypeId; 
         Animation.frameRate[this.playerId] = 10;
-        Animation.timer[this.playerId] = 0;
-
         Health.current[this.playerId] = charData.baseStats.health;
         Health.max[this.playerId] = charData.baseStats.health;
         
-        // Fire initial HP event
         setTimeout(() => {
             window.dispatchEvent(new CustomEvent('hp_updated', { 
                 detail: { current: Health.current[this.playerId], max: Health.max[this.playerId] } 
@@ -120,23 +128,12 @@ export class MainScene extends Phaser.Scene {
             this.alchemySystem.addElement(randomElement);
         }, 1000);
 
-        this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
-            if (this.autoQueueIntervalId !== undefined) {
-                window.clearInterval(this.autoQueueIntervalId);
-                this.autoQueueIntervalId = undefined;
-            }
-        });
-
         const soundHandler = ((e: CustomEvent<string>) => {
             if (this.cache.audio.exists(e.detail)) {
                 this.sound.play(e.detail, { volume: 0.5 });
             }
         }) as EventListener;
-
         window.addEventListener('play_sound', soundHandler);
-        this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
-            window.removeEventListener('play_sound', soundHandler);
-        });
 
         const deathHandler = () => {
             this.time.delayedCall(1000, () => {
@@ -144,11 +141,7 @@ export class MainScene extends Phaser.Scene {
                 this.scene.launch('GameOverScene');
             });
         };
-
         window.addEventListener('player_died', deathHandler);
-        this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
-            window.removeEventListener('player_died', deathHandler);
-        });
 
         const recipeHandler = (e: KeyboardEvent) => {
             if (e.code === 'KeyE') {
@@ -157,30 +150,29 @@ export class MainScene extends Phaser.Scene {
             }
         };
         window.addEventListener('keydown', recipeHandler);
-        this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
-            window.removeEventListener('keydown', recipeHandler);
-        });
 
-        // Endless mode transition listener
         const nextStageHandler = () => {
-            console.log("Advancing to next stage...");
             this.nightDirector.resetForNextStage();
             this.startBGM('main_bgm');
         };
         window.addEventListener('next_stage', nextStageHandler);
+
         this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+            window.removeEventListener('play_sound', soundHandler);
+            window.removeEventListener('player_died', deathHandler);
+            window.removeEventListener('keydown', recipeHandler);
             window.removeEventListener('next_stage', nextStageHandler);
+            if (this.autoQueueIntervalId !== undefined) {
+                window.clearInterval(this.autoQueueIntervalId);
+            }
         });
 
         this.startBGM('main_bgm');
         window.addEventListener('boss_spawned', () => this.startBGM('boss_bgm'));
-        window.addEventListener('player_died', () => this.stopBGM());
-        window.addEventListener('stage_clear', () => this.stopBGM());
 
         this.spawnDungeonProps();
-        
-        // Let UI know we're ready
         window.dispatchEvent(new CustomEvent('game_started'));
+        window.dispatchEvent(new CustomEvent('map_generated', { detail: this.dungeon.map }));
     }
 
     update(_time: number, delta: number) {
@@ -199,12 +191,9 @@ export class MainScene extends Phaser.Scene {
         this.combatSystem(delta);
         this.itemSystem.update(delta);
         this.renderSystem(delta);
-
         this.handleInteractions(delta);
 
-        const px = Position.x[this.playerId];
-        const py = Position.y[this.playerId];
-        this.cameras.main.centerOn(px, py);
+        this.cameras.main.centerOn(Position.x[this.playerId], Position.y[this.playerId]);
     }
 
     private handleInteractions(_dt: number) {
@@ -219,7 +208,7 @@ export class MainScene extends Phaser.Scene {
             const dy = py - Position.y[eid];
             const distSq = dx * dx + dy * dy;
 
-            if (typeId === 40) { // Lever
+            if (typeId === 40) {
                 if (distSq < 40 * 40 && Interactive.isActivated[eid] === 0) {
                     Interactive.isActivated[eid] = 1;
                     window.dispatchEvent(new CustomEvent('play_sound', { detail: 'hit' }));
@@ -230,7 +219,7 @@ export class MainScene extends Phaser.Scene {
                         }
                     }
                 }
-            } else if (typeId === 32) { // Spikes
+            } else if (typeId === 32) {
                 const animIdx = Math.floor(Animation.timer[eid] * 4 / 1000) % 4;
                 if (distSq < 20 * 20 && animIdx >= 2) {
                     Health.current[this.playerId] -= 0.1; 
@@ -238,7 +227,7 @@ export class MainScene extends Phaser.Scene {
                         detail: { current: Health.current[this.playerId], max: Health.max[this.playerId] } 
                     }));
                 }
-            } else if (typeId === 34) { // Explosive Barrel
+            } else if (typeId === 34) {
                 if (distSq < 40 * 40 && Interactive.isActivated[eid] === 0) {
                     Interactive.isActivated[eid] = 1;
                     this.juicePipeline.whiteFlash(100);
@@ -261,17 +250,9 @@ export class MainScene extends Phaser.Scene {
         }
     }
 
-    private stopBGM() {
-        if (this.currentBGM) {
-            this.currentBGM.stop();
-            this.currentBGM = undefined;
-        }
-    }
-
     private spawnDungeonProps() {
         // Random static props
-        const propCount = 80;
-        for (let i = 0; i < propCount; i++) {
+        for (let i = 0; i < 80; i++) {
             const eid = addEntity(world);
             addComponent(world, Position, eid);
             addComponent(world, SpriteInfo, eid);
@@ -280,7 +261,7 @@ export class MainScene extends Phaser.Scene {
             Position.y[eid] = pos.y;
             const roll = Math.random();
             if (roll > 0.8) SpriteInfo.textureIndex[eid] = 30; // crate
-            else if (roll > 0.7) SpriteInfo.textureIndex[eid] = 34; // explosive barrel
+            else if (roll > 0.7) SpriteInfo.textureIndex[eid] = 34; // barrel
             else if (roll > 0.6) SpriteInfo.textureIndex[eid] = 31; // skull
             else if (roll > 0.3) SpriteInfo.textureIndex[eid] = 33; // column
             else {
@@ -290,13 +271,11 @@ export class MainScene extends Phaser.Scene {
             }
         }
 
-        // Special Treasure Clusters
+        // Treasure Clusters
         for (let i = 0; i < 8; i++) {
             const pos = this.dungeon.getRandomFloorPixel();
             const lx = pos.x;
             const ly = pos.y;
-            
-            // Lever
             const lever = addEntity(world);
             addComponent(world, Position, lever);
             addComponent(world, SpriteInfo, lever);
@@ -305,7 +284,6 @@ export class MainScene extends Phaser.Scene {
             SpriteInfo.textureIndex[lever] = 40;
             Interactive.id[lever] = i;
 
-            // Locked Door
             const door = addEntity(world);
             addComponent(world, Position, door);
             addComponent(world, SpriteInfo, door);
@@ -314,17 +292,15 @@ export class MainScene extends Phaser.Scene {
             SpriteInfo.textureIndex[door] = 41;
             Interactive.id[door] = i;
 
-            // Treasure behind door
             const treasure = addEntity(world);
             addComponent(world, Position, treasure);
             addComponent(world, SpriteInfo, treasure);
             addComponent(world, Item, treasure);
             Position.x[treasure] = lx + 100; Position.y[treasure] = ly;
-            SpriteInfo.textureIndex[treasure] = 15; // Elite Treasure
+            SpriteInfo.textureIndex[treasure] = 15; 
             Item.xpValue[treasure] = 1000;
             Item.magnetized[treasure] = 0;
-
-            // 2 Guards
+            
             for (let g = 0; g < 2; g++) {
                 const guard = addEntity(world);
                 addComponent(world, Position, guard);
@@ -339,7 +315,6 @@ export class MainScene extends Phaser.Scene {
                 Health.current[guard] = 150; Health.max[guard] = 150;
                 Animation.frameRate[guard] = 8;
             }
+        }
     }
-}
-
 }

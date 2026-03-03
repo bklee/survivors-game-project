@@ -2,6 +2,7 @@ import { addEntity, addComponent, defineQuery, hasComponent, removeEntity } from
 import { world } from '../core/World';
 import { Animation, Position, Velocity, Health, SpriteInfo, Enemy, Player, Boss, EnemyProjectile } from '../components';
 
+import { DungeonGenerator } from '../core/DungeonGenerator';
 const enemyQuery = defineQuery([Enemy, Position, Velocity]);
 const playerQuery = defineQuery([Player, Position]);
 
@@ -20,6 +21,10 @@ export class NightDirector {
 
     private currentWaveIndex: number = 0;
     private lastSpawnTime: number = 0;
+    private dungeon: DungeonGenerator;
+    constructor(dungeon: DungeonGenerator) {
+        this.dungeon = dungeon;
+    }
 
     public update(dt: number) {
         this.timeElapsed += dt;
@@ -80,8 +85,6 @@ export class NightDirector {
     }
 
     private spawnEnemy(intensity: number) {
-        const angle = Math.random() * Math.PI * 2;
-        const radius = 800;
         const eid = addEntity(world);
         addComponent(world, Position, eid);
         addComponent(world, Velocity, eid);
@@ -90,14 +93,23 @@ export class NightDirector {
         addComponent(world, Animation, eid);
         addComponent(world, Enemy, eid);
 
-        Position.x[eid] = 2000 + Math.cos(angle) * radius;
-        Position.y[eid] = 2000 + Math.sin(angle) * radius;
+        const players = playerQuery(world);
+        let px = 2000;
+        let py = 2000;
+        if (players.length > 0) {
+            px = Position.x[players[0]];
+            py = Position.y[players[0]];
+        }
 
+        const pos = this.dungeon.getFloorPixelNear(px, py, 800);
+        Position.x[eid] = pos.x;
+        Position.y[eid] = pos.y;
         const typeRoll = Math.random();
         let typeId = 10; let speed = 60 * intensity; let hp = 10 * intensity;
         if (typeRoll > 0.8) { typeId = 12; speed = 40 * intensity; hp = 40 * intensity; }
         else if (typeRoll > 0.5) { typeId = 13; speed = 90 * intensity; hp = 5 * intensity; }
 
+        const angle = Math.random() * Math.PI * 2;
         Velocity.x[eid] = Math.cos(angle) * speed;
         Velocity.y[eid] = Math.sin(angle) * speed;
         Health.current[eid] = hp;
@@ -108,8 +120,6 @@ export class NightDirector {
     }
 
     private spawnBoss() {
-        const angle = Math.random() * Math.PI * 2;
-        const radius = 900;
         const eid = addEntity(world);
         addComponent(world, Position, eid);
         addComponent(world, Velocity, eid);
@@ -119,9 +129,18 @@ export class NightDirector {
         addComponent(world, Enemy, eid);
         addComponent(world, Boss, eid);
 
-        Position.x[eid] = 2000 + Math.cos(angle) * radius;
-        Position.y[eid] = 2000 + Math.sin(angle) * radius;
+        const players = playerQuery(world);
+        let px = 2000;
+        let py = 2000;
+        if (players.length > 0) {
+            px = Position.x[players[0]];
+            py = Position.y[players[0]];
+        }
 
+        const pos = this.dungeon.getFloorPixelNear(px, py, 900);
+        Position.x[eid] = pos.x;
+        Position.y[eid] = pos.y;
+        const angle = Math.random() * Math.PI * 2;
         Velocity.x[eid] = Math.cos(angle) * 35;
         Velocity.y[eid] = Math.sin(angle) * 35;
         Health.current[eid] = 500; Health.max[eid] = 500;

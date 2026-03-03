@@ -9,10 +9,11 @@ const bobs: (Phaser.GameObjects.Bob | undefined)[] = [];
 export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObjects.Blitter) => {
     return (dt: number) => {
         const ents = renderQuery(world);
+        const activeEids = new Set(ents);
 
         for (let i = 0; i < ents.length; i++) {
             const eid = ents[i];
-            const bob = bobs[eid];
+            let bob = bobs[eid];
             const typeId = SpriteInfo.textureIndex[eid];
 
             // 1. Identify Character / Entity Type
@@ -78,12 +79,17 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
 
             // 5. Render or Create Bob
             if (!bob) {
-                const newBob = blitter.create(Position.x[eid], Position.y[eid], frameName);
+                let finalFrame: string | number = frameName;
+                if (!blitter.texture.has(frameName.toString())) {
+                    finalFrame = 0; 
+                }
+
+                const newBob = blitter.create(Position.x[eid], Position.y[eid], finalFrame);
                 if (typeId === 10) { newBob.tint = 0xffaaaa; newBob.alpha = 0.9; }
                 else if (typeId === 11) { newBob.tint = 0xff5555; }
                 else if (typeId === 12 || typeId === 13) { newBob.tint = 0xffffff; }
-                else if (typeId === 14) { newBob.tint = 0xffcc00; } // GOLDEN ELITE
-                else if (typeId === 15) { newBob.tint = 0x00ffff; } // CYAN TREASURE
+                else if (typeId === 14) { newBob.tint = 0xffcc00; } 
+                else if (typeId === 15) { newBob.tint = 0x00ffff; } 
                 else if (typeId === 34) { newBob.tint = 0xff0000; } 
                 else if (typeId === 104) { newBob.tint = 0xffff00; }
                 
@@ -100,13 +106,14 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                     else if (Velocity.x[eid] > 0) bob.flipX = false;
                 }
 
-                try { bob.setFrame(frameName); } catch (e) {}
+                // Safe setFrame
+                if (blitter.texture.has(frameName.toString())) {
+                    try { bob.setFrame(frameName); } catch (e) {}
+                }
             }
         }
-        // Residue cleanup
-        // We know which EIDs were processed this frame. 
-        // Let's build a Set of active ones.
-        const activeEids = new Set(ents);
+
+        // 6. Cleanup Residue
         for (let i = 0; i < bobs.length; i++) {
             const b = bobs[i];
             if (b && !activeEids.has(i)) {
