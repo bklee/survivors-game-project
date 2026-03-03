@@ -44,7 +44,12 @@ export class MainScene extends Phaser.Scene {
         this.itemSystem = new ItemSystem();
 
         const blitter = this.add.blitter(0, 0, 'dungeon');
-        this.renderSystem = createRenderSystem(this, blitter);
+        
+        const playerAura = this.add.graphics();
+        playerAura.fillStyle(0x00ffff, 0.3);
+        playerAura.fillCircle(0, 0, 16);
+        
+        this.renderSystem = createRenderSystem(this, blitter, playerAura);
 
         // Spawn Player Entity
         this.playerId = addEntity(world);
@@ -106,6 +111,8 @@ export class MainScene extends Phaser.Scene {
         this.renderSystem(delta);
 
         // Make camera follow player manually
-        this.cameras.main.centerOn(Position.x[this.playerId], Position.y[this.playerId]);
+        const px = Position.x[this.playerId];
+        const py = Position.y[this.playerId];
+        this.cameras.main.centerOn(px, py);
     }
 }

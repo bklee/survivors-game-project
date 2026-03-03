@@ -8,7 +8,7 @@ const renderQuery = defineQuery([Position, SpriteInfo]);
 // Map entity IDs to Blitter Bobs using a dense array instead of a Map for performance
 const bobs: (Phaser.GameObjects.Bob | undefined)[] = [];
 
-export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObjects.Blitter) => {
+export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObjects.Blitter, playerAura: Phaser.GameObjects.Graphics) => {
     return (dt: number) => {
         const ents = renderQuery(world);
 
@@ -21,6 +21,13 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                 // Determine frame from SpriteInfo if needed, defaulting to 0
                 const frameId = SpriteInfo.textureIndex[eid];
                 const newBob = blitter.create(Position.x[eid], Position.y[eid], frameId);
+
+                // Tint enemies slightly red to distinguish them from the player
+                if (frameId >= 109 && frameId <= 112) {
+                    newBob.tint = 0xff5555;
+                    newBob.alpha = 0.9;
+                }
+
                 bobs[eid] = newBob;
             } else {
                 if (hasComponent(world, Animation, eid) && Animation.frameRate[eid] > 0) {
@@ -43,6 +50,11 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                 // Update position
                 bob.x = Position.x[eid];
                 bob.y = Position.y[eid];
+
+                // If this is the player (white wizard frames), move the aura there too
+                if (SpriteInfo.textureIndex[eid] >= 85 && SpriteInfo.textureIndex[eid] <= 88) {
+                    playerAura.setPosition(bob.x + 8, bob.y + 8); // center it slightly
+                }
             }
         }
     };
