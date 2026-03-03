@@ -90,7 +90,12 @@ export class AssetLoader {
         texture.add('spell_ice', 0, 304, 336, 16, 16);  // flask_big_blue
         texture.add('spell_gas', 0, 320, 336, 16, 16);  // flask_big_green
         texture.add('spell_dud', 0, 288, 320, 16, 16);  // bomb_f0
-        texture.add('enemy_bullet', 0, 313, 385, 6, 7); // tiny coin or dot
+        texture.add('enemy_bullet', 0, 313, 385, 6, 7); 
+        
+        // Weapons
+        texture.add('weapon_sword', 0, 339, 98, 10, 29);
+        texture.add('weapon_arrow', 0, 324, 202, 7, 21);
+        texture.add('weapon_staff', 0, 324, 129, 8, 30);
 
         // Dungeon Props (Static)
         texture.add('prop_crate', 0, 288, 408, 16, 24);

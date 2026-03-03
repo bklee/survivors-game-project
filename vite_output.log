@@ -1600,3 +1600,9 @@
 오후 12:21:22 [vite] (client) page reload src/scenes/MainScene.ts
 오후 12:21:58 [vite] (client) page reload src/systems/RenderSystem.ts
 오후 12:22:35 [vite] (client) page reload src/scenes/UpgradeScene.ts
+오후 12:23:54 [vite] (client) page reload src/assets/AssetLoader.ts
+오후 12:24:14 [vite] (client) page reload src/systems/SpellSystem.ts
+오후 12:25:03 [vite] (client) page reload src/systems/RenderSystem.ts
+오후 12:25:27 [vite] (client) page reload src/scenes/MainScene.ts
+오후 12:26:07 [vite] (client) page reload src/systems/RenderSystem.ts
+오후 12:26:36 [vite] (client) page reload src/systems/SpellSystem.ts

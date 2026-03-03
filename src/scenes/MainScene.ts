@@ -52,6 +52,7 @@ export class MainScene extends Phaser.Scene {
         this.alchemySystem = new AlchemySystem();
         this.combatSystem = createCombatSystem(this.juicePipeline);
         this.spellSystem = new SpellSystem(this.alchemySystem);
+        this.spellSystem.selectedCharId = this.selectedCharId;
         this.itemSystem = new ItemSystem();
 
         this.add.tileSprite(0, 0, WORLD_WIDTH, WORLD_HEIGHT, 'dungeon', 'floor')
