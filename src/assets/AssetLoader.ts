@@ -63,6 +63,18 @@ export class AssetLoader {
             texture.add(`demon_run_${i}`, 0, 144 + (i * 32), 428, 32, 36);
         }
         
+        // Orc (16x23)
+        for (let i = 0; i < 4; i++) {
+            texture.add(`orc_idle_${i}`, 0, 368 + (i * 16), 177, 16, 23);
+            texture.add(`orc_run_${i}`, 0, 432 + (i * 16), 177, 16, 23);
+        }
+
+        // Skeleton (16x16)
+        for (let i = 0; i < 4; i++) {
+            texture.add(`skeleton_idle_${i}`, 0, 368 + (i * 16), 88, 16, 16);
+            texture.add(`skeleton_run_${i}`, 0, 432 + (i * 16), 88, 16, 16);
+        }
+
         // Add default enemy (imp or similar)
         for (let i = 0; i < 4; i++) {
             texture.add(`imp_idle_${i}`, 0, 368 + (i * 16), 64, 16, 16);
@@ -73,6 +85,7 @@ export class AssetLoader {
         texture.add('spell_ice', 0, 304, 336, 16, 16);  // flask_big_blue
         texture.add('spell_gas', 0, 320, 336, 16, 16);  // flask_big_green
         texture.add('spell_dud', 0, 288, 320, 16, 16);  // bomb_f0
+        texture.add('enemy_bullet', 0, 313, 385, 6, 7); // tiny coin or dot
 
         // Add XP gem frame (flask_red or similar)
         texture.add('gem', 0, 288, 352, 16, 16);

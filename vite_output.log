@@ -403,3 +403,258 @@
       at Readable.push (node:internal/streams/readable:390:5)
       at Pipe.onStreamRead (node:internal/stream_base_commons:189:23)
 오전 11:47:46 [vite] (client) page reload src/systems/SpellSystem.ts
+오전 11:50:00 [vite] (client) page reload src/components/index.ts
+오전 11:50:23 [vite] (client) page reload src/assets/AssetLoader.ts
+오전 11:50:38 [vite] (client) page reload src/systems/RenderSystem.ts
+오전 11:50:57 [vite] (client) page reload src/systems/WaveSystem.ts
+오전 11:50:57 [vite] (client) Pre-transform error: Transform failed with 1 error:
+/Users/hangup2/apps/survivors-game-project/src/systems/WaveSystem.ts:105:12: ERROR: Expected ";" but found "spawnEnemy"
+  Plugin: vite:esbuild
+  File: /Users/hangup2/apps/survivors-game-project/src/systems/WaveSystem.ts:105:12
+  
+  Expected ";" but found "spawnEnemy"
+  103|              // physics system handles move, we just handle custom logic if needed
+  104|      }
+  105|      private spawnEnemy(intensity: number) {
+     |              ^
+  106|          const angle = Math.random() * Math.PI * 2;
+  107|          const radius = 800;
+  
+오전 11:50:57 [vite] Internal server error: Transform failed with 1 error:
+/Users/hangup2/apps/survivors-game-project/src/systems/WaveSystem.ts:105:12: ERROR: Expected ";" but found "spawnEnemy"
+  Plugin: vite:esbuild
+  File: /Users/hangup2/apps/survivors-game-project/src/systems/WaveSystem.ts:105:12
+  
+  Expected ";" but found "spawnEnemy"
+  103|              // physics system handles move, we just handle custom logic if needed
+  104|      }
+  105|      private spawnEnemy(intensity: number) {
+     |              ^
+  106|          const angle = Math.random() * Math.PI * 2;
+  107|          const radius = 800;
+  
+      at failureErrorWithLog (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:1467:15)
+      at /Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:736:50
+      at responseCallbacks.<computed> (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:603:9)
+      at handleIncomingPacket (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:658:12)
+      at Socket.readFromStdout (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:581:7)
+      at Socket.emit (node:events:508:28)
+      at addChunk (node:internal/streams/readable:559:12)
+      at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+      at Readable.push (node:internal/streams/readable:390:5)
+      at Pipe.onStreamRead (node:internal/stream_base_commons:189:23)
+오전 11:51:12 [vite] (client) page reload src/systems/CombatSystem.ts
+오전 11:51:13 [vite] (client) Pre-transform error: Transform failed with 1 error:
+/Users/hangup2/apps/survivors-game-project/src/systems/CombatSystem.ts:52:0: ERROR: Unexpected end of file
+  Plugin: vite:esbuild
+  File: /Users/hangup2/apps/survivors-game-project/src/systems/CombatSystem.ts:52:0
+  
+  Unexpected end of file
+  50 |          const spells = spellQuery(world);
+  51 |  };
+  52 |  
+     |  ^
+  
+오전 11:51:13 [vite] (client) Pre-transform error: Transform failed with 1 error:
+/Users/hangup2/apps/survivors-game-project/src/systems/WaveSystem.ts:105:12: ERROR: Expected ";" but found "spawnEnemy"
+  Plugin: vite:esbuild
+  File: /Users/hangup2/apps/survivors-game-project/src/systems/WaveSystem.ts:105:12
+  
+  Expected ";" but found "spawnEnemy"
+  103|              // physics system handles move, we just handle custom logic if needed
+  104|      }
+  105|      private spawnEnemy(intensity: number) {
+     |              ^
+  106|          const angle = Math.random() * Math.PI * 2;
+  107|          const radius = 800;
+  
+오전 11:51:13 [vite] Internal server error: Transform failed with 1 error:
+/Users/hangup2/apps/survivors-game-project/src/systems/WaveSystem.ts:105:12: ERROR: Expected ";" but found "spawnEnemy"
+  Plugin: vite:esbuild
+  File: /Users/hangup2/apps/survivors-game-project/src/systems/WaveSystem.ts:105:12
+  
+  Expected ";" but found "spawnEnemy"
+  103|              // physics system handles move, we just handle custom logic if needed
+  104|      }
+  105|      private spawnEnemy(intensity: number) {
+     |              ^
+  106|          const angle = Math.random() * Math.PI * 2;
+  107|          const radius = 800;
+  
+      at failureErrorWithLog (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:1467:15)
+      at /Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:736:50
+      at responseCallbacks.<computed> (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:603:9)
+      at handleIncomingPacket (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:658:12)
+      at Socket.readFromStdout (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:581:7)
+      at Socket.emit (node:events:508:28)
+      at addChunk (node:internal/streams/readable:559:12)
+      at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+      at Readable.push (node:internal/streams/readable:390:5)
+      at Pipe.onStreamRead (node:internal/stream_base_commons:189:23)
+오전 11:51:13 [vite] Internal server error: Transform failed with 1 error:
+/Users/hangup2/apps/survivors-game-project/src/systems/CombatSystem.ts:52:0: ERROR: Unexpected end of file
+  Plugin: vite:esbuild
+  File: /Users/hangup2/apps/survivors-game-project/src/systems/CombatSystem.ts:52:0
+  
+  Unexpected end of file
+  50 |          const spells = spellQuery(world);
+  51 |  };
+  52 |  
+     |  ^
+  
+      at failureErrorWithLog (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:1467:15)
+      at /Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:736:50
+      at responseCallbacks.<computed> (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:603:9)
+      at handleIncomingPacket (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:658:12)
+      at Socket.readFromStdout (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:581:7)
+      at Socket.emit (node:events:508:28)
+      at addChunk (node:internal/streams/readable:559:12)
+      at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+      at Readable.push (node:internal/streams/readable:390:5)
+      at Pipe.onStreamRead (node:internal/stream_base_commons:189:23)
+오전 11:51:16 [vite] (client) page reload src/scenes/MainScene.ts
+오전 11:51:16 [vite] (client) Pre-transform error: Transform failed with 1 error:
+/Users/hangup2/apps/survivors-game-project/src/systems/CombatSystem.ts:52:0: ERROR: Unexpected end of file
+  Plugin: vite:esbuild
+  File: /Users/hangup2/apps/survivors-game-project/src/systems/CombatSystem.ts:52:0
+  
+  Unexpected end of file
+  50 |          const spells = spellQuery(world);
+  51 |  };
+  52 |  
+     |  ^
+  
+오전 11:51:16 [vite] (client) Pre-transform error: Transform failed with 1 error:
+/Users/hangup2/apps/survivors-game-project/src/systems/WaveSystem.ts:105:12: ERROR: Expected ";" but found "spawnEnemy"
+  Plugin: vite:esbuild
+  File: /Users/hangup2/apps/survivors-game-project/src/systems/WaveSystem.ts:105:12
+  
+  Expected ";" but found "spawnEnemy"
+  103|              // physics system handles move, we just handle custom logic if needed
+  104|      }
+  105|      private spawnEnemy(intensity: number) {
+     |              ^
+  106|          const angle = Math.random() * Math.PI * 2;
+  107|          const radius = 800;
+  
+오전 11:51:16 [vite] Internal server error: Transform failed with 1 error:
+/Users/hangup2/apps/survivors-game-project/src/systems/WaveSystem.ts:105:12: ERROR: Expected ";" but found "spawnEnemy"
+  Plugin: vite:esbuild
+  File: /Users/hangup2/apps/survivors-game-project/src/systems/WaveSystem.ts:105:12
+  
+  Expected ";" but found "spawnEnemy"
+  103|              // physics system handles move, we just handle custom logic if needed
+  104|      }
+  105|      private spawnEnemy(intensity: number) {
+     |              ^
+  106|          const angle = Math.random() * Math.PI * 2;
+  107|          const radius = 800;
+  
+      at failureErrorWithLog (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:1467:15)
+      at /Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:736:50
+      at responseCallbacks.<computed> (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:603:9)
+      at handleIncomingPacket (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:658:12)
+      at Socket.readFromStdout (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:581:7)
+      at Socket.emit (node:events:508:28)
+      at addChunk (node:internal/streams/readable:559:12)
+      at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+      at Readable.push (node:internal/streams/readable:390:5)
+      at Pipe.onStreamRead (node:internal/stream_base_commons:189:23)
+오전 11:51:16 [vite] Internal server error: Transform failed with 1 error:
+/Users/hangup2/apps/survivors-game-project/src/systems/CombatSystem.ts:52:0: ERROR: Unexpected end of file
+  Plugin: vite:esbuild
+  File: /Users/hangup2/apps/survivors-game-project/src/systems/CombatSystem.ts:52:0
+  
+  Unexpected end of file
+  50 |          const spells = spellQuery(world);
+  51 |  };
+  52 |  
+     |  ^
+  
+      at failureErrorWithLog (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:1467:15)
+      at /Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:736:50
+      at responseCallbacks.<computed> (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:603:9)
+      at handleIncomingPacket (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:658:12)
+      at Socket.readFromStdout (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:581:7)
+      at Socket.emit (node:events:508:28)
+      at addChunk (node:internal/streams/readable:559:12)
+      at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+      at Readable.push (node:internal/streams/readable:390:5)
+      at Pipe.onStreamRead (node:internal/stream_base_commons:189:23)
+오전 11:51:25 [vite] (client) page reload src/systems/CombatSystem.ts
+오전 11:51:25 [vite] (client) Pre-transform error: Transform failed with 1 error:
+/Users/hangup2/apps/survivors-game-project/src/systems/WaveSystem.ts:105:12: ERROR: Expected ";" but found "spawnEnemy"
+  Plugin: vite:esbuild
+  File: /Users/hangup2/apps/survivors-game-project/src/systems/WaveSystem.ts:105:12
+  
+  Expected ";" but found "spawnEnemy"
+  103|              // physics system handles move, we just handle custom logic if needed
+  104|      }
+  105|      private spawnEnemy(intensity: number) {
+     |              ^
+  106|          const angle = Math.random() * Math.PI * 2;
+  107|          const radius = 800;
+  
+오전 11:51:25 [vite] Internal server error: Transform failed with 1 error:
+/Users/hangup2/apps/survivors-game-project/src/systems/WaveSystem.ts:105:12: ERROR: Expected ";" but found "spawnEnemy"
+  Plugin: vite:esbuild
+  File: /Users/hangup2/apps/survivors-game-project/src/systems/WaveSystem.ts:105:12
+  
+  Expected ";" but found "spawnEnemy"
+  103|              // physics system handles move, we just handle custom logic if needed
+  104|      }
+  105|      private spawnEnemy(intensity: number) {
+     |              ^
+  106|          const angle = Math.random() * Math.PI * 2;
+  107|          const radius = 800;
+  
+      at failureErrorWithLog (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:1467:15)
+      at /Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:736:50
+      at responseCallbacks.<computed> (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:603:9)
+      at handleIncomingPacket (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:658:12)
+      at Socket.readFromStdout (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:581:7)
+      at Socket.emit (node:events:508:28)
+      at addChunk (node:internal/streams/readable:559:12)
+      at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+      at Readable.push (node:internal/streams/readable:390:5)
+      at Pipe.onStreamRead (node:internal/stream_base_commons:189:23)
+오전 11:51:42 [vite] (client) page reload src/systems/CombatSystem.ts
+오전 11:51:42 [vite] (client) Pre-transform error: Transform failed with 1 error:
+/Users/hangup2/apps/survivors-game-project/src/systems/WaveSystem.ts:105:12: ERROR: Expected ";" but found "spawnEnemy"
+  Plugin: vite:esbuild
+  File: /Users/hangup2/apps/survivors-game-project/src/systems/WaveSystem.ts:105:12
+  
+  Expected ";" but found "spawnEnemy"
+  103|              // physics system handles move, we just handle custom logic if needed
+  104|      }
+  105|      private spawnEnemy(intensity: number) {
+     |              ^
+  106|          const angle = Math.random() * Math.PI * 2;
+  107|          const radius = 800;
+  
+오전 11:51:42 [vite] Internal server error: Transform failed with 1 error:
+/Users/hangup2/apps/survivors-game-project/src/systems/WaveSystem.ts:105:12: ERROR: Expected ";" but found "spawnEnemy"
+  Plugin: vite:esbuild
+  File: /Users/hangup2/apps/survivors-game-project/src/systems/WaveSystem.ts:105:12
+  
+  Expected ";" but found "spawnEnemy"
+  103|              // physics system handles move, we just handle custom logic if needed
+  104|      }
+  105|      private spawnEnemy(intensity: number) {
+     |              ^
+  106|          const angle = Math.random() * Math.PI * 2;
+  107|          const radius = 800;
+  
+      at failureErrorWithLog (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:1467:15)
+      at /Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:736:50
+      at responseCallbacks.<computed> (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:603:9)
+      at handleIncomingPacket (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:658:12)
+      at Socket.readFromStdout (/Users/hangup2/apps/survivors-game-project/node_modules/esbuild/lib/main.js:581:7)
+      at Socket.emit (node:events:508:28)
+      at addChunk (node:internal/streams/readable:559:12)
+      at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+      at Readable.push (node:internal/streams/readable:390:5)
+      at Pipe.onStreamRead (node:internal/stream_base_commons:189:23)
+오전 11:51:51 [vite] (client) page reload src/systems/WaveSystem.ts
+오전 11:52:02 [vite] (client) page reload src/scenes/MainScene.ts
+오전 11:52:05 [vite] (client) page reload src/systems/WaveSystem.ts

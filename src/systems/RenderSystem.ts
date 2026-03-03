@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { defineQuery, hasComponent } from 'bitecs';
-import { Animation, Position, SpriteInfo, Velocity } from '../components';
+import { Animation, Position, SpriteInfo, Velocity, Health } from '../components';
 import { world } from '../core/World';
 
 const renderQuery = defineQuery([Position, SpriteInfo]);
@@ -25,10 +25,13 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
             else if (typeId === 10) charKey = 'imp';
             else if (typeId === 11) charKey = 'demon';
             else if (typeId === 20) charKey = 'gem';
+            else if (typeId === 12) charKey = 'orc';
+            else if (typeId === 13) charKey = 'skeleton';
             else if (typeId === 100) charKey = 'spell_fire';
             else if (typeId === 101) charKey = 'spell_ice';
             else if (typeId === 102) charKey = 'spell_gas';
             else if (typeId === 103) charKey = 'spell_dud';
+            else if (typeId === 104) charKey = 'enemy_bullet';
 
             // 2. Identify State (Idle vs Run)
             let state = 'idle';
@@ -39,7 +42,7 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
 
             // 3. Handle Animation Framing
             let frameName: string | number = '';
-            if (typeId >= 20 && typeId <= 103) {
+            if (typeId >= 20 && typeId <= 104) {
                 frameName = charKey;
             } else {
                 const rate = Animation.frameRate[eid] || 8;
@@ -50,7 +53,13 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                 const currentFrameIdx = Math.floor(Animation.timer[eid] / frameDuration) % 4;
                 frameName = `${charKey}_${state}_${currentFrameIdx}`;
             }
-
+            // 4. Handle Death Effect (Vanishing)
+            let currentAlpha = 1.0;
+            if (hasComponent(world, Health, eid)) {
+                if (Health.current[eid] <= 0) {
+                    currentAlpha = 0.4; // fade out
+                }
+            }
             // 4. Render or Create Bob
             if (!bob) {
                 const newBob = blitter.create(Position.x[eid], Position.y[eid], frameName);
@@ -61,12 +70,17 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                     newBob.alpha = 0.9;
                 } else if (typeId === 11) { // demon
                     newBob.tint = 0xff5555;
+                } else if (typeId === 104) { // enemy bullet
+                    newBob.tint = 0xffff00; // yellow
                 }
+                
+                newBob.alpha = currentAlpha;
                 
                 bobs[eid] = newBob;
             } else {
                 bob.x = Position.x[eid];
                 bob.y = Position.y[eid];
+                bob.alpha = currentAlpha;
                 try {
                     bob.setFrame(frameName);
                 } catch (e) {
