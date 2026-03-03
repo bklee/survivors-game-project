@@ -3,6 +3,7 @@ import { BootScene } from './scenes/BootScene';
 import { MainScene } from './scenes/MainScene';
 import { UpgradeScene } from './scenes/UpgradeScene';
 import { UIScene } from './scenes/UIScene';
+import { GameOverScene } from './scenes/GameOverScene';
 
 const config: Phaser.Types.Core.GameConfig = {
     type: Phaser.AUTO,
@@ -20,7 +21,7 @@ const config: Phaser.Types.Core.GameConfig = {
             debug: false,
         },
     },
-    scene: [BootScene, MainScene, UIScene, UpgradeScene],
+    scene: [BootScene, MainScene, UIScene, UpgradeScene, GameOverScene],
     pixelArt: true,
     backgroundColor: '#111111',
 };

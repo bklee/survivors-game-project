@@ -4,6 +4,7 @@ import { Element } from '../alchemy/AlchemySystem';
 export class UIScene extends Phaser.Scene {
     private xpText!: Phaser.GameObjects.Text;
     private queueText!: Phaser.GameObjects.Text;
+    private hpBar!: Phaser.GameObjects.Rectangle;
     private bossWarningText!: Phaser.GameObjects.Text;
     private bossWarningTween?: Phaser.Tweens.Tween;
 
@@ -25,6 +26,11 @@ export class UIScene extends Phaser.Scene {
             fontSize: '20px',
             color: '#ffff00',
         });
+        // HP Bar Background
+        this.add.rectangle(640, 30, 400, 20, 0x333333).setOrigin(0.5);
+        this.hpBar = this.add.rectangle(640, 30, 400, 20, 0x00ff00).setOrigin(0.5);
+
+        // Listen for global events
 
         // Fixed at bottom center of 1280x720 canvas
         this.queueText = this.add.text(640, 680, "Queue: [ ]", {
@@ -44,11 +50,13 @@ export class UIScene extends Phaser.Scene {
         window.addEventListener('xp_collected', this.handleXp as EventListener);
         window.addEventListener('alchemyQueueUpdated', this.handleQueue as EventListener);
         window.addEventListener('boss_spawned', this.handleBossSpawn as EventListener);
+        window.addEventListener('hp_updated', this.handleHp as EventListener);
 
         this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
             window.removeEventListener('xp_collected', this.handleXp as EventListener);
             window.removeEventListener('alchemyQueueUpdated', this.handleQueue as EventListener);
             window.removeEventListener('boss_spawned', this.handleBossSpawn as EventListener);
+            window.removeEventListener('hp_updated', this.handleHp as EventListener);
             this.bossWarningTween?.stop();
         });
     }
@@ -67,6 +75,16 @@ export class UIScene extends Phaser.Scene {
     private handleQueue = (e: CustomEvent<Element[]>) => {
         const elements = e.detail;
         this.queueText.setText(`Queue: [ ${elements.join(' + ')} ]`);
+    }
+    private handleHp = (e: CustomEvent<{current: number, max: number}>) => {
+        const { current, max } = e.detail;
+        const percent = Phaser.Math.Clamp(current / max, 0, 1);
+        this.hpBar.width = 400 * percent;
+        
+        // Color shift: Green -> Yellow -> Red
+        if (percent > 0.5) this.hpBar.setFillStyle(0x00ff00);
+        else if (percent > 0.2) this.hpBar.setFillStyle(0xffff00);
+        else this.hpBar.setFillStyle(0xff0000);
     }
 
     private handleBossSpawn = () => {
