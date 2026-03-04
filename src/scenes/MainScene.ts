@@ -7,7 +7,7 @@ import { createRenderSystem } from '../systems/RenderSystem';
 import { PlayerSystem } from '../systems/PlayerSystem';
 import { NightDirector } from '../systems/WaveSystem';
 import { VirtualJoystick } from '../ui/VirtualJoystick';
-import { WORLD_WIDTH, WORLD_HEIGHT } from '../constants/GameConfig';
+
 import { CHARACTERS } from '../constants/CharacterConfig';
 
 import { JuicePipeline } from '../fx/JuicePipeline';
@@ -15,7 +15,7 @@ import { AlchemySystem, Element } from '../alchemy/AlchemySystem';
 import { createCombatSystem } from '../systems/CombatSystem';
 import { SpellSystem } from '../systems/SpellSystem';
 import { ItemSystem } from '../systems/ItemSystem';
-import { DungeonGenerator, MAP_WIDTH, MAP_HEIGHT, TILE_SIZE, TileType } from '../core/DungeonGenerator';
+import { DungeonGenerator, TILE_SIZE, TileType } from '../core/DungeonGenerator';
 
 export class MainScene extends Phaser.Scene {
     private physicsSystem!: (dt: number) => void;
@@ -33,6 +33,9 @@ export class MainScene extends Phaser.Scene {
     private autoQueueIntervalId?: number;
     private currentBGM?: Phaser.Sound.BaseSound;
     private dungeon!: DungeonGenerator;
+    private wallBlitter!: Phaser.GameObjects.Blitter;
+    private floorSprite!: Phaser.GameObjects.TileSprite;
+    private currentStage: number = 1;
 
     constructor() {
         super('MainScene');
@@ -46,8 +49,10 @@ export class MainScene extends Phaser.Scene {
     }
 
     create() {
-        // 1. Initialize Dungeon FIRST
-        this.dungeon = new DungeonGenerator();
+        this.currentStage = 1;
+
+        // 1. Initialize Dungeon FIRST (starting size 100x100)
+        this.dungeon = new DungeonGenerator(100, 100);
 
         // 2. Setup ECS Systems
         this.physicsSystem = createPhysicsSystem(this.dungeon);
@@ -62,24 +67,14 @@ export class MainScene extends Phaser.Scene {
         this.spellSystem.selectedCharId = this.selectedCharId;
 
         // 3. Render Background
-        this.add.tileSprite(0, 0, WORLD_WIDTH, WORLD_HEIGHT, 'dungeon', 'floor')
+        this.floorSprite = this.add.tileSprite(0, 0, this.dungeon.width * TILE_SIZE, this.dungeon.height * TILE_SIZE, 'dungeon', 'floor')
             .setOrigin(0, 0)
             .setDepth(-3);
 
         // 4. Render Walls (Optimized via Blitter)
-        const wallBlitter = this.add.blitter(0, 0, 'walls').setDepth(-2);
-        for (let y = 0; y < MAP_HEIGHT; y++) {
-            for (let x = 0; x < MAP_WIDTH; x++) {
-                if (this.dungeon.map[y][x] === TileType.WALL) {
-                    let frame = 'wall_top'; // Default
-                    const bottom = y < MAP_HEIGHT - 1 ? this.dungeon.map[y + 1][x] : TileType.WALL;
-                    if (bottom === TileType.FLOOR) frame = 'wall_top';
-                    else frame = 'wall_inner';
+        this.wallBlitter = this.add.blitter(0, 0, 'walls').setDepth(-2);
 
-                    wallBlitter.create(x * TILE_SIZE, y * TILE_SIZE, frame);
-                }
-            }
-        }
+        this.buildMap(this.currentStage);
 
         const charBlitter = this.add.blitter(0, 0, 'dungeon').setDepth(0);
         this.renderSystem = createRenderSystem(this, charBlitter);
@@ -117,7 +112,6 @@ export class MainScene extends Phaser.Scene {
             m.globalStats.damageMult = charData.baseStats.damage;
         });
 
-        this.cameras.main.setBounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
         this.cameras.main.setZoom(2.5);
 
         this.joystick = new VirtualJoystick(this, 150, 600, 50);
@@ -159,6 +153,14 @@ export class MainScene extends Phaser.Scene {
         window.addEventListener('keydown', recipeHandler);
 
         const nextStageHandler = () => {
+            this.currentStage++;
+            this.buildMap(this.currentStage);
+
+            // Relocate player safely in the new map
+            const startPos = this.dungeon.getRandomFloorPixel();
+            Position.x[this.playerId] = startPos.x;
+            Position.y[this.playerId] = startPos.y;
+
             this.nightDirector.resetForNextStage();
             this.startBGM('main_bgm');
         };
@@ -180,6 +182,37 @@ export class MainScene extends Phaser.Scene {
 
         this.spawnDungeonProps();
         window.dispatchEvent(new CustomEvent('game_started'));
+    }
+
+    private buildMap(stage: number) {
+        // Increase width and height by 10% each stage
+        const scale = Math.pow(1.10, Math.max(0, stage - 1));
+        const mapW = Math.floor(100 * scale);
+        const mapH = Math.floor(100 * scale);
+
+        this.dungeon.width = mapW;
+        this.dungeon.height = mapH;
+        this.dungeon.generate();
+
+        const wPx = mapW * TILE_SIZE;
+        const hPx = mapH * TILE_SIZE;
+
+        this.floorSprite.setSize(wPx, hPx);
+        this.cameras.main.setBounds(0, 0, wPx, hPx);
+
+        this.wallBlitter.clear();
+        for (let y = 0; y < mapH; y++) {
+            for (let x = 0; x < mapW; x++) {
+                if (this.dungeon.map[y][x] === TileType.WALL) {
+                    let frame = 'wall_top'; // Default
+                    const bottom = y < mapH - 1 ? this.dungeon.map[y + 1][x] : TileType.WALL;
+                    if (bottom === TileType.FLOOR) frame = 'wall_top';
+                    else frame = 'wall_inner';
+
+                    this.wallBlitter.create(x * TILE_SIZE, y * TILE_SIZE, frame);
+                }
+            }
+        }
         window.dispatchEvent(new CustomEvent('map_generated', { detail: this.dungeon.map }));
     }
 

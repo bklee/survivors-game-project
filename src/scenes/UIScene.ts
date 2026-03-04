@@ -22,7 +22,6 @@ export class UIScene extends Phaser.Scene {
     // Minimap
     private minimapGraphics!: Phaser.GameObjects.Graphics;
     private readonly MINIMAP_SIZE = 150;
-    private readonly SCALE = 150 / 4000;
 
     private playerQuery = defineQuery([Player, Position]);
     private enemyQuery = defineQuery([Enemy, Position]);
@@ -118,6 +117,12 @@ export class UIScene extends Phaser.Scene {
         this.minimapGraphics.clear();
 
         if (this.dungeonMap.length === 0) return;
+
+        const mapW = this.dungeonMap[0].length * 16;
+        const mapH = this.dungeonMap.length * 16;
+        const maxDim = Math.max(mapW, mapH);
+        const scale = this.MINIMAP_SIZE / maxDim;
+
         const offsetX = 1280 - 12 - this.MINIMAP_SIZE;
         const offsetY = 12;
 
@@ -132,10 +137,10 @@ export class UIScene extends Phaser.Scene {
 
                 // Draw tile
                 this.minimapGraphics.fillRect(
-                    offsetX + x * 16 * this.SCALE,
-                    offsetY + y * 16 * this.SCALE,
-                    Math.ceil(16 * this.SCALE),
-                    Math.ceil(16 * this.SCALE)
+                    offsetX + x * 16 * scale,
+                    offsetY + y * 16 * scale,
+                    Math.ceil(16 * scale),
+                    Math.ceil(16 * scale)
                 );
             }
         }
@@ -147,16 +152,16 @@ export class UIScene extends Phaser.Scene {
         this.minimapGraphics.fillStyle(0xff0000, 0.8);
         for (let i = 0; i < enemies.length; i++) {
             const eid = enemies[i];
-            const x = offsetX + (Position.x[eid] * this.SCALE);
-            const y = offsetY + (Position.y[eid] * this.SCALE);
+            const x = offsetX + (Position.x[eid] * scale);
+            const y = offsetY + (Position.y[eid] * scale);
             this.minimapGraphics.fillRect(x, y, 2, 2);
         }
 
         // Draw Player
         if (players.length > 0) {
             const peid = players[0];
-            const px = offsetX + (Position.x[peid] * this.SCALE);
-            const py = offsetY + (Position.y[peid] * this.SCALE);
+            const px = offsetX + (Position.x[peid] * scale);
+            const py = offsetY + (Position.y[peid] * scale);
             this.minimapGraphics.fillStyle(0xffffff, 1);
             this.minimapGraphics.fillCircle(px, py, 3);
         }
