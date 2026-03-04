@@ -6,6 +6,7 @@ import { globalStats } from '../core/PlayerStats';
 
 export class UIScene extends Phaser.Scene {
     private stageLevelText!: Phaser.GameObjects.Text;
+    private levelText!: Phaser.GameObjects.Text;
     private statsText!: Phaser.GameObjects.Text;
     private hpBar!: Phaser.GameObjects.Rectangle;
     private hpText!: Phaser.GameObjects.Text;
@@ -45,13 +46,21 @@ export class UIScene extends Phaser.Scene {
             fontStyle: 'bold'
         });
 
-        this.stageLevelText = this.add.text(640, 10, "Stage 1 | Level 1", {
-            fontSize: '22px',
+        this.stageLevelText = this.add.text(640, 10, "Stage 1", {
+            fontSize: '28px',
             color: '#ffff00',
             fontStyle: 'bold',
             stroke: '#000000',
             strokeThickness: 4
         }).setOrigin(0.5, 0);
+
+        this.levelText = this.add.text(10, 45, "Level 1 (0 / 100 XP) | SP: 0", {
+            fontSize: '20px',
+            color: '#00ffff',
+            fontStyle: 'bold',
+            stroke: '#000000',
+            strokeThickness: 3
+        });
 
         this.statsText = this.add.text(10, 80, this.getStatsString(), {
             fontSize: '16px',
@@ -78,7 +87,7 @@ export class UIScene extends Phaser.Scene {
         const mmBg2 = this.add.rectangle(mmX - 2, mmY + 2, this.MINIMAP_SIZE, this.MINIMAP_SIZE, 0x111111, 1).setOrigin(1, 0);
         this.minimapGraphics = this.add.graphics();
 
-        this.uiContainer.add([title, this.stageLevelText, this.statsText, hpBg, this.hpBar, this.hpText, this.coinText, mmBg1, mmBg2, this.minimapGraphics]);
+        this.uiContainer.add([title, this.stageLevelText, this.levelText, this.statsText, hpBg, this.hpBar, this.hpText, this.coinText, mmBg1, mmBg2, this.minimapGraphics]);
         this.uiContainer.setVisible(false);
 
         this.bossWarningText = this.add.text(640, 360, 'BOSS APPROACHING!', {
@@ -128,11 +137,12 @@ export class UIScene extends Phaser.Scene {
     }
 
     private getStatsString() {
-        return `ATK: x${globalStats.damageMult.toFixed(1)} | SPD: x${globalStats.moveSpeedMult.toFixed(1)} | CDR: -${((1 - globalStats.cooldownMult) * 100).toFixed(0)}%`;
+        return `ATK: x${globalStats.damageMult.toFixed(1)}\nSPD: x${globalStats.moveSpeedMult.toFixed(1)}\nCDR: -${((1 - globalStats.cooldownMult) * 100).toFixed(0)}%`;
     }
 
     private updateStageLevelText() {
-        this.stageLevelText.setText(`Stage ${this.currentStage} | Level ${this.currentLevel} (${Math.floor(this.currentXp)} / ${this.xpToNextLevel} XP) | SP: ${this.skillPoints}`);
+        this.stageLevelText.setText(`Stage ${this.currentStage}`);
+        this.levelText.setText(`Level ${this.currentLevel} (${Math.floor(this.currentXp)} / ${this.xpToNextLevel} XP) | SP: ${this.skillPoints}`);
     }
 
     update() {
