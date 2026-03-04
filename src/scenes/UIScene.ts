@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { defineQuery } from 'bitecs';
 import { world } from '../core/World';
-import { Position, Player, Enemy } from '../components';
+import { Position, Player, Enemy, Boss } from '../components';
 import { globalStats } from '../core/PlayerStats';
 
 export class UIScene extends Phaser.Scene {
@@ -16,6 +16,8 @@ export class UIScene extends Phaser.Scene {
     private stageClearText!: Phaser.GameObjects.Text;
     private dungeonMap: number[][] = [];
     private discoveredMap: boolean[][] = [];
+    private spawningComplete = false;
+    private arrowGraphics!: Phaser.GameObjects.Graphics;
 
     private currentLevel = 1;
     private currentStage = 1;
@@ -32,6 +34,7 @@ export class UIScene extends Phaser.Scene {
 
     private playerQuery = defineQuery([Player, Position]);
     private enemyQuery = defineQuery([Enemy, Position]);
+    private bossQuery = defineQuery([Boss, Position]);
 
     constructor() {
         super({ key: 'UIScene', active: true });
@@ -92,8 +95,9 @@ export class UIScene extends Phaser.Scene {
         const mmBg1 = this.add.rectangle(mmX, mmY, this.MINIMAP_SIZE + 4, this.MINIMAP_SIZE + 4, 0x222222, 1).setOrigin(1, 0);
         const mmBg2 = this.add.rectangle(mmX - 2, mmY + 2, this.MINIMAP_SIZE, this.MINIMAP_SIZE, 0x111111, 1).setOrigin(1, 0);
         this.minimapGraphics = this.add.graphics();
+        this.arrowGraphics = this.add.graphics();
 
-        this.uiContainer.add([title, this.stageLevelText, this.levelText, this.statsText, hpBg, this.hpBar, this.hpText, this.coinText, mmBg1, mmBg2, this.minimapGraphics]);
+        this.uiContainer.add([title, this.stageLevelText, this.levelText, this.statsText, hpBg, this.hpBar, this.hpText, this.coinText, mmBg1, mmBg2, this.minimapGraphics, this.arrowGraphics]);
         this.uiContainer.setVisible(false);
 
         this.bossWarningText = this.add.text(640, 360, 'BOSS APPROACHING!', {
@@ -116,12 +120,14 @@ export class UIScene extends Phaser.Scene {
             this.uiContainer.setVisible(true);
         });
 
+        window.addEventListener('spawning_complete', () => this.spawningComplete = true);
         window.addEventListener('xp_collected', this.handleXp as EventListener);
         window.addEventListener('boss_spawned', this.handleBossSpawn as EventListener);
         window.addEventListener('hp_updated', this.handleHp as EventListener);
         window.addEventListener('stage_clear', this.handleStageClear as EventListener);
         window.addEventListener('stage_updated', ((e: CustomEvent<number>) => {
             this.currentStage = e.detail;
+            this.spawningComplete = false;
             this.updateStageLevelText();
         }) as EventListener);
 
@@ -153,8 +159,61 @@ export class UIScene extends Phaser.Scene {
 
     update() {
         this.updateMinimap();
+        this.updateTargetArrows();
         // Keep stats updated in case of background changes
         this.statsText.setText(this.getStatsString());
+    }
+
+    private updateTargetArrows() {
+        this.arrowGraphics.clear();
+        const players = this.playerQuery(world);
+        if (players.length === 0) return;
+
+        const px = Position.x[players[0]];
+        const py = Position.y[players[0]];
+
+        const targets: { x: number, y: number, color: number }[] = [];
+
+        const bosses = this.bossQuery(world);
+        for (let i = 0; i < bosses.length; i++) {
+            targets.push({ x: Position.x[bosses[i]], y: Position.y[bosses[i]], color: 0xff00ff }); // Magenta boss arrow
+        }
+
+        if (this.spawningComplete && bosses.length === 0) {
+            const enemies = this.enemyQuery(world);
+            if (enemies.length > 0 && enemies.length < 5) {
+                for (let i = 0; i < enemies.length; i++) {
+                    targets.push({ x: Position.x[enemies[i]], y: Position.y[enemies[i]], color: 0xff0000 }); // Red enemy arrow
+                }
+            }
+        }
+
+        const cx = 640;
+        const cy = 360;
+        const radius = 280;
+
+        targets.forEach(t => {
+            const dx = t.x - px;
+            const dy = t.y - py;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+
+            if (dist > 300) {
+                const angle = Math.atan2(dy, dx);
+
+                this.arrowGraphics.fillStyle(t.color, 1);
+                this.arrowGraphics.lineStyle(2, 0xffffff, 1);
+
+                const ptX = cx + Math.cos(angle) * radius;
+                const ptY = cy + Math.sin(angle) * radius;
+                const bL_X = cx + Math.cos(angle - 0.2) * (radius - 24);
+                const bL_Y = cy + Math.sin(angle - 0.2) * (radius - 24);
+                const bR_X = cx + Math.cos(angle + 0.2) * (radius - 24);
+                const bR_Y = cy + Math.sin(angle + 0.2) * (radius - 24);
+
+                this.arrowGraphics.fillTriangle(ptX, ptY, bL_X, bL_Y, bR_X, bR_Y);
+                this.arrowGraphics.strokeTriangle(ptX, ptY, bL_X, bL_Y, bR_X, bR_Y);
+            }
+        });
     }
 
     private updateMinimap() {
