@@ -98,9 +98,9 @@ export class NightDirector {
     private getStageEnemyType(): number {
         const cycle = (this.stage - 1) % 3;
         let pool: number[] = [];
-        if (cycle === 0) pool = [70, 71, 72, 73]; // Undead (tiny_zombie, necromancer, skelet, zombie)
-        else if (cycle === 1) pool = [80, 81]; // Orc (shaman, warrior)
-        else pool = [60, 61]; // Demon (chort, imp)
+        if (cycle === 0) pool = [70, 71, 72, 73, 74, 75]; // Undead (tiny_zombie, necromancer, skelet, zombie, doc, ice_zombie)
+        else if (cycle === 1) pool = [80, 81, 82, 83]; // Orc (shaman, warrior, goblin, masked_orc)
+        else pool = [60, 61, 62]; // Demon (chort, imp, wogol)
         return pool[Math.floor(Math.random() * pool.length)];
     }
 

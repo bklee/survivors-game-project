@@ -7,6 +7,7 @@ const MONSTER_CONFIG: Record<number, { name: string, hasIdleRun: boolean }> = {
     // Demons
     60: { name: 'chort', hasIdleRun: true },
     61: { name: 'imp', hasIdleRun: true },
+    62: { name: 'wogol', hasIdleRun: true },
     69: { name: 'big_demon', hasIdleRun: true }, // BOSS
 
     // Undeads
@@ -14,11 +15,15 @@ const MONSTER_CONFIG: Record<number, { name: string, hasIdleRun: boolean }> = {
     71: { name: 'necromancer', hasIdleRun: false },
     72: { name: 'skelet', hasIdleRun: true },
     73: { name: 'zombie', hasIdleRun: false },
+    74: { name: 'doc', hasIdleRun: true },
+    75: { name: 'ice_zombie', hasIdleRun: false },
     79: { name: 'big_zombie', hasIdleRun: true }, // BOSS
 
     // Orcs
     80: { name: 'orc_shaman', hasIdleRun: true },
     81: { name: 'orc_warrior', hasIdleRun: true },
+    82: { name: 'goblin', hasIdleRun: true },
+    83: { name: 'masked_orc', hasIdleRun: true },
     89: { name: 'ogre', hasIdleRun: true }, // BOSS
 };
 
