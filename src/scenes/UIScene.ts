@@ -22,6 +22,7 @@ export class UIScene extends Phaser.Scene {
 
     private coinText!: Phaser.GameObjects.Text;
     private totalCoins = 0;
+    private skillPoints = 0;
 
     // Minimap
     private minimapGraphics!: Phaser.GameObjects.Graphics;
@@ -125,7 +126,7 @@ export class UIScene extends Phaser.Scene {
     }
 
     private updateStageLevelText() {
-        this.stageLevelText.setText(`Stage ${this.currentStage} | Level ${this.currentLevel} (${Math.floor(this.currentXp)} / ${this.xpToNextLevel} XP)`);
+        this.stageLevelText.setText(`Stage ${this.currentStage} | Level ${this.currentLevel} (${Math.floor(this.currentXp)} / ${this.xpToNextLevel} XP) | SP: ${this.skillPoints}`);
     }
 
     update() {
@@ -188,6 +189,7 @@ export class UIScene extends Phaser.Scene {
         this.currentXp += e.detail;
         if (this.currentXp >= this.xpToNextLevel) {
             this.currentLevel++;
+            this.skillPoints++;
             this.currentXp -= this.xpToNextLevel;
             this.xpToNextLevel = Math.floor(this.xpToNextLevel * 1.5);
             this.sound.play('level_up', { volume: 0.5 });
