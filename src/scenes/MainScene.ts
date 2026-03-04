@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { defineQuery, addEntity, addComponent, hasComponent } from 'bitecs';
+import { defineQuery, addEntity, addComponent, hasComponent, removeEntity } from 'bitecs';
 import { world } from '../core/World';
 import { Position, Velocity, Player, SpriteInfo, Animation, Health, Interactive, Item, Enemy } from '../components';
 import { createPhysicsSystem } from '../systems/PhysicsSystem';
@@ -249,21 +249,58 @@ export class MainScene extends Phaser.Scene {
                     }
                 }
             } else if (typeId === 34) { // Explosive Barrel
+            } else if (typeId === 34) { // Explosive Barrel
                 if (distSq < 40 * 40 && (!hasComponent(world, Interactive, eid) || Interactive.isActivated[eid] === 0)) {
-                    if (hasComponent(world, Interactive, eid)) {
-                        Interactive.isActivated[eid] = 1;
-                    } else {
-                        addComponent(world, Interactive, eid);
-                        Interactive.isActivated[eid] = 1;
-                    }
+                    addComponent(world, Interactive, eid);
+                    Interactive.isActivated[eid] = 1;
 
                     this.juicePipeline.whiteFlash(100);
-                    // Reduced Screen Shake Intensity (1/2)
                     this.juicePipeline.screenShake(0.0025, 300);
+                    this.juicePipeline.vfx.playFireHit(Position.x[eid], Position.y[eid]); // Visual cue
+
                     Health.current[this.playerId] -= 30;
                     window.dispatchEvent(new CustomEvent('hp_updated', {
                         detail: { current: Health.current[this.playerId], max: Health.max[this.playerId] }
                     }));
+                    window.dispatchEvent(new CustomEvent('play_sound', { detail: 'hit' }));
+
+                    // Remove explosive barrel after explosion
+                    removeEntity(world, eid);
+                }
+            } else if (typeId === 35) { // Health Potion
+                if (distSq < 20 * 20) {
+                    this.juicePipeline.whiteFlash(50);
+                    Health.current[this.playerId] = Math.min(Health.current[this.playerId] + 40, Health.max[this.playerId]);
+                    window.dispatchEvent(new CustomEvent('hp_updated', {
+                        detail: { current: Health.current[this.playerId], max: Health.max[this.playerId] }
+                    }));
+                    window.dispatchEvent(new CustomEvent('play_sound', { detail: 'level_up' }));
+                    removeEntity(world, eid);
+                }
+            } else if (typeId === 36) { // Treasure Chest
+                if (distSq < 30 * 30 && (!hasComponent(world, Interactive, eid) || Interactive.isActivated[eid] === 0)) {
+                    addComponent(world, Interactive, eid);
+                    Interactive.isActivated[eid] = 1;
+
+                    // Spawn 1000 XP
+                    const dropId = addEntity(world);
+                    addComponent(world, Position, dropId);
+                    addComponent(world, Velocity, dropId);
+                    addComponent(world, Item, dropId);
+                    addComponent(world, SpriteInfo, dropId);
+                    Position.x[dropId] = Position.x[eid];
+                    Position.y[dropId] = Position.y[eid];
+                    Velocity.x[dropId] = 0;
+                    Velocity.y[dropId] = -100;
+                    Item.xpValue[dropId] = 1500;
+                    SpriteInfo.textureIndex[dropId] = 20;
+                    Item.magnetized[dropId] = 0;
+
+                    this.juicePipeline.whiteFlash(100);
+                    window.dispatchEvent(new CustomEvent('play_sound', { detail: 'level_up' }));
+
+                    // Change chest sprite to "open chest" or simply remove the closed chest
+                    removeEntity(world, eid); // Removing it is cleaner for now
                 }
             }
         }
@@ -287,12 +324,14 @@ export class MainScene extends Phaser.Scene {
             Position.x[eid] = pos.x;
             Position.y[eid] = pos.y;
             const roll = Math.random();
-            if (roll > 0.8) SpriteInfo.textureIndex[eid] = 30;
-            else if (roll > 0.7) SpriteInfo.textureIndex[eid] = 34;
-            else if (roll > 0.6) SpriteInfo.textureIndex[eid] = 31;
-            else if (roll > 0.3) SpriteInfo.textureIndex[eid] = 33;
+            if (roll > 0.85) SpriteInfo.textureIndex[eid] = 30; // crate
+            else if (roll > 0.8) SpriteInfo.textureIndex[eid] = 34; // explosive barrel
+            else if (roll > 0.7) SpriteInfo.textureIndex[eid] = 31; // skull
+            else if (roll > 0.6) SpriteInfo.textureIndex[eid] = 36; // treasure chest
+            else if (roll > 0.5) SpriteInfo.textureIndex[eid] = 35; // health potion
+            else if (roll > 0.2) SpriteInfo.textureIndex[eid] = 33; // column
             else {
-                SpriteInfo.textureIndex[eid] = 32;
+                SpriteInfo.textureIndex[eid] = 32; // trap
                 addComponent(world, Animation, eid);
                 Animation.timer[eid] = Math.random() * 1000;
             }

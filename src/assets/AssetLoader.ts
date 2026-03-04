@@ -104,6 +104,7 @@ export class AssetLoader {
         texture.add('prop_crate', 0, 288, 408, 16, 24);
         texture.add('prop_skull', 0, 288, 432, 16, 16);
         texture.add('prop_column', 0, 80, 80, 16, 48);
+        texture.add('prop_chest', 0, 304, 416, 16, 16);
 
         // Dungeon Props (Animated - Spikes)
         for (let i = 0; i < 4; i++) {
