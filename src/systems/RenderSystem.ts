@@ -99,6 +99,15 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                 const animIdx = Math.floor(Animation.timer[eid] * rate / 1000) % 4;
                 frameName = `prop_spikes_${animIdx}`;
                 Animation.timer[eid] += dt;
+            } else if (typeId === 36) {
+                if (hasComponent(world, Interactive, eid) && Interactive.isActivated[eid]) {
+                    const fIdx = Math.min(2, Math.floor(Animation.timer[eid] * 0.01));
+                    textureKey = `chest_full_open_${fIdx}`;
+                    frameName = '';
+                    Animation.timer[eid] += dt;
+                } else {
+                    frameName = charKey;
+                }
             } else if (typeId >= 60 && typeId <= 82) {
                 const config = MONSTER_CONFIG[typeId];
                 if (config) {
