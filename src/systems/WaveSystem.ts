@@ -144,7 +144,7 @@ export class NightDirector {
         Position.y[eid] = pos.y;
 
         const typeId = this.getStageEnemyType();
-        let speed = 60 * intensity * this.globalDifficultyMultiplier;
+        let speed = 60; // Base speed, no longer scaled by stage/intensity
         let hp = 10 * intensity * this.globalDifficultyMultiplier;
 
         // Stat adjustments based on category
