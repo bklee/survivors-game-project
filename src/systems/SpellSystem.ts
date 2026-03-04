@@ -78,7 +78,7 @@ export class SpellSystem {
         Velocity.y[eid] = dy * 10;
         Rotation.angle[eid] = Math.atan2(dy, dx);
 
-        const fxEid = this.createBaseSpell(x + dx * 35, y + dy * 35, 109);
+        const fxEid = this.createBaseSpell(x + dx * 35, y + dy * 35, Math.random() > 0.5 ? 109 : 110);
         Spell.damage[fxEid] = 0;
         Spell.radius[fxEid] = 0;
         Spell.duration[fxEid] = 150;

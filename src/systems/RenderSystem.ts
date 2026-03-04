@@ -99,7 +99,8 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                 else if (typeId === 106) charKey = 'weapon_arrow';
                 else if (typeId === 107) charKey = 'weapon_staff';
                 else if (typeId === 108) charKey = 'weapon_bow';
-                else if (typeId === 109) charKey = 'attack_effect';
+                else if (typeId === 109) charKey = 'sword_slash';
+                else if (typeId === 110) charKey = 'super_slash';
             }
 
             const requiresSprite = typeId >= 100 || (typeId >= 60 && typeId <= 82) || typeId >= 50 || typeId === 36 || typeId === 21 || hasComponent(world, Rotation, eid);
@@ -144,6 +145,12 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                 Animation.timer[eid] = (Animation.timer[eid] || 0) + dt;
                 const fIdx = Math.floor(Animation.timer[eid] / (1000 / rate)) % 4;
                 textureKey = `coin_f${fIdx}`;
+            } else if (typeId === 109 || typeId === 110) {
+                // Slash Animation
+                const rate = 12;
+                Animation.timer[eid] = (Animation.timer[eid] || 0) + dt;
+                const fIdx = Math.floor(Animation.timer[eid] / (1000 / rate)) % 3;
+                textureKey = `${charKey}_f${fIdx}`;
                 frameName = '';
             } else if (typeId >= 60 && typeId <= 89) {
                 const config = MONSTER_CONFIG[typeId];
@@ -172,7 +179,7 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
 
             // 5. Render Bob or Sprite
             let finalFrame: string | number = frameName;
-            if (textureKey === 'dungeon' && !blitter.texture.has(frameName.toString()) && !['weapon_bow', 'attack_effect'].includes(charKey)) {
+            if (textureKey === 'dungeon' && !blitter.texture.has(frameName.toString()) && charKey !== 'weapon_bow') {
                 finalFrame = 'floor';
             }
 
@@ -181,15 +188,13 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                 let sprite = sprites[eid];
                 if (!sprite) {
                     if (charKey === 'weapon_bow') sprite = _scene.add.sprite(Position.x[eid], Position.y[eid], 'weapon_bow');
-                    else if (charKey === 'attack_effect') {
-                        sprite = _scene.add.sprite(Position.x[eid], Position.y[eid], 'attack_effect').setScale(0.5);
-                    } else sprite = _scene.add.sprite(Position.x[eid], Position.y[eid], textureKey, finalFrame === '' ? undefined : finalFrame as any);
+                    else sprite = _scene.add.sprite(Position.x[eid], Position.y[eid], textureKey, finalFrame === '' ? undefined : finalFrame as any);
                     sprite.setDepth(10);
                     sprites[eid] = sprite;
                 } else {
                     sprite.setPosition(Position.x[eid], Position.y[eid]);
                     sprite.alpha = currentAlpha;
-                    if (!['weapon_bow', 'attack_effect'].includes(charKey)) {
+                    if (charKey !== 'weapon_bow') {
                         sprite.setTexture(textureKey, finalFrame === '' ? undefined : finalFrame as any);
                     }
                 }
@@ -197,7 +202,7 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                 sprite.setVisible(true);
                 if (hasComponent(world, Boss, eid)) {
                     sprite.setScale(2.5);
-                } else if (charKey !== 'attack_effect') {
+                } else {
                     sprite.setScale(1.0);
                 }
 
