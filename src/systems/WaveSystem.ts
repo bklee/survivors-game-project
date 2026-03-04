@@ -8,61 +8,52 @@ const playerQuery = defineQuery([Player, Position]);
 
 export class NightDirector {
     private timeElapsed: number = 0; // ms
-    private bossSpawnThreshold = 30000;
-    private bossSpawned = false;
-    private spawnPauseUntil = 0;
-    private bossSpawnPauseDuration = 4000;
+    private stage: number = 1;
+    private maxEnemiesToSpawn: number = 0;
+    private spawnedEnemiesCount: number = 0;
+    private stageClearDispatched: boolean = false;
+    private bossSpawned: boolean = false;
     private bossBarrageTimer: number = 0;
     private globalDifficultyMultiplier = 1.0;
-    private waveConfig = [
-        { time: 0, spawnInterval: 1000, intensity: 1, maxEnemies: 30 },
-        { time: 60000, spawnInterval: 500, intensity: 2, maxEnemies: 70 },
-        { time: 300000, spawnInterval: 100, intensity: 3, maxEnemies: 150 },
-    ];
-
-    private currentWaveIndex: number = 0;
     private lastSpawnTime: number = 0;
     private dungeon: DungeonGenerator;
 
     constructor(dungeon: DungeonGenerator) {
         this.dungeon = dungeon;
+        this.resetForNextStage(1);
     }
 
     public update(dt: number) {
+        if (this.stageClearDispatched) return;
         this.timeElapsed += dt;
 
-        const nextWaveConfig = this.waveConfig[this.currentWaveIndex + 1];
-        if (nextWaveConfig && this.timeElapsed >= nextWaveConfig.time) {
-            this.currentWaveIndex++;
-            console.log(`Advancing to wave ${this.currentWaveIndex}`);
-        }
+        const isBossStage = this.stage % 3 === 0;
 
-        const currentWave = this.waveConfig[this.currentWaveIndex];
-
-        if (!this.bossSpawned && this.timeElapsed >= this.bossSpawnThreshold) {
+        if (isBossStage && !this.bossSpawned && this.timeElapsed >= 3000) {
             this.spawnBoss();
             this.bossSpawned = true;
-            this.spawnPauseUntil = this.timeElapsed + this.bossSpawnPauseDuration;
-            this.lastSpawnTime = this.spawnPauseUntil;
             window.dispatchEvent(new CustomEvent('boss_spawned'));
         }
 
         const enemies = enemyQuery(world);
 
-        if (this.timeElapsed >= this.spawnPauseUntil && this.timeElapsed - this.lastSpawnTime > currentWave.spawnInterval) {
-            const timePassed = this.timeElapsed - this.lastSpawnTime;
-            const targetSpawnCount = Math.floor(timePassed / currentWave.spawnInterval);
-            let actualSpawnCount = targetSpawnCount;
+        // Spawn normal enemies up to maxEnemiesToSpawn
+        const spawnInterval = Math.max(200, 1000 - (this.stage * 100));
+        let maxConcurrent = 30 + (this.stage * 10);
 
-            // Limit spawn count by maxEnemies
-            if (enemies.length + actualSpawnCount > currentWave.maxEnemies) {
-                actualSpawnCount = Math.max(0, currentWave.maxEnemies - enemies.length);
+        if (this.spawnedEnemiesCount < this.maxEnemiesToSpawn && enemies.length < maxConcurrent) {
+            if (this.timeElapsed - this.lastSpawnTime > spawnInterval) {
+                const intensity = Math.min(3, Math.ceil(this.stage / 2));
+                this.spawnEnemy(intensity);
+                this.spawnedEnemiesCount++;
+                this.lastSpawnTime = this.timeElapsed;
             }
-
-            for (let i = 0; i < actualSpawnCount; i++) {
-                this.spawnEnemy(currentWave.intensity);
+        } else if (this.spawnedEnemiesCount >= this.maxEnemiesToSpawn) {
+            // Normal stage clear condition: all spawned and all dead
+            if (!isBossStage && enemies.length === 0) {
+                this.stageClearDispatched = true;
+                window.dispatchEvent(new CustomEvent('stage_clear'));
             }
-            this.lastSpawnTime += targetSpawnCount * currentWave.spawnInterval;
         }
 
         const players = playerQuery(world);
@@ -179,23 +170,27 @@ export class NightDirector {
             Position.x[beid] = x; Position.y[beid] = y;
             Velocity.x[beid] = Math.cos(angle) * 150;
             Velocity.y[beid] = Math.sin(angle) * 150;
-            Lifespan.duration[beid] = 1200; // Limits attack to a specific radius range (1.2s * 150 = 180px radius)
+            Lifespan.duration[beid] = 1200;
             SpriteInfo.textureIndex[beid] = 104;
         }
     }
-    public resetForNextStage() {
-        console.log("Resetting for next stage... Increasing intensity!");
-        this.timeElapsed = 0;
-        this.currentWaveIndex = 0;
-        this.bossSpawned = false;
-        this.spawnPauseUntil = 0;
-        this.lastSpawnTime = 0;
-        this.globalDifficultyMultiplier += 0.25;
 
-        this.waveConfig.forEach(cfg => {
-            cfg.intensity += 1;
-            cfg.spawnInterval = Math.max(50, cfg.spawnInterval - 50);
-        });
+    public resetForNextStage(stage: number = 1) {
+        console.log(`Resetting for stage ${stage}... Increasing intensity!`);
+        this.stage = stage;
+        this.timeElapsed = 0;
+        this.bossSpawned = false;
+        this.stageClearDispatched = false;
+        this.lastSpawnTime = 0;
+        this.globalDifficultyMultiplier = 1.0 + ((stage - 1) * 0.25);
+
+        if (this.stage % 3 === 0) {
+            this.maxEnemiesToSpawn = 50 * stage;
+        } else {
+            // Normal stages have reasonable counts
+            this.maxEnemiesToSpawn = 20 * stage;
+        }
+        this.spawnedEnemiesCount = 0;
 
         const enemies = enemyQuery(world);
         for (let i = 0; i < enemies.length; i++) {

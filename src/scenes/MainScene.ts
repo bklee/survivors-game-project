@@ -161,7 +161,7 @@ export class MainScene extends Phaser.Scene {
             Position.x[this.playerId] = startPos.x;
             Position.y[this.playerId] = startPos.y;
 
-            this.nightDirector.resetForNextStage();
+            this.nightDirector.resetForNextStage(this.currentStage);
             this.startBGM('main_bgm');
         };
         window.addEventListener('next_stage', nextStageHandler);
