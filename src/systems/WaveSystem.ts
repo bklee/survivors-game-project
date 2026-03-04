@@ -15,9 +15,9 @@ export class NightDirector {
     private bossBarrageTimer: number = 0;
     private globalDifficultyMultiplier = 1.0;
     private waveConfig = [
-        { time: 0, spawnInterval: 1000, intensity: 1 },
-        { time: 60000, spawnInterval: 500, intensity: 2 },
-        { time: 300000, spawnInterval: 100, intensity: 3 },
+        { time: 0, spawnInterval: 1000, intensity: 1, maxEnemies: 30 },
+        { time: 60000, spawnInterval: 500, intensity: 2, maxEnemies: 70 },
+        { time: 300000, spawnInterval: 100, intensity: 3, maxEnemies: 150 },
     ];
 
     private currentWaveIndex: number = 0;
@@ -47,13 +47,22 @@ export class NightDirector {
             window.dispatchEvent(new CustomEvent('boss_spawned'));
         }
 
+        const enemies = enemyQuery(world);
+
         if (this.timeElapsed >= this.spawnPauseUntil && this.timeElapsed - this.lastSpawnTime > currentWave.spawnInterval) {
             const timePassed = this.timeElapsed - this.lastSpawnTime;
-            const spawnCount = Math.floor(timePassed / currentWave.spawnInterval);
-            for (let i = 0; i < spawnCount; i++) {
+            const targetSpawnCount = Math.floor(timePassed / currentWave.spawnInterval);
+            let actualSpawnCount = targetSpawnCount;
+
+            // Limit spawn count by maxEnemies
+            if (enemies.length + actualSpawnCount > currentWave.maxEnemies) {
+                actualSpawnCount = Math.max(0, currentWave.maxEnemies - enemies.length);
+            }
+
+            for (let i = 0; i < actualSpawnCount; i++) {
                 this.spawnEnemy(currentWave.intensity);
             }
-            this.lastSpawnTime += spawnCount * currentWave.spawnInterval;
+            this.lastSpawnTime += targetSpawnCount * currentWave.spawnInterval;
         }
 
         const players = playerQuery(world);
@@ -62,9 +71,9 @@ export class NightDirector {
         const playerX = Position.x[playerEid];
         const playerY = Position.y[playerEid];
 
-        const enemies = enemyQuery(world);
-        for (let i = 0; i < enemies.length; i++) {
-            const eid = enemies[i];
+        const activeEnemies = enemyQuery(world);
+        for (let i = 0; i < activeEnemies.length; i++) {
+            const eid = activeEnemies[i];
             const dx = playerX - Position.x[eid];
             const dy = playerY - Position.y[eid];
             const distance = Math.hypot(dx, dy);
@@ -103,7 +112,7 @@ export class NightDirector {
             py = Position.y[players[0]];
         }
 
-        const pos = this.dungeon.getFloorPixelNear(px, py, 300, 800);
+        const pos = this.dungeon.getFloorPixelNear(px, py, 500, 1000);
         Position.x[eid] = pos.x;
         Position.y[eid] = pos.y;
 
@@ -143,7 +152,7 @@ export class NightDirector {
             py = Position.y[players[0]];
         }
 
-        const pos = this.dungeon.getFloorPixelNear(px, py, 400, 900);
+        const pos = this.dungeon.getFloorPixelNear(px, py, 500, 1000);
         Position.x[eid] = pos.x;
         Position.y[eid] = pos.y;
 
