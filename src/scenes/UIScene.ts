@@ -68,9 +68,15 @@ export class UIScene extends Phaser.Scene {
             backgroundColor: '#00000088'
         });
 
-        const hpBg = this.add.rectangle(10, 710, 400, 20, 0x333333).setOrigin(0, 1);
-        this.hpBar = this.add.rectangle(10, 710, 400, 20, 0x00ff00).setOrigin(0, 1);
-        this.hpText = this.add.text(210, 700, '100 / 100', { fontSize: '14px', color: '#ffffff', fontStyle: 'bold' }).setOrigin(0.5, 0.5);
+        const hpBg = this.add.rectangle(10, 715, 400, 26, 0x222222).setOrigin(0, 1);
+        this.hpBar = this.add.rectangle(10, 715, 400, 26, 0x00ff00).setOrigin(0, 1);
+        this.hpText = this.add.text(210, 702, '100 / 100', {
+            fontSize: '18px',
+            color: '#ffffff',
+            fontStyle: 'bold',
+            stroke: '#000000',
+            strokeThickness: 4
+        }).setOrigin(0.5, 0.5);
 
         this.coinText = this.add.text(1270, 710, 'Coins: 0', {
             fontSize: '24px',
