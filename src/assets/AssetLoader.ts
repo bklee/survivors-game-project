@@ -50,10 +50,8 @@ export class AssetLoader {
                     this.scene.load.image(`${m.name}_run_f${i}`, `assets/frames/${m.name}_run_anim_f${i}.png`);
                 }
             } else {
-                const maxFrames = (m.name === 'zombie') ? 3 : 4;
-                for (let i = 0; i < maxFrames; i++) {
-                    const finalSuffix = (m.name === 'zombie') ? `_anim_f${i + 1}` : `_anim_f${i}`;
-                    this.scene.load.image(`${m.name}_f${i}`, `assets/frames/${m.name}${finalSuffix}.png`);
+                for (let i = 0; i < 4; i++) {
+                    this.scene.load.image(`${m.name}_f${i}`, `assets/frames/${m.name}_anim_f${i}.png`);
                 }
             }
         });
