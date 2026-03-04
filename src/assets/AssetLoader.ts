@@ -23,19 +23,24 @@ export class AssetLoader {
             // Demons
             { name: 'chort', hasIdleRun: true },
             { name: 'imp', hasIdleRun: true },
+            { name: 'wogol', hasIdleRun: true },
             { name: 'big_demon', hasIdleRun: true }, // BOSS
 
             // Undeads
             { name: 'skelet', hasIdleRun: true },
             { name: 'tiny_zombie', hasIdleRun: true },
-            { name: 'zombie', hasIdleRun: false }, // user requested 'zombie'
+            { name: 'zombie', hasIdleRun: false },
+            { name: 'ice_zombie', hasIdleRun: false },
+            { name: 'doc', hasIdleRun: true },
             { name: 'necromancer', hasIdleRun: false },
             { name: 'big_zombie', hasIdleRun: true }, // BOSS
 
             // Orcs
-            { name: 'ogre', hasIdleRun: true }, // BOSS
             { name: 'orc_shaman', hasIdleRun: true },
-            { name: 'orc_warrior', hasIdleRun: true }
+            { name: 'orc_warrior', hasIdleRun: true },
+            { name: 'goblin', hasIdleRun: true },
+            { name: 'masked_orc', hasIdleRun: true },
+            { name: 'ogre', hasIdleRun: true } // BOSS
         ];
 
         monsters.forEach(m => {

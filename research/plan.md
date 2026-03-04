@@ -58,9 +58,9 @@
 - [x] **공격 자동화 (Auto-Attack)**: 마법 발동 시 매번 Spacebar를 누르는 대신, 쿨타임에 맞춰 근처 적을 자동으로 조준/공격하는 오토 시스템 구현.
 - [x] **연금술 조합 로직 제거**: 게임 플레이 편의성과 난이도 조절을 위해 불필요했던 복잡한 연금술 큐 및 조합 시스템을 과감히 소거.
 - [x] **스테이지별 몬스터 그룹핑 (Monster Grouping)**: 스테이지별로 고유한 몬스터 그룹 및 보스 출현.
-  - **Undead**: Zombie, Necromancer, Skeleton (Boss: **Big Zombie**)
-  - **Orc**: Orc Shaman, Orc Warrior (Boss: **Ogre**)
-  - **Demon**: Chort, Imp (Boss: **Big Demon**)
+  - **Undead**: Zombie, Necromancer, Skeleton, Tiny Zombie, Doc, Ice Zombie (Boss: **Big Zombie**)
+  - **Orc**: Orc Shaman, Orc Warrior, Goblin, Masked Orc (Boss: **Ogre**)
+  - **Demon**: Chort, Imp, Wogol (Boss: **Big Demon**)
 - [x] **고퀄리티 개별 프레임 스프라이트**: GIF의 깨짐 문제를 해결하기 위해 개별 PNG 프레임(`assets/frames/`) 기반의 정밀 렌더링 시스템으로 전환.
 - [x] **UI 시인성 강화**: 현재 스테이지 번호 표시 추가 및 레벨업 시 캐릭터의 상세 능력치(공격력, 속력, 쿨타임, 획득 반경) 시각화 시스템 구축.
 - [x] **보스전 클리어 조건 확립**: 3판마다 등장하는 보스를 처치해야만 스테이지가 클리어되도록 핵심 게임 루프 강화.
