@@ -98,10 +98,17 @@ export class NightDirector {
     private getStageEnemyType(): number {
         const cycle = (this.stage - 1) % 3;
         let pool: number[] = [];
-        if (cycle === 0) pool = [70, 71, 72]; // Undead
-        else if (cycle === 1) pool = [80, 81, 82]; // Orc
-        else pool = [60, 61]; // Demon
+        if (cycle === 0) pool = [70, 71, 72, 73]; // Undead (tiny_zombie, necromancer, skelet, zombie)
+        else if (cycle === 1) pool = [80, 81]; // Orc (shaman, warrior)
+        else pool = [60, 61]; // Demon (chort, imp)
         return pool[Math.floor(Math.random() * pool.length)];
+    }
+
+    private getStageBossType(): number {
+        const cycle = (this.stage - 1) % 3;
+        if (cycle === 0) return 79; // Big Zombie
+        if (cycle === 1) return 89; // Ogre
+        return 69; // Big Demon
     }
 
     private spawnEnemy(intensity: number) {
@@ -134,7 +141,6 @@ export class NightDirector {
         else if (typeId >= 60 && typeId < 70) { speed *= 1.2; hp *= 1.1; } // Demons: faster
 
         // Specific monster tweaks
-        if (typeId === 80) { speed *= 0.6; hp *= 3.0; } // Ogre: very slow, very tough
         if (typeId === 71) { speed *= 0.7; hp *= 1.2; } // Necromancer: slightly slower
 
         const angle = Math.random() * Math.PI * 2;
@@ -169,15 +175,12 @@ export class NightDirector {
         Position.x[eid] = pos.x;
         Position.y[eid] = pos.y;
 
-        // Boss type: Pick the first in the group or random
-        const types = this.getStageEnemyType();
-        const typeId = types;
-
+        const typeId = this.getStageBossType();
         const angle = Math.random() * Math.PI * 2;
         Velocity.x[eid] = Math.cos(angle) * 35;
         Velocity.y[eid] = Math.sin(angle) * 35;
 
-        let hp = 500 * this.globalDifficultyMultiplier * (this.stage / 3);
+        let hp = 1000 * this.globalDifficultyMultiplier * (this.stage / 3);
         Health.current[eid] = hp;
         Health.max[eid] = hp;
         SpriteInfo.textureIndex[eid] = typeId;
