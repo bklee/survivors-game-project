@@ -13,20 +13,22 @@ export class AssetLoader {
     }
 
     loadImages() {
-        // Load the 0x72 dungeon tileset as a raw image
         this.scene.load.image('dungeon', 'assets/0x72_DungeonTilesetII_v1.7.png');
         this.scene.load.image('walls', 'assets/atlas_walls_high-16x32.png');
         this.scene.load.image('weapon_bow', 'assets/frames/weapon_bow.png');
         this.scene.load.image('attack_effect', 'assets/attack_effect.png');
+
+        // Load the monster GIFs as images (Phaser will treat as spritesheets if we define frames)
+        this.scene.load.image('demons', 'assets/demons.gif');
+        this.scene.load.image('orcs', 'assets/orcs.gif');
+        this.scene.load.image('undeads', 'assets/undeads.gif');
     }
 
     loadAudio() {
-        // BGM
-        this.scene.load.audio('select_bgm', 'assets/audio/hero_reprise.mp3');
-        this.scene.load.audio('main_bgm', 'assets/audio/fight_for_better_future.mp3');
-        this.scene.load.audio('boss_bgm', 'assets/audio/boss_battle_8_retro_01_opening.mp3');
+        this.scene.load.audio('select_bgm', 'assets/audio/hero_reprise.mp3', { stream: true });
+        this.scene.load.audio('main_bgm', 'assets/audio/fight_for_better_future.mp3', { stream: true });
+        this.scene.load.audio('boss_bgm', 'assets/audio/boss_battle_8_retro_01_opening.mp3', { stream: true });
 
-        // SFX
         this.scene.load.audio('fire_cast', 'assets/audio/fire_cast.mp3');
         this.scene.load.audio('ice_cast', 'assets/audio/ice_cast.mp3');
         this.scene.load.audio('poison_cast', 'assets/audio/poison_cast.mp3');
@@ -89,11 +91,26 @@ export class AssetLoader {
             texture.add(`imp_idle_${i}`, 0, 368 + (i * 16), 64, 16, 16);
             texture.add(`imp_run_${i}`, 0, 432 + (i * 16), 64, 16, 16);
         }
+
+        // Load new monster GIFs
+        const loadGIFGroup = (key: string, baseId: string) => {
+            const tex = this.scene.textures.get(key);
+            if (!tex) return;
+            for (let i = 0; i < 4; i++) {
+                tex.add(`${baseId}_idle_${i}`, 0, i * 32, 0, 32, 32);
+                tex.add(`${baseId}_run_${i}`, 0, i * 32, 32, 32, 32);
+            }
+        };
+
+        loadGIFGroup('demons', 'demon_new');
+        loadGIFGroup('orcs', 'orc_new');
+        loadGIFGroup('undeads', 'skeleton_new');
+
         // Add Spell Frames
-        texture.add('spell_fire', 0, 288, 336, 16, 16); // flask_big_red
-        texture.add('spell_ice', 0, 304, 336, 16, 16);  // flask_big_blue
-        texture.add('spell_gas', 0, 320, 336, 16, 16);  // flask_big_green
-        texture.add('spell_dud', 0, 288, 320, 16, 16);  // bomb_f0
+        texture.add('spell_fire', 0, 288, 336, 16, 16);
+        texture.add('spell_ice', 0, 304, 336, 16, 16);
+        texture.add('spell_gas', 0, 320, 336, 16, 16);
+        texture.add('spell_dud', 0, 288, 320, 16, 16);
         texture.add('enemy_bullet', 0, 313, 385, 6, 7);
 
         // Weapons
@@ -101,26 +118,22 @@ export class AssetLoader {
         texture.add('weapon_arrow', 0, 324, 202, 7, 21);
         texture.add('weapon_staff', 0, 324, 129, 8, 30);
 
-        // Dungeon Props (Static)
+        // Props
         texture.add('prop_crate', 0, 288, 408, 16, 24);
         texture.add('prop_skull', 0, 288, 432, 16, 16);
         texture.add('prop_column', 0, 80, 80, 16, 48);
         texture.add('prop_chest', 0, 304, 416, 16, 16);
 
-        // Dungeon Props (Animated - Spikes)
         for (let i = 0; i < 4; i++) {
             texture.add(`prop_spikes_${i}`, 0, 16 + (i * 16), 192, 16, 16);
         }
 
-        // Interactive (Levers & Doors)
         texture.add('lever_off', 0, 256, 448, 16, 16);
         texture.add('lever_on', 0, 272, 448, 16, 16);
         texture.add('door_closed', 0, 160, 144, 32, 32);
         texture.add('door_open', 0, 224, 144, 32, 32);
-
-        // Add XP gem frame
         texture.add('gem', 0, 288, 352, 16, 16);
-        // Define wall frame from the walls atlas
+
         const wallTex = this.scene.textures.get('walls');
         if (wallTex) {
             wallTex.add('wall_top', 0, 32, 96, 16, 32);

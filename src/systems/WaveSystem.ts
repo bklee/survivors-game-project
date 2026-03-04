@@ -49,10 +49,19 @@ export class NightDirector {
                 this.lastSpawnTime = this.timeElapsed;
             }
         } else if (this.spawnedEnemiesCount >= this.maxEnemiesToSpawn) {
-            // Normal stage clear condition: all spawned and all dead
-            if (!isBossStage && enemies.length === 0) {
-                this.stageClearDispatched = true;
-                window.dispatchEvent(new CustomEvent('stage_clear'));
+            if (isBossStage) {
+                // Boss stage clear condition: Boss is dead. Boss is marked with Boss component.
+                const bosses = defineQuery([Boss])(world);
+                if (this.bossSpawned && bosses.length === 0) {
+                    this.stageClearDispatched = true;
+                    window.dispatchEvent(new CustomEvent('stage_clear'));
+                }
+            } else {
+                // Normal stage clear: all dead
+                if (enemies.length === 0) {
+                    this.stageClearDispatched = true;
+                    window.dispatchEvent(new CustomEvent('stage_clear'));
+                }
             }
         }
 
@@ -86,6 +95,14 @@ export class NightDirector {
         }
     }
 
+    private getStageEnemyType(): number {
+        // 50: Demon, 51: Orc, 52: Skeleton/Undead
+        const cycle = (this.stage - 1) % 3;
+        if (cycle === 0) return 52; // Stage 1: Undead
+        if (cycle === 1) return 51; // Stage 2: Orc
+        return 50; // Stage 3: Demon
+    }
+
     private spawnEnemy(intensity: number) {
         const eid = addEntity(world);
         addComponent(world, Position, eid);
@@ -103,17 +120,17 @@ export class NightDirector {
             py = Position.y[players[0]];
         }
 
-        const pos = this.dungeon.getFloorPixelNear(px, py, 500, 1000);
+        const pos = this.dungeon.getFloorPixelNear(px, py, 400, 800);
         Position.x[eid] = pos.x;
         Position.y[eid] = pos.y;
 
-        const typeRoll = Math.random();
-        let typeId = 10;
+        const typeId = this.getStageEnemyType();
         let speed = 60 * intensity * this.globalDifficultyMultiplier;
         let hp = 10 * intensity * this.globalDifficultyMultiplier;
 
-        if (typeRoll > 0.8) { typeId = 12; speed = 40 * intensity * this.globalDifficultyMultiplier; hp = 40 * intensity * this.globalDifficultyMultiplier; }
-        else if (typeRoll > 0.5) { typeId = 13; speed = 90 * intensity * this.globalDifficultyMultiplier; hp = 5 * intensity * this.globalDifficultyMultiplier; }
+        // Stat adjustments based on category
+        if (typeId === 51) { speed = 50; hp *= 1.5; } // Orcs: slower but tougher
+        else if (typeId === 50) { speed = 70; hp *= 1.2; } // Demons: faster
 
         const angle = Math.random() * Math.PI * 2;
         Velocity.x[eid] = Math.cos(angle) * speed;
@@ -122,7 +139,7 @@ export class NightDirector {
         Health.max[eid] = hp;
         SpriteInfo.textureIndex[eid] = typeId;
         Animation.frameRate[eid] = 8;
-        Animation.timer[eid] = 0;
+        Animation.timer[eid] = Math.random() * 1000;
     }
 
     private spawnBoss() {
@@ -147,15 +164,22 @@ export class NightDirector {
         Position.x[eid] = pos.x;
         Position.y[eid] = pos.y;
 
+        const typeId = this.getStageEnemyType();
         const angle = Math.random() * Math.PI * 2;
         Velocity.x[eid] = Math.cos(angle) * 35;
         Velocity.y[eid] = Math.sin(angle) * 35;
-        Health.current[eid] = 500 * this.globalDifficultyMultiplier;
-        Health.max[eid] = 500 * this.globalDifficultyMultiplier;
-        SpriteInfo.textureIndex[eid] = 11;
+
+        let hp = 500 * this.globalDifficultyMultiplier * (this.stage / 3);
+        Health.current[eid] = hp;
+        Health.max[eid] = hp;
+        SpriteInfo.textureIndex[eid] = typeId;
         Animation.frameRate[eid] = 6;
         Animation.timer[eid] = 0;
+
+        // Scale boss size in RenderSystem based on Boss component presence if we had scaling there, 
+        // but for now we'll just use the same sprite.
     }
+
 
     private spawnBarrage(x: number, y: number) {
         const count = 12;
