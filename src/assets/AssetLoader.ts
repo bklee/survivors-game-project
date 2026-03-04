@@ -23,7 +23,7 @@ export class AssetLoader {
     loadAudio() {
         // BGM
         this.scene.load.audio('select_bgm', 'assets/audio/hero_reprise.wav');
-        this.scene.load.audio('main_bgm', 'assets/audio/main_bgm.wav');
+        this.scene.load.audio('main_bgm', 'assets/audio/fight_for_better_future.wav');
         this.scene.load.audio('boss_bgm', 'assets/audio/boss_battle_8_retro_01_opening.wav');
 
         // SFX
