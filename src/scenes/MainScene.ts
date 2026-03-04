@@ -324,64 +324,12 @@ export class MainScene extends Phaser.Scene {
             Position.x[eid] = pos.x;
             Position.y[eid] = pos.y;
             const roll = Math.random();
-            if (roll > 0.85) SpriteInfo.textureIndex[eid] = 30; // crate
-            else if (roll > 0.8) SpriteInfo.textureIndex[eid] = 34; // explosive barrel
-            else if (roll > 0.7) SpriteInfo.textureIndex[eid] = 31; // skull
-            else if (roll > 0.6) SpriteInfo.textureIndex[eid] = 36; // treasure chest
-            else if (roll > 0.5) SpriteInfo.textureIndex[eid] = 35; // health potion
-            else if (roll > 0.2) SpriteInfo.textureIndex[eid] = 33; // column
+            if (roll > 0.8) SpriteInfo.textureIndex[eid] = 36; // treasure chest
+            else if (roll > 0.4) SpriteInfo.textureIndex[eid] = 35; // health potion
             else {
                 SpriteInfo.textureIndex[eid] = 32; // trap
                 addComponent(world, Animation, eid);
                 Animation.timer[eid] = Math.random() * 1000;
-            }
-        }
-
-        for (let i = 0; i < 8; i++) {
-            const pos = this.dungeon.getRandomFloorPixel();
-            const lx = pos.x;
-            const ly = pos.y;
-            const lever = addEntity(world);
-            addComponent(world, Position, lever);
-            addComponent(world, SpriteInfo, lever);
-            addComponent(world, Interactive, lever);
-            Position.x[lever] = lx; Position.y[lever] = ly;
-            SpriteInfo.textureIndex[lever] = 40;
-            Interactive.id[lever] = i;
-
-            const door = addEntity(world);
-            addComponent(world, Position, door);
-            addComponent(world, SpriteInfo, door);
-            addComponent(world, Interactive, door);
-            const doorPos = this.dungeon.getFloorPixelNear(lx, ly, 10, 50);
-            Position.x[door] = doorPos.x; Position.y[door] = doorPos.y;
-            SpriteInfo.textureIndex[door] = 41;
-            Interactive.id[door] = i;
-
-            const treasure = addEntity(world);
-            addComponent(world, Position, treasure);
-            addComponent(world, SpriteInfo, treasure);
-            addComponent(world, Item, treasure);
-            const tmPos = this.dungeon.getFloorPixelNear(lx, ly, 10, 100);
-            Position.x[treasure] = tmPos.x; Position.y[treasure] = tmPos.y;
-            SpriteInfo.textureIndex[treasure] = 15;
-            Item.xpValue[treasure] = 1000;
-            Item.magnetized[treasure] = 0;
-
-            for (let g = 0; g < 2; g++) {
-                const guard = addEntity(world);
-                addComponent(world, Position, guard);
-                addComponent(world, Velocity, guard);
-                addComponent(world, Health, guard);
-                addComponent(world, SpriteInfo, guard);
-                addComponent(world, Animation, guard);
-                addComponent(world, Enemy, guard);
-                const gPos = this.dungeon.getFloorPixelNear(lx, ly, 10, 100);
-                Position.x[guard] = gPos.x;
-                Position.y[guard] = gPos.y;
-                SpriteInfo.textureIndex[guard] = 14;
-                Health.current[guard] = 150; Health.max[guard] = 150;
-                Animation.frameRate[guard] = 8;
             }
         }
     }
