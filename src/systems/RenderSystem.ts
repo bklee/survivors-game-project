@@ -4,14 +4,22 @@ import { Animation, Position, SpriteInfo, Velocity, Health, Interactive, Rotatio
 import { world } from '../core/World';
 
 const MONSTER_CONFIG: Record<number, { name: string, hasIdleRun: boolean }> = {
+    // Demons
     60: { name: 'chort', hasIdleRun: true },
     61: { name: 'imp', hasIdleRun: true },
+    69: { name: 'big_demon', hasIdleRun: true }, // BOSS
+
+    // Undeads
     70: { name: 'tiny_zombie', hasIdleRun: true },
     71: { name: 'necromancer', hasIdleRun: false },
     72: { name: 'skelet', hasIdleRun: true },
-    80: { name: 'ogre', hasIdleRun: true },
-    81: { name: 'orc_shaman', hasIdleRun: true },
-    82: { name: 'orc_warrior', hasIdleRun: true },
+    73: { name: 'zombie', hasIdleRun: false },
+    79: { name: 'big_zombie', hasIdleRun: true }, // BOSS
+
+    // Orcs
+    80: { name: 'orc_shaman', hasIdleRun: true },
+    81: { name: 'orc_warrior', hasIdleRun: true },
+    89: { name: 'ogre', hasIdleRun: true }, // BOSS
 };
 
 const renderQuery = defineQuery([Position, SpriteInfo]);

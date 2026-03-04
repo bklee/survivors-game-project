@@ -20,12 +20,20 @@ export class AssetLoader {
 
         // Monster Groups
         const monsters = [
+            // Demons
             { name: 'chort', hasIdleRun: true },
             { name: 'imp', hasIdleRun: true },
+            { name: 'big_demon', hasIdleRun: true }, // BOSS
+
+            // Undeads
             { name: 'skelet', hasIdleRun: true },
             { name: 'tiny_zombie', hasIdleRun: true },
+            { name: 'zombie', hasIdleRun: false }, // user requested 'zombie'
             { name: 'necromancer', hasIdleRun: false },
-            { name: 'ogre', hasIdleRun: true },
+            { name: 'big_zombie', hasIdleRun: true }, // BOSS
+
+            // Orcs
+            { name: 'ogre', hasIdleRun: true }, // BOSS
             { name: 'orc_shaman', hasIdleRun: true },
             { name: 'orc_warrior', hasIdleRun: true }
         ];
@@ -38,7 +46,8 @@ export class AssetLoader {
                 }
             } else {
                 for (let i = 0; i < 4; i++) {
-                    this.scene.load.image(`${m.name}_f${i}`, `assets/frames/${m.name}_anim_f${i}.png`);
+                    const suffix = m.name === 'zombie' ? `_anim_f${i + 1}` : `_anim_f${i}`;
+                    this.scene.load.image(`${m.name}_f${i}`, `assets/frames/${m.name}${suffix}.png`);
                 }
             }
         });
