@@ -34,6 +34,8 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
             else if (typeId === 32) charKey = 'prop_spikes';
             else if (typeId === 33) charKey = 'prop_column';
             else if (typeId === 34) charKey = 'prop_crate';
+            else if (typeId === 35) charKey = 'spell_fire'; // Health Potion sprite
+            else if (typeId === 36) charKey = 'prop_chest'; // Treasure Chest sprite
             else if (typeId === 40) charKey = 'lever';
             else if (typeId === 41) charKey = 'door';
             else if (typeId === 100) charKey = 'spell_fire';
@@ -57,7 +59,7 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
 
             // 3. Handle Animation Framing
             let frameName: string | number = '';
-            if ((typeId >= 15 && typeId <= 31) || typeId === 33 || typeId === 34 || (typeId >= 100 && typeId <= 107)) {
+            if ((typeId >= 15 && typeId <= 31) || typeId === 33 || typeId === 34 || typeId === 35 || typeId === 36 || (typeId >= 100 && typeId <= 107)) {
                 frameName = charKey;
             } else if (typeId === 40) {
                 frameName = Interactive.isActivated[eid] ? 'lever_on' : 'lever_off';
