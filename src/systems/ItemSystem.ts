@@ -8,9 +8,10 @@ const itemQuery = defineQuery([Position, Velocity, Item]);
 const playerQuery = defineQuery([Position, Player]);
 
 export class ItemSystem {
-    private magnetRadius: number = 150;
-    private pickupRadius: number = 30;
-    
+    private magnetRadius: number = 40;  // Reduced from 150
+    private pickupRadius: number = 20;  // Reduced from 30
+
+
     // We can dispatch events for UI or logic to consume
     public totalXpCollected: number = 0;
 
@@ -19,7 +20,7 @@ export class ItemSystem {
         const players = playerQuery(world);
         if (players.length === 0) return;
         const playerEid = players[0];
-        
+
         const px = Position.x[playerEid];
         const py = Position.y[playerEid];
 
@@ -27,7 +28,7 @@ export class ItemSystem {
 
         for (let i = 0; i < items.length; i++) {
             const eid = items[i];
-            
+
             const ix = Position.x[eid];
             const iy = Position.y[eid];
 
@@ -57,7 +58,7 @@ export class ItemSystem {
                 // Accelerate towards player
                 const dist = Math.sqrt(distSq);
                 const speed = 400; // suck speed
-                
+
                 Velocity.x[eid] = (dx / dist) * speed;
                 Velocity.y[eid] = (dy / dist) * speed;
             } else {

@@ -20,6 +20,9 @@ export class UIScene extends Phaser.Scene {
     private currentXp = 0;
     private xpToNextLevel = 100;
 
+    private coinText!: Phaser.GameObjects.Text;
+    private totalCoins = 0;
+
     // Minimap
     private minimapGraphics!: Phaser.GameObjects.Graphics;
     private readonly MINIMAP_SIZE = 150;
@@ -52,9 +55,17 @@ export class UIScene extends Phaser.Scene {
             backgroundColor: '#00000088'
         });
 
-        const hpBg = this.add.rectangle(440, 30, 400, 20, 0x333333).setOrigin(0, 0.5);
-        this.hpBar = this.add.rectangle(440, 30, 400, 20, 0x00ff00).setOrigin(0, 0.5);
-        this.hpText = this.add.text(640, 30, '100 / 100', { fontSize: '14px', color: '#ffffff' }).setOrigin(0.5, 0.5);
+        const hpBg = this.add.rectangle(10, 710, 400, 20, 0x333333).setOrigin(0, 1);
+        this.hpBar = this.add.rectangle(10, 710, 400, 20, 0x00ff00).setOrigin(0, 1);
+        this.hpText = this.add.text(210, 700, '100 / 100', { fontSize: '14px', color: '#ffffff', fontStyle: 'bold' }).setOrigin(0.5, 0.5);
+
+        this.coinText = this.add.text(1270, 710, 'Coins: 0', {
+            fontSize: '24px',
+            color: '#ffd700',
+            fontStyle: 'bold',
+            stroke: '#000000',
+            strokeThickness: 4
+        }).setOrigin(1, 1);
 
         // Minimap
         const mmX = 1280 - 10;
@@ -63,7 +74,7 @@ export class UIScene extends Phaser.Scene {
         const mmBg2 = this.add.rectangle(mmX - 2, mmY + 2, this.MINIMAP_SIZE, this.MINIMAP_SIZE, 0x111111, 1).setOrigin(1, 0);
         this.minimapGraphics = this.add.graphics();
 
-        this.uiContainer.add([title, this.stageLevelText, this.statsText, hpBg, this.hpBar, this.hpText, mmBg1, mmBg2, this.minimapGraphics]);
+        this.uiContainer.add([title, this.stageLevelText, this.statsText, hpBg, this.hpBar, this.hpText, this.coinText, mmBg1, mmBg2, this.minimapGraphics]);
         this.uiContainer.setVisible(false);
 
         this.bossWarningText = this.add.text(640, 360, 'BOSS APPROACHING!', {
@@ -172,6 +183,8 @@ export class UIScene extends Phaser.Scene {
     }
 
     private handleXp = (e: CustomEvent<number>) => {
+        this.totalCoins += 1;
+        this.coinText.setText(`Coins: ${this.totalCoins}`);
         this.currentXp += e.detail;
         if (this.currentXp >= this.xpToNextLevel) {
             this.currentLevel++;
