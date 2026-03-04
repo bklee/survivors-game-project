@@ -12,6 +12,7 @@ export class NightDirector {
     private maxEnemiesToSpawn: number = 0;
     private spawnedEnemiesCount: number = 0;
     private stageClearDispatched: boolean = false;
+    private spawningCompleteDispatched: boolean = false;
     private bossSpawned: boolean = false;
     private bossBarrageTimer: number = 0;
     private globalDifficultyMultiplier = 1.0;
@@ -55,6 +56,10 @@ export class NightDirector {
                 this.lastSpawnTime = this.timeElapsed;
             }
         } else if (this.spawnedEnemiesCount >= this.maxEnemiesToSpawn) {
+            if (!this.spawningCompleteDispatched) {
+                this.spawningCompleteDispatched = true;
+                window.dispatchEvent(new CustomEvent('spawning_complete'));
+            }
             if (isBossStage) {
                 // Boss stage clear condition: Boss is dead. Boss is marked with Boss component.
                 const bosses = defineQuery([Boss])(world);
@@ -222,6 +227,7 @@ export class NightDirector {
         this.timeElapsed = 0;
         this.bossSpawned = false;
         this.stageClearDispatched = false;
+        this.spawningCompleteDispatched = false;
         this.lastSpawnTime = 0;
         this.globalDifficultyMultiplier = 1.0 + ((stage - 1) * 0.25);
 
