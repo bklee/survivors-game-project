@@ -118,7 +118,6 @@ export class MainScene extends Phaser.Scene {
         window.addEventListener('play_sound', soundHandler);
 
         const comboCastHandler = () => {
-            this.juicePipeline.screenShake(0.00075, 150);
         };
         window.addEventListener('combo_cast', comboCastHandler);
 

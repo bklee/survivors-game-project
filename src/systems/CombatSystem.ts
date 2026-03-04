@@ -53,8 +53,6 @@ export const createCombatSystem = (juice: JuicePipeline) => {
                         detail: { current: Health.current[playerEid], max: Health.max[playerEid] }
                     }));
                     removeEntity(world, epid);
-                    // Reduced Screen Shake Intensity (1/2 of 0.001)
-                    juice.screenShake(0.0005, 100);
                 }
             }
 
@@ -89,7 +87,6 @@ export const createCombatSystem = (juice: JuicePipeline) => {
 
                     const typeId = SpriteInfo.textureIndex[eid];
                     if (typeId === 100) {
-                        juice.whiteFlash(20);
                         juice.vfx.playFireHit(tx, ty);
                     } else if (typeId === 101) {
                         // Reduced Hit Stop for balance
