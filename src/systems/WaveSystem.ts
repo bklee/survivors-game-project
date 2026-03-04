@@ -96,11 +96,12 @@ export class NightDirector {
     }
 
     private getStageEnemyType(): number {
-        // 50: Demon, 51: Orc, 52: Skeleton/Undead
         const cycle = (this.stage - 1) % 3;
-        if (cycle === 0) return 52; // Stage 1: Undead
-        if (cycle === 1) return 51; // Stage 2: Orc
-        return 50; // Stage 3: Demon
+        let pool: number[] = [];
+        if (cycle === 0) pool = [70, 71, 72]; // Undead
+        else if (cycle === 1) pool = [80, 81, 82]; // Orc
+        else pool = [60, 61]; // Demon
+        return pool[Math.floor(Math.random() * pool.length)];
     }
 
     private spawnEnemy(intensity: number) {
@@ -129,8 +130,12 @@ export class NightDirector {
         let hp = 10 * intensity * this.globalDifficultyMultiplier;
 
         // Stat adjustments based on category
-        if (typeId === 51) { speed = 50; hp *= 1.5; } // Orcs: slower but tougher
-        else if (typeId === 50) { speed = 70; hp *= 1.2; } // Demons: faster
+        if (typeId >= 80) { speed *= 0.8; hp *= 1.5; } // Orcs: slower but tougher
+        else if (typeId >= 60 && typeId < 70) { speed *= 1.2; hp *= 1.1; } // Demons: faster
+
+        // Specific monster tweaks
+        if (typeId === 80) { speed *= 0.6; hp *= 3.0; } // Ogre: very slow, very tough
+        if (typeId === 71) { speed *= 0.7; hp *= 1.2; } // Necromancer: slightly slower
 
         const angle = Math.random() * Math.PI * 2;
         Velocity.x[eid] = Math.cos(angle) * speed;
@@ -164,7 +169,10 @@ export class NightDirector {
         Position.x[eid] = pos.x;
         Position.y[eid] = pos.y;
 
-        const typeId = this.getStageEnemyType();
+        // Boss type: Pick the first in the group or random
+        const types = this.getStageEnemyType();
+        const typeId = types;
+
         const angle = Math.random() * Math.PI * 2;
         Velocity.x[eid] = Math.cos(angle) * 35;
         Velocity.y[eid] = Math.sin(angle) * 35;
@@ -175,9 +183,6 @@ export class NightDirector {
         SpriteInfo.textureIndex[eid] = typeId;
         Animation.frameRate[eid] = 6;
         Animation.timer[eid] = 0;
-
-        // Scale boss size in RenderSystem based on Boss component presence if we had scaling there, 
-        // but for now we'll just use the same sprite.
     }
 
 
