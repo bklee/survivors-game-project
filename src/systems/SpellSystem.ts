@@ -73,15 +73,25 @@ export class SpellSystem {
     }
 
     private spawnKnightAttack(x: number, y: number, dx: number, dy: number) {
-        // Close range arc swing (Sword)
-        const eid = this.createBaseSpell(x + dx * 20, y + dy * 20, 105);
+        // Fast arc swing (Sword Hitbox)
+        const eid = this.createBaseSpell(x + dx * 25, y + dy * 25, 105);
         Spell.damage[eid] = 60 * globalStats.damageMult;
         Spell.radius[eid] = 60; // wide swing
-        Spell.duration[eid] = 150; // very short lived
+        Spell.duration[eid] = 150; // very short lived (one swing)
         Spell.pierce[eid] = 10; // hits many
-        Velocity.x[eid] = dx * 5;
-        Velocity.y[eid] = dy * 5;
+        Velocity.x[eid] = dx * 10; // Tiny movement to simulate thrust
+        Velocity.y[eid] = dy * 10;
         Rotation.angle[eid] = Math.atan2(dy, dx);
+
+        // Visual Slash Effect (attack_effect.png)
+        const fxEid = this.createBaseSpell(x + dx * 35, y + dy * 35, 109);
+        Spell.damage[fxEid] = 0; // Purely visual
+        Spell.radius[fxEid] = 0;
+        Spell.duration[fxEid] = 150; // Match sword duration
+        Spell.pierce[fxEid] = 0;
+        Velocity.x[fxEid] = dx * 10;
+        Velocity.y[fxEid] = dy * 10;
+        Rotation.angle[fxEid] = Math.atan2(dy, dx);
     }
 
     private spawnElfAttack(x: number, y: number, dx: number, dy: number) {

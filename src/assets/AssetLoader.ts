@@ -17,6 +17,7 @@ export class AssetLoader {
         this.scene.load.image('dungeon', 'assets/0x72_DungeonTilesetII_v1.7.png');
         this.scene.load.image('walls', 'assets/atlas_walls_high-16x32.png');
         this.scene.load.image('weapon_bow', 'assets/frames/weapon_bow.png');
+        this.scene.load.image('attack_effect', 'assets/attack_effect.png');
     }
 
     loadAudio() {

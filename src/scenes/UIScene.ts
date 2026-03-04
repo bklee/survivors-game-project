@@ -22,13 +22,13 @@ export class UIScene extends Phaser.Scene {
     // Minimap
     private minimapGraphics!: Phaser.GameObjects.Graphics;
     private readonly MINIMAP_SIZE = 150;
-    private readonly SCALE = 150 / 4000; 
-    
+    private readonly SCALE = 150 / 4000;
+
     private playerQuery = defineQuery([Player, Position]);
     private enemyQuery = defineQuery([Enemy, Position]);
 
     constructor() {
-        super({ key: 'UIScene', active: true }); 
+        super({ key: 'UIScene', active: true });
     }
 
     create() {
@@ -58,8 +58,10 @@ export class UIScene extends Phaser.Scene {
         // Minimap
         const mmX = 1280 - 10;
         const mmY = 10;
-        const mmBg1 = this.add.rectangle(mmX, mmY, this.MINIMAP_SIZE + 4, this.MINIMAP_SIZE + 4, 0xffffff, 0.2).setOrigin(1, 0);
-        const mmBg2 = this.add.rectangle(mmX - 2, mmY + 2, this.MINIMAP_SIZE, this.MINIMAP_SIZE, 0x000000, 0.5).setOrigin(1, 0);
+        // Opaque strong border
+        const mmBg1 = this.add.rectangle(mmX, mmY, this.MINIMAP_SIZE + 4, this.MINIMAP_SIZE + 4, 0x222222, 1).setOrigin(1, 0);
+        // Solid dark background
+        const mmBg2 = this.add.rectangle(mmX - 2, mmY + 2, this.MINIMAP_SIZE, this.MINIMAP_SIZE, 0x111111, 1).setOrigin(1, 0);
         this.minimapGraphics = this.add.graphics();
 
         this.uiContainer.add([title, this.xpText, hpBg, this.hpBar, this.hpText, this.queueText, mmBg1, mmBg2, this.minimapGraphics]);
@@ -114,23 +116,27 @@ export class UIScene extends Phaser.Scene {
 
     private updateMinimap() {
         this.minimapGraphics.clear();
-        
+
         if (this.dungeonMap.length === 0) return;
         const offsetX = 1280 - 12 - this.MINIMAP_SIZE;
         const offsetY = 12;
 
-        // Draw Map (Dark gray)
-        this.minimapGraphics.fillStyle(0x444444, 0.5);
+        // Draw Map Walls & Floors (Zelda style)
         for (let y = 0; y < this.dungeonMap.length; y++) {
             for (let x = 0; x < this.dungeonMap[0].length; x++) {
                 if (this.dungeonMap[y][x] === 1) { // 1 is FLOOR
-                    this.minimapGraphics.fillRect(
-                        offsetX + x * 16 * this.SCALE, 
-                        offsetY + y * 16 * this.SCALE, 
-                        Math.max(1, 16 * this.SCALE), 
-                        Math.max(1, 16 * this.SCALE)
-                    );
+                    this.minimapGraphics.fillStyle(0x777777, 1.0); // Bright grey floor
+                } else {
+                    this.minimapGraphics.fillStyle(0x000000, 1.0); // Black walls
                 }
+
+                // Draw tile
+                this.minimapGraphics.fillRect(
+                    offsetX + x * 16 * this.SCALE,
+                    offsetY + y * 16 * this.SCALE,
+                    Math.ceil(16 * this.SCALE),
+                    Math.ceil(16 * this.SCALE)
+                );
             }
         }
 
@@ -171,14 +177,14 @@ export class UIScene extends Phaser.Scene {
         this.queueText.setText(`Queue: [ ${elements.join(' + ')} ]`);
     }
 
-    private handleHp = (e: CustomEvent<{current: number, max: number}>) => {
+    private handleHp = (e: CustomEvent<{ current: number, max: number }>) => {
         const { current, max } = e.detail;
         const percent = Phaser.Math.Clamp(current / max, 0, 1);
-        
+
         // Use displayWidth to scale from the left (assuming origin is 0)
         this.hpBar.displayWidth = 400 * percent;
         this.hpText.setText(`${Math.ceil(current)} / ${max}`);
-        
+
         if (percent > 0.5) this.hpBar.setFillStyle(0x00ff00);
         else if (percent > 0.2) this.hpBar.setFillStyle(0xffff00);
         else this.hpBar.setFillStyle(0xff0000);
