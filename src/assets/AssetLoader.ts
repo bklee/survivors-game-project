@@ -24,7 +24,7 @@ export class AssetLoader {
         // BGM
         this.scene.load.audio('select_bgm', 'assets/audio/hero_reprise.wav');
         this.scene.load.audio('main_bgm', 'assets/audio/main_bgm.wav');
-        this.scene.load.audio('boss_bgm', 'assets/audio/boss_bgm.wav');
+        this.scene.load.audio('boss_bgm', 'assets/audio/boss_battle_8_retro_01_opening.wav');
 
         // SFX
         this.scene.load.audio('fire_cast', 'assets/audio/fire_cast.mp3');
