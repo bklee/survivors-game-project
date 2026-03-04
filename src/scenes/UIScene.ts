@@ -45,11 +45,13 @@ export class UIScene extends Phaser.Scene {
             fontStyle: 'bold'
         });
 
-        this.stageLevelText = this.add.text(10, 45, "Stage 1 | Level 1", {
+        this.stageLevelText = this.add.text(640, 10, "Stage 1 | Level 1", {
             fontSize: '22px',
             color: '#ffff00',
-            fontStyle: 'bold'
-        });
+            fontStyle: 'bold',
+            stroke: '#000000',
+            strokeThickness: 4
+        }).setOrigin(0.5, 0);
 
         this.statsText = this.add.text(10, 80, this.getStatsString(), {
             fontSize: '16px',
