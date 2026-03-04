@@ -14,7 +14,7 @@ const MONSTER_CONFIG: Record<number, { name: string, hasIdleRun: boolean, frames
     70: { name: 'tiny_zombie', hasIdleRun: true },
     71: { name: 'necromancer', hasIdleRun: false },
     72: { name: 'skelet', hasIdleRun: true },
-    73: { name: 'zombie', hasIdleRun: false, frames: 3 },
+    73: { name: 'zombie', hasIdleRun: false },
     74: { name: 'doc', hasIdleRun: true },
     75: { name: 'ice_zombie', hasIdleRun: false },
     79: { name: 'big_zombie', hasIdleRun: true }, // BOSS
