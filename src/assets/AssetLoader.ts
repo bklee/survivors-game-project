@@ -22,7 +22,7 @@ export class AssetLoader {
 
     loadAudio() {
         // BGM
-        this.scene.load.audio('select_bgm', 'assets/audio/select_bgm.wav');
+        this.scene.load.audio('select_bgm', 'assets/audio/hero_reprise.wav');
         this.scene.load.audio('main_bgm', 'assets/audio/main_bgm.wav');
         this.scene.load.audio('boss_bgm', 'assets/audio/boss_bgm.wav');
 
