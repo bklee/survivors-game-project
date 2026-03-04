@@ -73,6 +73,7 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
             else if (typeId === 14) charKey = 'orc';
             else if (typeId === 15) charKey = 'gem';
             else if (typeId === 20) charKey = 'gem';
+            else if (typeId === 21) charKey = 'coin'; // Coin drop
             else if (typeId === 30) charKey = 'prop_crate';
             else if (typeId === 31) charKey = 'prop_skull';
             else if (typeId === 32) charKey = 'prop_spikes';
@@ -101,7 +102,7 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                 else if (typeId === 109) charKey = 'attack_effect';
             }
 
-            const requiresSprite = typeId >= 100 || (typeId >= 60 && typeId <= 82) || typeId >= 50 || typeId === 36 || hasComponent(world, Rotation, eid);
+            const requiresSprite = typeId >= 100 || (typeId >= 60 && typeId <= 82) || typeId >= 50 || typeId === 36 || typeId === 21 || hasComponent(world, Rotation, eid);
 
             // 2. Identify State (Idle vs Run)
             let state = 'idle';
@@ -112,7 +113,7 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
 
             // 3. Handle Animation Framing
             let frameName: string | number = '';
-            if ((typeId >= 15 && typeId <= 31) || [33, 34, 35].includes(typeId) || (typeId >= 100 && typeId <= 107)) {
+            if (typeId === 15 || typeId === 20 || (typeId >= 22 && typeId <= 31) || [33, 34, 35].includes(typeId) || (typeId >= 100 && typeId <= 107)) {
                 frameName = charKey;
             } else if (typeId === 40) {
                 frameName = Interactive.isActivated[eid] ? 'lever_on' : 'lever_off';
@@ -137,6 +138,13 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                     }
                     frameName = '';
                 }
+            } else if (typeId === 21) {
+                // Coin Animation
+                const rate = 8;
+                Animation.timer[eid] = (Animation.timer[eid] || 0) + dt;
+                const fIdx = Math.floor(Animation.timer[eid] / (1000 / rate)) % 4;
+                textureKey = `coin_f${fIdx}`;
+                frameName = '';
             } else if (typeId >= 60 && typeId <= 89) {
                 const config = MONSTER_CONFIG[typeId];
                 if (config) {
