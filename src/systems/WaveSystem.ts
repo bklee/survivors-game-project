@@ -38,8 +38,14 @@ export class NightDirector {
         const enemies = enemyQuery(world);
 
         // Spawn normal enemies up to maxEnemiesToSpawn
-        const spawnInterval = Math.max(200, 1000 - (this.stage * 100));
+        let spawnInterval = Math.max(200, 1000 - (this.stage * 100));
         let maxConcurrent = 30 + (this.stage * 10);
+
+        // Optimization: Reduce concurrent enemies during boss fights to save performance and adjust difficulty
+        if (this.bossSpawned) {
+            maxConcurrent = Math.min(maxConcurrent, 25);
+            spawnInterval *= 1.5; // Spawn slower
+        }
 
         if (this.spawnedEnemiesCount < this.maxEnemiesToSpawn && enemies.length < maxConcurrent) {
             if (this.timeElapsed - this.lastSpawnTime > spawnInterval) {
@@ -138,7 +144,10 @@ export class NightDirector {
 
         // Stat adjustments based on category
         if (typeId >= 80) { speed *= 0.8; hp *= 1.5; } // Orcs: slower but tougher
-        else if (typeId >= 60 && typeId < 70) { speed *= 1.2; hp *= 1.1; } // Demons: faster
+        else if (typeId >= 60 && typeId < 70) { speed *= 1.05; hp *= 1.1; } // Demons: slightly faster (was 1.2)
+
+        // Cap speed to 190 (player is 200) to ensure maneuvering is possible
+        speed = Math.min(speed, 190);
 
         // Specific monster tweaks
         if (typeId === 71) { speed *= 0.7; hp *= 1.2; } // Necromancer: slightly slower

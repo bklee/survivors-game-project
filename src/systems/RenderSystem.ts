@@ -3,7 +3,7 @@ import { defineQuery, hasComponent } from 'bitecs';
 import { Animation, Position, SpriteInfo, Velocity, Health, Interactive, Rotation, Boss, Player } from '../components';
 import { world } from '../core/World';
 
-const MONSTER_CONFIG: Record<number, { name: string, hasIdleRun: boolean }> = {
+const MONSTER_CONFIG: Record<number, { name: string, hasIdleRun: boolean, frames?: number }> = {
     // Demons
     60: { name: 'chort', hasIdleRun: true },
     61: { name: 'imp', hasIdleRun: true },
@@ -14,7 +14,7 @@ const MONSTER_CONFIG: Record<number, { name: string, hasIdleRun: boolean }> = {
     70: { name: 'tiny_zombie', hasIdleRun: true },
     71: { name: 'necromancer', hasIdleRun: false },
     72: { name: 'skelet', hasIdleRun: true },
-    73: { name: 'zombie', hasIdleRun: false },
+    73: { name: 'zombie', hasIdleRun: false, frames: 3 },
     74: { name: 'doc', hasIdleRun: true },
     75: { name: 'ice_zombie', hasIdleRun: false },
     79: { name: 'big_zombie', hasIdleRun: true }, // BOSS
@@ -45,6 +45,18 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
 
         for (let i = 0; i < ents.length; i++) {
             const eid = ents[i];
+
+            // 0. Viewport Culling for Performance
+            const dx_p = Position.x[eid] - px;
+            const dy_p = Position.y[eid] - py;
+            if (dx_p * dx_p + dy_p * dy_p > 500 * 500) {
+                const b = bobs[eid];
+                if (b) b.setVisible(false);
+                const s = sprites[eid];
+                if (s) s.setVisible(false);
+                continue;
+            }
+
             const typeId = SpriteInfo.textureIndex[eid];
             let bob = bobs[eid];
 
@@ -125,12 +137,13 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                     }
                     frameName = '';
                 }
-            } else if (typeId >= 60 && typeId <= 82) {
+            } else if (typeId >= 60 && typeId <= 89) {
                 const config = MONSTER_CONFIG[typeId];
                 if (config) {
                     const rate = Animation.frameRate[eid] || 8;
                     Animation.timer[eid] += dt;
-                    const fIdx = Math.floor(Animation.timer[eid] / (1000 / rate)) % 4;
+                    const maxF = config.frames || 4;
+                    const fIdx = Math.floor(Animation.timer[eid] / (1000 / rate)) % maxF;
                     if (config.hasIdleRun) {
                         textureKey = `${config.name}_${state}_f${fIdx}`;
                     } else {
@@ -171,6 +184,7 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                     if (!['weapon_bow', 'attack_effect'].includes(charKey)) sprite.setTexture(textureKey, finalFrame);
                 }
 
+                sprite.setVisible(true);
                 if (hasComponent(world, Boss, eid)) {
                     sprite.setScale(2.5);
                 } else if (charKey !== 'attack_effect') {
@@ -201,6 +215,7 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                     bobs[eid] = bob;
                 } else {
                     bob.setPosition(tx, ty); bob.alpha = currentAlpha;
+                    bob.setVisible(true);
                     if (hasComponent(world, Velocity, eid)) {
                         if (Velocity.x[eid] < 0) bob.flipX = true;
                         else if (Velocity.x[eid] > 0) bob.flipX = false;
