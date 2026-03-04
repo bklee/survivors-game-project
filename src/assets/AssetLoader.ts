@@ -22,9 +22,9 @@ export class AssetLoader {
 
     loadAudio() {
         // BGM
-        this.scene.load.audio('select_bgm', 'assets/audio/hero_reprise.wav');
-        this.scene.load.audio('main_bgm', 'assets/audio/fight_for_better_future.wav');
-        this.scene.load.audio('boss_bgm', 'assets/audio/boss_battle_8_retro_01_opening.wav');
+        this.scene.load.audio('select_bgm', 'assets/audio/hero_reprise.mp3');
+        this.scene.load.audio('main_bgm', 'assets/audio/fight_for_better_future.mp3');
+        this.scene.load.audio('boss_bgm', 'assets/audio/boss_battle_8_retro_01_opening.mp3');
 
         // SFX
         this.scene.load.audio('fire_cast', 'assets/audio/fire_cast.mp3');

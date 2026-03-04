@@ -4,7 +4,7 @@ import { world } from '../core/World';
 import { SpatialHash } from '../core/SpatialHash';
 import { isHitStopped } from '../fx/JuicePipeline';
 
-import { DungeonGenerator, TILE_SIZE, MAP_WIDTH, MAP_HEIGHT } from '../core/DungeonGenerator';
+import { DungeonGenerator, TILE_SIZE } from '../core/DungeonGenerator';
 
 // Simple movement physics query
 const physicsQuery = defineQuery([Position, Velocity]);
@@ -34,8 +34,8 @@ export const createPhysicsSystem = (dungeon: DungeonGenerator) => {
                 }
 
                 // Clamp to world bounds
-                const w = MAP_WIDTH * TILE_SIZE;
-                const h = MAP_HEIGHT * TILE_SIZE;
+                const w = dungeon.width * TILE_SIZE;
+                const h = dungeon.height * TILE_SIZE;
                 if (Position.x[eid] < 0) Position.x[eid] = 0;
                 else if (Position.x[eid] > w) Position.x[eid] = w;
 
