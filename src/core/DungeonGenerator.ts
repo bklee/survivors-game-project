@@ -17,44 +17,71 @@ export class DungeonGenerator {
     }
 
     public generate() {
-        // Create an open Survivor-style arena (All Floor)
+        const fillProbability = 0.40;
         this.map = Array(this.height).fill(0).map(() => Array(this.width).fill(TileType.FLOOR));
 
-        // 1. Create solid wall boundary
-        const BORDER_SIZE = 4;
+        // 1. Initial Random Fill
         for (let y = 0; y < this.height; y++) {
             for (let x = 0; x < this.width; x++) {
-                if (x < BORDER_SIZE || x >= this.width - BORDER_SIZE || y < BORDER_SIZE || y >= this.height - BORDER_SIZE) {
+                if (x === 0 || x === this.width - 1 || y === 0 || y === this.height - 1) {
                     this.map[y][x] = TileType.WALL;
+                } else {
+                    this.map[y][x] = (Math.random() < fillProbability) ? TileType.WALL : TileType.FLOOR;
                 }
             }
         }
 
-        // 2. Scatter structural pillars/obstacles to make the map interesting
-        // Number of pillars scales with map area
-        const area = this.width * this.height;
-        const numPillars = Math.floor(area * 0.004); 
-        for (let i = 0; i < numPillars; i++) {
-            const pw = Math.floor(Math.random() * 3) + 2; // Pillar width 2~4
-            const ph = Math.floor(Math.random() * 3) + 2; // Pillar height 2~4
-            const px = Math.floor(Math.random() * (this.width - 20)) + 10;
-            const py = Math.floor(Math.random() * (this.height - 20)) + 10;
+        // 2. Cellular Automata Smoothing
+        const numSteps = 5;
+        for (let i = 0; i < numSteps; i++) {
+            const nextMap = Array(this.height).fill(0).map(() => Array(this.width).fill(TileType.FLOOR));
+            for (let y = 0; y < this.height; y++) {
+                for (let x = 0; x < this.width; x++) {
+                    const wallCount = this.getSurroundingWallCount(x, y);
+                    if (this.map[y][x] === TileType.WALL) {
+                        nextMap[y][x] = wallCount >= 4 ? TileType.WALL : TileType.FLOOR;
+                    } else {
+                        nextMap[y][x] = wallCount >= 5 ? TileType.WALL : TileType.FLOOR;
+                    }
 
-            // Keep the center absolutely clear for player spawn
-            const cx = this.width / 2;
-            const cy = this.height / 2;
-            if (Math.abs(px - cx) < 30 && Math.abs(py - cy) < 30) {
-                continue;
+                    // Enforce solid boundary
+                    const BORDER = 4;
+                    if (x < BORDER || x >= this.width - BORDER || y < BORDER || y >= this.height - BORDER) {
+                        nextMap[y][x] = TileType.WALL;
+                    }
+                }
             }
+            this.map = nextMap;
+        }
 
-            for (let y = py; y < py + ph; y++) {
-                if (y >= this.height) continue;
-                for (let x = px; x < px + pw; x++) {
-                    if (x >= this.width) continue;
-                    this.map[y][x] = TileType.WALL;
+        // 3. Clear the center to guarantee a safe starting spot
+        const cx = Math.floor(this.width / 2);
+        const cy = Math.floor(this.height / 2);
+        for (let y = cy - 8; y <= cy + 8; y++) {
+            for (let x = cx - 8; x <= cx + 8; x++) {
+                if (y > 0 && y < this.height && x > 0 && x < this.width) {
+                    this.map[y][x] = TileType.FLOOR;
                 }
             }
         }
+    }
+
+    private getSurroundingWallCount(gridX: number, gridY: number): number {
+        let wallCount = 0;
+        for (let y = gridY - 1; y <= gridY + 1; y++) {
+            for (let x = gridX - 1; x <= gridX + 1; x++) {
+                if (x >= 0 && x < this.width && y >= 0 && y < this.height) {
+                    if (x !== gridX || y !== gridY) {
+                        if (this.map[y][x] === TileType.WALL) {
+                            wallCount++;
+                        }
+                    }
+                } else {
+                    wallCount++;
+                }
+            }
+        }
+        return wallCount;
     }
 
     public isFloor(xPixel: number, yPixel: number): boolean {
