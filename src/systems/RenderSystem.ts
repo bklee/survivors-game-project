@@ -47,6 +47,7 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
             else if (typeId === 106) charKey = 'weapon_arrow';
             else if (typeId === 107) charKey = 'weapon_staff';
             else if (typeId === 108) charKey = 'weapon_bow';
+            else if (typeId === 109) charKey = 'attack_effect';
 
             const requiresSprite = typeId >= 100 || hasComponent(world, Rotation, eid);
 
@@ -85,7 +86,7 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
 
             // 5. Render Bob or Sprite
             let finalFrame: string | number = frameName;
-            if (!blitter.texture.has(frameName.toString()) && charKey !== 'weapon_bow') {
+            if (!blitter.texture.has(frameName.toString()) && charKey !== 'weapon_bow' && charKey !== 'attack_effect') {
                 finalFrame = 'floor';
             }
 
@@ -100,6 +101,9 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                 if (!sprite) {
                     if (charKey === 'weapon_bow') {
                         sprite = _scene.add.sprite(Position.x[eid], Position.y[eid], 'weapon_bow');
+                    } else if (charKey === 'attack_effect') {
+                        sprite = _scene.add.sprite(Position.x[eid], Position.y[eid], 'attack_effect');
+                        sprite.setScale(0.5); // Attack effect is 200px wide, scaling it down.
                     } else {
                         sprite = _scene.add.sprite(Position.x[eid], Position.y[eid], 'dungeon', finalFrame);
                     }
@@ -109,7 +113,7 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                     sprite.x = Position.x[eid];
                     sprite.y = Position.y[eid];
                     sprite.alpha = currentAlpha;
-                    if (charKey !== 'weapon_bow') {
+                    if (charKey !== 'weapon_bow' && charKey !== 'attack_effect') {
                         sprite.setFrame(finalFrame);
                     }
                 }
