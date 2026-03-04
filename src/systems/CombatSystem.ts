@@ -1,5 +1,5 @@
 import { defineQuery, removeEntity, addEntity, addComponent, hasComponent } from 'bitecs';
-import { Position, Spell, Health, Item, Velocity, SpriteInfo, Boss, Player, EnemyProjectile, Enemy, Lifespan } from '../components';
+import { Position, Spell, Health, Item, Velocity, SpriteInfo, Boss, Player, EnemyProjectile, Enemy, Lifespan, Animation } from '../components';
 import { world } from '../core/World';
 import { JuicePipeline } from '../fx/JuicePipeline';
 import { enemySpatialHash } from './PhysicsSystem';
@@ -127,12 +127,14 @@ export const createCombatSystem = (juice: JuicePipeline) => {
                 addComponent(world, Velocity, dropId);
                 addComponent(world, Item, dropId);
                 addComponent(world, SpriteInfo, dropId);
+                addComponent(world, Animation, dropId);
                 Position.x[dropId] = tx;
                 Position.y[dropId] = ty;
                 Velocity.x[dropId] = (Math.random() - 0.5) * 100;
                 Velocity.y[dropId] = (Math.random() - 0.5) * 100;
                 Item.xpValue[dropId] = isBoss ? 500 : 10;
-                SpriteInfo.textureIndex[dropId] = 20;
+                SpriteInfo.textureIndex[dropId] = 21; // Coin type
+                Animation.timer[dropId] = Math.random() * 1000;
                 Item.magnetized[dropId] = 0;
                 removeEntity(world, targetId);
             }

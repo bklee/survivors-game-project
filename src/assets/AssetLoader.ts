@@ -61,6 +61,11 @@ export class AssetLoader {
             this.scene.load.image(`chest_full_open_${i}`, `assets/frames/chest_full_open_anim_f${i}.png`);
             this.scene.load.image(`chest_empty_open_${i}`, `assets/frames/chest_empty_open_anim_f${i}.png`);
         }
+
+        // Add Coin animations
+        for (let i = 0; i < 4; i++) {
+            this.scene.load.image(`coin_f${i}`, `assets/frames/coin_anim_f${i}.png`);
+        }
     }
 
     loadAudio() {

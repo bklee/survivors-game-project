@@ -114,7 +114,7 @@ export class UIScene extends Phaser.Scene {
     }
 
     private updateStageLevelText() {
-        this.stageLevelText.setText(`Stage ${this.currentStage} | Level ${this.currentLevel}`);
+        this.stageLevelText.setText(`Stage ${this.currentStage} | Level ${this.currentLevel} (${Math.floor(this.currentXp)} / ${this.xpToNextLevel} XP)`);
     }
 
     update() {
