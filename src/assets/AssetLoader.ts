@@ -18,10 +18,30 @@ export class AssetLoader {
         this.scene.load.image('weapon_bow', 'assets/frames/weapon_bow.png');
         this.scene.load.image('attack_effect', 'assets/attack_effect.png');
 
-        // Load the monster GIFs as images (Phaser will treat as spritesheets if we define frames)
-        this.scene.load.image('demons', 'assets/demons.gif');
-        this.scene.load.image('orcs', 'assets/orcs.gif');
-        this.scene.load.image('undeads', 'assets/undeads.gif');
+        // Monster Groups
+        const monsters = [
+            { name: 'chort', hasIdleRun: true },
+            { name: 'imp', hasIdleRun: true },
+            { name: 'skelet', hasIdleRun: true },
+            { name: 'tiny_zombie', hasIdleRun: true },
+            { name: 'necromancer', hasIdleRun: false },
+            { name: 'ogre', hasIdleRun: true },
+            { name: 'orc_shaman', hasIdleRun: true },
+            { name: 'orc_warrior', hasIdleRun: true }
+        ];
+
+        monsters.forEach(m => {
+            if (m.hasIdleRun) {
+                for (let i = 0; i < 4; i++) {
+                    this.scene.load.image(`${m.name}_idle_f${i}`, `assets/frames/${m.name}_idle_anim_f${i}.png`);
+                    this.scene.load.image(`${m.name}_run_f${i}`, `assets/frames/${m.name}_run_anim_f${i}.png`);
+                }
+            } else {
+                for (let i = 0; i < 4; i++) {
+                    this.scene.load.image(`${m.name}_f${i}`, `assets/frames/${m.name}_anim_f${i}.png`);
+                }
+            }
+        });
     }
 
     loadAudio() {
@@ -92,19 +112,8 @@ export class AssetLoader {
             texture.add(`imp_run_${i}`, 0, 432 + (i * 16), 64, 16, 16);
         }
 
-        // Load new monster GIFs
-        const loadGIFGroup = (key: string, baseId: string) => {
-            const tex = this.scene.textures.get(key);
-            if (!tex) return;
-            for (let i = 0; i < 4; i++) {
-                tex.add(`${baseId}_idle_${i}`, 0, i * 32, 0, 32, 32);
-                tex.add(`${baseId}_run_${i}`, 0, i * 32, 32, 32, 32);
-            }
-        };
-
-        loadGIFGroup('demons', 'demon_new');
-        loadGIFGroup('orcs', 'orc_new');
-        loadGIFGroup('undeads', 'skeleton_new');
+        // Default monster frames (older versions, keeping for compatibility if needed)
+        // ...
 
         // Add Spell Frames
         texture.add('spell_fire', 0, 288, 336, 16, 16);

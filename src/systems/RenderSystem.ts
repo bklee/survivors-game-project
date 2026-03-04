@@ -3,6 +3,17 @@ import { defineQuery, hasComponent } from 'bitecs';
 import { Animation, Position, SpriteInfo, Velocity, Health, Interactive, Rotation, Boss } from '../components';
 import { world } from '../core/World';
 
+const MONSTER_CONFIG: Record<number, { name: string, hasIdleRun: boolean }> = {
+    60: { name: 'chort', hasIdleRun: true },
+    61: { name: 'imp', hasIdleRun: true },
+    70: { name: 'tiny_zombie', hasIdleRun: true },
+    71: { name: 'necromancer', hasIdleRun: false },
+    72: { name: 'skelet', hasIdleRun: true },
+    80: { name: 'ogre', hasIdleRun: true },
+    81: { name: 'orc_shaman', hasIdleRun: true },
+    82: { name: 'orc_warrior', hasIdleRun: true },
+};
+
 const renderQuery = defineQuery([Position, SpriteInfo]);
 const bobs: (Phaser.GameObjects.Bob | undefined)[] = [];
 const sprites: (Phaser.GameObjects.Sprite | undefined)[] = [];
@@ -39,10 +50,13 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
             else if (typeId === 36) charKey = 'prop_chest';
             else if (typeId === 40) charKey = 'lever';
             else if (typeId === 41) charKey = 'door';
-            else if (typeId === 50) { charKey = 'demon_new'; textureKey = 'demons'; }
-            else if (typeId === 51) { charKey = 'orc_new'; textureKey = 'orcs'; }
-            else if (typeId === 52) { charKey = 'skeleton_new'; textureKey = 'undeads'; }
-            else if (typeId >= 100) {
+            else if (typeId >= 60 && typeId <= 82) {
+                const config = MONSTER_CONFIG[typeId];
+                if (config) {
+                    charKey = config.name;
+                    textureKey = config.name; // We'll handle exact frame name later
+                }
+            } else if (typeId >= 100) {
                 if (typeId === 100) charKey = 'spell_fire';
                 else if (typeId === 101) charKey = 'spell_ice';
                 else if (typeId === 102) charKey = 'spell_gas';
@@ -55,7 +69,7 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                 else if (typeId === 109) charKey = 'attack_effect';
             }
 
-            const requiresSprite = typeId >= 100 || typeId >= 50 || hasComponent(world, Rotation, eid);
+            const requiresSprite = typeId >= 100 || (typeId >= 60 && typeId <= 82) || typeId >= 50 || hasComponent(world, Rotation, eid);
 
             // 2. Identify State (Idle vs Run)
             let state = 'idle';
@@ -77,6 +91,19 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                 const animIdx = Math.floor(Animation.timer[eid] * rate / 1000) % 4;
                 frameName = `prop_spikes_${animIdx}`;
                 Animation.timer[eid] += dt;
+            } else if (typeId >= 60 && typeId <= 82) {
+                const config = MONSTER_CONFIG[typeId];
+                if (config) {
+                    const rate = Animation.frameRate[eid] || 8;
+                    Animation.timer[eid] += dt;
+                    const fIdx = Math.floor(Animation.timer[eid] / (1000 / rate)) % 4;
+                    if (config.hasIdleRun) {
+                        textureKey = `${config.name}_${state}_f${fIdx}`;
+                    } else {
+                        textureKey = `${config.name}_f${fIdx}`;
+                    }
+                    frameName = ''; // individual asset is the whole texture
+                }
             } else {
                 const rate = Animation.frameRate[eid] || 8;
                 Animation.timer[eid] += dt;
