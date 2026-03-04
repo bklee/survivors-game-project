@@ -84,10 +84,16 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
             // 5. Render Bob or Sprite
             let finalFrame: string | number = frameName;
             if (!blitter.texture.has(frameName.toString()) && charKey !== 'weapon_bow') {
-                finalFrame = 0;
+                finalFrame = 'floor';
             }
 
             if (requiresSprite) {
+                // If this eid previously had a bob, remove it
+                if (bobs[eid]) {
+                    bobs[eid]!.destroy();
+                    bobs[eid] = undefined;
+                }
+
                 let sprite = sprites[eid];
                 if (!sprite) {
                     if (charKey === 'weapon_bow') {
@@ -112,6 +118,12 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
 
                 if (typeId === 104) { sprite.tint = 0xffff00; }
             } else {
+                // If this eid previously had a sprite, remove it
+                if (sprites[eid]) {
+                    sprites[eid]!.destroy();
+                    sprites[eid] = undefined;
+                }
+
                 const frameObj = blitter.texture.get(finalFrame.toString());
                 const hw = frameObj && frameObj.name !== '__BASE' ? frameObj.halfWidth : 8;
                 const hh = frameObj && frameObj.name !== '__BASE' ? frameObj.halfHeight : 8;
