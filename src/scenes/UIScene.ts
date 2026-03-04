@@ -14,6 +14,7 @@ export class UIScene extends Phaser.Scene {
     private bossWarningTween?: Phaser.Tweens.Tween;
     private stageClearText!: Phaser.GameObjects.Text;
     private dungeonMap: number[][] = [];
+    private discoveredMap: boolean[][] = [];
 
     private currentLevel = 1;
     private currentStage = 1;
@@ -110,6 +111,9 @@ export class UIScene extends Phaser.Scene {
         window.addEventListener('player_died', () => this.sound.stopAll());
         window.addEventListener('map_generated', ((e: CustomEvent<number[][]>) => {
             this.dungeonMap = e.detail;
+            const h = this.dungeonMap.length;
+            const w = h > 0 ? this.dungeonMap[0].length : 0;
+            this.discoveredMap = Array.from({ length: h }, () => Array(w).fill(false));
         }) as EventListener);
 
         this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
@@ -139,6 +143,30 @@ export class UIScene extends Phaser.Scene {
         this.minimapGraphics.clear();
         if (this.dungeonMap.length === 0) return;
 
+        const players = this.playerQuery(world);
+        let pxWorld = 0;
+        let pyWorld = 0;
+        if (players.length > 0) {
+            pxWorld = Position.x[players[0]];
+            pyWorld = Position.y[players[0]];
+
+            // Uncover map around player
+            const tileX = Math.floor(pxWorld / 16);
+            const tileY = Math.floor(pyWorld / 16);
+            const sightRadius = 15;
+            for (let dy = -sightRadius; dy <= sightRadius; dy++) {
+                for (let dx = -sightRadius; dx <= sightRadius; dx++) {
+                    if (dx * dx + dy * dy <= sightRadius * sightRadius) {
+                        const nx = tileX + dx;
+                        const ny = tileY + dy;
+                        if (ny >= 0 && ny < this.dungeonMap.length && nx >= 0 && nx < this.dungeonMap[0].length) {
+                            this.discoveredMap[ny][nx] = true;
+                        }
+                    }
+                }
+            }
+        }
+
         const mapW = this.dungeonMap[0].length * 16;
         const mapH = this.dungeonMap.length * 16;
         const maxDim = Math.max(mapW, mapH);
@@ -150,7 +178,7 @@ export class UIScene extends Phaser.Scene {
         for (let y = 0; y < this.dungeonMap.length; y++) {
             for (let x = 0; x < this.dungeonMap[0].length; x++) {
                 if (this.dungeonMap[y][x] === 1) {
-                    this.minimapGraphics.fillStyle(0x777777, 1.0);
+                    this.minimapGraphics.fillStyle(this.discoveredMap[y][x] ? 0x888888 : 0x222222, 1.0);
                 } else {
                     this.minimapGraphics.fillStyle(0x000000, 1.0);
                 }
@@ -163,7 +191,6 @@ export class UIScene extends Phaser.Scene {
             }
         }
 
-        const players = this.playerQuery(world);
         const enemies = this.enemyQuery(world);
 
         this.minimapGraphics.fillStyle(0xff0000, 0.8);
