@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { defineQuery, hasComponent } from 'bitecs';
-import { Animation, Position, SpriteInfo, Velocity, Health, Interactive, Rotation, Boss } from '../components';
+import { Animation, Position, SpriteInfo, Velocity, Health, Interactive, Rotation, Boss, Player } from '../components';
 import { world } from '../core/World';
 
 const MONSTER_CONFIG: Record<number, { name: string, hasIdleRun: boolean }> = {
@@ -35,6 +35,13 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
     return (dt: number) => {
         const ents = renderQuery(world);
         const activeEids = new Set(ents);
+
+        const players = defineQuery([Player, Position])(world);
+        let px = 0, py = 0;
+        if (players.length > 0) {
+            px = Position.x[players[0]];
+            py = Position.y[players[0]];
+        }
 
         for (let i = 0; i < ents.length; i++) {
             const eid = ents[i];
@@ -82,7 +89,7 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                 else if (typeId === 109) charKey = 'attack_effect';
             }
 
-            const requiresSprite = typeId >= 100 || (typeId >= 60 && typeId <= 82) || typeId >= 50 || hasComponent(world, Rotation, eid);
+            const requiresSprite = typeId >= 100 || (typeId >= 60 && typeId <= 82) || typeId >= 50 || typeId === 36 || hasComponent(world, Rotation, eid);
 
             // 2. Identify State (Idle vs Run)
             let state = 'idle';
@@ -106,12 +113,17 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                 Animation.timer[eid] += dt;
             } else if (typeId === 36) {
                 if (hasComponent(world, Interactive, eid) && Interactive.isActivated[eid]) {
-                    const fIdx = Math.min(2, Math.floor(Animation.timer[eid] * 0.01));
-                    textureKey = `chest_full_open_${fIdx}`;
+                    textureKey = `chest_empty_open_2`;
                     frameName = '';
-                    Animation.timer[eid] += dt;
                 } else {
-                    frameName = charKey;
+                    const dx = Position.x[eid] - px;
+                    const dy = Position.y[eid] - py;
+                    if (dx * dx + dy * dy < 60 * 60) {
+                        textureKey = `chest_full_open_2`;
+                    } else {
+                        textureKey = `chest_full_open_0`;
+                    }
+                    frameName = '';
                 }
             } else if (typeId >= 60 && typeId <= 82) {
                 const config = MONSTER_CONFIG[typeId];
