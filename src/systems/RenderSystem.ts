@@ -112,7 +112,7 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
 
             // 3. Handle Animation Framing
             let frameName: string | number = '';
-            if ((typeId >= 15 && typeId <= 31) || [33, 34, 35, 36].includes(typeId) || (typeId >= 100 && typeId <= 107)) {
+            if ((typeId >= 15 && typeId <= 31) || [33, 34, 35].includes(typeId) || (typeId >= 100 && typeId <= 107)) {
                 frameName = charKey;
             } else if (typeId === 40) {
                 frameName = Interactive.isActivated[eid] ? 'lever_on' : 'lever_off';
@@ -175,13 +175,15 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                     if (charKey === 'weapon_bow') sprite = _scene.add.sprite(Position.x[eid], Position.y[eid], 'weapon_bow');
                     else if (charKey === 'attack_effect') {
                         sprite = _scene.add.sprite(Position.x[eid], Position.y[eid], 'attack_effect').setScale(0.5);
-                    } else sprite = _scene.add.sprite(Position.x[eid], Position.y[eid], textureKey, finalFrame);
+                    } else sprite = _scene.add.sprite(Position.x[eid], Position.y[eid], textureKey, finalFrame === '' ? undefined : finalFrame as any);
                     sprite.setDepth(10);
                     sprites[eid] = sprite;
                 } else {
                     sprite.setPosition(Position.x[eid], Position.y[eid]);
                     sprite.alpha = currentAlpha;
-                    if (!['weapon_bow', 'attack_effect'].includes(charKey)) sprite.setTexture(textureKey, finalFrame);
+                    if (!['weapon_bow', 'attack_effect'].includes(charKey)) {
+                        sprite.setTexture(textureKey, finalFrame === '' ? undefined : finalFrame as any);
+                    }
                 }
 
                 sprite.setVisible(true);
