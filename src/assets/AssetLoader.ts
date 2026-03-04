@@ -51,6 +51,12 @@ export class AssetLoader {
                 }
             }
         });
+
+        // Add Chest animations
+        for (let i = 0; i < 3; i++) {
+            this.scene.load.image(`chest_full_open_${i}`, `assets/frames/chest_full_open_anim_f${i}.png`);
+            this.scene.load.image(`chest_empty_open_${i}`, `assets/frames/chest_empty_open_anim_f${i}.png`);
+        }
     }
 
     loadAudio() {

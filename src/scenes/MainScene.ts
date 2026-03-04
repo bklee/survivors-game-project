@@ -298,20 +298,38 @@ export class MainScene extends Phaser.Scene {
                     addComponent(world, Interactive, eid);
                     Interactive.isActivated[eid] = 1;
 
-                    const dropId = addEntity(world);
-                    addComponent(world, Position, dropId);
-                    addComponent(world, Velocity, dropId);
-                    addComponent(world, Item, dropId);
-                    addComponent(world, SpriteInfo, dropId);
-                    Position.x[dropId] = Position.x[eid];
-                    Position.y[dropId] = Position.y[eid];
-                    Velocity.x[dropId] = 0;
-                    Velocity.y[dropId] = -100;
-                    Item.xpValue[dropId] = 1500;
-                    SpriteInfo.textureIndex[dropId] = 20;
-                    Item.magnetized[dropId] = 0;
+                    // Ensure Animation component exists for chest opening frames
+                    if (!hasComponent(world, Animation, eid)) {
+                        addComponent(world, Animation, eid);
+                    }
+                    Animation.timer[eid] = 0;
+
+                    // Spawn loot
+                    for (let j = 0; j < 5; j++) {
+                        const dropId = addEntity(world);
+                        addComponent(world, Position, dropId);
+                        addComponent(world, Velocity, dropId);
+                        addComponent(world, Item, dropId);
+                        addComponent(world, SpriteInfo, dropId);
+                        Position.x[dropId] = Position.x[eid];
+                        Position.y[dropId] = Position.y[eid];
+                        Velocity.x[dropId] = (Math.random() - 0.5) * 200;
+                        Velocity.y[dropId] = (Math.random() - 0.5) * 200 - 100;
+                        Item.xpValue[dropId] = 200;
+                        SpriteInfo.textureIndex[dropId] = 20;
+                        Item.magnetized[dropId] = 0;
+                    }
+
+                    if (Math.random() > 0.5) {
+                        const potId = addEntity(world);
+                        addComponent(world, Position, potId);
+                        addComponent(world, SpriteInfo, potId);
+                        Position.x[potId] = Position.x[eid];
+                        Position.y[potId] = Position.y[eid] + 16;
+                        SpriteInfo.textureIndex[potId] = 35;
+                    }
+
                     window.dispatchEvent(new CustomEvent('play_sound', { detail: 'level_up' }));
-                    removeEntity(world, eid);
                 }
             }
         }
@@ -335,7 +353,11 @@ export class MainScene extends Phaser.Scene {
             Position.x[eid] = pos.x;
             Position.y[eid] = pos.y;
             const roll = Math.random();
-            if (roll > 0.8) SpriteInfo.textureIndex[eid] = 36;
+            if (roll > 0.8) {
+                SpriteInfo.textureIndex[eid] = 36;
+                addComponent(world, Animation, eid);
+                Animation.timer[eid] = 0;
+            }
             else if (roll > 0.4) SpriteInfo.textureIndex[eid] = 35;
             else {
                 SpriteInfo.textureIndex[eid] = 32;
