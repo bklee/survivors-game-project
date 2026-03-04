@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { defineQuery, hasComponent } from 'bitecs';
-import { Animation, Position, SpriteInfo, Velocity, Health, Interactive, Rotation } from '../components';
+import { Animation, Position, SpriteInfo, Velocity, Health, Interactive, Rotation, Boss } from '../components';
 import { world } from '../core/World';
 
 const renderQuery = defineQuery([Position, SpriteInfo]);
@@ -14,11 +14,12 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
 
         for (let i = 0; i < ents.length; i++) {
             const eid = ents[i];
-            let bob = bobs[eid];
             const typeId = SpriteInfo.textureIndex[eid];
+            let bob = bobs[eid];
 
             // 1. Identify Character / Entity Type
             let charKey = '';
+            let textureKey = 'dungeon';
             if (typeId === 0) charKey = 'knight';
             else if (typeId === 1) charKey = 'wizard';
             else if (typeId === 2) charKey = 'elf';
@@ -26,30 +27,35 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
             else if (typeId === 11) charKey = 'demon';
             else if (typeId === 12) charKey = 'orc';
             else if (typeId === 13) charKey = 'skeleton';
-            else if (typeId === 14) charKey = 'orc'; // Elite Guard
-            else if (typeId === 15) charKey = 'gem'; // Big Treasure
+            else if (typeId === 14) charKey = 'orc';
+            else if (typeId === 15) charKey = 'gem';
             else if (typeId === 20) charKey = 'gem';
             else if (typeId === 30) charKey = 'prop_crate';
             else if (typeId === 31) charKey = 'prop_skull';
             else if (typeId === 32) charKey = 'prop_spikes';
             else if (typeId === 33) charKey = 'prop_column';
             else if (typeId === 34) charKey = 'prop_crate';
-            else if (typeId === 35) charKey = 'spell_fire'; // Health Potion sprite
-            else if (typeId === 36) charKey = 'prop_chest'; // Treasure Chest sprite
+            else if (typeId === 35) charKey = 'spell_fire';
+            else if (typeId === 36) charKey = 'prop_chest';
             else if (typeId === 40) charKey = 'lever';
             else if (typeId === 41) charKey = 'door';
-            else if (typeId === 100) charKey = 'spell_fire';
-            else if (typeId === 101) charKey = 'spell_ice';
-            else if (typeId === 102) charKey = 'spell_gas';
-            else if (typeId === 103) charKey = 'spell_dud';
-            else if (typeId === 104) charKey = 'enemy_bullet';
-            else if (typeId === 105) charKey = 'weapon_sword';
-            else if (typeId === 106) charKey = 'weapon_arrow';
-            else if (typeId === 107) charKey = 'weapon_staff';
-            else if (typeId === 108) charKey = 'weapon_bow';
-            else if (typeId === 109) charKey = 'attack_effect';
+            else if (typeId === 50) { charKey = 'demon_new'; textureKey = 'demons'; }
+            else if (typeId === 51) { charKey = 'orc_new'; textureKey = 'orcs'; }
+            else if (typeId === 52) { charKey = 'skeleton_new'; textureKey = 'undeads'; }
+            else if (typeId >= 100) {
+                if (typeId === 100) charKey = 'spell_fire';
+                else if (typeId === 101) charKey = 'spell_ice';
+                else if (typeId === 102) charKey = 'spell_gas';
+                else if (typeId === 103) charKey = 'spell_dud';
+                else if (typeId === 104) charKey = 'enemy_bullet';
+                else if (typeId === 105) charKey = 'weapon_sword';
+                else if (typeId === 106) charKey = 'weapon_arrow';
+                else if (typeId === 107) charKey = 'weapon_staff';
+                else if (typeId === 108) charKey = 'weapon_bow';
+                else if (typeId === 109) charKey = 'attack_effect';
+            }
 
-            const requiresSprite = typeId >= 100 || hasComponent(world, Rotation, eid);
+            const requiresSprite = typeId >= 100 || typeId >= 50 || hasComponent(world, Rotation, eid);
 
             // 2. Identify State (Idle vs Run)
             let state = 'idle';
@@ -60,7 +66,7 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
 
             // 3. Handle Animation Framing
             let frameName: string | number = '';
-            if ((typeId >= 15 && typeId <= 31) || typeId === 33 || typeId === 34 || typeId === 35 || typeId === 36 || (typeId >= 100 && typeId <= 107)) {
+            if ((typeId >= 15 && typeId <= 31) || [33, 34, 35, 36].includes(typeId) || (typeId >= 100 && typeId <= 107)) {
                 frameName = charKey;
             } else if (typeId === 40) {
                 frameName = Interactive.isActivated[eid] ? 'lever_on' : 'lever_off';
@@ -78,85 +84,66 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                 frameName = `${charKey}_${state}_${currentFrameIdx}`;
             }
 
-            // 4. Handle Death Effect (Vanishing)
+            // 4. Handle Alpha (Death Effect)
             let currentAlpha = 1.0;
-            if (hasComponent(world, Health, eid) && typeId < 30) {
-                if (Health.current[eid] <= 0) currentAlpha = 0.4;
-            }
+            if (hasComponent(world, Health, eid) && typeId < 30 && Health.current[eid] <= 0) currentAlpha = 0.4;
 
             // 5. Render Bob or Sprite
             let finalFrame: string | number = frameName;
-            if (!blitter.texture.has(frameName.toString()) && charKey !== 'weapon_bow' && charKey !== 'attack_effect') {
+            if (textureKey === 'dungeon' && !blitter.texture.has(frameName.toString()) && !['weapon_bow', 'attack_effect'].includes(charKey)) {
                 finalFrame = 'floor';
             }
 
             if (requiresSprite) {
-                // If this eid previously had a bob, remove it
-                if (bobs[eid]) {
-                    bobs[eid]!.destroy();
-                    bobs[eid] = undefined;
-                }
-
+                if (bob) { bob.destroy(); bobs[eid] = undefined; bob = undefined; }
                 let sprite = sprites[eid];
                 if (!sprite) {
-                    if (charKey === 'weapon_bow') {
-                        sprite = _scene.add.sprite(Position.x[eid], Position.y[eid], 'weapon_bow');
-                    } else if (charKey === 'attack_effect') {
-                        sprite = _scene.add.sprite(Position.x[eid], Position.y[eid], 'attack_effect');
-                        sprite.setScale(0.5); // Attack effect is 200px wide, scaling it down.
-                    } else {
-                        sprite = _scene.add.sprite(Position.x[eid], Position.y[eid], 'dungeon', finalFrame);
-                    }
+                    if (charKey === 'weapon_bow') sprite = _scene.add.sprite(Position.x[eid], Position.y[eid], 'weapon_bow');
+                    else if (charKey === 'attack_effect') {
+                        sprite = _scene.add.sprite(Position.x[eid], Position.y[eid], 'attack_effect').setScale(0.5);
+                    } else sprite = _scene.add.sprite(Position.x[eid], Position.y[eid], textureKey, finalFrame);
                     sprite.setDepth(10);
                     sprites[eid] = sprite;
                 } else {
-                    sprite.x = Position.x[eid];
-                    sprite.y = Position.y[eid];
+                    sprite.setPosition(Position.x[eid], Position.y[eid]);
                     sprite.alpha = currentAlpha;
-                    if (charKey !== 'weapon_bow' && charKey !== 'attack_effect') {
-                        sprite.setFrame(finalFrame);
-                    }
+                    if (!['weapon_bow', 'attack_effect'].includes(charKey)) sprite.setTexture(textureKey, finalFrame);
                 }
 
-                if (hasComponent(world, Rotation, eid)) {
-                    sprite.rotation = Rotation.angle[eid];
+                if (hasComponent(world, Boss, eid)) {
+                    sprite.setScale(2.5);
+                } else if (charKey !== 'attack_effect') {
+                    sprite.setScale(1.0);
                 }
 
-                if (typeId === 104) { sprite.tint = 0xffff00; }
+                if (hasComponent(world, Velocity, eid)) {
+                    if (Velocity.x[eid] < 0) sprite.flipX = true;
+                    else if (Velocity.x[eid] > 0) sprite.flipX = false;
+                }
+                if (hasComponent(world, Rotation, eid)) sprite.rotation = Rotation.angle[eid];
+                if (typeId === 104) sprite.tint = 0xffff00;
             } else {
-                // If this eid previously had a sprite, remove it
-                if (sprites[eid]) {
-                    sprites[eid]!.destroy();
-                    sprites[eid] = undefined;
-                }
-
+                if (sprites[eid]) { sprites[eid]!.destroy(); sprites[eid] = undefined; }
                 const frameObj = blitter.texture.get(finalFrame.toString());
                 const hw = frameObj && frameObj.name !== '__BASE' ? frameObj.halfWidth : 8;
                 const hh = frameObj && frameObj.name !== '__BASE' ? frameObj.halfHeight : 8;
-                const targetX = Position.x[eid] - hw;
-                const targetY = Position.y[eid] - hh;
-
+                const tx = Position.x[eid] - hw;
+                const ty = Position.y[eid] - hh;
                 if (!bob) {
-                    const newBob = blitter.create(targetX, targetY, finalFrame);
-                    if (typeId === 10) { newBob.tint = 0xffaaaa; newBob.alpha = 0.9; }
-                    else if (typeId === 11) { newBob.tint = 0xff5555; }
-                    else if (typeId === 12 || typeId === 13) { newBob.tint = 0xffffff; }
-                    else if (typeId === 14) { newBob.tint = 0xffcc00; }
-                    else if (typeId === 15) { newBob.tint = 0x00ffff; }
-                    else if (typeId === 34) { newBob.tint = 0xff0000; }
-
-                    newBob.alpha = currentAlpha;
-                    bobs[eid] = newBob;
-                } else {
-                    bob.x = targetX;
-                    bob.y = targetY;
+                    bob = blitter.create(tx, ty, finalFrame);
+                    if (typeId === 10) { bob.tint = 0xffaaaa; bob.alpha = 0.9; }
+                    else if (typeId === 11) bob.tint = 0xff5555;
+                    else if (typeId === 14) bob.tint = 0xffcc00;
+                    else if (typeId === 15) bob.tint = 0x00ffff;
+                    else if (typeId === 34) bob.tint = 0xff0000;
                     bob.alpha = currentAlpha;
-
+                    bobs[eid] = bob;
+                } else {
+                    bob.setPosition(tx, ty); bob.alpha = currentAlpha;
                     if (hasComponent(world, Velocity, eid)) {
                         if (Velocity.x[eid] < 0) bob.flipX = true;
                         else if (Velocity.x[eid] > 0) bob.flipX = false;
                     }
-
                     if (blitter.texture.has(frameName.toString())) {
                         try { bob.setFrame(frameName); } catch (e) { }
                     }
@@ -166,19 +153,10 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
 
         // 6. Cleanup Residue
         for (let i = 0; i < bobs.length; i++) {
-            const b = bobs[i];
-            if (b && !activeEids.has(i)) {
-                b.destroy();
-                bobs[i] = undefined;
-            }
+            if (bobs[i] && !activeEids.has(i)) { bobs[i]!.destroy(); bobs[i] = undefined; }
         }
-
         for (let i = 0; i < sprites.length; i++) {
-            const s = sprites[i];
-            if (s && !activeEids.has(i)) {
-                s.destroy();
-                sprites[i] = undefined;
-            }
+            if (sprites[i] && !activeEids.has(i)) { sprites[i]!.destroy(); sprites[i] = undefined; }
         }
     };
 };
