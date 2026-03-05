@@ -16,9 +16,18 @@ export class CharacterSelectScene extends Phaser.Scene {
             .setAlpha(0.6);
 
         // Ensure selection BGM is playing (especially after retry)
-        if (!this.sound.get('select_bgm') && this.cache.audio.exists('select_bgm')) {
+        // Check if ANY instance of select_bgm is currently playing
+        const isBgmPlaying = this.sound.getAllPlaying().some(s => s.key === 'select_bgm');
+
+        if (!isBgmPlaying && this.cache.audio.exists('select_bgm')) {
+            // Force resume audio context if suspended (common in browsers)
+            const soundManager = this.sound as any;
+            if (soundManager.context?.state === 'suspended') {
+                soundManager.context.resume();
+            }
             this.sound.play('select_bgm', { loop: true, volume: 0.4 });
         }
+
 
 
 

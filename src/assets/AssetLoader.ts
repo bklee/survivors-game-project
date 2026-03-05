@@ -18,7 +18,7 @@ export class AssetLoader {
         this.scene.load.image('weapon_bow', './assets/frames/weapon_bow.png');
         this.scene.load.image('weapon_knight_sword', './assets/frames/weapon_knight_sword.png');
         this.scene.load.image('weapon_green_magic_staff', './assets/frames/weapon_green_magic_staff.png');
-        this.scene.load.image('main_bg', './assets/main.jpg');
+        this.scene.load.image('main_bg', './assets/main.png');
         this.scene.load.image('loading_bg', './assets/loading.jpg');
         this.scene.load.image('hp_icon', './assets/frames/ui_heart_full.png');
         this.scene.load.image('game_over', './assets/game_over.png');
