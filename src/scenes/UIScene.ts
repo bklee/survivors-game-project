@@ -45,7 +45,7 @@ export class UIScene extends Phaser.Scene {
     private bossQuery = defineQuery([Boss, Position]);
 
     constructor() {
-        super({ key: 'UIScene', active: true });
+        super({ key: 'UIScene' });
     }
 
     create() {
@@ -109,8 +109,8 @@ export class UIScene extends Phaser.Scene {
         shine.fillRect(hpX + 4, hpY - hpHeight + 4, fullWidth - 8, (hpHeight - 8) / 2);
 
         // 3. Heart Icon 
-        const hpIcon = this.add.image(hpX + 15, hpY - hpHeight / 2, 'hp_icon')
-            .setDisplaySize(32, 32) // Reverted to original size 
+        const hpIcon = this.add.image(hpX - 1, hpY - hpHeight / 2, 'hp_icon')
+            .setDisplaySize(35, 35) // Increased by 10% (32 * 1.1 ≈ 35)
             .setOrigin(0.5, 0.5)
             .setDepth(20);
 
@@ -125,7 +125,7 @@ export class UIScene extends Phaser.Scene {
         }).setOrigin(0.5, 0.5).setDepth(6);
 
         // --- Boss HP Bar (Hidden by default) ---
-        this.bossHpContainer = this.add.container(640, 60).setVisible(false);
+        this.bossHpContainer = this.add.container(640, 80).setVisible(false).setAlpha(0.8);
         const bossBarW = 600;
         const bossBarH = 24;
 
@@ -138,8 +138,8 @@ export class UIScene extends Phaser.Scene {
         this.bossHpBar = this.add.rectangle(-bossBarW / 2 + 3, 0, bossBarW - 6, bossBarH - 6, 0xff0000)
             .setOrigin(0, 0.5);
 
-        this.bossHpText = this.add.text(0, -bossBarH - 10, 'BOSS HP', {
-            fontSize: '24px', color: '#ffffff', fontStyle: 'bold', stroke: '#000', strokeThickness: 4
+        this.bossHpText = this.add.text(0, 0, 'BOSS HP', {
+            fontSize: '20px', color: '#ffffff', fontStyle: 'bold', stroke: '#000', strokeThickness: 4
         }).setOrigin(0.5);
 
         this.bossHpContainer.add([bFrame, this.bossHpBar, this.bossHpText]);
@@ -464,7 +464,7 @@ export class UIScene extends Phaser.Scene {
         const percent = Phaser.Math.Clamp(current / max, 0, 1);
         this.bossHpBar.displayWidth = (600 - 6) * percent;
         if (name && this.bossHpText) {
-            this.bossHpText.setText(`${name.toUpperCase()} HP`);
+            this.bossHpText.setText(`${name.toUpperCase()}`);
         }
     }
 
