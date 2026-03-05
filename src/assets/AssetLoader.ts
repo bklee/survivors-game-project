@@ -20,6 +20,7 @@ export class AssetLoader {
         this.scene.load.image('weapon_green_magic_staff', './assets/frames/weapon_green_magic_staff.png');
         this.scene.load.image('main_bg', './assets/main.jpg');
         this.scene.load.image('loading_bg', './assets/loading.jpg');
+        this.scene.load.image('hp_icon', './assets/hp_icon.png');
         for (let i = 0; i < 3; i++) {
             this.scene.load.image(`sword_slash_f${i}`, `./assets/frames/sword_slash_f${i}.png`);
             this.scene.load.image(`super_slash_f${i}`, `./assets/frames/super_slash_f${i}.png`);

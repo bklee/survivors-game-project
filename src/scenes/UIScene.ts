@@ -11,6 +11,10 @@ export class UIScene extends Phaser.Scene {
     private statsText!: Phaser.GameObjects.Text;
     private hpBar!: Phaser.GameObjects.Rectangle;
     private hpText!: Phaser.GameObjects.Text;
+
+    private bossHpBar?: Phaser.GameObjects.Rectangle;
+    private bossHpText?: Phaser.GameObjects.Text;
+    private bossHpContainer?: Phaser.GameObjects.Container;
     private uiContainer!: Phaser.GameObjects.Container;
     private bossWarningText!: Phaser.GameObjects.Text;
     private bossWarningTween?: Phaser.Tweens.Tween;
@@ -82,15 +86,58 @@ export class UIScene extends Phaser.Scene {
             }
         });
 
-        const hpBg = this.add.rectangle(10, 715, 400, 26, 0x222222).setOrigin(0, 1);
-        this.hpBar = this.add.rectangle(10, 715, 400, 26, 0x00ff00).setOrigin(0, 1);
-        this.hpText = this.add.text(210, 702, '100 / 100', {
-            fontSize: '18px',
+        // --- Stylized HP Bar (Design based on feedback) ---
+        const hpX = 20;
+        const hpY = 700;
+        const hpHeight = 30;
+        const fullWidth = 400;
+
+        // 1. HP Bar Frame/Background
+        const hpFrame = this.add.graphics();
+        hpFrame.lineStyle(4, 0xffffff); // White outline
+        hpFrame.strokeRoundedRect(hpX, hpY - hpHeight, fullWidth, hpHeight, 4);
+        hpFrame.fillStyle(0x000000, 0.8); // Dark background
+        hpFrame.fillRoundedRect(hpX, hpY - hpHeight, fullWidth, hpHeight, 4);
+
+        // 2. HP Fill Bar
+        this.hpBar = this.add.rectangle(hpX + 4, hpY - hpHeight + 4, fullWidth - 8, hpHeight - 8, 0xffcc00)
+            .setOrigin(0, 0);
+
+        // 3. Lightning Icon
+        const hpIcon = this.add.image(hpX - 10, hpY - hpHeight / 2 - 5, 'hp_icon')
+            .setDisplaySize(48, 48)
+            .setOrigin(0.5, 0.5)
+            .setDepth(5);
+
+        // 4. HP Text
+        this.hpText = this.add.text(hpX + fullWidth / 2, hpY - hpHeight / 2, '100 / 100', {
+            fontFamily: '"MedievalSharp", cursive',
+            fontSize: '20px',
             color: '#ffffff',
             fontStyle: 'bold',
             stroke: '#000000',
             strokeThickness: 4
-        }).setOrigin(0.5, 0.5);
+        }).setOrigin(0.5, 0.5).setDepth(6);
+
+        // --- Boss HP Bar (Hidden by default) ---
+        this.bossHpContainer = this.add.container(640, 60).setVisible(false);
+        const bossBarW = 600;
+        const bossBarH = 24;
+
+        const bFrame = this.add.graphics();
+        bFrame.lineStyle(3, 0x888888);
+        bFrame.strokeRect(-bossBarW / 2, -bossBarH / 2, bossBarW, bossBarH);
+        bFrame.fillStyle(0x111111, 0.9);
+        bFrame.fillRect(-bossBarW / 2, -bossBarH / 2, bossBarW, bossBarH);
+
+        this.bossHpBar = this.add.rectangle(-bossBarW / 2 + 3, 0, bossBarW - 6, bossBarH - 6, 0xff0000)
+            .setOrigin(0, 0.5);
+
+        this.bossHpText = this.add.text(0, -bossBarH - 10, 'BOSS HP', {
+            fontSize: '24px', color: '#ffffff', fontStyle: 'bold', stroke: '#000', strokeThickness: 4
+        }).setOrigin(0.5);
+
+        this.bossHpContainer.add([bFrame, this.bossHpBar, this.bossHpText]);
 
         this.coinText = this.add.text(1270, 710, 'Coins: 0', {
             fontSize: '24px',
@@ -179,7 +226,7 @@ export class UIScene extends Phaser.Scene {
             this.scene.start('TitleScene');
         });
 
-        this.uiContainer.add([this.stageLevelText, this.levelText, this.statsText, hpBg, this.hpBar, this.hpText, this.coinText, mmBg1, mmBg2, this.minimapGraphics, this.arrowGraphics, pauseBtn]);
+        this.uiContainer.add([this.stageLevelText, this.levelText, this.statsText, hpFrame, this.hpBar, hpIcon, this.hpText, this.coinText, mmBg1, mmBg2, this.minimapGraphics, this.arrowGraphics, pauseBtn]);
         this.uiContainer.setVisible(false);
 
         this.bossWarningText = this.add.text(640, 360, 'BOSS APPROACHING!', {
@@ -206,6 +253,7 @@ export class UIScene extends Phaser.Scene {
         window.addEventListener('spawning_complete', () => this.spawningComplete = true);
         window.addEventListener('xp_collected', this.handleXp as EventListener);
         window.addEventListener('boss_spawned', this.handleBossSpawn as EventListener);
+        window.addEventListener('boss_hp', this.handleBossHp as EventListener);
         window.addEventListener('hp_updated', this.handleHp as EventListener);
         window.addEventListener('stage_clear', this.handleStageClear as EventListener);
         window.addEventListener('stage_updated', ((e: CustomEvent<number>) => {
@@ -395,11 +443,24 @@ export class UIScene extends Phaser.Scene {
     private handleHp = (e: CustomEvent<{ current: number, max: number }>) => {
         const { current, max } = e.detail;
         const percent = Phaser.Math.Clamp(current / max, 0, 1);
-        this.hpBar.displayWidth = 400 * percent;
+        const fullWidth = 400 - 8;
+        this.hpBar.displayWidth = fullWidth * percent;
         this.hpText.setText(`${Math.ceil(current)} / ${max}`);
-        if (percent > 0.5) this.hpBar.setFillStyle(0x00ff00);
-        else if (percent > 0.2) this.hpBar.setFillStyle(0xffff00);
-        else this.hpBar.setFillStyle(0xff0000);
+
+        // Maintain yellow/gold theme from feedback, but flash red when very low
+        if (percent > 0.15) this.hpBar.setFillStyle(0xffcc00);
+        else this.hpBar.setFillStyle(0xff3300);
+    }
+
+    private handleBossHp = (e: CustomEvent<{ current: number, max: number, name?: string }>) => {
+        if (!this.bossHpContainer || !this.bossHpBar) return;
+        const { current, max, name } = e.detail;
+        this.bossHpContainer.setVisible(current > 0);
+        const percent = Phaser.Math.Clamp(current / max, 0, 1);
+        this.bossHpBar.displayWidth = (600 - 6) * percent;
+        if (name && this.bossHpText) {
+            this.bossHpText.setText(`${name.toUpperCase()} HP`);
+        }
     }
 
     private handleBossSpawn = () => {
