@@ -17,6 +17,7 @@ export class AssetLoader {
         this.scene.load.image('walls', './assets/atlas_walls_high-16x32.png');
         this.scene.load.image('weapon_bow', './assets/frames/weapon_bow.png');
         this.scene.load.image('main_bg', './assets/main.jpg');
+        this.scene.load.image('loading_bg', './assets/loading.jpg');
         for (let i = 0; i < 3; i++) {
             this.scene.load.image(`sword_slash_f${i}`, `./assets/frames/sword_slash_f${i}.png`);
             this.scene.load.image(`super_slash_f${i}`, `./assets/frames/super_slash_f${i}.png`);
