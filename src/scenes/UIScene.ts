@@ -74,7 +74,7 @@ export class UIScene extends Phaser.Scene {
         });
 
         // 2. Coin UI (Redesigned as per user request)
-        this.coinText = this.add.text(10, 45, '0', {
+        this.coinText = this.add.text(10, 55, '0', {
             fontFamily: '"MedievalSharp", cursive',
             fontSize: '28px',
             color: '#ffffff',
@@ -83,12 +83,12 @@ export class UIScene extends Phaser.Scene {
             strokeThickness: 5
         }).setOrigin(0, 0.5);
 
-        this.coinIcon = this.add.image(this.coinText.x + this.coinText.width + 10, 45, 'coin_f0')
+        this.coinIcon = this.add.image(this.coinText.x + this.coinText.width + 10, 55, 'coin_f0')
             .setScale(2.5)
             .setOrigin(0, 0.5);
 
         // 3. Stats Text
-        this.statsText = this.add.text(10, 80, this.getStatsString(), {
+        this.statsText = this.add.text(10, 95, this.getStatsString(), {
             fontSize: '16px',
             color: '#00ff00',
             backgroundColor: '#00000088'
