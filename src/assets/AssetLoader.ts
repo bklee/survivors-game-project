@@ -91,6 +91,7 @@ export class AssetLoader {
         this.scene.load.audio('level_up', './assets/audio/level_up.mp3');
         this.scene.load.audio('victory_fanfare', './assets/audio/victory_fanfare.mp3');
         this.scene.load.audio('coin_pickup', './assets/audio/coin.mp3');
+        this.scene.load.audio('game_over_bgm', './assets/audio/true_love_ost.wav');
     }
 
     loadTextureAtlas() {
