@@ -1,28 +1,21 @@
-#!/usr/bin/expect -f
-set timeout 300
-set password "fconfig1034"
-set host "root@185.169.252.97"
-set localDir "/Users/hangup2/apps/survivors-game-project/dist/"
-set remoteDir "/home/docker/games/survivors"
+#!/bin/bash
+set -e
 
-puts "===> Cleaning remote directory: $remoteDir"
-spawn ssh -o StrictHostKeyChecking=no $host "mkdir -p $remoteDir && rm -rf $remoteDir/*"
-expect {
-    "*assword:*" {
-        send "$password\n"
-        exp_continue
-    }
-    eof
-}
+HOST="root@185.169.252.97"
+KEY="/Users/hangup2/apps/survivors-game-project/.deploy_key"
+LOCAL_DIR="/Users/hangup2/apps/survivors-game-project/dist/"
+REMOTE_DIR="/home/docker/games/survivors"
+SSH_OPTS="-i $KEY -o StrictHostKeyChecking=no"
 
-puts "===> Deploying files using rsync from $localDir to $host:$remoteDir"
-# Using rsync to ensure all directories and files are synced correctly
-spawn rsync -avz -e "ssh -o StrictHostKeyChecking=no" $localDir $host:$remoteDir/
-expect {
-    "*assword:*" {
-        send "$password\n"
-        exp_continue
-    }
-    eof
-}
-puts "===> Deployment finished!
+echo "===> Building project..."
+cd /Users/hangup2/apps/survivors-game-project
+npm run build
+
+echo "===> Cleaning remote directory: $REMOTE_DIR"
+ssh $SSH_OPTS $HOST "mkdir -p $REMOTE_DIR && rm -rf $REMOTE_DIR/*"
+
+echo "===> Deploying files using rsync from $LOCAL_DIR to $HOST:$REMOTE_DIR"
+rsync -avz -e "ssh $SSH_OPTS" $LOCAL_DIR $HOST:$REMOTE_DIR/
+
+echo "===> Deployment finished!"
+echo "===> Live URL: http://185.169.252.97/survivors/"

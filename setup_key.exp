@@ -1,0 +1,22 @@
+#!/usr/bin/expect -f
+set timeout 30
+set password "fconfig1034"
+set host "root@185.169.252.97"
+
+# Read public key content
+set pubkey_file "/Users/hangup2/apps/survivors-game-project/.deploy_key.pub"
+set fp [open $pubkey_file r]
+set pubkey [read $fp]
+close $fp
+set pubkey [string trimright $pubkey "\n"]
+
+puts "===> Copying public key to server..."
+spawn ssh -o StrictHostKeyChecking=no $host "mkdir -p ~/.ssh && echo '$pubkey' >> ~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys && chmod 700 ~/.ssh"
+expect {
+    "*assword:*" {
+        send "$password\n"
+        exp_continue
+    }
+    eof
+}
+puts "===> Key setup complete!"
