@@ -166,7 +166,7 @@ export class UIScene extends Phaser.Scene {
             fontStyle: 'bold',
             stroke: '#000000',
             strokeThickness: 8,
-        }).setOrigin(0.5, 0.5).setVisible(false);
+        }).setOrigin(0.5, 0.5).setVisible(false).setDepth(999);
 
         this.stageClearText = this.add.text(640, 360, 'STAGE CLEAR!', {
             fontSize: '96px',
@@ -174,7 +174,7 @@ export class UIScene extends Phaser.Scene {
             fontStyle: 'bold',
             stroke: '#000000',
             strokeThickness: 10,
-        }).setOrigin(0.5, 0.5).setVisible(false);
+        }).setOrigin(0.5, 0.5).setVisible(false).setDepth(999);
 
         window.addEventListener('game_started', () => {
             this.uiContainer.setVisible(true);
@@ -393,11 +393,11 @@ export class UIScene extends Phaser.Scene {
     }
 
     private handleStageClear = () => {
-        const panel = this.add.rectangle(640, 360, 600, 300, 0x000000, 0.9).setStrokeStyle(4, 0xffd700);
+        const panel = this.add.rectangle(640, 360, 600, 300, 0x000000, 0.9).setStrokeStyle(4, 0xffd700).setDepth(998);
         this.stageClearText.setVisible(true).setPosition(640, 300).setText(`STAGE ${this.currentStage} CLEAR!`);
         const reward = this.add.text(640, 400, "BATTLE REWARD:\nALL STATS +10%", {
             fontSize: '32px', color: '#00ff00', align: 'center', fontStyle: 'bold'
-        }).setOrigin(0.5);
+        }).setOrigin(0.5).setDepth(999);
 
         this.tweens.add({
             targets: [panel, this.stageClearText, reward],
