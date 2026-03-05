@@ -247,6 +247,7 @@ export class MainScene extends Phaser.Scene {
         if (dX !== 0 || dY !== 0) {
             Velocity.x[this.playerId] = dX * 200;
             Velocity.y[this.playerId] = dY * 200;
+            this.spellSystem.setFacing(dX, dY);
         }
 
         this.spellSystem.update(delta);

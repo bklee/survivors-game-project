@@ -29,6 +29,14 @@ export class SpellSystem {
         });
     }
 
+    public setFacing(ix: number, iy: number) {
+        const mag = Math.sqrt(ix * ix + iy * iy);
+        if (mag > 0.01) {
+            this.lastFacingX = ix / mag;
+            this.lastFacingY = iy / mag;
+        }
+    }
+
     private updateFacingFromKeys() {
         let ix = 0, iy = 0;
         if (this.keys['KeyW'] || this.keys['ArrowUp']) iy -= 1;
@@ -36,11 +44,7 @@ export class SpellSystem {
         if (this.keys['KeyA'] || this.keys['ArrowLeft']) ix -= 1;
         if (this.keys['KeyD'] || this.keys['ArrowRight']) ix += 1;
 
-        const mag = Math.sqrt(ix * ix + iy * iy);
-        if (mag > 0) {
-            this.lastFacingX = ix / mag;
-            this.lastFacingY = iy / mag;
-        }
+        this.setFacing(ix, iy);
     }
 
     public update(dt: number) {
