@@ -12,14 +12,35 @@ export class SpellSystem {
     public selectedCharId: string = 'wizard';
     private autoAttackTimer: number = 0;
 
+    private keys: Record<string, boolean> = {};
 
     constructor() {
-        // Space still manual if desired, but adding auto-attack
+        // Track keyboard input for attack direction
         window.addEventListener('keydown', (e) => {
+            this.keys[e.code] = true;
             if (e.code === 'Space') {
                 this.castSpell('basic');
             }
+            this.updateFacingFromKeys();
         });
+        window.addEventListener('keyup', (e) => {
+            this.keys[e.code] = false;
+            this.updateFacingFromKeys();
+        });
+    }
+
+    private updateFacingFromKeys() {
+        let ix = 0, iy = 0;
+        if (this.keys['KeyW'] || this.keys['ArrowUp']) iy -= 1;
+        if (this.keys['KeyS'] || this.keys['ArrowDown']) iy += 1;
+        if (this.keys['KeyA'] || this.keys['ArrowLeft']) ix -= 1;
+        if (this.keys['KeyD'] || this.keys['ArrowRight']) ix += 1;
+
+        const mag = Math.sqrt(ix * ix + iy * iy);
+        if (mag > 0) {
+            this.lastFacingX = ix / mag;
+            this.lastFacingY = iy / mag;
+        }
     }
 
     public update(dt: number) {
@@ -44,15 +65,6 @@ export class SpellSystem {
 
         const px = Position.x[playerEid];
         const py = Position.y[playerEid];
-        const pvx = Velocity.x[playerEid];
-        const pvy = Velocity.y[playerEid];
-
-        const playerSpeedSq = pvx * pvx + pvy * pvy;
-        if (playerSpeedSq > 0.0001) {
-            const playerSpeed = Math.sqrt(playerSpeedSq);
-            this.lastFacingX = pvx / playerSpeed;
-            this.lastFacingY = pvy / playerSpeed;
-        }
 
         if ((this.spellCooldowns.get(spellId) ?? 0) > 0) return;
         this.spellCooldowns.set(spellId, 500 * globalStats.cooldownMult);
