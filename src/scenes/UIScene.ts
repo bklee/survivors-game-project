@@ -47,11 +47,7 @@ export class UIScene extends Phaser.Scene {
     create() {
         this.uiContainer = this.add.container(0, 0);
 
-        const title = this.add.text(10, 10, "Alchemist's Night", {
-            fontSize: '24px',
-            color: '#ffffff',
-            fontStyle: 'bold'
-        });
+
 
         this.stageLevelText = this.add.text(640, 10, "Stage 1", {
             fontSize: '28px',
@@ -158,7 +154,7 @@ export class UIScene extends Phaser.Scene {
             pauseBtn.setText('⏸');
         });
 
-        this.uiContainer.add([title, this.stageLevelText, this.levelText, this.statsText, hpBg, this.hpBar, this.hpText, this.coinText, mmBg1, mmBg2, this.minimapGraphics, this.arrowGraphics, pauseBtn]);
+        this.uiContainer.add([this.stageLevelText, this.levelText, this.statsText, hpBg, this.hpBar, this.hpText, this.coinText, mmBg1, mmBg2, this.minimapGraphics, this.arrowGraphics, pauseBtn]);
         this.uiContainer.setVisible(false);
 
         this.bossWarningText = this.add.text(640, 360, 'BOSS APPROACHING!', {
