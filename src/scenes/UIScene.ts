@@ -50,6 +50,18 @@ export class UIScene extends Phaser.Scene {
     }
 
     create() {
+        // --- Reset State for Fresh Start ---
+        this.currentLevel = 1;
+        this.currentStage = 1;
+        this.currentXp = 0;
+        this.xpToNextLevel = 100;
+        this.totalCoins = 0;
+        this.skillPoints = 0;
+        this.spawningComplete = false;
+        this.dungeonMap = [];
+        this.discoveredMap = [];
+        // ------------------------------------
+
         this.uiContainer = this.add.container(0, 0);
 
         this.stageLevelText = this.add.text(640, 10, "Stage 1", {
@@ -253,38 +265,62 @@ export class UIScene extends Phaser.Scene {
             strokeThickness: 10,
         }).setOrigin(0.5, 0.5).setVisible(false).setDepth(999);
 
-        window.addEventListener('game_started', () => {
-            this.uiContainer.setVisible(true);
-            this.joystick.setVisible(true);
+        this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+            window.removeEventListener('game_started', gameStartedHandler);
+            window.removeEventListener('spawning_complete', spawningCompleteHandler);
+            window.removeEventListener('xp_collected', this.handleXp as EventListener);
+            window.removeEventListener('boss_spawned', this.handleBossSpawn as EventListener);
+            window.removeEventListener('boss_hp', this.handleBossHp as EventListener);
+            window.removeEventListener('hp_updated', this.handleHp as EventListener);
+            window.removeEventListener('stage_clear', this.handleStageClear as EventListener);
+            window.removeEventListener('stage_updated', stageUpdatedHandler);
+            window.removeEventListener('player_died', playerDiedHandler);
+            window.removeEventListener('map_generated', mapGeneratedHandler);
+            this.bossWarningTween?.stop();
         });
 
-        window.addEventListener('spawning_complete', () => this.spawningComplete = true);
+        // Store handlers to be able to remove them
+        const gameStartedHandler = () => {
+            this.uiContainer.setVisible(true);
+            this.joystick.setVisible(true);
+        };
+        const spawningCompleteHandler = () => this.spawningComplete = true;
+        const stageUpdatedHandler = ((e: CustomEvent<number>) => {
+            this.currentStage = e.detail;
+            this.spawningComplete = false;
+            this.updateStageLevelText();
+        }) as EventListener;
+        const playerDiedHandler = () => this.sound.stopAll();
+        const mapGeneratedHandler = ((e: CustomEvent<number[][]>) => {
+            this.dungeonMap = e.detail;
+            const h = this.dungeonMap.length;
+            const w = h > 0 ? this.dungeonMap[0].length : 0;
+            this.discoveredMap = Array.from({ length: h }, () => Array(w).fill(false));
+        }) as EventListener;
+
+        window.addEventListener('game_started', gameStartedHandler);
+        window.addEventListener('spawning_complete', spawningCompleteHandler);
         window.addEventListener('xp_collected', this.handleXp as EventListener);
         window.addEventListener('boss_spawned', this.handleBossSpawn as EventListener);
         window.addEventListener('boss_hp', this.handleBossHp as EventListener);
         window.addEventListener('hp_updated', this.handleHp as EventListener);
         window.addEventListener('stage_clear', this.handleStageClear as EventListener);
-        window.addEventListener('stage_updated', ((e: CustomEvent<number>) => {
-            this.currentStage = e.detail;
-            this.spawningComplete = false;
-            this.updateStageLevelText();
-        }) as EventListener);
+        window.addEventListener('stage_updated', stageUpdatedHandler);
+        window.addEventListener('player_died', playerDiedHandler);
+        window.addEventListener('map_generated', mapGeneratedHandler);
 
-        window.addEventListener('player_died', () => this.sound.stopAll());
-        window.addEventListener('map_generated', ((e: CustomEvent<number[][]>) => {
-            this.dungeonMap = e.detail;
-            const h = this.dungeonMap.length;
-            const w = h > 0 ? this.dungeonMap[0].length : 0;
-            this.discoveredMap = Array.from({ length: h }, () => Array(w).fill(false));
-        }) as EventListener);
+        // If game is already started (could happen if UIScene is launched late), make it visible
+        const mainScene = this.scene.get('MainScene') as any;
+        if (mainScene && mainScene.scene.isActive()) {
+            this.uiContainer.setVisible(true);
+            this.joystick.setVisible(true);
+        }
 
-        this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
-            window.removeEventListener('xp_collected', this.handleXp as EventListener);
-            window.removeEventListener('boss_spawned', this.handleBossSpawn as EventListener);
-            window.removeEventListener('hp_updated', this.handleHp as EventListener);
-            window.removeEventListener('stage_clear', this.handleStageClear as EventListener);
-            this.bossWarningTween?.stop();
-        });
+        // --- Initial Display Update ---
+        this.updateStageLevelText();
+        this.coinText.setText(this.totalCoins.toLocaleString());
+        this.coinIcon.x = this.coinText.x + this.coinText.width + 10;
+        // ------------------------------
     }
 
     private getStatsString() {
