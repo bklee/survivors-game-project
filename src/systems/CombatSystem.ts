@@ -5,11 +5,22 @@ import { JuicePipeline } from '../fx/JuicePipeline';
 import { enemySpatialHash } from './PhysicsSystem';
 
 const spellQuery = defineQuery([Position, Spell]);
+const playerHealthQuery = defineQuery([Player, Position, Health]);
+const enemyContactQuery = defineQuery([Enemy, Position]);
+const enemyDeathQuery = defineQuery([Enemy, Position, Health]);
+const enemyProjQuery = defineQuery([EnemyProjectile, Position]);
+
+let lastSoundTime = 0;
+const SOUND_THROTTLE_MS = 50;
+let dmgNumbersThisFrame = 0;
+const MAX_DMG_NUMBERS_PER_FRAME = 8;
 
 export const createCombatSystem = (juice: JuicePipeline) => {
     return (dt: number) => {
         const deltaSec = dt / 1000;
-        const players = defineQuery([Player, Position, Health])(world);
+        const now = performance.now();
+        dmgNumbersThisFrame = 0;
+        const players = playerHealthQuery(world);
 
         if (players.length > 0) {
             const playerEid = players[0];
@@ -17,7 +28,7 @@ export const createCombatSystem = (juice: JuicePipeline) => {
             const py = Position.y[playerEid];
 
             // 1. Enemy -> Player Damage (Contact)
-            const enemies = defineQuery([Enemy, Position])(world);
+            const enemies = enemyContactQuery(world);
             for (let i = 0; i < enemies.length; i++) {
                 const eeid = enemies[i];
                 if (hasComponent(world, Boss, eeid)) continue;
@@ -33,7 +44,7 @@ export const createCombatSystem = (juice: JuicePipeline) => {
             }
 
             // 2. Projectile -> Player Damage & Lifespan Evaluation
-            const eProjectiles = defineQuery([EnemyProjectile, Position])(world);
+            const eProjectiles = enemyProjQuery(world);
             for (let i = 0; i < eProjectiles.length; i++) {
                 const epid = eProjectiles[i];
 
@@ -83,7 +94,10 @@ export const createCombatSystem = (juice: JuicePipeline) => {
                 const dx = tx - sx;
                 const dy = ty - sy;
                 if (dx * dx + dy * dy <= sRadius * sRadius) {
-                    window.dispatchEvent(new CustomEvent('play_sound', { detail: 'hit' }));
+                    if (now - lastSoundTime > SOUND_THROTTLE_MS) {
+                        window.dispatchEvent(new CustomEvent('play_sound', { detail: 'hit' }));
+                        lastSoundTime = now;
+                    }
 
                     const typeId = SpriteInfo.textureIndex[eid];
                     if (typeId === 100) {
@@ -97,7 +111,10 @@ export const createCombatSystem = (juice: JuicePipeline) => {
                     }
 
                     Health.current[targetId] -= Spell.damage[eid];
-                    juice.damageNumber(tx, ty, Spell.damage[eid]);
+                    if (dmgNumbersThisFrame < MAX_DMG_NUMBERS_PER_FRAME) {
+                        juice.damageNumber(tx, ty, Spell.damage[eid]);
+                        dmgNumbersThisFrame++;
+                    }
                     juice.hitStop(10);
 
                     Spell.pierce[eid] -= 1;
@@ -110,7 +127,7 @@ export const createCombatSystem = (juice: JuicePipeline) => {
         }
 
         // Generic Enemy Death Check
-        const allEnemies = defineQuery([Enemy, Position, Health])(world);
+        const allEnemies = enemyDeathQuery(world);
         for (let i = 0; i < allEnemies.length; i++) {
             const targetId = allEnemies[i];
             if (Health.current[targetId] <= 0) {
