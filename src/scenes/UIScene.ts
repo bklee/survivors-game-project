@@ -99,15 +99,20 @@ export class UIScene extends Phaser.Scene {
         hpFrame.fillStyle(0x000000, 0.8); // Dark background
         hpFrame.fillRoundedRect(hpX, hpY - hpHeight, fullWidth, hpHeight, 4);
 
-        // 2. HP Fill Bar
+        // 2. HP Fill Bar (with shine mask)
         this.hpBar = this.add.rectangle(hpX + 4, hpY - hpHeight + 4, fullWidth - 8, hpHeight - 8, 0xffcc00)
             .setOrigin(0, 0);
 
-        // 3. Lightning Icon
-        const hpIcon = this.add.image(hpX + 10, hpY - hpHeight / 2, 'hp_icon')
-            .setDisplaySize(40, 40)
+        // Add a subtle shine/highlight effect on top of the bar
+        const shine = this.add.graphics();
+        shine.fillStyle(0xffffff, 0.2);
+        shine.fillRect(hpX + 4, hpY - hpHeight + 4, fullWidth - 8, (hpHeight - 8) / 2);
+
+        // 3. Heart Icon 
+        const hpIcon = this.add.image(hpX + 15, hpY - hpHeight / 2, 'hp_icon')
+            .setDisplaySize(32, 32) // Reverted to original size 
             .setOrigin(0.5, 0.5)
-            .setDepth(5);
+            .setDepth(20);
 
         // 4. HP Text
         this.hpText = this.add.text(hpX + fullWidth / 2, hpY - hpHeight / 2, '100 / 100', {
@@ -226,7 +231,7 @@ export class UIScene extends Phaser.Scene {
             this.scene.start('TitleScene');
         });
 
-        this.uiContainer.add([this.stageLevelText, this.levelText, this.statsText, hpFrame, this.hpBar, hpIcon, this.hpText, this.coinText, mmBg1, mmBg2, this.minimapGraphics, this.arrowGraphics, pauseBtn]);
+        this.uiContainer.add([this.stageLevelText, this.levelText, this.statsText, hpFrame, this.hpBar, shine, hpIcon, this.hpText, this.coinText, mmBg1, mmBg2, this.minimapGraphics, this.arrowGraphics, pauseBtn]);
         this.uiContainer.setVisible(false);
 
         this.bossWarningText = this.add.text(640, 360, 'BOSS APPROACHING!', {
@@ -447,9 +452,9 @@ export class UIScene extends Phaser.Scene {
         this.hpBar.displayWidth = fullWidth * percent;
         this.hpText.setText(`${Math.ceil(current)} / ${max}`);
 
-        // Maintain yellow/gold theme from feedback, but flash red when below 20%
+        // Use pure red for 20% warning
         if (percent > 0.20) this.hpBar.setFillStyle(0xffcc00);
-        else this.hpBar.setFillStyle(0xff3300);
+        else this.hpBar.setFillStyle(0xff0000);
     }
 
     private handleBossHp = (e: CustomEvent<{ current: number, max: number, name?: string }>) => {
