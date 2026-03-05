@@ -14,75 +14,7 @@ export class CharacterSelectScene extends Phaser.Scene {
             .setDisplaySize(width, height)
             .setAlpha(0.6);
 
-        // Medieval Theme Overlay (Start Button Container)
-        const overlay = this.add.container(0, 0).setDepth(1000);
 
-        const darkBg = this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.7);
-        overlay.add(darkBg);
-
-        // Start Button Graphics
-        const btnWidth = 400;
-        const btnHeight = 100;
-        const btnX = width / 2;
-        const btnY = height / 2;
-
-        const btnBg = this.add.rectangle(btnX, btnY, btnWidth, btnHeight, 0x3d2b1f, 1)
-            .setStrokeStyle(4, 0xd4af37)
-            .setInteractive({ useHandCursor: true });
-
-        const btnText = this.add.text(btnX, btnY, 'START GAME', {
-            fontFamily: '"MedievalSharp", cursive',
-            fontSize: '48px',
-            color: '#ffd700',
-            fontStyle: 'bold'
-        }).setOrigin(0.5);
-
-        overlay.add([btnBg, btnText]);
-
-        // Button Interactions
-        btnBg.on('pointerover', () => {
-            btnBg.setFillStyle(0x5d4037);
-            this.tweens.add({
-                targets: btnText,
-                scale: 1.1,
-                duration: 200
-            });
-        });
-
-        btnBg.on('pointerout', () => {
-            btnBg.setFillStyle(0x3d2b1f);
-            this.tweens.add({
-                targets: btnText,
-                scale: 1.0,
-                duration: 200
-            });
-        });
-
-        btnBg.on('pointerdown', () => {
-            // Click effect
-            btnBg.setScale(0.95);
-            this.sound.play('select_bgm', { volume: 0.5 }); // Quick sound feedback
-
-            // Unlock audio context
-            if ((this.sound as any).context?.state === 'suspended') {
-                (this.sound as any).context.resume();
-            }
-
-            // Play select BGM if not already playing
-            if (!this.sound.get('select_bgm') && this.cache.audio.exists('select_bgm')) {
-                this.sound.play('select_bgm', { loop: true, volume: 0.4 });
-            }
-
-            // Fade out everything
-            this.tweens.add({
-                targets: overlay,
-                alpha: 0,
-                duration: 600,
-                onComplete: () => {
-                    overlay.destroy();
-                }
-            });
-        });
 
         // Title
         this.add.text(width / 2, 100, 'CHOOSE YOUR HERO!', {
