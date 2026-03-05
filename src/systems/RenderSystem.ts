@@ -103,7 +103,8 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                 else if (typeId === 110) charKey = 'super_slash';
             }
 
-            const requiresSprite = typeId >= 100 || (typeId >= 60 && typeId <= 82) || typeId >= 50 || typeId === 36 || typeId === 21 || hasComponent(world, Rotation, eid);
+            const isPlayer = hasComponent(world, Player, eid);
+            const requiresSprite = isPlayer || typeId >= 100 || (typeId >= 60 && typeId <= 82) || typeId >= 50 || typeId === 36 || typeId === 21 || hasComponent(world, Rotation, eid);
 
             // 2. Identify State (Idle vs Run)
             let state = 'idle';
@@ -189,7 +190,13 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                 if (!sprite) {
                     if (charKey === 'weapon_bow') sprite = _scene.add.sprite(Position.x[eid], Position.y[eid], 'weapon_bow');
                     else sprite = _scene.add.sprite(Position.x[eid], Position.y[eid], textureKey, finalFrame === '' ? undefined : finalFrame as any);
-                    sprite.setDepth(10);
+
+                    let depth = 10;
+                    if (isPlayer) depth = 30; // Player on top of everything
+                    else if (typeId >= 100) depth = 20; // Spells above enemies
+                    else if (typeId >= 60 && typeId <= 89) depth = 15; // Enemies above props
+
+                    sprite.setDepth(depth);
                     sprites[eid] = sprite;
                 } else {
                     sprite.setPosition(Position.x[eid], Position.y[eid]);
