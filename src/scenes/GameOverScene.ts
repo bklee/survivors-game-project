@@ -11,11 +11,16 @@ export class GameOverScene extends Phaser.Scene {
         // 0. Fade In Effect when scene starts
         this.cameras.main.fadeIn(1000, 0, 0, 0);
 
+        // 0.5 Play Game Over BGM
+        if (this.cache.audio.exists('game_over_bgm')) {
+            this.sound.play('game_over_bgm', { loop: true, volume: 0.5 });
+        }
+
         // 1. Background Image (game_over.png)
         this.add.image(width / 2, height / 2, 'game_over')
             .setDisplaySize(width, height);
 
-        // 2. Clearer overlay
+        // 2. Overlay
         this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.2);
 
         // 3. Retry Button
@@ -31,12 +36,12 @@ export class GameOverScene extends Phaser.Scene {
         }).setOrigin(0.5);
 
         retryBtn.on('pointerdown', () => {
+            // Stop all sounds including Game Over BGM
             this.sound.stopAll();
 
             // Fade out and transition
             this.cameras.main.fadeOut(800, 0, 0, 0);
             this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => {
-                // Return to TitleScene to ensure clean state initialization
                 this.scene.start('TitleScene');
             });
         });
