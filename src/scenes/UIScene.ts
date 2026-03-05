@@ -60,8 +60,7 @@ export class UIScene extends Phaser.Scene {
         const { width, height } = this.scale;
         this.joystick = new VirtualJoystick(this, width / 2, height - 100, 60);
         this.joystick.setVisible(false);
-
-        this.levelText = this.add.text(10, 45, "Level 1 (0 / 100 XP) | SP: 0", {
+        this.levelText = this.add.text(10, 10, "Level 1 (0 / 100 XP) | SP: 0", {
             fontSize: '20px',
             color: '#00ffff',
             fontStyle: 'bold',
@@ -69,7 +68,7 @@ export class UIScene extends Phaser.Scene {
             strokeThickness: 3
         });
 
-        this.statsText = this.add.text(10, 80, this.getStatsString(), {
+        this.statsText = this.add.text(10, 45, this.getStatsString(), {
             fontSize: '16px',
             color: '#00ff00',
             backgroundColor: '#00000088'
