@@ -42,7 +42,8 @@ export class GameOverScene extends Phaser.Scene {
             // Fade out and transition
             this.cameras.main.fadeOut(800, 0, 0, 0);
             this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => {
-                this.scene.start('TitleScene');
+                // Go straight to character select as requested
+                this.scene.start('CharacterSelectScene');
             });
         });
 
