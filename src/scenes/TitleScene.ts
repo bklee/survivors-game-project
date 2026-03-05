@@ -8,50 +8,37 @@ export class TitleScene extends Phaser.Scene {
     create() {
         const { width, height } = this.scale;
 
-        // Background Image
-        this.add.image(width / 2, height / 2, 'main_bg')
+        // Background Image becomes the interactive area (since button is in the image)
+        const bg = this.add.image(width / 2, height / 2, 'main_bg')
             .setDisplaySize(width, height)
-            .setAlpha(1.0);
-
-        // Start Button Graphics
-        const btnWidth = 400;
-        const btnHeight = 100;
-        const btnX = width / 2;
-        const btnY = height / 2 + 200; // Position below the center
-
-        const btnBg = this.add.rectangle(btnX, btnY, btnWidth, btnHeight, 0x3d2b1f, 1)
-            .setStrokeStyle(4, 0xd4af37)
             .setInteractive({ useHandCursor: true });
 
-        const btnText = this.add.text(btnX, btnY, 'START GAME', {
-            fontFamily: '"MedievalSharp", cursive',
-            fontSize: '48px',
-            color: '#ffd700',
-            fontStyle: 'bold'
-        }).setOrigin(0.5);
-
-        // Button Interactions
-        btnBg.on('pointerover', () => {
-            btnBg.setFillStyle(0x5d4037);
+        // Hover effect: Brighten slightly by setting tint or just scale up slightly
+        bg.on('pointerover', () => {
             this.tweens.add({
-                targets: btnText,
-                scale: 1.1,
+                targets: bg,
+                scale: 1.02,
                 duration: 200
             });
         });
 
-        btnBg.on('pointerout', () => {
-            btnBg.setFillStyle(0x3d2b1f);
+        bg.on('pointerout', () => {
             this.tweens.add({
-                targets: btnText,
+                targets: bg,
                 scale: 1.0,
                 duration: 200
             });
         });
 
-        btnBg.on('pointerdown', () => {
-            // Click effect
-            btnBg.setScale(0.95);
+        bg.on('pointerdown', () => {
+            // Click effect: Shrink quickly
+            this.tweens.add({
+                targets: bg,
+                scale: 0.95,
+                duration: 100,
+                yoyo: true
+            });
+
             if (this.cache.audio.exists('select_bgm')) {
                 this.sound.play('select_bgm', { volume: 0.5 }); // Quick sound feedback
             }
@@ -71,16 +58,6 @@ export class TitleScene extends Phaser.Scene {
             this.cameras.main.once('camerafadeoutcomplete', () => {
                 this.scene.start('CharacterSelectScene');
             });
-        });
-
-        // Add a pulsing effect to the button background
-        this.tweens.add({
-            targets: btnBg,
-            alpha: 0.8,
-            duration: 1000,
-            yoyo: true,
-            repeat: -1,
-            ease: 'Sine.easeInOut'
         });
     }
 }
