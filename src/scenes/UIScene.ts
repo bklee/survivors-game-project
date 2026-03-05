@@ -104,8 +104,8 @@ export class UIScene extends Phaser.Scene {
             .setOrigin(0, 0);
 
         // 3. Lightning Icon
-        const hpIcon = this.add.image(hpX - 10, hpY - hpHeight / 2 - 5, 'hp_icon')
-            .setDisplaySize(48, 48)
+        const hpIcon = this.add.image(hpX + 10, hpY - hpHeight / 2, 'hp_icon')
+            .setDisplaySize(40, 40)
             .setOrigin(0.5, 0.5)
             .setDepth(5);
 
@@ -447,8 +447,8 @@ export class UIScene extends Phaser.Scene {
         this.hpBar.displayWidth = fullWidth * percent;
         this.hpText.setText(`${Math.ceil(current)} / ${max}`);
 
-        // Maintain yellow/gold theme from feedback, but flash red when very low
-        if (percent > 0.15) this.hpBar.setFillStyle(0xffcc00);
+        // Maintain yellow/gold theme from feedback, but flash red when below 20%
+        if (percent > 0.20) this.hpBar.setFillStyle(0xffcc00);
         else this.hpBar.setFillStyle(0xff3300);
     }
 
