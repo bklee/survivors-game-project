@@ -13,7 +13,7 @@ export class GameOverScene extends Phaser.Scene {
 
         // 0.5 Play Game Over BGM
         if (this.cache.audio.exists('game_over_bgm')) {
-            this.sound.play('game_over_bgm', { loop: true, volume: 0.5 });
+            this.sound.play('game_over_bgm', { loop: true, volume: 0.65 });
         }
 
         // 1. Background Image (game_over.png)
