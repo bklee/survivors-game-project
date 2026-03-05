@@ -138,6 +138,19 @@ export class MainScene extends Phaser.Scene {
         const nextStageHandler = () => {
             this.currentStage++;
             this.isPausedForClear = false;
+
+            // Remove old props, items, and spells from previous stage
+            const allEntities = defineQuery([Position, SpriteInfo])(world);
+            for (let i = 0; i < allEntities.length; i++) {
+                const eid = allEntities[i];
+                if (eid === this.playerId) continue; // Keep player
+                const tid = SpriteInfo.textureIndex[eid];
+                // Props (32-36), Items/Coins (20-21), Spells (100+), Enemies (60-89)
+                if ((tid >= 20 && tid <= 36) || tid >= 60) {
+                    removeEntity(world, eid);
+                }
+            }
+
             this.buildMap(this.currentStage);
 
             const startPos = this.dungeon.getRandomFloorPixel();
@@ -151,6 +164,9 @@ export class MainScene extends Phaser.Scene {
             window.dispatchEvent(new CustomEvent('hp_updated', {
                 detail: { current: Health.current[this.playerId], max: Health.max[this.playerId] }
             }));
+
+            // Re-spawn props on new map
+            this.spawnDungeonProps();
 
             this.startBGM('main_bgm');
             window.dispatchEvent(new CustomEvent('stage_updated', { detail: this.currentStage }));
