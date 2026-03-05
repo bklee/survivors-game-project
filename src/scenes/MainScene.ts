@@ -49,6 +49,25 @@ export class MainScene extends Phaser.Scene {
     }
 
     create() {
+        // --- Fresh Start Reset ---
+        // 1. Clear Bitecs World
+        const allEntities = defineQuery([Position])(world);
+        for (let i = 0; i < allEntities.length; i++) {
+            removeEntity(world, allEntities[i]);
+        }
+
+        // 2. Reset Global Stats
+        globalStats.damageMult = 1;
+        globalStats.moveSpeedMult = 1;
+        globalStats.cooldownMult = 1;
+        globalStats.pickupRadiusMult = 1;
+
+        // 3. Ensure UIScene is running
+        if (!this.scene.isActive('UIScene')) {
+            this.scene.launch('UIScene');
+        }
+        // -------------------------
+
         this.currentStage = 1;
         this.isPausedForClear = false;
 
