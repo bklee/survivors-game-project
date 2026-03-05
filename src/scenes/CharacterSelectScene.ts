@@ -10,7 +10,7 @@ export class CharacterSelectScene extends Phaser.Scene {
         const { width, height } = this.scale;
 
         // Background Image
-        this.add.image(width / 2, height / 2, 'main_bg')
+        this.add.image(width / 2, height / 2, 'loading_bg')
             .setDisplaySize(width, height)
             .setAlpha(0.6);
 
