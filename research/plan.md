@@ -1,4 +1,4 @@
-# Alchemist's Night: 구현 계획 (Implementation Plan)
+# Survivors Game: 구현 계획 (Implementation Plan)
 
 ## 1. 프로젝트 아키텍처 (Project Architecture)
 
