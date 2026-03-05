@@ -137,6 +137,10 @@ export class MainScene extends Phaser.Scene {
                 this.currentStage = 2; // Will become 3 in nextStageHandler
                 window.dispatchEvent(new CustomEvent('next_stage'));
             }
+            // Debug: Trigger stage clear
+            if (e.code === 'KeyC' && e.shiftKey) {
+                window.dispatchEvent(new CustomEvent('stage_clear'));
+            }
         };
         window.addEventListener('keydown', recipeHandler);
 
