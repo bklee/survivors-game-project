@@ -177,13 +177,16 @@ export class MainScene extends Phaser.Scene {
             // Re-spawn props on new map
             this.spawnDungeonProps();
 
-            // Alternating BGM based on stage parity to keep it fresh
+            // Stop any ongoing sounds (like victory fanfare) before starting a new stage
+            this.sound.stopAll();
+
+            // Random BGM selection for normal stages, specific for boss stages
             if (this.currentStage % 3 === 0) {
                 this.startBGM('boss_bgm');
-            } else if (this.currentStage % 2 === 0) {
-                this.startBGM('select_bgm'); // Using hero_reprise as alternate stage music
             } else {
-                this.startBGM('main_bgm');
+                const normalBGMs = ['main_bgm', 'bgm_metal', 'bgm_unchained'];
+                const randomBGM = normalBGMs[Math.floor(Math.random() * normalBGMs.length)];
+                this.startBGM(randomBGM);
             }
             window.dispatchEvent(new CustomEvent('stage_updated', { detail: this.currentStage }));
         };
