@@ -234,13 +234,13 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                     if (!wSprite) {
                         const weaponTex = charKey === 'knight' ? 'weapon_knight_sword' : 'weapon_green_magic_staff';
                         wSprite = _scene.add.sprite(Position.x[eid], Position.y[eid], weaponTex);
-                        wSprite.setOrigin(0.5, 0.8);
+                        wSprite.setOrigin(0.5, charKey === 'wizard' ? 0.5 : 0.8);
                         wSprite.setDepth(31);
                         playerWeaponSprites[eid] = wSprite;
                     }
 
-                    const wx = charKey === 'wizard' ? 6 : 8;
-                    const wy = charKey === 'wizard' ? -4 : 2;
+                    const wx = charKey === 'wizard' ? 7 : 8;
+                    const wy = charKey === 'wizard' ? 2 : 2;
                     let baseRot = charKey === 'knight' ? Math.PI / 6 : 0;
 
                     let swingRot = 0;
