@@ -225,7 +225,17 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                     if (Velocity.x[eid] < 0) sprite.flipX = true;
                     else if (Velocity.x[eid] > 0) sprite.flipX = false;
                 }
-                if (hasComponent(world, Rotation, eid)) sprite.rotation = Rotation.angle[eid];
+                if (hasComponent(world, Rotation, eid)) {
+                    sprite.rotation = Rotation.angle[eid];
+                    if (typeId === 109 || typeId === 110) {
+                        sprite.flipX = true; // Sprite natively faces left, force it right so rotation 0 aligns right
+                        if (hasComponent(world, Velocity, eid)) {
+                            sprite.flipY = Velocity.x[eid] < 0; // Prevent upside down bottom-to-top swings for backwards attacks
+                        } else {
+                            sprite.flipY = false;
+                        }
+                    }
+                }
                 if (typeId === 104) sprite.tint = 0xffff00;
 
                 // Render specific player weapons
