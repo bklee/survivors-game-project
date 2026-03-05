@@ -30,9 +30,17 @@ const MONSTER_CONFIG: Record<number, { name: string, hasIdleRun: boolean, frames
 const renderQuery = defineQuery([Position, SpriteInfo]);
 const bobs: (Phaser.GameObjects.Bob | undefined)[] = [];
 const sprites: (Phaser.GameObjects.Sprite | undefined)[] = [];
+const playerWeaponSprites: (Phaser.GameObjects.Sprite | undefined)[] = [];
+let playerAttackTimer = 0;
+
+window.addEventListener('combo_cast', () => {
+    playerAttackTimer = 150;
+});
 
 export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObjects.Blitter) => {
     return (dt: number) => {
+        if (playerAttackTimer > 0) playerAttackTimer -= dt;
+
         const ents = renderQuery(world);
         const activeEids = new Set(ents);
 
@@ -219,6 +227,44 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                 }
                 if (hasComponent(world, Rotation, eid)) sprite.rotation = Rotation.angle[eid];
                 if (typeId === 104) sprite.tint = 0xffff00;
+
+                // Render specific player weapons
+                if (isPlayer && (charKey === 'knight' || charKey === 'wizard')) {
+                    let wSprite = playerWeaponSprites[eid];
+                    if (!wSprite) {
+                        const weaponTex = charKey === 'knight' ? 'weapon_knight_sword' : 'weapon_green_magic_staff';
+                        wSprite = _scene.add.sprite(Position.x[eid], Position.y[eid], weaponTex);
+                        wSprite.setOrigin(0.5, 0.8);
+                        wSprite.setDepth(31);
+                        playerWeaponSprites[eid] = wSprite;
+                    }
+
+                    const wx = charKey === 'wizard' ? 6 : 8;
+                    const wy = charKey === 'wizard' ? -4 : 2;
+                    let baseRot = charKey === 'knight' ? Math.PI / 6 : 0;
+
+                    let swingRot = 0;
+                    if (playerAttackTimer > 0) {
+                        const progress = 1 - (playerAttackTimer / 150);
+                        if (charKey === 'knight') swingRot = Math.sin(progress * Math.PI) * Math.PI / 2;
+                        else swingRot = Math.sin(progress * Math.PI) * (Math.PI / 4);
+                    } else if (state === 'run') {
+                        swingRot = Math.sin(Animation.timer[eid] / 100) * 0.15;
+                    }
+
+                    if (sprite.flipX) {
+                        wSprite.setPosition(Position.x[eid] - wx, Position.y[eid] + wy);
+                        wSprite.flipX = true;
+                        wSprite.rotation = -baseRot - swingRot;
+                    } else {
+                        wSprite.setPosition(Position.x[eid] + wx, Position.y[eid] + wy);
+                        wSprite.flipX = false;
+                        wSprite.rotation = baseRot + swingRot;
+                    }
+                    wSprite.setVisible(true);
+                    wSprite.alpha = currentAlpha;
+                }
+
             } else {
                 if (sprites[eid]) { sprites[eid]!.destroy(); sprites[eid] = undefined; }
                 const frameObj = blitter.texture.get(finalFrame.toString());
@@ -255,6 +301,9 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
         }
         for (let i = 0; i < sprites.length; i++) {
             if (sprites[i] && !activeEids.has(i)) { sprites[i]!.destroy(); sprites[i] = undefined; }
+        }
+        for (let i = 0; i < playerWeaponSprites.length; i++) {
+            if (playerWeaponSprites[i] && !activeEids.has(i)) { playerWeaponSprites[i]!.destroy(); playerWeaponSprites[i] = undefined; }
         }
     };
 };
