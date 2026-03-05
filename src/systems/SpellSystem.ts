@@ -12,7 +12,10 @@ export class SpellSystem {
     public selectedCharId: string = 'wizard';
     private autoAttackTimer: number = 0;
 
-    constructor() {
+    private scene: Phaser.Scene;
+
+    constructor(scene: Phaser.Scene) {
+        this.scene = scene;
         // Space still manual if desired, but adding auto-attack
         window.addEventListener('keydown', (e) => {
             if (e.code === 'Space') {
@@ -43,14 +46,28 @@ export class SpellSystem {
 
         const px = Position.x[playerEid];
         const py = Position.y[playerEid];
-        const pvx = Velocity.x[playerEid];
-        const pvy = Velocity.y[playerEid];
+        // Target direction based on cursor
+        const pointer = this.scene.input.activePointer;
+        const targetX = pointer.worldX;
+        const targetY = pointer.worldY;
 
-        const playerSpeedSq = pvx * pvx + pvy * pvy;
-        if (playerSpeedSq > 0.0001) {
-            const playerSpeed = Math.sqrt(playerSpeedSq);
-            this.lastFacingX = pvx / playerSpeed;
-            this.lastFacingY = pvy / playerSpeed;
+        let dx = targetX - px;
+        let dy = targetY - py;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+
+        if (dist > 0.1) {
+            this.lastFacingX = dx / dist;
+            this.lastFacingY = dy / dist;
+        } else {
+            // Fallback if cursor is exactly on player (rare)
+            const pvx = Velocity.x[playerEid];
+            const pvy = Velocity.y[playerEid];
+            const playerSpeedSq = pvx * pvx + pvy * pvy;
+            if (playerSpeedSq > 0.0001) {
+                const playerSpeed = Math.sqrt(playerSpeedSq);
+                this.lastFacingX = pvx / playerSpeed;
+                this.lastFacingY = pvy / playerSpeed;
+            }
         }
 
         if ((this.spellCooldowns.get(spellId) ?? 0) > 0) return;

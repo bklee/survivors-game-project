@@ -56,7 +56,7 @@ export class MainScene extends Phaser.Scene {
         this.nightDirector = new NightDirector(this.dungeon);
         this.juicePipeline = new JuicePipeline(this);
         this.combatSystem = createCombatSystem(this.juicePipeline);
-        this.spellSystem = new SpellSystem();
+        this.spellSystem = new SpellSystem(this);
         this.itemSystem = new ItemSystem();
 
         this.spellSystem.selectedCharId = this.selectedCharId;
