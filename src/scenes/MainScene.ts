@@ -183,6 +183,9 @@ export class MainScene extends Phaser.Scene {
             Velocity.x[this.playerId] = 0;
             Velocity.y[this.playerId] = 0;
             this.sound.stopAll();
+            if (this.cache.audio.exists('victory_fanfare')) {
+                this.sound.play('victory_fanfare', { volume: 0.5 });
+            }
         };
         window.addEventListener('stage_clear', stageClearInternalHandler);
 
