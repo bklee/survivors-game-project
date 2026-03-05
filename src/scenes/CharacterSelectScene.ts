@@ -15,6 +15,11 @@ export class CharacterSelectScene extends Phaser.Scene {
             .setDisplaySize(width, height)
             .setAlpha(0.6);
 
+        // Ensure selection BGM is playing (especially after retry)
+        if (!this.sound.get('select_bgm') && this.cache.audio.exists('select_bgm')) {
+            this.sound.play('select_bgm', { loop: true, volume: 0.4 });
+        }
+
 
 
         // Title
