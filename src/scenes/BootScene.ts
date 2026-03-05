@@ -15,6 +15,7 @@ export class BootScene extends Scene {
     create() {
         const loader = new AssetLoader(this);
         loader.defineFrames();
+        this.scene.launch('UIScene');
         this.scene.start('TitleScene');
     }
 
