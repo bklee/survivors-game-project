@@ -9,23 +9,14 @@ export class GameOverScene extends Phaser.Scene {
         const { width, height } = this.scale;
 
         // 1. Background Image (game_over.png)
+        // Background already contains "GAME OVER" text based on user request
         this.add.image(width / 2, height / 2, 'game_over')
             .setDisplaySize(width, height);
 
-        // 2. Dark Overlay for readability
-        this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.4);
+        // 2. Clearer overlay (optional, but keep it subtle so the background text shows)
+        this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.2);
 
-        // 3. GAME OVER Text
-        this.add.text(width / 2, height / 2 - 100, 'GAME OVER', {
-            fontFamily: '"MedievalSharp", cursive',
-            fontSize: '96px',
-            color: '#ff0000',
-            fontStyle: 'bold',
-            stroke: '#000000',
-            strokeThickness: 10
-        }).setOrigin(0.5);
-
-        // 4. Retry Button
+        // 3. Retry Button
         const retryBtn = this.add.rectangle(width / 2, height / 2 + 150, 240, 70, 0x3d2b1f, 0.8)
             .setInteractive({ useHandCursor: true })
             .setStrokeStyle(3, 0xffd700);
