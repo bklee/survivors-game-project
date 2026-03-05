@@ -132,6 +132,11 @@ export class MainScene extends Phaser.Scene {
                 this.scene.pause();
                 this.scene.launch('RecipeScene');
             }
+            // Debug: Skip to boss stage
+            if (e.code === 'KeyB' && e.shiftKey) {
+                this.currentStage = 2; // Will become 3 in nextStageHandler
+                window.dispatchEvent(new CustomEvent('next_stage'));
+            }
         };
         window.addEventListener('keydown', recipeHandler);
 
