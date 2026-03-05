@@ -7,6 +7,7 @@ export class TitleScene extends Phaser.Scene {
 
     create() {
         const { width, height } = this.scale;
+        this.cameras.main.fadeIn(1000, 0, 0, 0);
 
         // Background Image becomes the interactive area (since button is in the image)
         const bg = this.add.image(width / 2, height / 2, 'main_bg')
