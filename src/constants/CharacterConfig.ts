@@ -16,7 +16,7 @@ export const CHARACTERS: Record<string, CharacterData> = {
     KNIGHT: {
         name: 'Knight',
         id: 'knight',
-        baseStats: { health: 120, speed: 180, damage: 1.2 },
+        baseStats: { health: 120, speed: 100, damage: 1.2 },
         frames: {
             idle: { x: 128, y: 68, w: 16, h: 28, count: 4 },
             run: { x: 192, y: 68, w: 16, h: 28, count: 4 },
@@ -25,7 +25,7 @@ export const CHARACTERS: Record<string, CharacterData> = {
     WIZARD: {
         name: 'Wizard',
         id: 'wizard',
-        baseStats: { health: 80, speed: 200, damage: 1.5 },
+        baseStats: { health: 80, speed: 120, damage: 1.5 },
         frames: {
             idle: { x: 128, y: 132, w: 16, h: 28, count: 4 },
             run: { x: 192, y: 132, w: 16, h: 28, count: 4 },
@@ -34,7 +34,7 @@ export const CHARACTERS: Record<string, CharacterData> = {
     ELF: {
         name: 'Elf',
         id: 'elf',
-        baseStats: { health: 100, speed: 220, damage: 1.1 },
+        baseStats: { health: 100, speed: 180, damage: 1.1 },
         frames: {
             idle: { x: 128, y: 4, w: 16, h: 28, count: 4 },
             run: { x: 192, y: 4, w: 16, h: 28, count: 4 },
