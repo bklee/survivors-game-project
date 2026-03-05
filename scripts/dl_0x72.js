@@ -26,7 +26,7 @@ const path = require('path');
         page.locator('text=0x72_DungeonTilesetII_v1.7.zip').locator('..').locator('.button').click()
     ]);
 
-    const downloadPath = path.join(__dirname, 'public/assets/0x72_dungeon.zip');
+    const downloadPath = path.join(__dirname, '..', 'public/assets/0x72_dungeon.zip');
     await download.saveAs(downloadPath);
     console.log('Downloaded to ' + downloadPath);
 

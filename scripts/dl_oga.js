@@ -18,7 +18,7 @@ https.get(url, (res) => {
             const downloadUrl = match[1];
             console.log('Found URL: ' + downloadUrl);
 
-            const dest = path.join(__dirname, 'public/assets/dungeon_v1.zip'); // it might be png or zip
+            const dest = path.join(__dirname, '..', 'public/assets/dungeon_v1.zip'); // it might be png or zip
             const file = fs.createWriteStream(dest);
             https.get(downloadUrl, (response) => {
                 response.pipe(file);

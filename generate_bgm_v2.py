@@ -3,7 +3,7 @@ import math
 import struct
 import os
 
-os.makedirs('public/assets/audio', exist_ok=True)
+os.makedirs('./public/assets/audio', exist_ok=True)
 SAMPLE_RATE = 44100
 
 def note_freq(note_str):
@@ -93,7 +93,7 @@ def make_select_bgm(): # Zelda fairy fountain style
         generate_track(melody_notes, duration, 'triangle', vol_mult=0.4, attack=0.05, release=0.4),
         generate_track(chord_notes, duration, 'sine', vol_mult=0.2, attack=0.5, release=0.5)
     ]
-    save_wav('public/assets/audio/select_bgm.wav', tracks, duration)
+    save_wav('./public/assets/audio/select_bgm.wav', tracks, duration)
 
 def make_main_bgm(): # Orchestral march / Fantasy Overworld
     duration = 16.0
@@ -133,7 +133,7 @@ def make_main_bgm(): # Orchestral march / Fantasy Overworld
         generate_track(melody_notes, duration, 'square', vol_mult=0.15, attack=0.05, release=0.1), # Brass imitation
         generate_track(bass_notes, duration, 'sawtooth', vol_mult=0.15, attack=0.1, release=0.2) # Strings imitation
     ]
-    save_wav('public/assets/audio/main_bgm.wav', tracks, duration)
+    save_wav('./public/assets/audio/main_bgm.wav', tracks, duration)
 
 def make_boss_bgm(): # Fast tense strings and low brass
     duration = 16.0
@@ -163,7 +163,7 @@ def make_boss_bgm(): # Fast tense strings and low brass
         generate_track(melody_notes, duration, 'sawtooth', vol_mult=0.1, attack=0.01, release=0.05), # frantic strings
         generate_track(bass_notes, duration, 'square', vol_mult=0.2, attack=0.05, release=0.2) # deep horns
     ]
-    save_wav('public/assets/audio/boss_bgm.wav', tracks, duration)
+    save_wav('./public/assets/audio/boss_bgm.wav', tracks, duration)
 
 make_select_bgm()
 make_main_bgm()
@@ -171,8 +171,8 @@ make_boss_bgm()
 
 print("Copied files to dist too if exists")
 import shutil
-if os.path.exists('dist/assets/audio'):
-    shutil.copyfile('public/assets/audio/select_bgm.wav', 'dist/assets/audio/select_bgm.wav')
-    shutil.copyfile('public/assets/audio/main_bgm.wav', 'dist/assets/audio/main_bgm.wav')
-    shutil.copyfile('public/assets/audio/boss_bgm.wav', 'dist/assets/audio/boss_bgm.wav')
+if os.path.exists('./dist/assets/audio'):
+    shutil.copyfile('./public/assets/audio/select_bgm.wav', './dist/assets/audio/select_bgm.wav')
+    shutil.copyfile('./public/assets/audio/main_bgm.wav', './dist/assets/audio/main_bgm.wav')
+    shutil.copyfile('./public/assets/audio/boss_bgm.wav', './dist/assets/audio/boss_bgm.wav')
 
