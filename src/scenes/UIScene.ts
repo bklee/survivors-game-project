@@ -34,6 +34,7 @@ export class UIScene extends Phaser.Scene {
     private readonly MINIMAP_SIZE = 150;
 
     public joystick!: VirtualJoystick;
+    private minimapTimer = 0;
 
     private playerQuery = defineQuery([Player, Position]);
     private enemyQuery = defineQuery([Enemy, Position]);
@@ -218,10 +219,13 @@ export class UIScene extends Phaser.Scene {
         this.levelText.setText(`Level ${this.currentLevel} (${Math.floor(this.currentXp)} / ${this.xpToNextLevel} XP) | SP: ${this.skillPoints}`);
     }
 
-    update() {
-        this.updateMinimap();
+    update(_time: number, delta: number) {
+        this.minimapTimer += delta;
+        if (this.minimapTimer >= 500) {
+            this.updateMinimap();
+            this.minimapTimer = 0;
+        }
         this.updateTargetArrows();
-        // Keep stats updated in case of background changes
         this.statsText.setText(this.getStatsString());
     }
 
