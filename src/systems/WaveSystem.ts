@@ -200,6 +200,11 @@ export class NightDirector {
         SpriteInfo.textureIndex[eid] = typeId;
         Animation.frameRate[eid] = 6;
         Animation.timer[eid] = 0;
+
+        const bName = typeId === 69 ? "BIG DEMON" : (typeId === 79 ? "BIG ZOMBIE" : "OGRE");
+        window.dispatchEvent(new CustomEvent('boss_hp', {
+            detail: { current: hp, max: hp, name: bName }
+        }));
     }
 
 
