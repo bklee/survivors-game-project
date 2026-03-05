@@ -9,10 +9,6 @@ export class CharacterSelectScene extends Phaser.Scene {
     create() {
         const { width, height } = this.scale;
 
-        // Play Selection BGM
-        if (this.cache.audio.exists('select_bgm')) {
-            this.sound.play('select_bgm', { loop: true, volume: 0.4 });
-        }
 
         this.add.text(width / 2, 100, 'CHOOSE YOUR ALCHEMIST', {
             fontSize: '48px',
@@ -36,7 +32,7 @@ export class CharacterSelectScene extends Phaser.Scene {
 
             // Display Character Sprite
             const sprite = this.add.sprite(x, y - 50, 'dungeon', `${char.id}_idle_0`)
-                .setScale(4); 
+                .setScale(4);
 
             this.tweens.add({
                 targets: sprite,
@@ -61,6 +57,14 @@ export class CharacterSelectScene extends Phaser.Scene {
             }).setOrigin(0.5);
 
             card.on('pointerdown', () => {
+                // Resume AudioContext on first user gesture (browser autoplay policy)
+                if ((this.sound as any).context?.state === 'suspended') {
+                    (this.sound as any).context.resume();
+                }
+                // Play select BGM on first card interaction if not already playing
+                if (!this.sound.get('select_bgm') && this.cache.audio.exists('select_bgm')) {
+                    this.sound.play('select_bgm', { loop: true, volume: 0.4 });
+                }
                 this.sound.stopAll(); // Stop selection BGM
                 this.scene.start('MainScene', { characterId: id });
             });
