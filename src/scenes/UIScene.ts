@@ -104,7 +104,60 @@ export class UIScene extends Phaser.Scene {
         this.minimapGraphics = this.add.graphics();
         this.arrowGraphics = this.add.graphics();
 
-        this.uiContainer.add([title, this.stageLevelText, this.levelText, this.statsText, hpBg, this.hpBar, this.hpText, this.coinText, mmBg1, mmBg2, this.minimapGraphics, this.arrowGraphics]);
+        // Pause Button (top-right, left of minimap)
+        const pauseBtn = this.add.text(1280 - 170, 15, '⏸', {
+            fontSize: '32px',
+            color: '#ffffff',
+            backgroundColor: '#00000088',
+            padding: { x: 8, y: 4 }
+        }).setInteractive({ useHandCursor: true });
+
+        // Pause Overlay (hidden by default)
+        const pauseOverlay = this.add.rectangle(640, 360, 1280, 720, 0x000000, 0.7).setVisible(false).setDepth(900);
+        const pauseText = this.add.text(640, 300, 'PAUSED', {
+            fontFamily: '"MedievalSharp", cursive',
+            fontSize: '72px',
+            color: '#ffd700',
+            fontStyle: 'bold',
+            stroke: '#000000',
+            strokeThickness: 8
+        }).setOrigin(0.5).setVisible(false).setDepth(901);
+
+        const resumeBtn = this.add.text(640, 400, '▶ RESUME', {
+            fontFamily: '"MedievalSharp", cursive',
+            fontSize: '36px',
+            color: '#ffffff',
+            backgroundColor: '#3d2b1f',
+            padding: { x: 20, y: 10 }
+        }).setOrigin(0.5).setInteractive({ useHandCursor: true }).setVisible(false).setDepth(901);
+
+        pauseBtn.on('pointerdown', () => {
+            const mainScene = this.scene.get('MainScene');
+            if (mainScene.scene.isPaused()) {
+                mainScene.scene.resume();
+                pauseOverlay.setVisible(false);
+                pauseText.setVisible(false);
+                resumeBtn.setVisible(false);
+                pauseBtn.setText('⏸');
+            } else {
+                mainScene.scene.pause();
+                pauseOverlay.setVisible(true);
+                pauseText.setVisible(true);
+                resumeBtn.setVisible(true);
+                pauseBtn.setText('⏸');
+            }
+        });
+
+        resumeBtn.on('pointerdown', () => {
+            const mainScene = this.scene.get('MainScene');
+            mainScene.scene.resume();
+            pauseOverlay.setVisible(false);
+            pauseText.setVisible(false);
+            resumeBtn.setVisible(false);
+            pauseBtn.setText('⏸');
+        });
+
+        this.uiContainer.add([title, this.stageLevelText, this.levelText, this.statsText, hpBg, this.hpBar, this.hpText, this.coinText, mmBg1, mmBg2, this.minimapGraphics, this.arrowGraphics, pauseBtn]);
         this.uiContainer.setVisible(false);
 
         this.bossWarningText = this.add.text(640, 360, 'BOSS APPROACHING!', {
