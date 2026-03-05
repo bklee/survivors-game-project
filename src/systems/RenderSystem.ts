@@ -227,13 +227,11 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                 }
                 if (hasComponent(world, Rotation, eid)) {
                     sprite.rotation = Rotation.angle[eid];
+                    // Slash sprites natively face left; offset by π so rotation=0 faces right
                     if (typeId === 109 || typeId === 110) {
-                        sprite.flipX = true; // Sprite natively faces left, force it right so rotation 0 aligns right
-                        if (hasComponent(world, Velocity, eid)) {
-                            sprite.flipY = Velocity.x[eid] < 0; // Prevent upside down bottom-to-top swings for backwards attacks
-                        } else {
-                            sprite.flipY = false;
-                        }
+                        sprite.rotation = Rotation.angle[eid] + Math.PI;
+                        sprite.flipX = false;
+                        sprite.flipY = false;
                     }
                 }
                 if (typeId === 104) sprite.tint = 0xffff00;
