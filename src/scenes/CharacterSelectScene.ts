@@ -9,67 +9,91 @@ export class CharacterSelectScene extends Phaser.Scene {
     create() {
         const { width, height } = this.scale;
 
-        // Medieval Theme Overlay
-        const overlay = this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.9)
-            .setDepth(1000)
-            .setInteractive();
+        // Background Image
+        this.add.image(width / 2, height / 2, 'main_bg')
+            .setDisplaySize(width, height)
+            .setAlpha(0.6);
 
-        // Add a gold border frame for medieval feel
-        const frame = this.add.graphics().setDepth(1001);
-        frame.lineStyle(4, 0xd4af37, 1); // Gold color
-        frame.strokeRect(width / 2 - 300, height / 2 - 80, 600, 160);
+        // Medieval Theme Overlay (Start Button Container)
+        const overlay = this.add.container(0, 0).setDepth(1000);
 
-        const enterText = this.add.text(width / 2, height / 2, 'CLICK TO START', {
+        const darkBg = this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.7);
+        overlay.add(darkBg);
+
+        // Start Button Graphics
+        const btnWidth = 400;
+        const btnHeight = 100;
+        const btnX = width / 2;
+        const btnY = height / 2;
+
+        const btnBg = this.add.rectangle(btnX, btnY, btnWidth, btnHeight, 0x3d2b1f, 1)
+            .setStrokeStyle(4, 0xd4af37)
+            .setInteractive({ useHandCursor: true });
+
+        const btnText = this.add.text(btnX, btnY, 'START GAME', {
             fontFamily: '"MedievalSharp", cursive',
-            fontSize: '72px',
+            fontSize: '48px',
             color: '#ffd700',
-            fontStyle: 'bold',
-            stroke: '#000000',
-            strokeThickness: 8,
-            shadow: { offsetX: 2, offsetY: 2, color: '#333', blur: 10, fill: true }
-        }).setOrigin(0.5).setDepth(1002);
+            fontStyle: 'bold'
+        }).setOrigin(0.5);
 
-        // Pulsing animation for the text
-        this.tweens.add({
-            targets: enterText,
-            scale: 1.1,
-            duration: 800,
-            yoyo: true,
-            repeat: -1,
-            ease: 'Sine.easeInOut'
+        overlay.add([btnBg, btnText]);
+
+        // Button Interactions
+        btnBg.on('pointerover', () => {
+            btnBg.setFillStyle(0x5d4037);
+            this.tweens.add({
+                targets: btnText,
+                scale: 1.1,
+                duration: 200
+            });
         });
 
-        overlay.on('pointerdown', () => {
-            // Unlock audio
+        btnBg.on('pointerout', () => {
+            btnBg.setFillStyle(0x3d2b1f);
+            this.tweens.add({
+                targets: btnText,
+                scale: 1.0,
+                duration: 200
+            });
+        });
+
+        btnBg.on('pointerdown', () => {
+            // Click effect
+            btnBg.setScale(0.95);
+            this.sound.play('select_bgm', { volume: 0.5 }); // Quick sound feedback
+
+            // Unlock audio context
             if ((this.sound as any).context?.state === 'suspended') {
                 (this.sound as any).context.resume();
             }
 
-            // Play select BGM
-            if (this.cache.audio.exists('select_bgm')) {
+            // Play select BGM if not already playing
+            if (!this.sound.get('select_bgm') && this.cache.audio.exists('select_bgm')) {
                 this.sound.play('select_bgm', { loop: true, volume: 0.4 });
             }
 
             // Fade out everything
             this.tweens.add({
-                targets: [overlay, enterText, frame],
+                targets: overlay,
                 alpha: 0,
                 duration: 600,
                 onComplete: () => {
                     overlay.destroy();
-                    enterText.destroy();
-                    frame.destroy();
                 }
             });
         });
+
+        // Title
         this.add.text(width / 2, 100, 'CHOOSE YOUR HERO!', {
             fontFamily: '"MedievalSharp", cursive',
-            fontSize: '56px',
+            fontSize: '64px',
             color: '#ffd700',
             fontStyle: 'bold',
             stroke: '#000000',
-            strokeThickness: 6
-        }).setOrigin(0.5);
+            strokeThickness: 8,
+            shadow: { offsetX: 2, offsetY: 2, color: '#333', blur: 10, fill: true }
+        }).setOrigin(0.5).setDepth(100);
 
         const charIds = Object.keys(CHARACTERS);
         const cardWidth = 300;
