@@ -9,7 +9,59 @@ export class CharacterSelectScene extends Phaser.Scene {
     create() {
         const { width, height } = this.scale;
 
+        // Medieval Theme Overlay
+        const overlay = this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.9)
+            .setDepth(1000)
+            .setInteractive();
 
+        // Add a gold border frame for medieval feel
+        const frame = this.add.graphics().setDepth(1001);
+        frame.lineStyle(4, 0xd4af37, 1); // Gold color
+        frame.strokeRect(width / 2 - 300, height / 2 - 80, 600, 160);
+
+        const enterText = this.add.text(width / 2, height / 2, 'CLICK TO START', {
+            fontFamily: '"MedievalSharp", cursive',
+            fontSize: '72px',
+            color: '#ffd700',
+            fontStyle: 'bold',
+            stroke: '#000000',
+            strokeThickness: 8,
+            shadow: { offsetX: 2, offsetY: 2, color: '#333', blur: 10, fill: true }
+        }).setOrigin(0.5).setDepth(1002);
+
+        // Pulsing animation for the text
+        this.tweens.add({
+            targets: enterText,
+            scale: 1.1,
+            duration: 800,
+            yoyo: true,
+            repeat: -1,
+            ease: 'Sine.easeInOut'
+        });
+
+        overlay.on('pointerdown', () => {
+            // Unlock audio
+            if ((this.sound as any).context?.state === 'suspended') {
+                (this.sound as any).context.resume();
+            }
+
+            // Play select BGM
+            if (this.cache.audio.exists('select_bgm')) {
+                this.sound.play('select_bgm', { loop: true, volume: 0.4 });
+            }
+
+            // Fade out everything
+            this.tweens.add({
+                targets: [overlay, enterText, frame],
+                alpha: 0,
+                duration: 600,
+                onComplete: () => {
+                    overlay.destroy();
+                    enterText.destroy();
+                    frame.destroy();
+                }
+            });
+        });
         this.add.text(width / 2, 100, 'CHOOSE YOUR ALCHEMIST', {
             fontSize: '48px',
             color: '#ffffff',
@@ -57,14 +109,6 @@ export class CharacterSelectScene extends Phaser.Scene {
             }).setOrigin(0.5);
 
             card.on('pointerdown', () => {
-                // Resume AudioContext on first user gesture (browser autoplay policy)
-                if ((this.sound as any).context?.state === 'suspended') {
-                    (this.sound as any).context.resume();
-                }
-                // Play select BGM on first card interaction if not already playing
-                if (!this.sound.get('select_bgm') && this.cache.audio.exists('select_bgm')) {
-                    this.sound.play('select_bgm', { loop: true, volume: 0.4 });
-                }
                 this.sound.stopAll(); // Stop selection BGM
                 this.scene.start('MainScene', { characterId: id });
             });
