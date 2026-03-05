@@ -127,6 +127,14 @@ export class UIScene extends Phaser.Scene {
             padding: { x: 20, y: 10 }
         }).setOrigin(0.5).setInteractive({ useHandCursor: true }).setVisible(false).setDepth(901);
 
+        const quitBtn = this.add.text(640, 480, '🏠 MAIN MENU', {
+            fontFamily: '"MedievalSharp", cursive',
+            fontSize: '30px',
+            color: '#ff9999',
+            backgroundColor: '#3d2b1f',
+            padding: { x: 20, y: 10 }
+        }).setOrigin(0.5).setInteractive({ useHandCursor: true }).setVisible(false).setDepth(901);
+
         pauseBtn.on('pointerdown', () => {
             const mainScene = this.scene.get('MainScene');
             if (mainScene.scene.isPaused()) {
@@ -134,12 +142,14 @@ export class UIScene extends Phaser.Scene {
                 pauseOverlay.setVisible(false);
                 pauseText.setVisible(false);
                 resumeBtn.setVisible(false);
+                quitBtn.setVisible(false);
                 pauseBtn.setText('⏸');
             } else {
                 mainScene.scene.pause();
                 pauseOverlay.setVisible(true);
                 pauseText.setVisible(true);
                 resumeBtn.setVisible(true);
+                quitBtn.setVisible(true);
                 pauseBtn.setText('⏸');
             }
         });
@@ -150,7 +160,15 @@ export class UIScene extends Phaser.Scene {
             pauseOverlay.setVisible(false);
             pauseText.setVisible(false);
             resumeBtn.setVisible(false);
+            quitBtn.setVisible(false);
             pauseBtn.setText('⏸');
+        });
+
+        quitBtn.on('pointerdown', () => {
+            this.sound.stopAll();
+            this.scene.stop('MainScene');
+            this.scene.stop('UIScene');
+            this.scene.start('TitleScene');
         });
 
         this.uiContainer.add([this.stageLevelText, this.levelText, this.statsText, hpBg, this.hpBar, this.hpText, this.coinText, mmBg1, mmBg2, this.minimapGraphics, this.arrowGraphics, pauseBtn]);
