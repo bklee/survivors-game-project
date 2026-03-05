@@ -104,13 +104,13 @@ export class UIScene extends Phaser.Scene {
         this.minimapGraphics = this.add.graphics();
         this.arrowGraphics = this.add.graphics();
 
-        // Pause Button (top-right, left of minimap)
-        const pauseBtn = this.add.text(1280 - 170, 15, '⏸', {
+        // Pause Button (below minimap)
+        const pauseBtn = this.add.text(1270, 170, '⏸', {
             fontSize: '32px',
             color: '#ffffff',
             backgroundColor: '#00000088',
             padding: { x: 8, y: 4 }
-        }).setInteractive({ useHandCursor: true });
+        }).setOrigin(1, 0).setInteractive({ useHandCursor: true });
 
         // Pause Overlay (hidden by default)
         const pauseOverlay = this.add.rectangle(640, 360, 1280, 720, 0x000000, 0.7).setVisible(false).setDepth(900);
