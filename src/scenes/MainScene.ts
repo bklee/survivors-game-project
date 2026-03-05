@@ -145,6 +145,13 @@ export class MainScene extends Phaser.Scene {
             Position.y[this.playerId] = startPos.y;
 
             this.nightDirector.resetForNextStage(this.currentStage);
+
+            // Restore HP to 100% on new stage
+            Health.current[this.playerId] = Health.max[this.playerId];
+            window.dispatchEvent(new CustomEvent('hp_updated', {
+                detail: { current: Health.current[this.playerId], max: Health.max[this.playerId] }
+            }));
+
             this.startBGM('main_bgm');
             window.dispatchEvent(new CustomEvent('stage_updated', { detail: this.currentStage }));
         };
