@@ -177,7 +177,14 @@ export class MainScene extends Phaser.Scene {
             // Re-spawn props on new map
             this.spawnDungeonProps();
 
-            this.startBGM('main_bgm');
+            // Alternating BGM based on stage parity to keep it fresh
+            if (this.currentStage % 3 === 0) {
+                this.startBGM('boss_bgm');
+            } else if (this.currentStage % 2 === 0) {
+                this.startBGM('select_bgm'); // Using hero_reprise as alternate stage music
+            } else {
+                this.startBGM('main_bgm');
+            }
             window.dispatchEvent(new CustomEvent('stage_updated', { detail: this.currentStage }));
         };
         window.addEventListener('next_stage', nextStageHandler);
@@ -370,10 +377,12 @@ export class MainScene extends Phaser.Scene {
     }
 
     private startBGM(key: string) {
-        if (this.currentBGM && this.currentBGM.key === key) return;
+        if (this.currentBGM && this.currentBGM.key === key && this.currentBGM.isPlaying) return;
         if (this.currentBGM) this.currentBGM.stop();
         if (this.cache.audio.exists(key)) {
-            this.currentBGM = this.sound.add(key, { loop: true, volume: 0.3 });
+            // Volume adjustment: boss music slightly louder, select music slightly softer
+            const vol = key === 'boss_bgm' ? 0.4 : (key === 'select_bgm' ? 0.25 : 0.3);
+            this.currentBGM = this.sound.add(key, { loop: true, volume: vol });
             this.currentBGM.play();
         }
     }
