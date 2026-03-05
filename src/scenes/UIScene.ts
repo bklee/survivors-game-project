@@ -194,59 +194,86 @@ export class UIScene extends Phaser.Scene {
             strokeThickness: 8
         }).setOrigin(0.5).setVisible(false).setDepth(901);
 
-        const resumeBtn = this.add.text(640, 400, '▶ RESUME', {
+        const resumeBtnBg = this.add.rectangle(640, 400, 300, 60, 0x3d2b1f, 0.9)
+            .setStrokeStyle(2, 0xffd700)
+            .setOrigin(0.5)
+            .setInteractive({ useHandCursor: true })
+            .setVisible(false)
+            .setDepth(901);
+        const resumeBtnText = this.add.text(640, 400, '▶ RESUME', {
             fontFamily: '"MedievalSharp", cursive',
-            fontSize: '36px',
+            fontSize: '32px',
             color: '#ffffff',
-            backgroundColor: '#3d2b1f',
-            padding: { x: 20, y: 10 }
-        }).setOrigin(0.5).setInteractive({ useHandCursor: true }).setVisible(false).setDepth(901);
+            fontStyle: 'bold'
+        }).setOrigin(0.5).setVisible(false).setDepth(902);
 
-        const quitBtn = this.add.text(640, 480, '🏠 MAIN MENU', {
+        const quitBtnBg = this.add.rectangle(640, 480, 300, 60, 0x3d2b1f, 0.9)
+            .setStrokeStyle(2, 0xff9999)
+            .setOrigin(0.5)
+            .setInteractive({ useHandCursor: true })
+            .setVisible(false)
+            .setDepth(901);
+        const quitBtnText = this.add.text(640, 480, '🏠 MAIN MENU', {
             fontFamily: '"MedievalSharp", cursive',
-            fontSize: '30px',
+            fontSize: '32px',
             color: '#ff9999',
-            backgroundColor: '#3d2b1f',
-            padding: { x: 20, y: 10 }
-        }).setOrigin(0.5).setInteractive({ useHandCursor: true }).setVisible(false).setDepth(901);
+            fontStyle: 'bold'
+        }).setOrigin(0.5).setVisible(false).setDepth(902);
+
+        // UI helper to show/hide pause menu
+        const setPauseVisible = (visible: boolean) => {
+            pauseOverlay.setVisible(visible);
+            pauseText.setVisible(visible);
+            resumeBtnBg.setVisible(visible);
+            resumeBtnText.setVisible(visible);
+            quitBtnBg.setVisible(visible);
+            quitBtnText.setVisible(visible);
+        };
 
         pauseBtn.on('pointerdown', () => {
             const mainScene = this.scene.get('MainScene');
             if (mainScene.scene.isPaused()) {
                 mainScene.scene.resume();
-                pauseOverlay.setVisible(false);
-                pauseText.setVisible(false);
-                resumeBtn.setVisible(false);
-                quitBtn.setVisible(false);
-                pauseBtn.setText('⏸');
+                setPauseVisible(false);
             } else {
                 mainScene.scene.pause();
-                pauseOverlay.setVisible(true);
-                pauseText.setVisible(true);
-                resumeBtn.setVisible(true);
-                quitBtn.setVisible(true);
-                pauseBtn.setText('⏸');
+                setPauseVisible(true);
             }
         });
 
-        resumeBtn.on('pointerdown', () => {
+        resumeBtnBg.on('pointerdown', () => {
             const mainScene = this.scene.get('MainScene');
             mainScene.scene.resume();
-            pauseOverlay.setVisible(false);
-            pauseText.setVisible(false);
-            resumeBtn.setVisible(false);
-            quitBtn.setVisible(false);
-            pauseBtn.setText('⏸');
+            setPauseVisible(false);
         });
 
-        quitBtn.on('pointerdown', () => {
+        resumeBtnBg.on('pointerover', () => {
+            resumeBtnBg.setFillStyle(0x5a4030, 1).setScale(1.05);
+            resumeBtnText.setScale(1.05);
+        });
+        resumeBtnBg.on('pointerout', () => {
+            resumeBtnBg.setFillStyle(0x3d2b1f, 0.9).setScale(1);
+            resumeBtnText.setScale(1);
+        });
+
+        quitBtnBg.on('pointerdown', () => {
             this.sound.stopAll();
             this.scene.stop('MainScene');
             this.scene.stop('UIScene');
             this.scene.start('TitleScene');
         });
 
+        quitBtnBg.on('pointerover', () => {
+            quitBtnBg.setFillStyle(0x5a4030, 1).setScale(1.05);
+            quitBtnText.setScale(1.05);
+        });
+        quitBtnBg.on('pointerout', () => {
+            quitBtnBg.setFillStyle(0x3d2b1f, 0.9).setScale(1);
+            quitBtnText.setScale(1);
+        });
+
         this.uiContainer.add([this.stageLevelText, this.levelText, this.statsText, hpFrame, this.hpBar, shine, hpIcon, this.hpText, this.coinText, this.coinIcon, mmBg1, mmBg2, this.minimapGraphics, this.arrowGraphics, pauseBtn]);
+        // Note: Pause overlay/buttons are not in uiContainer based on previous structure
         this.uiContainer.setVisible(false);
 
         this.bossWarningText = this.add.text(640, 360, 'BOSS APPROACHING!', {
