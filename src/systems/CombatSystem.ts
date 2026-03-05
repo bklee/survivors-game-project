@@ -111,6 +111,14 @@ export const createCombatSystem = (juice: JuicePipeline) => {
                     }
 
                     Health.current[targetId] -= Spell.damage[eid];
+
+                    if (hasComponent(world, Boss, targetId)) {
+                        const bName = SpriteInfo.textureIndex[targetId] === 69 ? "BIG DEMON" : (SpriteInfo.textureIndex[targetId] === 79 ? "BIG ZOMBIE" : "OGRE");
+                        window.dispatchEvent(new CustomEvent('boss_hp', {
+                            detail: { current: Health.current[targetId], max: Health.max[targetId], name: bName }
+                        }));
+                    }
+
                     if (dmgNumbersThisFrame < MAX_DMG_NUMBERS_PER_FRAME) {
                         juice.damageNumber(tx, ty, Spell.damage[eid]);
                         dmgNumbersThisFrame++;
@@ -133,6 +141,7 @@ export const createCombatSystem = (juice: JuicePipeline) => {
             if (Health.current[targetId] <= 0) {
                 const isBoss = hasComponent(world, Boss, targetId);
                 if (isBoss) {
+                    window.dispatchEvent(new CustomEvent('boss_hp', { detail: { current: 0, max: 100 } })); // Hide boss bar
                     window.dispatchEvent(new CustomEvent('stage_clear'));
                 }
 
