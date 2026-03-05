@@ -6,7 +6,6 @@ import { createPhysicsSystem } from '../systems/PhysicsSystem';
 import { createRenderSystem } from '../systems/RenderSystem';
 import { PlayerSystem } from '../systems/PlayerSystem';
 import { NightDirector } from '../systems/WaveSystem';
-import { VirtualJoystick } from '../ui/VirtualJoystick';
 
 import { CHARACTERS } from '../constants/CharacterConfig';
 
@@ -21,7 +20,7 @@ export class MainScene extends Phaser.Scene {
     private renderSystem!: (dt: number) => void;
     private playerSystem!: PlayerSystem;
     private nightDirector!: NightDirector;
-    private joystick!: VirtualJoystick;
+    private uiScene!: any;
     private playerId!: number;
     private juicePipeline!: JuicePipeline;
     private combatSystem!: (dt: number) => void;
@@ -107,9 +106,7 @@ export class MainScene extends Phaser.Scene {
         });
 
         this.cameras.main.setZoom(2.5);
-
-        const { width, height } = this.scale;
-        this.joystick = new VirtualJoystick(this, width / 2, height - 100, 60);
+        this.uiScene = this.scene.get('UIScene');
 
         const soundHandler = ((e: CustomEvent<string>) => {
             if (this.cache.audio.exists(e.detail)) {
@@ -217,8 +214,8 @@ export class MainScene extends Phaser.Scene {
         this.nightDirector.update(delta);
         this.playerSystem.update(delta);
 
-        const dX = this.joystick.vector.x;
-        const dY = this.joystick.vector.y;
+        const dX = this.uiScene?.joystick?.vector?.x || 0;
+        const dY = this.uiScene?.joystick?.vector?.y || 0;
         if (dX !== 0 || dY !== 0) {
             Velocity.x[this.playerId] = dX * 200;
             Velocity.y[this.playerId] = dY * 200;

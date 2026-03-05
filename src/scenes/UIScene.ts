@@ -3,6 +3,7 @@ import { defineQuery } from 'bitecs';
 import { world } from '../core/World';
 import { Position, Player, Enemy, Boss } from '../components';
 import { globalStats } from '../core/PlayerStats';
+import { VirtualJoystick } from '../ui/VirtualJoystick';
 
 export class UIScene extends Phaser.Scene {
     private stageLevelText!: Phaser.GameObjects.Text;
@@ -32,6 +33,8 @@ export class UIScene extends Phaser.Scene {
     private minimapGraphics!: Phaser.GameObjects.Graphics;
     private readonly MINIMAP_SIZE = 150;
 
+    public joystick!: VirtualJoystick;
+
     private playerQuery = defineQuery([Player, Position]);
     private enemyQuery = defineQuery([Enemy, Position]);
     private bossQuery = defineQuery([Boss, Position]);
@@ -56,6 +59,10 @@ export class UIScene extends Phaser.Scene {
             stroke: '#000000',
             strokeThickness: 4
         }).setOrigin(0.5, 0);
+
+        const { width, height } = this.scale;
+        this.joystick = new VirtualJoystick(this, width / 2, height - 100, 60);
+        this.joystick.setVisible(false);
 
         this.levelText = this.add.text(10, 45, "Level 1 (0 / 100 XP) | SP: 0", {
             fontSize: '20px',
@@ -118,6 +125,7 @@ export class UIScene extends Phaser.Scene {
 
         window.addEventListener('game_started', () => {
             this.uiContainer.setVisible(true);
+            this.joystick.setVisible(true);
         });
 
         window.addEventListener('spawning_complete', () => this.spawningComplete = true);

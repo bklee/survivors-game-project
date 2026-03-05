@@ -7,6 +7,7 @@ export class VirtualJoystick {
     private radius: number;
     private background!: Phaser.GameObjects.Graphics;
     private thumb!: Phaser.GameObjects.Graphics;
+    private panel!: Phaser.GameObjects.Graphics;
     private activePointer: Phaser.Input.Pointer | null = null;
     public isDown: boolean = false;
     public vector: Phaser.Math.Vector2 = new Phaser.Math.Vector2(0, 0);
@@ -22,13 +23,13 @@ export class VirtualJoystick {
 
     private createJoysticGraphics() {
         // Subtle background panel for the joystick area
-        const panel = this.scene.add.graphics();
-        panel.fillStyle(0x000000, 0.3);
-        panel.fillRoundedRect(this.x - this.radius * 2, this.y - this.radius * 1.5, this.radius * 4, this.radius * 3, 20);
-        panel.lineStyle(2, 0xffffff, 0.1);
-        panel.strokeRoundedRect(this.x - this.radius * 2, this.y - this.radius * 1.5, this.radius * 4, this.radius * 3, 20);
-        panel.setScrollFactor(0);
-        panel.setDepth(99);
+        this.panel = this.scene.add.graphics();
+        this.panel.fillStyle(0x000000, 0.3);
+        this.panel.fillRoundedRect(this.x - this.radius * 2, this.y - this.radius * 1.5, this.radius * 4, this.radius * 3, 20);
+        this.panel.lineStyle(2, 0xffffff, 0.1);
+        this.panel.strokeRoundedRect(this.x - this.radius * 2, this.y - this.radius * 1.5, this.radius * 4, this.radius * 3, 20);
+        this.panel.setScrollFactor(0);
+        this.panel.setDepth(99);
 
         this.background = this.scene.add.graphics();
         this.background.lineStyle(6, 0xffffff, 0.2);
@@ -106,5 +107,11 @@ export class VirtualJoystick {
         const distanceRatio = Math.min(dist / this.radius, 1);
 
         this.vector.set(Math.cos(angle) * distanceRatio, Math.sin(angle) * distanceRatio);
+    }
+
+    public setVisible(state: boolean) {
+        if (this.panel) this.panel.setVisible(state);
+        if (this.background) this.background.setVisible(state);
+        if (this.thumb) this.thumb.setVisible(state);
     }
 }
