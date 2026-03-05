@@ -21,6 +21,7 @@ export class AssetLoader {
         this.scene.load.image('main_bg', './assets/main.jpg');
         this.scene.load.image('loading_bg', './assets/loading.jpg');
         this.scene.load.image('hp_icon', './assets/frames/ui_heart_full.png');
+        this.scene.load.image('game_over', './assets/game_over.png');
         this.scene.load.image('ui_heart_full', './assets/frames/ui_heart_full.png');
         for (let i = 0; i < 3; i++) {
             this.scene.load.image(`sword_slash_f${i}`, `./assets/frames/sword_slash_f${i}.png`);

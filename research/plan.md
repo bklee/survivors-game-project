@@ -43,8 +43,8 @@
 ### Phase 12: 상호작용 및 환경 기믹 (Completed)
 
 - [x] **함정 시스템**: 가시 함정(Spikes) 데미지 판정 연동 및 **폭발 화약통(Explosive Barrels)** 구현.
-- [x] **인터랙티브 오브젝트**: 문(Door)과 이를 여는 레버(Lever) 시스템 구현.
-- [x] **비밀 보물 방(Secret Rooms)**: 잠긴 문 뒤에 거대 보물(1000 XP)과 정예 오크 가드(Elite Guard) 배치.
+- [ ] **인터랙티브 오브젝트**: 문(Door)과 이를 여는 레버(Lever) 시스템 구현.
+- [ ] **비밀 보물 방(Secret Rooms)**: 잠긴 문 뒤에 거대 보물(1000 XP)과 정예 오크 가드(Elite Guard) 배치.
 
 ### Phase 13: 디테일 폴리싱 및 전투 고도화 (Completed)
 
