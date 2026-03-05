@@ -1,27 +1,21 @@
 import { addComponent, defineQuery, hasComponent } from 'bitecs';
-import { CHARACTERS } from '../constants/CharacterConfig';
+import { CharacterData } from '../constants/CharacterConfig';
 import { Animation, Position, Velocity, Player } from '../components';
 import { world } from '../core/World';
 import { globalStats } from '../core/PlayerStats';
 
-// For simplicity, a very basic player state
-export enum PlayerCharacter {
-    RABBIT, // bunny hop
-    BEAR, // dance range attack
-    PANDA, // rolling dash
-}
-
 const playerQuery = defineQuery([Position, Velocity, Player]);
 
 export class PlayerSystem {
-    private character: PlayerCharacter = PlayerCharacter.RABBIT;
+    private charData: CharacterData;
     private stateTime: number = 0;
 
     private keys: Record<string, boolean> = {};
     private isDashing: boolean = false;
     private dashCooldown: number = 0;
 
-    constructor() {
+    constructor(charData: CharacterData) {
+        this.charData = charData;
         window.addEventListener('keydown', (e) => {
             this.keys[e.code] = true;
             if (e.code === 'ShiftLeft' && this.dashCooldown <= 0) {
@@ -55,21 +49,8 @@ export class PlayerSystem {
                 Animation.frameRate[eid] = 10;
                 Animation.timer[eid] = 0;
             }
-            let speed = 200;
 
-            switch (this.character) {
-                case PlayerCharacter.RABBIT:
-                    const hopPhase = Math.sin(this.stateTime / 100);
-                    speed = CHARACTERS.WIZARD.baseStats.speed + (hopPhase > 0 ? hopPhase * 100 : 0);
-                    break;
-                case PlayerCharacter.BEAR:
-                    speed = CHARACTERS.KNIGHT.baseStats.speed;
-                    break;
-                case PlayerCharacter.PANDA:
-                    speed = this.isDashing ? 600 : CHARACTERS.ELF.baseStats.speed;
-                    break;
-            }
-
+            let speed = this.isDashing ? 600 : this.charData.baseStats.speed;
             speed *= globalStats.moveSpeedMult;
 
             const mag = Math.sqrt(inputX * inputX + inputY * inputY);

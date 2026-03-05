@@ -62,7 +62,7 @@ export class UIScene extends Phaser.Scene {
         this.joystick.setVisible(false);
         this.levelText = this.add.text(10, 10, "Level 1 (0 / 100 XP) | SP: 0", {
             fontSize: '20px',
-            color: '#00ffff',
+            color: '#ffcc00', // Changed to Gold for better visibility
             fontStyle: 'bold',
             stroke: '#000000',
             strokeThickness: 3

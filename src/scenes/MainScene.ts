@@ -14,6 +14,8 @@ import { createCombatSystem } from '../systems/CombatSystem';
 import { SpellSystem } from '../systems/SpellSystem';
 import { ItemSystem } from '../systems/ItemSystem';
 import { DungeonGenerator, TILE_SIZE, TileType } from '../core/DungeonGenerator';
+import { globalStats } from '../core/PlayerStats';
+import { CharacterData } from '../constants/CharacterConfig';
 
 export class MainScene extends Phaser.Scene {
     private physicsSystem!: (dt: number) => void;
@@ -33,6 +35,7 @@ export class MainScene extends Phaser.Scene {
     private floorSprite!: Phaser.GameObjects.TileSprite;
     private currentStage: number = 1;
     private isPausedForClear: boolean = false;
+    private charData!: CharacterData;
 
     constructor() {
         super('MainScene');
@@ -51,8 +54,11 @@ export class MainScene extends Phaser.Scene {
 
         this.dungeon = new DungeonGenerator(100, 100);
 
+        const charData = CHARACTERS[this.selectedCharId.toUpperCase()] || CHARACTERS.WIZARD;
+        this.charData = charData; // Store it for update loop
+
         this.physicsSystem = createPhysicsSystem(this.dungeon);
-        this.playerSystem = new PlayerSystem();
+        this.playerSystem = new PlayerSystem(charData);
         this.nightDirector = new NightDirector(this.dungeon);
         this.juicePipeline = new JuicePipeline(this);
         this.combatSystem = createCombatSystem(this.juicePipeline);
@@ -88,11 +94,10 @@ export class MainScene extends Phaser.Scene {
         if (this.selectedCharId === 'knight') charTypeId = 0;
         else if (this.selectedCharId === 'elf') charTypeId = 2;
 
-        const charData = CHARACTERS[this.selectedCharId.toUpperCase()] || CHARACTERS.WIZARD;
         SpriteInfo.textureIndex[this.playerId] = charTypeId;
         Animation.frameRate[this.playerId] = 10;
-        Health.current[this.playerId] = charData.baseStats.health;
-        Health.max[this.playerId] = charData.baseStats.health;
+        Health.current[this.playerId] = this.charData.baseStats.health;
+        Health.max[this.playerId] = this.charData.baseStats.health;
 
         setTimeout(() => {
             window.dispatchEvent(new CustomEvent('hp_updated', {
@@ -262,8 +267,9 @@ export class MainScene extends Phaser.Scene {
         const dX = this.uiScene?.joystick?.vector?.x || 0;
         const dY = this.uiScene?.joystick?.vector?.y || 0;
         if (dX !== 0 || dY !== 0) {
-            Velocity.x[this.playerId] = dX * 200;
-            Velocity.y[this.playerId] = dY * 200;
+            const speed = this.charData.baseStats.speed * globalStats.moveSpeedMult;
+            Velocity.x[this.playerId] = dX * speed;
+            Velocity.y[this.playerId] = dY * speed;
             this.spellSystem.setFacing(dX, dY);
         }
 
