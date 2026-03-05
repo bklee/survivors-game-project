@@ -62,10 +62,13 @@ export class CharacterSelectScene extends Phaser.Scene {
                 }
             });
         });
-        this.add.text(width / 2, 100, 'CHOOSE YOUR ALCHEMIST', {
-            fontSize: '48px',
-            color: '#ffffff',
-            fontStyle: 'bold'
+        this.add.text(width / 2, 100, 'CHOOSE YOUR HERO!', {
+            fontFamily: '"MedievalSharp", cursive',
+            fontSize: '56px',
+            color: '#ffd700',
+            fontStyle: 'bold',
+            stroke: '#000000',
+            strokeThickness: 6
         }).setOrigin(0.5);
 
         const charIds = Object.keys(CHARACTERS);
