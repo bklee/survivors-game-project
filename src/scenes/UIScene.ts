@@ -73,7 +73,7 @@ export class UIScene extends Phaser.Scene {
             strokeThickness: 3
         });
 
-        // 2. Coin UI (Redesigned as per user request)
+        // 2. Coin UI (Adjusted Y from 45 to 55 for spacing)
         this.coinText = this.add.text(10, 55, '0', {
             fontFamily: '"MedievalSharp", cursive',
             fontSize: '28px',
@@ -87,7 +87,7 @@ export class UIScene extends Phaser.Scene {
             .setScale(2.5)
             .setOrigin(0, 0.5);
 
-        // 3. Stats Text
+        // 3. Stats Text (Adjusted Y to 95 for spacing)
         this.statsText = this.add.text(10, 95, this.getStatsString(), {
             fontSize: '16px',
             color: '#00ff00',
@@ -433,6 +433,7 @@ export class UIScene extends Phaser.Scene {
         this.totalCoins += 1;
         this.coinText.setText(this.totalCoins.toLocaleString());
         this.coinIcon.x = this.coinText.x + this.coinText.width + 10;
+        this.sound.play('coin_pickup', { volume: 0.4 });
         this.currentXp += e.detail;
         if (this.currentXp >= this.xpToNextLevel) {
             this.currentLevel++;

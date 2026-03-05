@@ -21,6 +21,7 @@ export class AssetLoader {
         this.scene.load.image('main_bg', './assets/main.jpg');
         this.scene.load.image('loading_bg', './assets/loading.jpg');
         this.scene.load.image('hp_icon', './assets/frames/ui_heart_full.png');
+        this.scene.load.image('ui_heart_full', './assets/frames/ui_heart_full.png');
         for (let i = 0; i < 3; i++) {
             this.scene.load.image(`sword_slash_f${i}`, `./assets/frames/sword_slash_f${i}.png`);
             this.scene.load.image(`super_slash_f${i}`, `./assets/frames/super_slash_f${i}.png`);
@@ -88,6 +89,7 @@ export class AssetLoader {
         this.scene.load.audio('hit', './assets/audio/hit.mp3');
         this.scene.load.audio('level_up', './assets/audio/level_up.mp3');
         this.scene.load.audio('victory_fanfare', './assets/audio/victory_fanfare.mp3');
+        this.scene.load.audio('coin_pickup', './assets/audio/coin.mp3');
     }
 
     loadTextureAtlas() {
