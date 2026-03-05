@@ -433,7 +433,7 @@ export class UIScene extends Phaser.Scene {
         this.totalCoins += 1;
         this.coinText.setText(this.totalCoins.toLocaleString());
         this.coinIcon.x = this.coinText.x + this.coinText.width + 10;
-        this.sound.play('coin_pickup', { volume: 0.4 });
+        this.sound.play('coin_pickup', { volume: 0.8 });
         this.currentXp += e.detail;
         if (this.currentXp >= this.xpToNextLevel) {
             this.currentLevel++;
