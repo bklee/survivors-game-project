@@ -18,12 +18,23 @@ export class TitleScene extends Phaser.Scene {
             .setInteractive({ useHandCursor: true })
             .setStrokeStyle(3, 0xffd700);
 
-        this.add.text(width / 2, height / 2 + 150, 'START', {
+        const startText = this.add.text(width / 2, height / 2 + 150, 'START', {
             fontFamily: '"MedievalSharp", cursive',
             fontSize: '40px',
             color: '#ffffff',
             fontStyle: 'bold'
         }).setOrigin(0.5);
+
+        // Pulsing Animation to make it blink/attract attention
+        this.tweens.add({
+            targets: [startBtn, startText],
+            alpha: 0.5,
+            duration: 800,
+            yoyo: true,
+            repeat: -1,
+            ease: 'Sine.easeInOut'
+        });
+
 
         startBtn.on('pointerdown', () => {
             if (this.cache.audio.exists('select_bgm')) {
