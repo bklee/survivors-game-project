@@ -8,12 +8,14 @@ export class GameOverScene extends Phaser.Scene {
     create() {
         const { width, height } = this.scale;
 
+        // 0. Fade In Effect when scene starts
+        this.cameras.main.fadeIn(1000, 0, 0, 0);
+
         // 1. Background Image (game_over.png)
-        // Background already contains "GAME OVER" text based on user request
         this.add.image(width / 2, height / 2, 'game_over')
             .setDisplaySize(width, height);
 
-        // 2. Clearer overlay (optional, but keep it subtle so the background text shows)
+        // 2. Clearer overlay
         this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.2);
 
         // 3. Retry Button
@@ -30,7 +32,13 @@ export class GameOverScene extends Phaser.Scene {
 
         retryBtn.on('pointerdown', () => {
             this.sound.stopAll();
-            window.location.reload();
+
+            // Fade out and transition
+            this.cameras.main.fadeOut(800, 0, 0, 0);
+            this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => {
+                // Return to TitleScene to ensure clean state initialization
+                this.scene.start('TitleScene');
+            });
         });
 
         // Button Hover Effects
