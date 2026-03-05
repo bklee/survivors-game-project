@@ -221,7 +221,7 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                     sprite.setScale(1.0);
                 }
 
-                if (hasComponent(world, Velocity, eid)) {
+                if (hasComponent(world, Velocity, eid) && !hasComponent(world, Rotation, eid)) {
                     if (Velocity.x[eid] < 0) sprite.flipX = true;
                     else if (Velocity.x[eid] > 0) sprite.flipX = false;
                 }

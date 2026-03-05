@@ -86,20 +86,11 @@ export class SpellSystem {
     }
 
     private spawnKnightAttack(x: number, y: number, dx: number, dy: number) {
-        const eid = this.createBaseSpell(x + dx * 25, y + dy * 25, 105);
-        Spell.damage[eid] = 60 * globalStats.damageMult;
-        Spell.radius[eid] = 60;
-        Spell.duration[eid] = 150;
-        Spell.pierce[eid] = 10;
-        Velocity.x[eid] = dx * 10;
-        Velocity.y[eid] = dy * 10;
-        Rotation.angle[eid] = Math.atan2(dy, dx);
-
         const fxEid = this.createBaseSpell(x + dx * 35, y + dy * 35, Math.random() > 0.5 ? 109 : 110);
-        Spell.damage[fxEid] = 0;
-        Spell.radius[fxEid] = 0;
+        Spell.damage[fxEid] = 60 * globalStats.damageMult;
+        Spell.radius[fxEid] = 60;
         Spell.duration[fxEid] = 150;
-        Spell.pierce[fxEid] = 0;
+        Spell.pierce[fxEid] = 10;
         Velocity.x[fxEid] = dx * 10;
         Velocity.y[fxEid] = dy * 10;
         Rotation.angle[fxEid] = Math.atan2(dy, dx);
