@@ -13,12 +13,12 @@ export class AssetLoader {
     }
 
     loadImages() {
-        this.scene.load.image('dungeon', 'assets/0x72_DungeonTilesetII_v1.7.png');
-        this.scene.load.image('walls', 'assets/atlas_walls_high-16x32.png');
-        this.scene.load.image('weapon_bow', 'assets/frames/weapon_bow.png');
+        this.scene.load.image('dungeon', './assets/0x72_DungeonTilesetII_v1.7.png');
+        this.scene.load.image('walls', './assets/atlas_walls_high-16x32.png');
+        this.scene.load.image('weapon_bow', './assets/frames/weapon_bow.png');
         for (let i = 0; i < 3; i++) {
-            this.scene.load.image(`sword_slash_f${i}`, `assets/frames/sword_slash_f${i}.png`);
-            this.scene.load.image(`super_slash_f${i}`, `assets/frames/super_slash_f${i}.png`);
+            this.scene.load.image(`sword_slash_f${i}`, `./assets/frames/sword_slash_f${i}.png`);
+            this.scene.load.image(`super_slash_f${i}`, `./assets/frames/super_slash_f${i}.png`);
         }
         // Monster Groups
         const monsters = [
@@ -48,38 +48,38 @@ export class AssetLoader {
         monsters.forEach(m => {
             if (m.hasIdleRun) {
                 for (let i = 0; i < 4; i++) {
-                    this.scene.load.image(`${m.name}_idle_f${i}`, `assets/frames/${m.name}_idle_anim_f${i}.png`);
-                    this.scene.load.image(`${m.name}_run_f${i}`, `assets/frames/${m.name}_run_anim_f${i}.png`);
+                    this.scene.load.image(`${m.name}_idle_f${i}`, `./assets/frames/${m.name}_idle_anim_f${i}.png`);
+                    this.scene.load.image(`${m.name}_run_f${i}`, `./assets/frames/${m.name}_run_anim_f${i}.png`);
                 }
             } else {
                 for (let i = 0; i < 4; i++) {
-                    this.scene.load.image(`${m.name}_f${i}`, `assets/frames/${m.name}_anim_f${i}.png`);
+                    this.scene.load.image(`${m.name}_f${i}`, `./assets/frames/${m.name}_anim_f${i}.png`);
                 }
             }
         });
 
         // Add Chest animations
         for (let i = 0; i < 3; i++) {
-            this.scene.load.image(`chest_full_open_${i}`, `assets/frames/chest_full_open_anim_f${i}.png`);
-            this.scene.load.image(`chest_empty_open_${i}`, `assets/frames/chest_empty_open_anim_f${i}.png`);
+            this.scene.load.image(`chest_full_open_${i}`, `./assets/frames/chest_full_open_anim_f${i}.png`);
+            this.scene.load.image(`chest_empty_open_${i}`, `./assets/frames/chest_empty_open_anim_f${i}.png`);
         }
 
         // Add Coin animations
         for (let i = 0; i < 4; i++) {
-            this.scene.load.image(`coin_f${i}`, `assets/frames/coin_anim_f${i}.png`);
+            this.scene.load.image(`coin_f${i}`, `./assets/frames/coin_anim_f${i}.png`);
         }
     }
 
     loadAudio() {
-        this.scene.load.audio('select_bgm', 'assets/audio/hero_reprise.mp3', { stream: true });
-        this.scene.load.audio('main_bgm', 'assets/audio/fight_for_better_future.mp3', { stream: true });
-        this.scene.load.audio('boss_bgm', 'assets/audio/boss_battle_8_retro_01_opening.mp3', { stream: true });
+        this.scene.load.audio('select_bgm', './assets/audio/hero_reprise.mp3', { stream: true });
+        this.scene.load.audio('main_bgm', './assets/audio/fight_for_better_future.mp3', { stream: true });
+        this.scene.load.audio('boss_bgm', './assets/audio/boss_battle_8_retro_01_opening.mp3', { stream: true });
 
-        this.scene.load.audio('fire_cast', 'assets/audio/fire_cast.mp3');
-        this.scene.load.audio('ice_cast', 'assets/audio/ice_cast.mp3');
-        this.scene.load.audio('poison_cast', 'assets/audio/poison_cast.mp3');
-        this.scene.load.audio('hit', 'assets/audio/hit.mp3');
-        this.scene.load.audio('level_up', 'assets/audio/level_up.mp3');
+        this.scene.load.audio('fire_cast', './assets/audio/fire_cast.mp3');
+        this.scene.load.audio('ice_cast', './assets/audio/ice_cast.mp3');
+        this.scene.load.audio('poison_cast', './assets/audio/poison_cast.mp3');
+        this.scene.load.audio('hit', './assets/audio/hit.mp3');
+        this.scene.load.audio('level_up', './assets/audio/level_up.mp3');
     }
 
     loadTextureAtlas() {

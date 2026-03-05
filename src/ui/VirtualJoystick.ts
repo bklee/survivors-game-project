@@ -7,7 +7,7 @@ export class VirtualJoystick {
     private radius: number;
     private background!: Phaser.GameObjects.Graphics;
     private thumb!: Phaser.GameObjects.Graphics;
-
+    private activePointer: Phaser.Input.Pointer | null = null;
     public isDown: boolean = false;
     public vector: Phaser.Math.Vector2 = new Phaser.Math.Vector2(0, 0);
 
@@ -21,13 +21,30 @@ export class VirtualJoystick {
     }
 
     private createJoysticGraphics() {
+        // Subtle background panel for the joystick area
+        const panel = this.scene.add.graphics();
+        panel.fillStyle(0x000000, 0.3);
+        panel.fillRoundedRect(this.x - this.radius * 2, this.y - this.radius * 1.5, this.radius * 4, this.radius * 3, 20);
+        panel.lineStyle(2, 0xffffff, 0.1);
+        panel.strokeRoundedRect(this.x - this.radius * 2, this.y - this.radius * 1.5, this.radius * 4, this.radius * 3, 20);
+        panel.setScrollFactor(0);
+        panel.setDepth(99);
+
         this.background = this.scene.add.graphics();
-        this.background.lineStyle(4, 0x888888, 0.5);
+        this.background.lineStyle(6, 0xffffff, 0.2);
         this.background.strokeCircle(this.x, this.y, this.radius);
+        this.background.lineStyle(2, 0xffffff, 0.4);
+        this.background.strokeCircle(this.x, this.y, this.radius * 0.8);
+        this.background.setScrollFactor(0);
+        this.background.setDepth(100);
 
         this.thumb = this.scene.add.graphics();
-        this.thumb.fillStyle(0xcccccc, 0.8);
-        this.thumb.fillCircle(this.x, this.y, this.radius / 2);
+        this.thumb.fillStyle(0x00ffff, 0.5);
+        this.thumb.fillCircle(this.x, this.y, this.radius * 0.6);
+        this.thumb.lineStyle(2, 0xffffff, 0.8);
+        this.thumb.strokeCircle(this.x, this.y, this.radius * 0.6);
+        this.thumb.setScrollFactor(0);
+        this.thumb.setDepth(101);
     }
 
     private setupInput() {
@@ -37,25 +54,35 @@ export class VirtualJoystick {
     }
 
     private onPointerDown(pointer: Phaser.Input.Pointer) {
+        if (this.activePointer) return;
+
         const dist = Phaser.Math.Distance.Between(pointer.x, pointer.y, this.x, this.y);
-        if (dist < this.radius * 2) {
+        if (dist < this.radius * 1.5) {
             this.isDown = true;
+            this.activePointer = pointer;
             this.updateThumbPosition(pointer);
         }
     }
 
     private onPointerMove(pointer: Phaser.Input.Pointer) {
-        if (!this.isDown) return;
+        if (!this.isDown || this.activePointer !== pointer) return;
         this.updateThumbPosition(pointer);
     }
 
-    private onPointerUp() {
-        if (!this.isDown) return;
+    private onPointerUp(pointer: Phaser.Input.Pointer) {
+        if (!this.isDown || this.activePointer !== pointer) return;
         this.isDown = false;
+        this.activePointer = null;
         this.vector.set(0, 0);
+        this.drawThumb(this.x, this.y);
+    }
+
+    private drawThumb(x: number, y: number) {
         this.thumb.clear();
-        this.thumb.fillStyle(0xcccccc, 0.8);
-        this.thumb.fillCircle(this.x, this.y, this.radius / 2);
+        this.thumb.fillStyle(0x00ffff, 0.5);
+        this.thumb.fillCircle(x, y, this.radius * 0.6);
+        this.thumb.lineStyle(2, 0xffffff, 0.8);
+        this.thumb.strokeCircle(x, y, this.radius * 0.6);
     }
 
     private updateThumbPosition(pointer: Phaser.Input.Pointer) {
@@ -72,9 +99,7 @@ export class VirtualJoystick {
             thumbY = this.y + Math.sin(angle) * this.radius;
         }
 
-        this.thumb.clear();
-        this.thumb.fillStyle(0xcccccc, 0.8);
-        this.thumb.fillCircle(thumbX, thumbY, this.radius / 2);
+        this.drawThumb(thumbX, thumbY);
 
         // Calculate normalized vector for movement
         const angle = Math.atan2(thumbY - this.y, thumbX - this.x);

@@ -3,7 +3,7 @@ import math
 import struct
 import os
 
-os.makedirs('public/assets/audio', exist_ok=True)
+os.makedirs('./public/assets/audio', exist_ok=True)
 
 def generate_tone(frequency, duration, sample_rate=44100, wave_type='square'):
     data = []
@@ -46,20 +46,20 @@ select_notes = [(261.63, 0.4), (329.63, 0.4), (392.00, 0.4), (523.25, 0.8), (392
 select_data = []
 for freq, dur in select_notes:
     select_data.extend(generate_tone(freq, dur, wave_type='sine'))
-save_wav('public/assets/audio/select_bgm.wav', select_data)
+save_wav('./public/assets/audio/select_bgm.wav', select_data)
 
 print("Generating main_bgm.wav...")
 main_notes = [(110.00, 0.3), (110.00, 0.3), (123.47, 0.3), (130.81, 0.3), (110.00, 0.3), (146.83, 0.3)] * 8
 main_data = []
 for freq, dur in main_notes:
     main_data.extend(generate_tone(freq, dur, wave_type='square'))
-save_wav('public/assets/audio/main_bgm.wav', main_data)
+save_wav('./public/assets/audio/main_bgm.wav', main_data)
 
 print("Generating boss_bgm.wav...")
 boss_notes = [(164.81, 0.15), (174.61, 0.15), (233.08, 0.15), (164.81, 0.15), (174.61, 0.15), (329.63, 0.15), (311.13, 0.2)] * 10
 boss_data = []
 for freq, dur in boss_notes:
     boss_data.extend(generate_tone(freq, dur, wave_type='sawtooth'))
-save_wav('public/assets/audio/boss_bgm.wav', boss_data)
+save_wav('./public/assets/audio/boss_bgm.wav', boss_data)
 
 print("Done generating BGM files.")

@@ -108,7 +108,8 @@ export class MainScene extends Phaser.Scene {
 
         this.cameras.main.setZoom(2.5);
 
-        this.joystick = new VirtualJoystick(this, 150, 600, 50);
+        const { width, height } = this.scale;
+        this.joystick = new VirtualJoystick(this, width / 2, height - 100, 60);
 
         const soundHandler = ((e: CustomEvent<string>) => {
             if (this.cache.audio.exists(e.detail)) {
