@@ -77,6 +77,8 @@ export class AssetLoader {
     loadAudio() {
         this.scene.load.audio('select_bgm', './assets/audio/hero_reprise.mp3', { stream: true });
         this.scene.load.audio('main_bgm', './assets/audio/fight_for_better_future.mp3', { stream: true });
+        this.scene.load.audio('bgm_metal', './assets/audio/once_more_metal.wav', { stream: true });
+        this.scene.load.audio('bgm_unchained', './assets/audio/unchained_destiny_loop.wav', { stream: true });
         this.scene.load.audio('boss_bgm', './assets/audio/boss_battle_8_retro_01_opening.mp3', { stream: true });
 
         this.scene.load.audio('fire_cast', './assets/audio/fire_cast.mp3');
