@@ -42,7 +42,10 @@ export class GameOverScene extends Phaser.Scene {
             // Fade out and transition
             this.cameras.main.fadeOut(800, 0, 0, 0);
             this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => {
-                // Go straight to character select as requested
+                // To perfectly clear the previous game state (MainScene, UIScene), 
+                // we stop them explicitly before starting the character select.
+                this.scene.stop('MainScene');
+                this.scene.stop('UIScene');
                 this.scene.start('CharacterSelectScene');
             });
         });
