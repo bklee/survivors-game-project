@@ -227,9 +227,8 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                 }
                 if (hasComponent(world, Rotation, eid)) {
                     sprite.rotation = Rotation.angle[eid];
-                    // Slash sprites natively face left; offset by π so rotation=0 faces right
+                    // Slash sprites: ensure no flip interferes with rotation
                     if (typeId === 109 || typeId === 110) {
-                        sprite.rotation = Rotation.angle[eid] + Math.PI;
                         sprite.flipX = false;
                         sprite.flipY = false;
                     }
