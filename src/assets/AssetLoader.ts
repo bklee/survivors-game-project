@@ -84,6 +84,7 @@ export class AssetLoader {
         this.scene.load.audio('poison_cast', './assets/audio/poison_cast.mp3');
         this.scene.load.audio('hit', './assets/audio/hit.mp3');
         this.scene.load.audio('level_up', './assets/audio/level_up.mp3');
+        this.scene.load.audio('victory_fanfare', './assets/audio/victory_fanfare.mp3');
     }
 
     loadTextureAtlas() {
