@@ -30,6 +30,7 @@ export class UIScene extends Phaser.Scene {
     private xpToNextLevel = 100;
 
     private coinText!: Phaser.GameObjects.Text;
+    private coinIcon!: Phaser.GameObjects.Image;
     private totalCoins = 0;
     private skillPoints = 0;
 
@@ -51,8 +52,6 @@ export class UIScene extends Phaser.Scene {
     create() {
         this.uiContainer = this.add.container(0, 0);
 
-
-
         this.stageLevelText = this.add.text(640, 10, "Stage 1", {
             fontSize: '28px',
             color: '#ffff00',
@@ -64,19 +63,36 @@ export class UIScene extends Phaser.Scene {
         const { width, height } = this.scale;
         this.joystick = new VirtualJoystick(this, width / 2, height - 100, 60);
         this.joystick.setVisible(false);
+
+        // 1. Level Text (Top Left)
         this.levelText = this.add.text(10, 10, "Level 1 (0 / 100 XP) | SP: 0", {
             fontSize: '20px',
-            color: '#ffcc00', // Changed to Gold for better visibility
+            color: '#ffcc00',
             fontStyle: 'bold',
             stroke: '#000000',
             strokeThickness: 3
         });
 
-        this.statsText = this.add.text(10, 45, this.getStatsString(), {
+        // 2. Coin UI (Redesigned as per user request)
+        this.coinText = this.add.text(10, 45, '0', {
+            fontFamily: '"MedievalSharp", cursive',
+            fontSize: '28px',
+            color: '#ffffff',
+            fontStyle: 'bold',
+            stroke: '#000000',
+            strokeThickness: 5
+        }).setOrigin(0, 0.5);
+
+        this.coinIcon = this.add.image(this.coinText.x + this.coinText.width + 10, 45, 'coin_f0')
+            .setScale(2.5)
+            .setOrigin(0, 0.5);
+
+        // 3. Stats Text
+        this.statsText = this.add.text(10, 80, this.getStatsString(), {
             fontSize: '16px',
             color: '#00ff00',
             backgroundColor: '#00000088'
-        }).setVisible(false); // Hidden by default
+        }).setVisible(false);
 
         // Stats Toggle (Shift + A)
         this.input.keyboard?.on('keydown-A', (event: KeyboardEvent) => {
@@ -86,35 +102,30 @@ export class UIScene extends Phaser.Scene {
             }
         });
 
-        // --- Stylized HP Bar (Design based on feedback) ---
+        // --- Stylized HP Bar ---
         const hpX = 20;
         const hpY = 700;
         const hpHeight = 30;
         const fullWidth = 400;
 
-        // 1. HP Bar Frame/Background
         const hpFrame = this.add.graphics();
-        hpFrame.lineStyle(4, 0xffffff); // White outline
+        hpFrame.lineStyle(4, 0xffffff);
         hpFrame.strokeRoundedRect(hpX, hpY - hpHeight, fullWidth, hpHeight, 4);
-        hpFrame.fillStyle(0x000000, 0.8); // Dark background
+        hpFrame.fillStyle(0x000000, 0.8);
         hpFrame.fillRoundedRect(hpX, hpY - hpHeight, fullWidth, hpHeight, 4);
 
-        // 2. HP Fill Bar (with shine mask)
         this.hpBar = this.add.rectangle(hpX + 4, hpY - hpHeight + 4, fullWidth - 8, hpHeight - 8, 0xffcc00)
             .setOrigin(0, 0);
 
-        // Add a subtle shine/highlight effect on top of the bar
         const shine = this.add.graphics();
         shine.fillStyle(0xffffff, 0.2);
         shine.fillRect(hpX + 4, hpY - hpHeight + 4, fullWidth - 8, (hpHeight - 8) / 2);
 
-        // 3. Heart Icon 
         const hpIcon = this.add.image(hpX - 1, hpY - hpHeight / 2, 'hp_icon')
-            .setDisplaySize(35, 35) // Increased by 10% (32 * 1.1 ≈ 35)
+            .setDisplaySize(35, 35)
             .setOrigin(0.5, 0.5)
             .setDepth(20);
 
-        // 4. HP Text
         this.hpText = this.add.text(hpX + fullWidth / 2, hpY - hpHeight / 2, '100 / 100', {
             fontFamily: '"MedievalSharp", cursive',
             fontSize: '20px',
@@ -124,7 +135,7 @@ export class UIScene extends Phaser.Scene {
             strokeThickness: 4
         }).setOrigin(0.5, 0.5).setDepth(6);
 
-        // --- Boss HP Bar (Hidden by default) ---
+        // --- Boss HP Bar ---
         this.bossHpContainer = this.add.container(640, 80).setVisible(false).setAlpha(0.8);
         const bossBarW = 600;
         const bossBarH = 24;
@@ -144,15 +155,7 @@ export class UIScene extends Phaser.Scene {
 
         this.bossHpContainer.add([bFrame, this.bossHpBar, this.bossHpText]);
 
-        this.coinText = this.add.text(1270, 710, 'Coins: 0', {
-            fontSize: '24px',
-            color: '#ffd700',
-            fontStyle: 'bold',
-            stroke: '#000000',
-            strokeThickness: 4
-        }).setOrigin(1, 1);
-
-        // Minimap
+        // --- Minimap ---
         const mmX = 1280 - 10;
         const mmY = 10;
         const mmBg1 = this.add.rectangle(mmX, mmY, this.MINIMAP_SIZE + 4, this.MINIMAP_SIZE + 4, 0x222222, 1).setOrigin(1, 0);
@@ -160,7 +163,7 @@ export class UIScene extends Phaser.Scene {
         this.minimapGraphics = this.add.graphics();
         this.arrowGraphics = this.add.graphics();
 
-        // Pause Button (below minimap)
+        // Pause Button
         const pauseBtn = this.add.text(1270, 170, '⏸', {
             fontSize: '32px',
             color: '#ffffff',
@@ -168,7 +171,7 @@ export class UIScene extends Phaser.Scene {
             padding: { x: 8, y: 4 }
         }).setOrigin(1, 0).setInteractive({ useHandCursor: true });
 
-        // Pause Overlay (hidden by default)
+        // Pause Overlays
         const pauseOverlay = this.add.rectangle(640, 360, 1280, 720, 0x000000, 0.7).setVisible(false).setDepth(900);
         const pauseText = this.add.text(640, 300, 'PAUSED', {
             fontFamily: '"MedievalSharp", cursive',
@@ -231,7 +234,7 @@ export class UIScene extends Phaser.Scene {
             this.scene.start('TitleScene');
         });
 
-        this.uiContainer.add([this.stageLevelText, this.levelText, this.statsText, hpFrame, this.hpBar, shine, hpIcon, this.hpText, this.coinText, mmBg1, mmBg2, this.minimapGraphics, this.arrowGraphics, pauseBtn]);
+        this.uiContainer.add([this.stageLevelText, this.levelText, this.statsText, hpFrame, this.hpBar, shine, hpIcon, this.hpText, this.coinText, this.coinIcon, mmBg1, mmBg2, this.minimapGraphics, this.arrowGraphics, pauseBtn]);
         this.uiContainer.setVisible(false);
 
         this.bossWarningText = this.add.text(640, 360, 'BOSS APPROACHING!', {
@@ -428,7 +431,8 @@ export class UIScene extends Phaser.Scene {
 
     private handleXp = (e: CustomEvent<number>) => {
         this.totalCoins += 1;
-        this.coinText.setText(`Coins: ${this.totalCoins}`);
+        this.coinText.setText(this.totalCoins.toLocaleString());
+        this.coinIcon.x = this.coinText.x + this.coinText.width + 10;
         this.currentXp += e.detail;
         if (this.currentXp >= this.xpToNextLevel) {
             this.currentLevel++;
@@ -452,7 +456,6 @@ export class UIScene extends Phaser.Scene {
         this.hpBar.displayWidth = fullWidth * percent;
         this.hpText.setText(`${Math.ceil(current)} / ${max}`);
 
-        // Use pure red for 20% warning
         if (percent > 0.20) this.hpBar.setFillStyle(0xffcc00);
         else this.hpBar.setFillStyle(0xff0000);
     }
