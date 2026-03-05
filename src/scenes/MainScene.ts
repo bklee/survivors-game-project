@@ -146,6 +146,10 @@ export class MainScene extends Phaser.Scene {
             if (e.code === 'KeyC' && e.shiftKey) {
                 window.dispatchEvent(new CustomEvent('stage_clear'));
             }
+            // Debug: Trigger Game Over
+            if (e.code === 'KeyR' && e.shiftKey) {
+                window.dispatchEvent(new CustomEvent('player_died'));
+            }
         };
         window.addEventListener('keydown', recipeHandler);
 
