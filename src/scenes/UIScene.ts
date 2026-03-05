@@ -72,6 +72,14 @@ export class UIScene extends Phaser.Scene {
             fontSize: '16px',
             color: '#00ff00',
             backgroundColor: '#00000088'
+        }).setVisible(false); // Hidden by default
+
+        // Stats Toggle (Shift + A)
+        this.input.keyboard?.on('keydown-A', (event: KeyboardEvent) => {
+            if (event.shiftKey) {
+                const isVisible = this.statsText.visible;
+                this.statsText.setVisible(!isVisible);
+            }
         });
 
         const hpBg = this.add.rectangle(10, 715, 400, 26, 0x222222).setOrigin(0, 1);
