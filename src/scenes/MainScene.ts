@@ -322,7 +322,18 @@ export class MainScene extends Phaser.Scene {
             if (typeId === 40) {
                 if (distSq < 40 * 40 && hasComponent(world, Interactive, eid) && Interactive.isActivated[eid] === 0) {
                     Interactive.isActivated[eid] = 1;
+                    const linkId = Interactive.id[eid];
                     window.dispatchEvent(new CustomEvent('play_sound', { detail: 'hit' }));
+
+                    // Link: Activate all items with same ID (e.g. Doors)
+                    if (linkId > 0) {
+                        for (let j = 0; j < interactives.length; j++) {
+                            const targetEid = interactives[j];
+                            if (targetEid !== eid && hasComponent(world, Interactive, targetEid) && Interactive.id[targetEid] === linkId) {
+                                Interactive.isActivated[targetEid] = 1;
+                            }
+                        }
+                    }
                 }
             } else if (typeId === 32) {
                 const animIdx = Math.floor(Animation.timer[eid] * 4 / 1000) % 4;
@@ -472,5 +483,43 @@ export class MainScene extends Phaser.Scene {
                 Animation.timer[eid] = Math.random() * 1000;
             }
         }
+        this.spawnSecretRoom();
+    }
+
+    private spawnSecretRoom() {
+        const pos = this.dungeon.getRandomFloorPixel();
+
+        // Locked Door
+        const doorId = addEntity(world);
+        addComponent(world, Position, doorId);
+        addComponent(world, SpriteInfo, doorId);
+        addComponent(world, Interactive, doorId);
+        Position.x[doorId] = pos.x;
+        Position.y[doorId] = pos.y;
+        SpriteInfo.textureIndex[doorId] = 41; // Door
+        Interactive.isActivated[doorId] = 0;
+        Interactive.id[doorId] = 99; // Link ID for secret room
+
+        // Lever to open the door (placed far away)
+        const leverPos = this.dungeon.getFloorPixelNear(pos.x, pos.y, 400, 800);
+        const leverId = addEntity(world);
+        addComponent(world, Position, leverId);
+        addComponent(world, SpriteInfo, leverId);
+        addComponent(world, Interactive, leverId);
+        Position.x[leverId] = leverPos.x;
+        Position.y[leverId] = leverPos.y;
+        SpriteInfo.textureIndex[leverId] = 40; // Lever
+        Interactive.isActivated[leverId] = 0;
+        Interactive.id[leverId] = 99; // Same link ID
+
+        // Special Treasure behind the door
+        const chestId = addEntity(world);
+        addComponent(world, Position, chestId);
+        addComponent(world, SpriteInfo, chestId);
+        addComponent(world, Animation, chestId);
+        Position.x[chestId] = pos.x;
+        Position.y[chestId] = pos.y - 16; // Just above/behind the door
+        SpriteInfo.textureIndex[chestId] = 36;
+        Animation.timer[chestId] = 0;
     }
 }
