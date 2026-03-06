@@ -26,6 +26,7 @@ export class AssetLoader {
         for (let i = 0; i < 3; i++) {
             this.scene.load.image(`sword_slash_f${i}`, `./assets/frames/sword_slash_f${i}.png`);
             this.scene.load.image(`super_slash_f${i}`, `./assets/frames/super_slash_f${i}.png`);
+            this.scene.load.image(`spell_fire_f${i}`, `./assets/frames/spell_fire_f${i}.png`);
         }
         // We will define all monster, coin, and chest frames in defineFrames() using the dungeon tileset
     }
