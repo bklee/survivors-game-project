@@ -164,7 +164,8 @@ export const createCombatSystem = (juice: JuicePipeline) => {
                 Position.y[dropId] = ty;
                 Velocity.x[dropId] = (Math.random() - 0.5) * 100;
                 Velocity.y[dropId] = (Math.random() - 0.5) * 100;
-                Item.xpValue[dropId] = 0; // Coins only increase coin count now, no EXP
+                const coinValue = Math.floor(Math.random() * 100) + 1;
+                Item.xpValue[dropId] = coinValue; // Coins drop random value 1-100
                 SpriteInfo.textureIndex[dropId] = 21; // Coin type
                 Animation.timer[dropId] = Math.random() * 1000;
                 Item.magnetized[dropId] = 0;
