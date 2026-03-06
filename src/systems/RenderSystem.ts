@@ -33,8 +33,8 @@ const sprites: (Phaser.GameObjects.Sprite | undefined)[] = [];
 const playerWeaponSprites: (Phaser.GameObjects.Sprite | undefined)[] = [];
 let playerAttackTimer = 0;
 
-window.addEventListener('combo_cast', () => {
-    playerAttackTimer = 400; // 지팡이 숨김 시간 연장
+window.addEventListener('combo_cast', (e: any) => {
+    playerAttackTimer = e.detail?.duration || 400;
 });
 
 export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObjects.Blitter) => {
@@ -279,13 +279,13 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                         playerWeaponSprites[eid] = wSprite;
                     }
 
-                    const wx = charKey === 'wizard' ? 7 : 7; // 검사 무기를 캐릭터 쪽으로 더 정밀 밀착 (10 -> 7)
-                    const wy = charKey === 'wizard' ? 2 : 2; // 세로 위치도 살짝 내려서 손 위치에 맞춤 (0 -> 2)
+                    const wx = charKey === 'wizard' ? 7 : 5; // 검사 무기를 캐릭터 쪽으로 더 밀착 (7 -> 5)
+                    const wy = charKey === 'wizard' ? 2 : 3; // 세로 위치 조정 (2 -> 3)
                     let baseRot = charKey === 'knight' ? -Math.PI / 4 : 0;
 
                     let swingRot = 0;
                     if (playerAttackTimer > 0) {
-                        const animDuration = (charKey === 'knight') ? 250 : 400; // 캐릭터별 공격 시간에 맞춤
+                        const animDuration = (charKey === 'knight') ? 250 : 400;
                         const progress = Math.max(0, 1 - (playerAttackTimer / animDuration));
 
                         if (charKey === 'knight') {
