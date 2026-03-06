@@ -1,5 +1,5 @@
 import { defineQuery } from 'bitecs';
-import { Position, Velocity, Enemy } from '../components';
+import { Position, Velocity, Enemy, SpriteInfo, Interactive } from '../components';
 import { world } from '../core/World';
 import { SpatialHash } from '../core/SpatialHash';
 import { isHitStopped } from '../fx/JuicePipeline';
@@ -9,29 +9,44 @@ import { DungeonGenerator, TILE_SIZE } from '../core/DungeonGenerator';
 // Simple movement physics query
 const physicsQuery = defineQuery([Position, Velocity]);
 const enemyQuery = defineQuery([Enemy, Position]);
+const doorQuery = defineQuery([Position, SpriteInfo, Interactive]);
 
 export const enemySpatialHash = new SpatialHash(64);
 
 export const createPhysicsSystem = (dungeon: DungeonGenerator) => {
     return (dt: number) => {
         const ents = physicsQuery(world);
+        const doors = doorQuery(world);
         const deltaSec = dt / 1000;
 
         if (!isHitStopped) {
             for (let i = 0; i < ents.length; i++) {
                 const eid = ents[i];
 
-                const nextX = Position.x[eid] + Velocity.x[eid] * deltaSec;
-                const nextY = Position.y[eid] + Velocity.y[eid] * deltaSec;
+                let nextX = Position.x[eid] + Velocity.x[eid] * deltaSec;
+                let nextY = Position.y[eid] + Velocity.y[eid] * deltaSec;
 
-                // Wall Collision check with Bounding Box
-                // Setting collision size to 12x12
-                if (dungeon.isFloorRect(nextX, Position.y[eid], 12, 12)) {
-                    Position.x[eid] = nextX;
+                // 1. Wall Collision (Dungeon)
+                let canMoveX = dungeon.isFloorRect(nextX, Position.y[eid], 12, 12);
+                let canMoveY = dungeon.isFloorRect(Position.x[eid], nextY, 12, 12);
+
+                // 2. Door Collision (Entities)
+                for (let j = 0; j < doors.length; j++) {
+                    const doorEid = doors[j];
+                    if (SpriteInfo.textureIndex[doorEid] === 41 && Interactive.isActivated[doorEid] === 0) {
+                        // Closed Door: Block like a wall
+                        const dx = nextX - Position.x[doorEid];
+                        const dy = Position.y[eid] - Position.y[doorEid];
+                        if (Math.abs(dx) < 16 && Math.abs(dy) < 16) canMoveX = false;
+
+                        const dy2 = nextY - Position.y[doorEid];
+                        const dx2 = Position.x[eid] - Position.x[doorEid];
+                        if (Math.abs(dy2) < 16 && Math.abs(dx2) < 16) canMoveY = false;
+                    }
                 }
-                if (dungeon.isFloorRect(Position.x[eid], nextY, 12, 12)) {
-                    Position.y[eid] = nextY;
-                }
+
+                if (canMoveX) Position.x[eid] = nextX;
+                if (canMoveY) Position.y[eid] = nextY;
 
                 // Clamp to world bounds
                 const w = dungeon.width * TILE_SIZE;
