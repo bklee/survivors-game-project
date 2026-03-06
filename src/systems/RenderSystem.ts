@@ -279,16 +279,18 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                         playerWeaponSprites[eid] = wSprite;
                     }
 
-                    const wx = charKey === 'wizard' ? 7 : 8;
-                    const wy = charKey === 'wizard' ? 2 : 2;
-                    let baseRot = charKey === 'knight' ? Math.PI / 6 : 0;
+                    const wx = charKey === 'wizard' ? 7 : 10;
+                    const wy = charKey === 'wizard' ? 2 : 0;
+                    let baseRot = charKey === 'knight' ? -Math.PI / 4 : 0;
 
                     let swingRot = 0;
                     if (playerAttackTimer > 0) {
                         const animDuration = (charKey === 'knight') ? 250 : 400; // 캐릭터별 공격 시간에 맞춤
                         const progress = Math.max(0, 1 - (playerAttackTimer / animDuration));
 
-                        if (charKey === 'knight') swingRot = Math.sin(progress * Math.PI) * Math.PI / 2;
+                        if (charKey === 'knight') {
+                            swingRot = Math.sin(progress * Math.PI) * (Math.PI * 0.8);
+                        }
                         else if (charKey === 'wizard') swingRot = Math.sin(progress * Math.PI) * (Math.PI / 15); // 까딱(약 12도) 하는 효과로 최소화
                         else swingRot = Math.sin(progress * Math.PI) * (Math.PI / 4);
                     } else if (state === 'run') {
