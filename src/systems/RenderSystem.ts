@@ -225,8 +225,6 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                 sprite.setVisible(true);
                 if (hasComponent(world, Boss, eid)) {
                     sprite.setScale(2.5);
-                } else if (typeId >= 54 && typeId <= 57) {
-                    sprite.setScale(1.5); // Big Flasks
                 } else {
                     sprite.setScale(1.0);
                 }
