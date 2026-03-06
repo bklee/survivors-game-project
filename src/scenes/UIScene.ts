@@ -11,6 +11,7 @@ export class UIScene extends Phaser.Scene {
     private statsText!: Phaser.GameObjects.Text;
     private hpBar!: Phaser.GameObjects.Rectangle;
     private hpText!: Phaser.GameObjects.Text;
+    private skillPointsText!: Phaser.GameObjects.Text;
 
     private bossHpBar?: Phaser.GameObjects.Rectangle;
     private bossHpText?: Phaser.GameObjects.Text;
@@ -65,11 +66,11 @@ export class UIScene extends Phaser.Scene {
         this.uiContainer = this.add.container(0, 0);
 
         this.stageLevelText = this.add.text(640, 10, "Stage 1", {
-            fontSize: '28px',
+            fontSize: '56px',
             color: '#ffff00',
             fontStyle: 'bold',
             stroke: '#000000',
-            strokeThickness: 4
+            strokeThickness: 8
         }).setOrigin(0.5, 0);
 
         const { width, height } = this.scale;
@@ -77,31 +78,40 @@ export class UIScene extends Phaser.Scene {
         this.joystick.setVisible(false);
 
         // 1. Level Text (Top Left)
-        this.levelText = this.add.text(10, 10, "Level 1 (0 / 100 XP) | SP: 0", {
-            fontSize: '20px',
+        this.levelText = this.add.text(10, 10, "Level 1 (0 / 100 XP)", {
+            fontSize: '40px',
             color: '#ffcc00',
             fontStyle: 'bold',
             stroke: '#000000',
-            strokeThickness: 3
+            strokeThickness: 6
         });
 
-        // 2. Coin UI (Adjusted Y from 45 to 55 for spacing)
-        this.coinText = this.add.text(10, 55, '0', {
+        // 1.5 Skill Points Text (Bottom Right)
+        this.skillPointsText = this.add.text(1270, 710, "SP: 0", {
+            fontSize: '48px',
+            color: '#ffcc00',
+            fontStyle: 'bold',
+            stroke: '#000000',
+            strokeThickness: 6
+        }).setOrigin(1, 1);
+
+        // 2. Coin UI (Adjusted Y for increased font size)
+        this.coinText = this.add.text(10, 100, '0', {
             fontFamily: '"MedievalSharp", cursive',
-            fontSize: '28px',
+            fontSize: '56px',
             color: '#ffffff',
             fontStyle: 'bold',
             stroke: '#000000',
-            strokeThickness: 5
+            strokeThickness: 10
         }).setOrigin(0, 0.5);
 
-        this.coinIcon = this.add.image(this.coinText.x + this.coinText.width + 10, 55, 'coin_f0')
-            .setScale(2.5)
+        this.coinIcon = this.add.image(this.coinText.x + this.coinText.width + 20, 100, 'coin_f0')
+            .setScale(5.0)
             .setOrigin(0, 0.5);
 
-        // 3. Stats Text (Adjusted Y to 95 for spacing)
-        this.statsText = this.add.text(10, 95, this.getStatsString(), {
-            fontSize: '16px',
+        // 3. Stats Text (Adjusted Y and size for mobile)
+        this.statsText = this.add.text(10, 160, this.getStatsString(), {
+            fontSize: '32px',
             color: '#00ff00',
             backgroundColor: '#00000088'
         }).setVisible(false);
@@ -272,7 +282,7 @@ export class UIScene extends Phaser.Scene {
             quitBtnText.setScale(1);
         });
 
-        this.uiContainer.add([this.stageLevelText, this.levelText, this.statsText, hpFrame, this.hpBar, shine, hpIcon, this.hpText, this.coinText, this.coinIcon, mmBg1, mmBg2, this.minimapGraphics, this.arrowGraphics, pauseBtn]);
+        this.uiContainer.add([this.stageLevelText, this.levelText, this.skillPointsText, this.statsText, hpFrame, this.hpBar, shine, hpIcon, this.hpText, this.coinText, this.coinIcon, mmBg1, mmBg2, this.minimapGraphics, this.arrowGraphics, pauseBtn]);
         // Note: Pause overlay/buttons are not in uiContainer based on previous structure
         this.uiContainer.setVisible(false);
 
@@ -346,7 +356,7 @@ export class UIScene extends Phaser.Scene {
         // --- Initial Display Update ---
         this.updateStageLevelText();
         this.coinText.setText(this.totalCoins.toLocaleString());
-        this.coinIcon.x = this.coinText.x + this.coinText.width + 10;
+        this.coinIcon.x = this.coinText.x + this.coinText.width + 20;
         // ------------------------------
     }
 
@@ -356,7 +366,8 @@ export class UIScene extends Phaser.Scene {
 
     private updateStageLevelText() {
         this.stageLevelText.setText(`Stage ${this.currentStage}`);
-        this.levelText.setText(`Level ${this.currentLevel} (${Math.floor(this.currentXp)} / ${this.xpToNextLevel} XP) | SP: ${this.skillPoints}`);
+        this.levelText.setText(`Level ${this.currentLevel} (${Math.floor(this.currentXp)} / ${this.xpToNextLevel} XP)`);
+        this.skillPointsText.setText(`SP: ${this.skillPoints}`);
     }
 
     update(_time: number, delta: number) {
@@ -495,7 +506,7 @@ export class UIScene extends Phaser.Scene {
     private handleXp = (e: CustomEvent<number>) => {
         this.totalCoins += 1;
         this.coinText.setText(this.totalCoins.toLocaleString());
-        this.coinIcon.x = this.coinText.x + this.coinText.width + 10;
+        this.coinIcon.x = this.coinText.x + this.coinText.width + 20;
         this.sound.play('coin_pickup', { volume: 0.8 });
         this.currentXp += e.detail;
         if (this.currentXp >= this.xpToNextLevel) {
