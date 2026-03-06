@@ -279,8 +279,8 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                         playerWeaponSprites[eid] = wSprite;
                     }
 
-                    const wx = charKey === 'wizard' ? 7 : 10;
-                    const wy = charKey === 'wizard' ? 2 : 0;
+                    const wx = charKey === 'wizard' ? 7 : 7; // 검사 무기를 캐릭터 쪽으로 더 정밀 밀착 (10 -> 7)
+                    const wy = charKey === 'wizard' ? 2 : 2; // 세로 위치도 살짝 내려서 손 위치에 맞춤 (0 -> 2)
                     let baseRot = charKey === 'knight' ? -Math.PI / 4 : 0;
 
                     let swingRot = 0;
