@@ -196,8 +196,8 @@ export class AssetLoader {
             texture.add(`prop_spikes_${i}`, 0, 16 + (i * 16), 192, 16, 16);
         }
 
-        texture.add('lever_off', 0, 256, 448, 16, 16);
-        texture.add('lever_on', 0, 272, 448, 16, 16);
+        texture.add('lever_off', 0, 80, 208, 16, 16);   // tile_list: lever_left  (이전 좌표 256,448 → 빨간 몬스터 스프라이트 구역 버그 수정)
+        texture.add('lever_on', 0, 96, 208, 16, 16);   // tile_list: lever_right
         texture.add('door_closed', 0, 32, 240, 32, 32);   // tile_list: doors_leaf_closed  (이전 좌표 160,144 → wizzard 스프라이트와 겹쳐있던 버그 수정)
         texture.add('door_open', 0, 80, 240, 32, 32);     // tile_list: doors_leaf_open
         texture.add('gem', 0, 320, 336, 16, 16);
