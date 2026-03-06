@@ -170,6 +170,12 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                 textureKey = `spell_fire_f${fIdx}`;
                 frameName = '';
             } else if (typeId === 109 || typeId === 110) {
+                // Slash Animation
+                const rate = 12;
+                Animation.timer[eid] = (Animation.timer[eid] || 0) + dt;
+                const fIdx = Math.floor(Animation.timer[eid] / (1000 / rate)) % 3;
+                textureKey = `${charKey}_f${fIdx}`;
+                frameName = '';
             } else if (typeId >= 60 && typeId <= 89) {
                 const config = MONSTER_CONFIG[typeId];
                 if (config) {
