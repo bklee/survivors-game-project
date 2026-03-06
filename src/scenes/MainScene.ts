@@ -407,7 +407,7 @@ export class MainScene extends Phaser.Scene {
                     }
                     Animation.timer[eid] = 0;
 
-                    // Spawn loot
+                    // Spawn loot (Coins)
                     for (let j = 0; j < 5; j++) {
                         const dropId = addEntity(world);
                         addComponent(world, Position, dropId);
@@ -418,8 +418,9 @@ export class MainScene extends Phaser.Scene {
                         Position.y[dropId] = Position.y[eid];
                         Velocity.x[dropId] = (Math.random() - 0.5) * 200;
                         Velocity.y[dropId] = (Math.random() - 0.5) * 200 - 100;
-                        Item.xpValue[dropId] = 200;
-                        SpriteInfo.textureIndex[dropId] = 20;
+                        // Random value per coin (5 items * max 200 = 1000 total)
+                        Item.xpValue[dropId] = Math.floor(Math.random() * 100) + 100;
+                        SpriteInfo.textureIndex[dropId] = 21; // Coin type
                         Item.magnetized[dropId] = 0;
                     }
 
