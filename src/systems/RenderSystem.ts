@@ -302,12 +302,7 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                         wSprite.rotation = baseRot + swingRot;
                     }
 
-                    // Hide Wizard's staff during attack as requested
-                    if (charKey === 'wizard' && playerAttackTimer > 0) {
-                        wSprite.setVisible(false);
-                    } else {
-                        wSprite.setVisible(true);
-                    }
+                    wSprite.setVisible(true);
                     wSprite.alpha = currentAlpha;
                 }
 
