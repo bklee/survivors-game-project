@@ -169,7 +169,7 @@ export class UIScene extends Phaser.Scene {
         expFrame.fillStyle(0x000000, 0.8);
         expFrame.fillRoundedRect(expX, expY - expHeight, fullWidth, expHeight, 4);
 
-        this.xpBar = this.add.rectangle(expX + 4, expY - expHeight + 4, 0, expHeight - 8, 0x00ff00)
+        this.xpBar = this.add.rectangle(expX + 4, expY - expHeight + 4, 1, expHeight - 8, 0x00ff00)
             .setOrigin(0, 0);
 
         const expShine = this.add.graphics();
@@ -405,7 +405,7 @@ export class UIScene extends Phaser.Scene {
         this.skillPointsText.setText(`SP: ${this.skillPoints}`);
 
         const percent = Phaser.Math.Clamp(this.currentXp / this.xpToNextLevel, 0, 1);
-        this.xpBar.displayWidth = (400 - 8) * percent;
+        this.xpBar.width = Math.max(1, (400 - 8) * percent);
     }
 
     update(_time: number, delta: number) {
