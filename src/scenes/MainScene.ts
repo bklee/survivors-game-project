@@ -36,6 +36,7 @@ export class MainScene extends Phaser.Scene {
     private currentStage: number = 1;
     private isPausedForClear: boolean = false;
     private charData!: CharacterData;
+    private secretRoomData?: { doorPixel: { x: number; y: number }; floorPixels: { x: number; y: number }[] };
 
     constructor() {
         super('MainScene');
@@ -255,6 +256,9 @@ export class MainScene extends Phaser.Scene {
         this.dungeon.width = mapW;
         this.dungeon.height = mapH;
         this.dungeon.generate();
+
+        // 비밀 방 생성 (맵 타일을 수정하므로 벽 렌더링 전에 호출)
+        this.secretRoomData = this.dungeon.carveSecretRoom();
 
         const wPx = mapW * TILE_SIZE;
         const hPx = mapH * TILE_SIZE;
@@ -494,39 +498,61 @@ export class MainScene extends Phaser.Scene {
     }
 
     private spawnSecretRoom() {
-        const pos = this.dungeon.getRandomFloorPixel();
+        if (!this.secretRoomData) return;
+        const { doorPixel, floorPixels } = this.secretRoomData;
 
-        // Locked Door
+        // ── 잠긴 문 (비밀 방 입구) ──
         const doorId = addEntity(world);
         addComponent(world, Position, doorId);
         addComponent(world, SpriteInfo, doorId);
         addComponent(world, Interactive, doorId);
-        Position.x[doorId] = pos.x;
-        Position.y[doorId] = pos.y;
         SpriteInfo.textureIndex[doorId] = 41; // Door
+        Position.x[doorId] = doorPixel.x;
+        Position.y[doorId] = doorPixel.y;
         Interactive.isActivated[doorId] = 0;
-        Interactive.id[doorId] = 99; // Link ID for secret room
+        Interactive.id[doorId] = 99;
 
-        // Lever to open the door (placed far away)
-        const leverPos = this.dungeon.getFloorPixelNear(pos.x, pos.y, 400, 800);
+        // ── 레버 (먼 곳에 배치) ──
+        const leverPos = this.dungeon.getFloorPixelNear(doorPixel.x, doorPixel.y, 400, 800);
         const leverId = addEntity(world);
         addComponent(world, Position, leverId);
         addComponent(world, SpriteInfo, leverId);
         addComponent(world, Interactive, leverId);
+        SpriteInfo.textureIndex[leverId] = 40; // Lever
         Position.x[leverId] = leverPos.x;
         Position.y[leverId] = leverPos.y;
-        SpriteInfo.textureIndex[leverId] = 40; // Lever
         Interactive.isActivated[leverId] = 0;
-        Interactive.id[leverId] = 99; // Same link ID
+        Interactive.id[leverId] = 99;
 
-        // Special Treasure behind the door
-        const chestId = addEntity(world);
-        addComponent(world, Position, chestId);
-        addComponent(world, SpriteInfo, chestId);
-        addComponent(world, Animation, chestId);
-        Position.x[chestId] = pos.x;
-        Position.y[chestId] = pos.y - 16; // Just above/behind the door
-        SpriteInfo.textureIndex[chestId] = 36;
-        Animation.timer[chestId] = 0;
+        // ── 방 내부에 보물 배치 ──
+        if (floorPixels.length < 3) return;
+
+        // 보물상자 3개 (방 안 아래쪽에 균등 배치)
+        const chestPositions = [
+            floorPixels[Math.floor(floorPixels.length * 0.6)],
+            floorPixels[Math.floor(floorPixels.length * 0.7)],
+            floorPixels[Math.floor(floorPixels.length * 0.8)],
+        ];
+        for (const cPos of chestPositions) {
+            const chestId = addEntity(world);
+            addComponent(world, Position, chestId);
+            addComponent(world, SpriteInfo, chestId);
+            addComponent(world, Animation, chestId);
+            SpriteInfo.textureIndex[chestId] = 36;
+            Position.x[chestId] = cPos.x;
+            Position.y[chestId] = cPos.y;
+            Animation.timer[chestId] = 0;
+        }
+
+        // 물약 2개 (방 안 랜덤 위치)
+        for (let i = 0; i < 2; i++) {
+            const pPos = floorPixels[Math.floor(Math.random() * floorPixels.length)];
+            const potId = addEntity(world);
+            addComponent(world, Position, potId);
+            addComponent(world, SpriteInfo, potId);
+            SpriteInfo.textureIndex[potId] = 54 + Math.floor(Math.random() * 4); // big potion (54~57)
+            Position.x[potId] = pPos.x;
+            Position.y[potId] = pPos.y;
+        }
     }
 }
