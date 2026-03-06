@@ -339,6 +339,7 @@ export class UIScene extends Phaser.Scene {
             window.removeEventListener('game_started', gameStartedHandler);
             window.removeEventListener('spawning_complete', spawningCompleteHandler);
             window.removeEventListener('xp_collected', this.handleXp as EventListener);
+            window.removeEventListener('xp_percent_collected', this.handleXpPercent as EventListener);
             window.removeEventListener('coin_collected', this.handleCoinCollected as EventListener);
             window.removeEventListener('boss_spawned', this.handleBossSpawn as EventListener);
             window.removeEventListener('boss_hp', this.handleBossHp as EventListener);
@@ -372,6 +373,7 @@ export class UIScene extends Phaser.Scene {
         window.addEventListener('game_started', gameStartedHandler);
         window.addEventListener('spawning_complete', spawningCompleteHandler);
         window.addEventListener('xp_collected', this.handleXp as EventListener);
+        window.addEventListener('xp_percent_collected', this.handleXpPercent as EventListener);
         window.addEventListener('coin_collected', this.handleCoinCollected as EventListener);
         window.addEventListener('boss_spawned', this.handleBossSpawn as EventListener);
         window.addEventListener('boss_hp', this.handleBossHp as EventListener);
@@ -546,6 +548,12 @@ export class UIScene extends Phaser.Scene {
         this.coinText.setText(this.totalCoins.toLocaleString());
         this.coinIcon.x = this.coinText.x + this.coinText.width + 20;
         this.sound.play('coin_pickup', { volume: 0.8 });
+    }
+
+    private handleXpPercent = (e: CustomEvent<number>) => {
+        const percent = e.detail / 100;
+        const amount = Math.floor(this.xpToNextLevel * percent);
+        this.handleXp(new CustomEvent('xp_collected', { detail: { amount, isDirect: true } }));
     }
 
     private handleXp = (e: CustomEvent<any>) => {

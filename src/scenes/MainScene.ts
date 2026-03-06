@@ -357,13 +357,38 @@ export class MainScene extends Phaser.Scene {
                     window.dispatchEvent(new CustomEvent('play_sound', { detail: 'hit' }));
                     removeEntity(world, eid);
                 }
-            } else if (typeId === 35) {
+            } else if (typeId >= 50 && typeId <= 53) {
                 if (distSq < 20 * 20) {
-                    Health.current[this.playerId] = Math.min(Health.current[this.playerId] + 40, Health.max[this.playerId]);
-                    window.dispatchEvent(new CustomEvent('hp_updated', {
-                        detail: { current: Health.current[this.playerId], max: Health.max[this.playerId] }
-                    }));
+                    // Potion Effects
+                    if (typeId === 50) { // Green: EXP (~50% of current level requirement)
+                        const randomPercent = 40 + Math.random() * 20;
+                        window.dispatchEvent(new CustomEvent('xp_percent_collected', { detail: randomPercent }));
+                    } else if (typeId === 51) { // Yellow: Refill Health 100%
+                        Health.current[this.playerId] = Health.max[this.playerId];
+                        window.dispatchEvent(new CustomEvent('hp_updated', {
+                            detail: { current: Health.current[this.playerId], max: Health.max[this.playerId] }
+                        }));
+                    } else if (typeId === 52) { // Orange: Kill nearby monsters
+                        const killRadiusSq = 400 * 400;
+                        for (let j = 0; j < enemies.length; j++) {
+                            const enemyEid = enemies[j];
+                            const edx = Position.x[enemyEid] - px;
+                            const edy = Position.y[enemyEid] - py;
+                            if (edx * edx + edy * edy < killRadiusSq) {
+                                Health.current[enemyEid] = 0;
+                            }
+                        }
+                        this.juicePipeline.screenShake(0.01, 500);
+                        this.juicePipeline.vfx.playFireHit(px, py);
+                    } else if (typeId === 53) { // Blue: Refill MP (Not Implemented yet)
+                        // TODO: Add MP refill logic when MP system is added
+                    }
+
                     window.dispatchEvent(new CustomEvent('play_sound', { detail: 'level_up' }));
+                    removeEntity(world, eid);
+                }
+            } else if (typeId === 35) { // Old potion (remove just in case)
+                if (distSq < 20 * 20) {
                     removeEntity(world, eid);
                 }
             } else if (typeId === 36) {
@@ -393,14 +418,13 @@ export class MainScene extends Phaser.Scene {
                         Item.magnetized[dropId] = 0;
                     }
 
-                    if (Math.random() > 0.5) {
-                        const potId = addEntity(world);
-                        addComponent(world, Position, potId);
-                        addComponent(world, SpriteInfo, potId);
-                        Position.x[potId] = Position.x[eid];
-                        Position.y[potId] = Position.y[eid] + 16;
-                        SpriteInfo.textureIndex[potId] = 35;
-                    }
+                    // Always spawn a random potion (Green, Yellow, Orange, Blue)
+                    const potId = addEntity(world);
+                    addComponent(world, Position, potId);
+                    addComponent(world, SpriteInfo, potId);
+                    Position.x[potId] = Position.x[eid];
+                    Position.y[potId] = Position.y[eid] + 16;
+                    SpriteInfo.textureIndex[potId] = 50 + Math.floor(Math.random() * 4); // 50, 51, 52, 53
 
                     window.dispatchEvent(new CustomEvent('play_sound', { detail: 'level_up' }));
                 }
@@ -433,9 +457,8 @@ export class MainScene extends Phaser.Scene {
                 addComponent(world, Animation, eid);
                 Animation.timer[eid] = 0;
             }
-            else if (roll > 0.4) SpriteInfo.textureIndex[eid] = 35;
             else {
-                SpriteInfo.textureIndex[eid] = 32;
+                SpriteInfo.textureIndex[eid] = (Math.random() > 0.5) ? 32 : 31;
                 addComponent(world, Animation, eid);
                 Animation.timer[eid] = Math.random() * 1000;
             }
