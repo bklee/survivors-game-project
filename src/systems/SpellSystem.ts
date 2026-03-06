@@ -102,9 +102,9 @@ export class SpellSystem {
         const eid = this.createBaseSpell(x, y, 106); // typeId 106 (weapon_arrow)
         Spell.damage[eid] = 30 * globalStats.damageMult;
         Spell.radius[eid] = 47; // 마법사 범위(45)보다 +2 상향
-        Spell.duration[eid] = 2000;
+        Spell.duration[eid] = 200; // 사거리 제한: 속도 400 * 0.2초 = 약 80px 이동 후 소멸
         Spell.pierce[eid] = 3;
-        Velocity.x[eid] = dx * 400; // 속도 700 -> 400 하향
+        Velocity.x[eid] = dx * 400; // 속도 400
         Velocity.y[eid] = dy * 400;
         Rotation.angle[eid] = Math.atan2(dy, dx);
     }
