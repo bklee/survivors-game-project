@@ -34,7 +34,7 @@ const playerWeaponSprites: (Phaser.GameObjects.Sprite | undefined)[] = [];
 let playerAttackTimer = 0;
 
 window.addEventListener('combo_cast', () => {
-    playerAttackTimer = 150;
+    playerAttackTimer = 400; // 지팡이 숨김 시간 연장
 });
 
 export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObjects.Blitter) => {
