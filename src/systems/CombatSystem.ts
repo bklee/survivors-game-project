@@ -148,6 +148,13 @@ export const createCombatSystem = (juice: JuicePipeline) => {
                 const tx = Position.x[targetId];
                 const ty = Position.y[targetId];
 
+                // Direct XP Gain on Death (as requested: "XP should increase on monster death")
+                const totalXp = isBoss ? 500 : 10;
+                const directXp = Math.floor(totalXp * 0.5);
+                window.dispatchEvent(new CustomEvent('xp_collected', {
+                    detail: { amount: directXp, isDirect: true }
+                }));
+
                 const dropId = addEntity(world);
                 addComponent(world, Position, dropId);
                 addComponent(world, Velocity, dropId);
@@ -158,7 +165,7 @@ export const createCombatSystem = (juice: JuicePipeline) => {
                 Position.y[dropId] = ty;
                 Velocity.x[dropId] = (Math.random() - 0.5) * 100;
                 Velocity.y[dropId] = (Math.random() - 0.5) * 100;
-                Item.xpValue[dropId] = isBoss ? 500 : 10;
+                Item.xpValue[dropId] = totalXp - directXp; // Remaining 50%
                 SpriteInfo.textureIndex[dropId] = 21; // Coin type
                 Animation.timer[dropId] = Math.random() * 1000;
                 Item.magnetized[dropId] = 0;
