@@ -41,8 +41,9 @@ export class ItemSystem {
 
             // If within pickup radius
             if (distSq <= currentPickupRadius * currentPickupRadius) {
-                // Collect Coin
-                window.dispatchEvent(new CustomEvent('coin_collected', { detail: { amount: 1 } }));
+                // Collect Coin with its specific value
+                const amount = Item.xpValue[eid];
+                window.dispatchEvent(new CustomEvent('coin_collected', { detail: { amount } }));
                 removeEntity(world, eid);
                 continue;
             }
