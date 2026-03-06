@@ -15,7 +15,6 @@ export class AssetLoader {
     loadImages() {
         this.scene.load.image('dungeon', './assets/0x72_DungeonTilesetII_v1.7.png');
         this.scene.load.image('walls', './assets/atlas_walls_high-16x32.png');
-        this.scene.load.image('weapon_bow', './assets/frames/weapon_bow.png');
         this.scene.load.image('weapon_knight_sword', './assets/frames/weapon_knight_sword.png');
         this.scene.load.image('weapon_green_magic_staff', './assets/frames/weapon_green_magic_staff.png');
         this.scene.load.image('main_bg', './assets/main.png');
@@ -184,6 +183,7 @@ export class AssetLoader {
         // Weapons
         texture.add('weapon_sword', 0, 339, 98, 10, 29);
         texture.add('weapon_arrow', 0, 324, 202, 7, 21);
+        texture.add('weapon_bow', 0, 289, 195, 14, 26);
         texture.add('weapon_staff', 0, 324, 129, 8, 30);
 
         // Props
