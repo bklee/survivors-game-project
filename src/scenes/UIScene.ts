@@ -91,8 +91,8 @@ export class UIScene extends Phaser.Scene {
             strokeThickness: 6
         }).setOrigin(1, 1);
 
-        // 2. Coin UI (Adjusted Y to prevent overlap with Stage)
-        this.coinText = this.add.text(10, 140, '0', {
+        // 2. Coin UI (Fine-tuned position)
+        this.coinText = this.add.text(10, 115, '0', {
             fontFamily: '"MedievalSharp", cursive',
             fontSize: '56px',
             color: '#ffffff',
@@ -101,12 +101,12 @@ export class UIScene extends Phaser.Scene {
             strokeThickness: 10
         }).setOrigin(0, 0.5);
 
-        this.coinIcon = this.add.image(this.coinText.x + this.coinText.width + 20, 140, 'dungeon', 'coin_f0')
+        this.coinIcon = this.add.image(this.coinText.x + this.coinText.width + 20, 115, 'dungeon', 'coin_f0')
             .setScale(5.0)
             .setOrigin(0, 0.5);
 
         // 3. Stats Text (Adjusted Y to prevent overlap)
-        this.statsText = this.add.text(10, 200, this.getStatsString(), {
+        this.statsText = this.add.text(10, 170, this.getStatsString(), {
             fontSize: '32px',
             color: '#00ff00',
             backgroundColor: '#00000088'
