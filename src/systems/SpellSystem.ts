@@ -11,10 +11,12 @@ export class SpellSystem {
     private lastFacingY = 0;
     public selectedCharId: string = 'wizard';
     private autoAttackTimer: number = 0;
+    private scene: Phaser.Scene;
 
     private keys: Record<string, boolean> = {};
 
-    constructor() {
+    constructor(scene: Phaser.Scene) {
+        this.scene = scene;
         // Track keyboard input for attack direction
         window.addEventListener('keydown', (e) => {
             this.keys[e.code] = true;
@@ -108,14 +110,26 @@ export class SpellSystem {
     }
 
     private spawnWizardAttack(x: number, y: number, dx: number, dy: number) {
-        const castDist = 100;
-        const eid = this.createBaseSpell(x + dx * castDist, y + dy * castDist, 100);
-        Spell.damage[eid] = 45 * globalStats.damageMult;
-        Spell.radius[eid] = 60;
-        Spell.duration[eid] = 500;
-        Spell.pierce[eid] = 255;
-        Velocity.x[eid] = 0;
-        Velocity.y[eid] = 0;
+        const explosionCount = 3;
+        const spacing = 40; // Approx character size
+        const firstDist = 60;
+        const delay = 100; // ms between "빵"
+
+        for (let i = 0; i < explosionCount; i++) {
+            this.scene.time.delayedCall(i * delay, () => {
+                const castDist = firstDist + (i * spacing);
+                const eid = this.createBaseSpell(x + dx * castDist, y + dy * castDist, 100);
+                Spell.damage[eid] = 45 * globalStats.damageMult;
+                Spell.radius[eid] = 40; // Character size approx
+                Spell.duration[eid] = 400;
+                Spell.pierce[eid] = 255;
+                Velocity.x[eid] = 0;
+                Velocity.y[eid] = 0;
+
+                // Add a small shake for each 'bang'
+                window.dispatchEvent(new CustomEvent('play_sound', { detail: 'fire_cast' }));
+            });
+        }
     }
 
     private createBaseSpell(x: number, y: number, typeId: number): number {
