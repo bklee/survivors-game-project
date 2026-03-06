@@ -101,7 +101,7 @@ export class SpellSystem {
     private spawnElfAttack(x: number, y: number, dx: number, dy: number) {
         const eid = this.createBaseSpell(x, y, 106); // typeId 106 (weapon_arrow)
         Spell.damage[eid] = 30 * globalStats.damageMult;
-        Spell.radius[eid] = 47; // 마법사 범위(45)보다 +2 상향
+        Spell.radius[eid] = 15; // 공격 판정 범위 70% 축소 (47 -> 15): 정밀 타격감 강화
         Spell.duration[eid] = 400; // 사거리 2배 상향: 속도 400 * 0.4초 = 약 160px 이동 후 소멸
         Spell.pierce[eid] = 3;
         Velocity.x[eid] = dx * 400; // 속도 400
