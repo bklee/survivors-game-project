@@ -1,5 +1,5 @@
 import { addEntity, addComponent, defineQuery } from 'bitecs';
-import { Position, Velocity, Spell, Player, SpriteInfo, Rotation } from '../components';
+import { Position, Velocity, Spell, Player, SpriteInfo, Rotation, Animation } from '../components';
 import { world } from '../core/World';
 import { globalStats } from '../core/PlayerStats';
 
@@ -138,6 +138,7 @@ export class SpellSystem {
         addComponent(world, Spell, eid);
         addComponent(world, SpriteInfo, eid);
         addComponent(world, Rotation, eid);
+        addComponent(world, Animation, eid); // Animation 컴포넌트 추가
         Position.x[eid] = x;
         Position.y[eid] = y;
         SpriteInfo.textureIndex[eid] = typeId;
