@@ -275,7 +275,7 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
 
                         wSprite = _scene.add.sprite(Position.x[eid], Position.y[eid], weaponTex, weaponFrame);
                         wSprite.setOrigin(0.5, (charKey === 'wizard' || charKey === 'elf') ? 0.5 : 0.8);
-                        wSprite.setDepth(31);
+                        wSprite.setDepth(29); // 플레이어(30)보다 뒤에 위치하도록 조정
                         playerWeaponSprites[eid] = wSprite;
                     }
 
