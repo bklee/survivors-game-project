@@ -32,20 +32,20 @@ export class AssetLoader {
     }
 
     loadAudio() {
-        this.scene.load.audio('select_bgm', './assets/audio/hero_reprise.mp3', { stream: true });
-        this.scene.load.audio('main_bgm', './assets/audio/fight_for_better_future.mp3', { stream: true });
-        this.scene.load.audio('bgm_metal', './assets/audio/once_more_metal.wav', { stream: true });
-        this.scene.load.audio('bgm_unchained', './assets/audio/unchained_destiny_loop.wav', { stream: true });
-        this.scene.load.audio('boss_bgm', './assets/audio/boss_battle_8_retro_01_opening.mp3', { stream: true });
+        this.scene.load.audio('select_bgm', 'assets/audio/hero_reprise.mp3', { stream: true });
+        this.scene.load.audio('main_bgm', 'assets/audio/fight_for_better_future.mp3', { stream: true });
+        this.scene.load.audio('bgm_metal', 'assets/audio/once_more_metal.mp3', { stream: true });
+        this.scene.load.audio('bgm_unchained', 'assets/audio/unchained_destiny_loop.mp3', { stream: true });
+        this.scene.load.audio('boss_bgm', 'assets/audio/boss_battle_8_retro_01_opening.mp3', { stream: true });
 
-        this.scene.load.audio('fire_cast', './assets/audio/fire_cast.mp3');
-        this.scene.load.audio('ice_cast', './assets/audio/ice_cast.mp3');
-        this.scene.load.audio('poison_cast', './assets/audio/poison_cast.mp3');
-        this.scene.load.audio('hit', './assets/audio/hit.mp3');
-        this.scene.load.audio('level_up', './assets/audio/level_up.mp3');
-        this.scene.load.audio('victory_fanfare', './assets/audio/victory_fanfare.mp3');
-        this.scene.load.audio('coin_pickup', './assets/audio/coin.mp3');
-        this.scene.load.audio('game_over_bgm', './assets/audio/true_love_ost.wav');
+        this.scene.load.audio('fire_cast', 'assets/audio/fire_cast.mp3');
+        this.scene.load.audio('ice_cast', 'assets/audio/ice_cast.mp3');
+        this.scene.load.audio('poison_cast', 'assets/audio/poison_cast.mp3');
+        this.scene.load.audio('hit', 'assets/audio/hit.mp3');
+        this.scene.load.audio('level_up', 'assets/audio/level_up.mp3');
+        this.scene.load.audio('victory_fanfare', 'assets/audio/victory_fanfare.mp3');
+        this.scene.load.audio('coin_pickup', 'assets/audio/coin.mp3');
+        this.scene.load.audio('game_over_bgm', 'assets/audio/true_love_ost.mp3');
     }
 
     loadTextureAtlas() {
