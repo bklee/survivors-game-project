@@ -214,8 +214,7 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                     const textureArg = textureKey;
                     const frameArg = (finalFrame === '' || finalFrame === undefined) ? undefined : finalFrame as any;
 
-                    if (charKey === 'weapon_bow') sprite = _scene.add.sprite(Position.x[eid], Position.y[eid], 'weapon_bow');
-                    else sprite = _scene.add.sprite(Position.x[eid], Position.y[eid], textureArg, frameArg);
+                    sprite = _scene.add.sprite(Position.x[eid], Position.y[eid], textureArg, frameArg);
 
                     let depth = 10;
                     if (isPlayer) depth = 30; // Player on top of everything
@@ -227,10 +226,8 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                 } else {
                     sprite.setPosition(Position.x[eid], Position.y[eid]);
                     sprite.alpha = currentAlpha;
-                    if (charKey !== 'weapon_bow') {
-                        const frameArg = (finalFrame === '' || finalFrame === undefined) ? undefined : finalFrame as any;
-                        sprite.setTexture(textureKey, frameArg);
-                    }
+                    const frameArg = (finalFrame === '' || finalFrame === undefined) ? undefined : finalFrame as any;
+                    sprite.setTexture(textureKey, frameArg);
                 }
 
                 sprite.setVisible(true);
@@ -247,7 +244,12 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                     else if (Velocity.x[eid] > 0) sprite.flipX = false;
                 }
                 if (hasComponent(world, Rotation, eid)) {
-                    sprite.rotation = Rotation.angle[eid];
+                    // Arrow (typeId 106/108) needs a 90-degree offset because it is vertical in tileset
+                    if (charKey === 'weapon_arrow' || typeId === 108 || typeId === 106) {
+                        sprite.rotation = Rotation.angle[eid] + Math.PI / 2;
+                    } else {
+                        sprite.rotation = Rotation.angle[eid];
+                    }
                     // Slash sprites: ensure no flip interferes with rotation
                     if (typeId === 109 || typeId === 110) {
                         sprite.flipX = false;
@@ -258,12 +260,21 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                 else sprite.clearTint();
 
                 // Render specific player weapons
-                if (isPlayer && (charKey === 'knight' || charKey === 'wizard')) {
+                if (isPlayer && (charKey === 'knight' || charKey === 'wizard' || charKey === 'elf')) {
                     let wSprite = playerWeaponSprites[eid];
                     if (!wSprite) {
-                        const weaponTex = charKey === 'knight' ? 'weapon_knight_sword' : 'weapon_green_magic_staff';
-                        wSprite = _scene.add.sprite(Position.x[eid], Position.y[eid], weaponTex);
-                        wSprite.setOrigin(0.5, charKey === 'wizard' ? 0.5 : 0.8);
+                        let weaponTex = 'dungeon';
+                        let weaponFrame: string | undefined = undefined;
+
+                        if (charKey === 'knight') weaponTex = 'weapon_knight_sword';
+                        else if (charKey === 'wizard') weaponTex = 'weapon_green_magic_staff';
+                        else {
+                            weaponTex = 'dungeon';
+                            weaponFrame = 'weapon_bow';
+                        }
+
+                        wSprite = _scene.add.sprite(Position.x[eid], Position.y[eid], weaponTex, weaponFrame);
+                        wSprite.setOrigin(0.5, (charKey === 'wizard' || charKey === 'elf') ? 0.5 : 0.8);
                         wSprite.setDepth(31);
                         playerWeaponSprites[eid] = wSprite;
                     }
