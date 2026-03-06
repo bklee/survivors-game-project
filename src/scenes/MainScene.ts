@@ -357,19 +357,24 @@ export class MainScene extends Phaser.Scene {
                     window.dispatchEvent(new CustomEvent('play_sound', { detail: 'hit' }));
                     removeEntity(world, eid);
                 }
-            } else if (typeId >= 50 && typeId <= 53) {
+            } else if (typeId >= 50 && typeId <= 57) {
                 if (distSq < 20 * 20) {
-                    // Potion Effects
-                    if (typeId === 50) { // Green: EXP (~50% of current level requirement)
-                        const randomPercent = 40 + Math.random() * 20;
+                    // Potion Effects (50-53 Small, 54-57 Big)
+                    const isBig = typeId >= 54;
+                    const baseType = isBig ? typeId - 4 : typeId;
+
+                    if (baseType === 50) { // Green: EXP (~50% of current level requirement)
+                        const multiplier = isBig ? 1.5 : 1.0;
+                        const randomPercent = (40 + Math.random() * 20) * multiplier;
                         window.dispatchEvent(new CustomEvent('xp_percent_collected', { detail: randomPercent }));
-                    } else if (typeId === 51) { // Yellow: Refill Health 100%
+                    } else if (baseType === 51) { // Yellow: Refill Health 100%
                         Health.current[this.playerId] = Health.max[this.playerId];
                         window.dispatchEvent(new CustomEvent('hp_updated', {
                             detail: { current: Health.current[this.playerId], max: Health.max[this.playerId] }
                         }));
-                    } else if (typeId === 52) { // Orange: Kill nearby monsters
-                        const killRadiusSq = 400 * 400;
+                    } else if (baseType === 52) { // Red/Orange: Kill nearby monsters
+                        const multiplier = isBig ? 2.0 : 1.0;
+                        const killRadiusSq = (400 * multiplier) * (400 * multiplier);
                         for (let j = 0; j < enemies.length; j++) {
                             const enemyEid = enemies[j];
                             const edx = Position.x[enemyEid] - px;
@@ -378,9 +383,9 @@ export class MainScene extends Phaser.Scene {
                                 Health.current[enemyEid] = 0;
                             }
                         }
-                        this.juicePipeline.screenShake(0.01, 500);
+                        this.juicePipeline.screenShake(0.01 * multiplier, 500);
                         this.juicePipeline.vfx.playFireHit(px, py);
-                    } else if (typeId === 53) { // Blue: Refill MP (Not Implemented yet)
+                    } else if (baseType === 53) { // Blue: Refill MP (Not Implemented yet)
                         // TODO: Add MP refill logic when MP system is added
                     }
 
@@ -418,13 +423,16 @@ export class MainScene extends Phaser.Scene {
                         Item.magnetized[dropId] = 0;
                     }
 
-                    // Always spawn a random potion (Green, Yellow, Orange, Blue)
+                    // Always spawn a random potion (Green, Yellow, Red/Orange, Blue)
+                    // Randomly choose between Small (50-53) and Big (54-57)
+                    const isBig = Math.random() > 0.7; // 30% chance for big potion
+                    const potionBase = isBig ? 54 : 50;
                     const potId = addEntity(world);
                     addComponent(world, Position, potId);
                     addComponent(world, SpriteInfo, potId);
                     Position.x[potId] = Position.x[eid];
                     Position.y[potId] = Position.y[eid] + 16;
-                    SpriteInfo.textureIndex[potId] = 50 + Math.floor(Math.random() * 4); // 50, 51, 52, 53
+                    SpriteInfo.textureIndex[potId] = potionBase + Math.floor(Math.random() * 4);
 
                     window.dispatchEvent(new CustomEvent('play_sound', { detail: 'level_up' }));
                 }

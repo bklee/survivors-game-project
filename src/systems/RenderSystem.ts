@@ -91,7 +91,14 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
             else if (typeId === 36) charKey = 'prop_chest';
             else if (typeId === 40) charKey = 'lever';
             else if (typeId === 41) charKey = 'door';
-            else if (typeId >= 50 && typeId <= 53) charKey = 'spell_fire';
+            else if (typeId === 50) charKey = 'flask_green';
+            else if (typeId === 51) charKey = 'flask_yellow';
+            else if (typeId === 52) charKey = 'flask_red';
+            else if (typeId === 53) charKey = 'flask_blue';
+            else if (typeId === 54) charKey = 'flask_big_green';
+            else if (typeId === 55) charKey = 'flask_big_yellow';
+            else if (typeId === 56) charKey = 'flask_big_red';
+            else if (typeId === 57) charKey = 'flask_big_blue';
             else if (typeId >= 60 && typeId <= 82) {
                 const config = MONSTER_CONFIG[typeId];
                 if (config) {
@@ -124,7 +131,7 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
 
             // 3. Handle Animation Framing
             let frameName: string | number = '';
-            if (typeId === 15 || typeId === 20 || (typeId >= 22 && typeId <= 31) || [33, 34, 35, 50, 51, 52, 53].includes(typeId) || (typeId >= 100 && typeId <= 107)) {
+            if (typeId === 15 || typeId === 20 || (typeId >= 22 && typeId <= 31) || [33, 34, 35, 50, 51, 52, 53, 54, 55, 56, 57].includes(typeId) || (typeId >= 100 && typeId <= 107)) {
                 frameName = charKey;
             } else if (typeId === 40) {
                 frameName = Interactive.isActivated[eid] ? 'lever_on' : 'lever_off';
@@ -218,6 +225,8 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                 sprite.setVisible(true);
                 if (hasComponent(world, Boss, eid)) {
                     sprite.setScale(2.5);
+                } else if (typeId >= 54 && typeId <= 57) {
+                    sprite.setScale(1.5); // Big Flasks
                 } else {
                     sprite.setScale(1.0);
                 }
@@ -235,10 +244,6 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                     }
                 }
                 if (typeId === 104) sprite.tint = 0xffff00;
-                else if (typeId === 50) sprite.tint = 0x00ff00; // Green
-                else if (typeId === 51) sprite.tint = 0xffff00; // Yellow
-                else if (typeId === 52) sprite.tint = 0xffa500; // Orange
-                else if (typeId === 53) sprite.tint = 0x0000ff; // Blue
                 else sprite.clearTint();
 
                 // Render specific player weapons

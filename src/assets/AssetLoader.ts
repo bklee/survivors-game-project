@@ -153,7 +153,18 @@ export class AssetLoader {
         // Default monster frames (older versions, keeping for compatibility if needed)
         // ...
 
-        // Add Spell Frames
+        // Flasks (Potions) - Big
+        texture.add('flask_big_red', 0, 288, 336, 16, 16);
+        texture.add('flask_big_blue', 0, 304, 336, 16, 16);
+        texture.add('flask_big_green', 0, 320, 336, 16, 16);
+        texture.add('flask_big_yellow', 0, 336, 336, 16, 16);
+
+        // Flasks (Potions) - Small
+        texture.add('flask_red', 0, 288, 352, 16, 16);
+        texture.add('flask_blue', 0, 304, 352, 16, 16);
+        texture.add('flask_green', 0, 320, 352, 16, 16);
+        texture.add('flask_yellow', 0, 336, 352, 16, 16);
+
         texture.add('spell_fire', 0, 288, 336, 16, 16);
         texture.add('spell_ice', 0, 304, 336, 16, 16);
         texture.add('spell_gas', 0, 320, 336, 16, 16);
