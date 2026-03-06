@@ -171,7 +171,7 @@ export class UIScene extends Phaser.Scene {
         expShine.fillStyle(0xffffff, 0.2);
         expShine.fillRect(expX + 4, expY - expHeight + 4, fullWidth - 8, (expHeight - 8) / 2);
 
-        const expIcon = this.add.image(expX - 1, expY - expHeight / 2, 'gem')
+        const expIcon = this.add.image(expX - 1, expY - expHeight / 2, 'dungeon', 'gem')
             .setDisplaySize(35, 35)
             .setOrigin(0.5, 0.5)
             .setDepth(20);
