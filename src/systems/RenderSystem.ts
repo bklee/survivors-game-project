@@ -162,13 +162,14 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                 const fIdx = Math.floor(Animation.timer[eid] / (1000 / rate)) % 4;
                 textureKey = 'dungeon';
                 frameName = `coin_f${fIdx}`;
-            } else if (typeId === 109 || typeId === 110) {
-                // Slash Animation
+            } else if (typeId === 100) {
+                // Spell Fire Animation (Wizard Attack)
                 const rate = 12;
                 Animation.timer[eid] = (Animation.timer[eid] || 0) + dt;
                 const fIdx = Math.floor(Animation.timer[eid] / (1000 / rate)) % 3;
-                textureKey = `${charKey}_f${fIdx}`;
+                textureKey = `spell_fire_f${fIdx}`;
                 frameName = '';
+            } else if (typeId === 109 || typeId === 110) {
             } else if (typeId >= 60 && typeId <= 89) {
                 const config = MONSTER_CONFIG[typeId];
                 if (config) {
@@ -225,6 +226,8 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                 sprite.setVisible(true);
                 if (hasComponent(world, Boss, eid)) {
                     sprite.setScale(2.5);
+                } else if (typeId === 100) {
+                    sprite.setScale(3.0); // Wizard special fire effect size
                 } else {
                     sprite.setScale(1.0);
                 }
@@ -277,7 +280,13 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                         wSprite.flipX = false;
                         wSprite.rotation = baseRot + swingRot;
                     }
-                    wSprite.setVisible(true);
+
+                    // Hide Wizard's staff during attack as requested
+                    if (charKey === 'wizard' && playerAttackTimer > 0) {
+                        wSprite.setVisible(false);
+                    } else {
+                        wSprite.setVisible(true);
+                    }
                     wSprite.alpha = currentAlpha;
                 }
 

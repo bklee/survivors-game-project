@@ -108,21 +108,6 @@ export class SpellSystem {
     }
 
     private spawnWizardAttack(x: number, y: number, dx: number, dy: number) {
-        const staffEid = addEntity(world);
-        addComponent(world, Position, staffEid);
-        addComponent(world, Velocity, staffEid);
-        addComponent(world, SpriteInfo, staffEid);
-        addComponent(world, Rotation, staffEid);
-        Position.x[staffEid] = x + dx * 10;
-        Position.y[staffEid] = y + dy * 10;
-        SpriteInfo.textureIndex[staffEid] = 107;
-        Rotation.angle[staffEid] = Math.atan2(dy, dx);
-        Velocity.x[staffEid] = dx * 10;
-        Velocity.y[staffEid] = dy * 10;
-        addComponent(world, Spell, staffEid);
-        Spell.duration[staffEid] = 200;
-        Spell.damage[staffEid] = 0;
-
         const castDist = 100;
         const eid = this.createBaseSpell(x + dx * castDist, y + dy * castDist, 100);
         Spell.damage[eid] = 45 * globalStats.damageMult;
