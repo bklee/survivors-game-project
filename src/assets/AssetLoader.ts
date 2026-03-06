@@ -22,59 +22,12 @@ export class AssetLoader {
         this.scene.load.image('loading_bg', './assets/loading.jpg');
         this.scene.load.image('hp_icon', './assets/frames/ui_heart_full.png');
         this.scene.load.image('game_over', './assets/game_over.png');
-        this.scene.load.image('ui_heart_full', './assets/frames/ui_heart_full.png');
+
         for (let i = 0; i < 3; i++) {
             this.scene.load.image(`sword_slash_f${i}`, `./assets/frames/sword_slash_f${i}.png`);
             this.scene.load.image(`super_slash_f${i}`, `./assets/frames/super_slash_f${i}.png`);
         }
-        // Monster Groups
-        const monsters = [
-            // Demons
-            { name: 'chort', hasIdleRun: true },
-            { name: 'imp', hasIdleRun: true },
-            { name: 'wogol', hasIdleRun: true },
-            { name: 'big_demon', hasIdleRun: true }, // BOSS
-
-            // Undeads
-            { name: 'skelet', hasIdleRun: true },
-            { name: 'tiny_zombie', hasIdleRun: true },
-            { name: 'zombie', hasIdleRun: false },
-            { name: 'ice_zombie', hasIdleRun: false },
-            { name: 'doc', hasIdleRun: true },
-            { name: 'necromancer', hasIdleRun: false },
-            { name: 'big_zombie', hasIdleRun: true }, // BOSS
-
-            // Orcs
-            { name: 'orc_shaman', hasIdleRun: true },
-            { name: 'orc_warrior', hasIdleRun: true },
-            { name: 'goblin', hasIdleRun: true },
-            { name: 'masked_orc', hasIdleRun: true },
-            { name: 'ogre', hasIdleRun: true } // BOSS
-        ];
-
-        monsters.forEach(m => {
-            if (m.hasIdleRun) {
-                for (let i = 0; i < 4; i++) {
-                    this.scene.load.image(`${m.name}_idle_f${i}`, `./assets/frames/${m.name}_idle_anim_f${i}.png`);
-                    this.scene.load.image(`${m.name}_run_f${i}`, `./assets/frames/${m.name}_run_anim_f${i}.png`);
-                }
-            } else {
-                for (let i = 0; i < 4; i++) {
-                    this.scene.load.image(`${m.name}_f${i}`, `./assets/frames/${m.name}_anim_f${i}.png`);
-                }
-            }
-        });
-
-        // Add Chest animations
-        for (let i = 0; i < 3; i++) {
-            this.scene.load.image(`chest_full_open_${i}`, `./assets/frames/chest_full_open_anim_f${i}.png`);
-            this.scene.load.image(`chest_empty_open_${i}`, `./assets/frames/chest_empty_open_anim_f${i}.png`);
-        }
-
-        // Add Coin animations
-        for (let i = 0; i < 4; i++) {
-            this.scene.load.image(`coin_f${i}`, `./assets/frames/coin_anim_f${i}.png`);
-        }
+        // We will define all monster, coin, and chest frames in defineFrames() using the dungeon tileset
     }
 
     loadAudio() {
@@ -146,9 +99,65 @@ export class AssetLoader {
 
         // Add default enemy (imp or similar)
         for (let i = 0; i < 4; i++) {
-            texture.add(`imp_idle_${i}`, 0, 368 + (i * 16), 64, 16, 16);
-            texture.add(`imp_run_${i}`, 0, 432 + (i * 16), 64, 16, 16);
+            texture.add(`imp_idle_f${i}`, 0, 368 + (i * 16), 64, 16, 16);
+            texture.add(`imp_run_f${i}`, 0, 432 + (i * 16), 64, 16, 16);
         }
+
+        // --- NEW COMPREHENSIVE FRAMES FROM TILESET ---
+        // Big Bosses (32x36)
+        for (let i = 0; i < 4; i++) {
+            texture.add(`big_demon_idle_f${i}`, 0, 16 + (i * 32), 428, 32, 36);
+            texture.add(`big_demon_run_f${i}`, 0, 144 + (i * 32), 428, 32, 36);
+            texture.add(`big_zombie_idle_f${i}`, 0, 16 + (i * 32), 332, 32, 36);
+            texture.add(`big_zombie_run_f${i}`, 0, 144 + (i * 32), 332, 32, 36);
+            texture.add(`ogre_idle_f${i}`, 0, 16 + (i * 32), 380, 32, 36);
+            texture.add(`ogre_run_f${i}`, 0, 144 + (i * 32), 380, 32, 36);
+        }
+
+        // Monsters (16x23 / 16x16)
+        for (let i = 0; i < 4; i++) {
+            // Orcs
+            texture.add(`orc_shaman_idle_f${i}`, 0, 368 + (i * 16), 201, 16, 23);
+            texture.add(`orc_shaman_run_f${i}`, 0, 432 + (i * 16), 201, 16, 23);
+            texture.add(`orc_warrior_idle_f${i}`, 0, 368 + (i * 16), 177, 16, 23);
+            texture.add(`orc_warrior_run_f${i}`, 0, 432 + (i * 16), 177, 16, 23);
+            texture.add(`goblin_idle_f${i}`, 0, 368 + (i * 16), 40, 16, 16);
+            texture.add(`goblin_run_f${i}`, 0, 432 + (i * 16), 40, 16, 16);
+            texture.add(`masked_orc_idle_f${i}`, 0, 368 + (i * 16), 153, 16, 23);
+            texture.add(`masked_orc_run_f${i}`, 0, 432 + (i * 16), 153, 16, 23);
+            // Undeads
+            texture.add(`skelet_idle_f${i}`, 0, 368 + (i * 16), 88, 16, 16);
+            texture.add(`skelet_run_f${i}`, 0, 432 + (i * 16), 88, 16, 16);
+            texture.add(`tiny_zombie_idle_f${i}`, 0, 368 + (i * 16), 16, 16, 16);
+            texture.add(`tiny_zombie_run_f${i}`, 0, 432 + (i * 16), 16, 16, 16);
+            texture.add(`zombie_f${i}`, 0, 368 + (i * 16), 136, 16, 16);
+            texture.add(`ice_zombie_f${i}`, 0, 432 + (i * 16), 136, 16, 16);
+            texture.add(`doc_idle_f${i}`, 0, 368 + (i * 16), 345, 16, 23);
+            texture.add(`doc_run_f${i}`, 0, 432 + (i * 16), 345, 16, 23);
+            texture.add(`necromancer_f${i}`, 0, 368 + (i * 16), 225, 16, 23);
+            // Demons
+            texture.add(`chort_idle_f${i}`, 0, 368 + (i * 16), 273, 16, 23);
+            texture.add(`chort_run_f${i}`, 0, 432 + (i * 16), 273, 16, 23);
+            texture.add(`wogol_idle_f${i}`, 0, 368 + (i * 16), 249, 16, 23);
+            texture.add(`wogol_run_f${i}`, 0, 432 + (i * 16), 249, 16, 23);
+        }
+
+        // Chests (16x16)
+        for (let i = 0; i < 3; i++) {
+            texture.add(`chest_full_open_f${i}`, 0, 304 + (i * 16), 416, 16, 16);
+            texture.add(`chest_empty_open_f${i}`, 0, 304 + (i * 16), 400, 16, 16);
+        }
+
+        // Coins (6x7)
+        for (let i = 0; i < 4; i++) {
+            texture.add(`coin_f${i}`, 0, 289 + (i * 8), 385, 6, 7);
+        }
+
+        // Slashes (placeholder coordinates if needed, or keeping current)
+        // sword_slash_f0-2... for now let's hope they are not critical or use similar frames
+        // Actually sword slash might be a special asset. We'll leave them if not in tileset.
+        // Wait, I saw sword_slash in AssetLoader before. If it's not in tileset, keep it.
+        // --- END NEW FRAMES ---
 
         // Default monster frames (older versions, keeping for compatibility if needed)
         // ...
@@ -190,7 +199,7 @@ export class AssetLoader {
         texture.add('lever_on', 0, 272, 448, 16, 16);
         texture.add('door_closed', 0, 160, 144, 32, 32);
         texture.add('door_open', 0, 224, 144, 32, 32);
-        texture.add('gem', 0, 288, 352, 16, 16);
+        texture.add('gem', 0, 320, 336, 16, 16);
 
         const wallTex = this.scene.textures.get('walls');
         if (wallTex) {
