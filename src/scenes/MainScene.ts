@@ -471,14 +471,21 @@ export class MainScene extends Phaser.Scene {
             const pos = this.dungeon.getRandomFloorPixel();
             Position.x[eid] = pos.x;
             Position.y[eid] = pos.y;
+
+            // bitECS 슬롯 재사용 시 이전 typeId(wizard=1 등) 오염 방지: 먼저 안전한 값으로 초기화
+            SpriteInfo.textureIndex[eid] = 31; // 기본값 prop_skull
+
             const roll = Math.random();
-            if (roll > 0.8) {
-                SpriteInfo.textureIndex[eid] = 36;
+            if (roll > 0.9) {
+                SpriteInfo.textureIndex[eid] = 36; // 보물 상자 (10%)
                 addComponent(world, Animation, eid);
                 Animation.timer[eid] = 0;
-            }
-            else {
-                SpriteInfo.textureIndex[eid] = (Math.random() > 0.5) ? 32 : 31;
+            } else if (roll > 0.7) {
+                SpriteInfo.textureIndex[eid] = 32; // 가시덫 (20%)
+                addComponent(world, Animation, eid);
+                Animation.timer[eid] = Math.random() * 1000;
+            } else {
+                SpriteInfo.textureIndex[eid] = 31; // 해골 소품 (70%)
                 addComponent(world, Animation, eid);
                 Animation.timer[eid] = Math.random() * 1000;
             }
