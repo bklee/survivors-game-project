@@ -121,6 +121,11 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
             }
 
             const isPlayer = hasComponent(world, Player, eid);
+
+            // 캐릭터 typeId(0=knight,1=wizard,2=elf)이지만 Player 컴포넌트가 없으면 렌더링하지 않음
+            // (bitECS 기본값 0으로 인해 wizard 스프라이트가 바닥 구조물로 나타나는 문제 방지)
+            if ((typeId === 0 || typeId === 1 || typeId === 2) && !isPlayer) continue;
+
             const requiresSprite = isPlayer || typeId >= 100 || (typeId >= 60 && typeId <= 82) || typeId >= 50 || typeId === 36 || typeId === 21 || hasComponent(world, Rotation, eid);
 
             // 2. Identify State (Idle vs Run)
