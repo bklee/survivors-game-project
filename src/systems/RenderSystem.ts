@@ -67,6 +67,7 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
 
             const typeId = SpriteInfo.textureIndex[eid];
             let bob = bobs[eid];
+            let frameName: string | number = '';
 
             // 1. Identify Character / Entity Type
             let charKey = '';
@@ -112,9 +113,9 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                 else if (typeId === 103) charKey = 'spell_dud';
                 else if (typeId === 104) charKey = 'enemy_bullet';
                 else if (typeId === 105) charKey = 'weapon_sword';
-                else if (typeId === 106) charKey = 'weapon_arrow';
+                else if (typeId === 106) { charKey = 'weapon_arrow'; textureKey = 'dungeon'; frameName = 'weapon_arrow'; }
                 else if (typeId === 107) charKey = 'weapon_staff';
-                else if (typeId === 108) charKey = 'weapon_bow';
+                else if (typeId === 108) { charKey = 'weapon_bow'; textureKey = 'dungeon'; frameName = 'weapon_bow'; }
                 else if (typeId === 109) charKey = 'sword_slash';
                 else if (typeId === 110) charKey = 'super_slash';
             }
@@ -130,7 +131,6 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
             }
 
             // 3. Handle Animation Framing
-            let frameName: string | number = '';
             if (typeId === 15 || typeId === 20 || (typeId >= 22 && typeId <= 31) || [33, 34, 35, 50, 51, 52, 53, 54, 55, 56, 57].includes(typeId) || (typeId >= 101 && typeId <= 107)) {
                 frameName = charKey;
             } else if (typeId === 40) {
