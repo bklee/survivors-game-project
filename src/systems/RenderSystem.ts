@@ -211,8 +211,11 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                 if (bob) { bob.destroy(); bobs[eid] = undefined; bob = undefined; }
                 let sprite = sprites[eid];
                 if (!sprite) {
+                    const textureArg = textureKey;
+                    const frameArg = (finalFrame === '' || finalFrame === undefined) ? undefined : finalFrame as any;
+
                     if (charKey === 'weapon_bow') sprite = _scene.add.sprite(Position.x[eid], Position.y[eid], 'weapon_bow');
-                    else sprite = _scene.add.sprite(Position.x[eid], Position.y[eid], textureKey, finalFrame === '' ? undefined : finalFrame as any);
+                    else sprite = _scene.add.sprite(Position.x[eid], Position.y[eid], textureArg, frameArg);
 
                     let depth = 10;
                     if (isPlayer) depth = 30; // Player on top of everything
@@ -225,7 +228,8 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                     sprite.setPosition(Position.x[eid], Position.y[eid]);
                     sprite.alpha = currentAlpha;
                     if (charKey !== 'weapon_bow') {
-                        sprite.setTexture(textureKey, finalFrame === '' ? undefined : finalFrame as any);
+                        const frameArg = (finalFrame === '' || finalFrame === undefined) ? undefined : finalFrame as any;
+                        sprite.setTexture(textureKey, frameArg);
                     }
                 }
 
