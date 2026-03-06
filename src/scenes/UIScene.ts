@@ -101,7 +101,7 @@ export class UIScene extends Phaser.Scene {
             strokeThickness: 10
         }).setOrigin(0, 0.5);
 
-        this.coinIcon = this.add.image(this.coinText.x + this.coinText.width + 20, 140, 'coin_f0')
+        this.coinIcon = this.add.image(this.coinText.x + this.coinText.width + 20, 140, 'dungeon', 'coin_f0')
             .setScale(5.0)
             .setOrigin(0, 0.5);
 
