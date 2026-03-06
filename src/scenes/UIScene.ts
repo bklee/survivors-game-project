@@ -339,6 +339,7 @@ export class UIScene extends Phaser.Scene {
             window.removeEventListener('game_started', gameStartedHandler);
             window.removeEventListener('spawning_complete', spawningCompleteHandler);
             window.removeEventListener('xp_collected', this.handleXp as EventListener);
+            window.removeEventListener('coin_collected', this.handleCoinCollected as EventListener);
             window.removeEventListener('boss_spawned', this.handleBossSpawn as EventListener);
             window.removeEventListener('boss_hp', this.handleBossHp as EventListener);
             window.removeEventListener('hp_updated', this.handleHp as EventListener);
@@ -371,6 +372,7 @@ export class UIScene extends Phaser.Scene {
         window.addEventListener('game_started', gameStartedHandler);
         window.addEventListener('spawning_complete', spawningCompleteHandler);
         window.addEventListener('xp_collected', this.handleXp as EventListener);
+        window.addEventListener('coin_collected', this.handleCoinCollected as EventListener);
         window.addEventListener('boss_spawned', this.handleBossSpawn as EventListener);
         window.addEventListener('boss_hp', this.handleBossHp as EventListener);
         window.addEventListener('hp_updated', this.handleHp as EventListener);
@@ -399,7 +401,7 @@ export class UIScene extends Phaser.Scene {
 
     private updateStageLevelText() {
         this.stageLevelText.setText(`Stage ${this.currentStage}`);
-        this.levelText.setText(`Level ${this.currentLevel} (${Math.floor(this.currentXp)} / ${this.xpToNextLevel} EXP)`);
+        this.levelText.setText(`Level ${this.currentLevel}`);
         this.skillPointsText.setText(`SP: ${this.skillPoints}`);
 
         const percent = Phaser.Math.Clamp(this.currentXp / this.xpToNextLevel, 0, 1);
@@ -539,17 +541,17 @@ export class UIScene extends Phaser.Scene {
         }
     }
 
+    private handleCoinCollected = () => {
+        this.totalCoins += 1;
+        this.coinText.setText(this.totalCoins.toLocaleString());
+        this.coinIcon.x = this.coinText.x + this.coinText.width + 20;
+        this.sound.play('coin_pickup', { volume: 0.8 });
+    }
+
     private handleXp = (e: CustomEvent<any>) => {
-        const detail = typeof e.detail === 'number' ? { amount: e.detail, isDirect: false } : e.detail;
+        const amount = typeof e.detail === 'number' ? e.detail : e.detail.amount;
 
-        if (!detail.isDirect) {
-            this.totalCoins += 1;
-            this.coinText.setText(this.totalCoins.toLocaleString());
-            this.coinIcon.x = this.coinText.x + this.coinText.width + 20;
-            this.sound.play('coin_pickup', { volume: 0.8 });
-        }
-
-        this.currentXp += detail.amount;
+        this.currentXp += amount;
         if (this.currentXp >= this.xpToNextLevel) {
             this.currentLevel++;
             this.skillPoints++;
