@@ -79,7 +79,7 @@ export class UIScene extends Phaser.Scene {
         this.joystick.setVisible(false);
 
         // 1. Level Text (Top Left)
-        this.levelText = this.add.text(10, 10, "Level 1 (0 / 100 XP)", {
+        this.levelText = this.add.text(10, 10, "Level 1 (0 / 100 EXP)", {
             fontSize: '40px',
             color: '#ffcc00',
             fontStyle: 'bold',
@@ -158,27 +158,37 @@ export class UIScene extends Phaser.Scene {
             strokeThickness: 4
         }).setOrigin(0.5, 0.5).setDepth(6);
 
-        // --- XP Bar (Below HP Bar) ---
-        const xpX = hpX;
-        const xpY = hpY + 25; // Adjusted spacing
-        const xpHeight = 16;
+        // --- EXP Bar (Below HP Bar) ---
+        const expX = hpX;
+        const expY = hpY + 45; // Same spacing as HP bar
+        const expHeight = 30;
 
-        const xpFrame = this.add.graphics();
-        xpFrame.lineStyle(2, 0xffffff);
-        xpFrame.strokeRoundedRect(xpX, xpY - xpHeight, fullWidth, xpHeight, 2);
-        xpFrame.fillStyle(0x000000, 0.8);
-        xpFrame.fillRoundedRect(xpX, xpY - xpHeight, fullWidth, xpHeight, 2);
+        const expFrame = this.add.graphics();
+        expFrame.lineStyle(4, 0xffffff);
+        expFrame.strokeRoundedRect(expX, expY - expHeight, fullWidth, expHeight, 4);
+        expFrame.fillStyle(0x000000, 0.8);
+        expFrame.fillRoundedRect(expX, expY - expHeight, fullWidth, expHeight, 4);
 
-        this.xpBar = this.add.rectangle(xpX + 2, xpY - xpHeight + 2, 0, xpHeight - 4, 0x00ff00) // Green color
+        this.xpBar = this.add.rectangle(expX + 4, expY - expHeight + 4, 0, expHeight - 8, 0x00ff00)
             .setOrigin(0, 0);
 
-        const xpLabel = this.add.text(xpX + fullWidth / 2, xpY - xpHeight / 2, 'XP', {
-            fontSize: '14px',
+        const expShine = this.add.graphics();
+        expShine.fillStyle(0xffffff, 0.2);
+        expShine.fillRect(expX + 4, expY - expHeight + 4, fullWidth - 8, (expHeight - 8) / 2);
+
+        const expIcon = this.add.image(expX - 1, expY - expHeight / 2, 'gem')
+            .setDisplaySize(35, 35)
+            .setOrigin(0.5, 0.5)
+            .setDepth(20);
+
+        const expLabel = this.add.text(expX + fullWidth / 2, expY - expHeight / 2, 'EXP', {
+            fontFamily: '"MedievalSharp", cursive',
+            fontSize: '20px',
             color: '#ffffff',
             fontStyle: 'bold',
             stroke: '#000000',
-            strokeThickness: 2
-        }).setOrigin(0.5, 0.5);
+            strokeThickness: 4
+        }).setOrigin(0.5, 0.5).setDepth(6);
 
         // --- Boss HP Bar ---
         this.bossHpContainer = this.add.container(640, 80).setVisible(false).setAlpha(0.8);
@@ -305,7 +315,7 @@ export class UIScene extends Phaser.Scene {
             quitBtnText.setScale(1);
         });
 
-        this.uiContainer.add([this.stageLevelText, this.levelText, this.skillPointsText, this.statsText, hpFrame, this.hpBar, shine, hpIcon, this.hpText, xpFrame, this.xpBar, xpLabel, this.coinText, this.coinIcon, mmBg1, mmBg2, this.minimapGraphics, this.arrowGraphics, pauseBtn]);
+        this.uiContainer.add([this.stageLevelText, this.levelText, this.skillPointsText, this.statsText, hpFrame, this.hpBar, shine, hpIcon, this.hpText, expFrame, this.xpBar, expShine, expIcon, expLabel, this.coinText, this.coinIcon, mmBg1, mmBg2, this.minimapGraphics, this.arrowGraphics, pauseBtn]);
         // Note: Pause overlay/buttons are not in uiContainer based on previous structure
         this.uiContainer.setVisible(false);
 
@@ -389,11 +399,11 @@ export class UIScene extends Phaser.Scene {
 
     private updateStageLevelText() {
         this.stageLevelText.setText(`Stage ${this.currentStage}`);
-        this.levelText.setText(`Level ${this.currentLevel} (${Math.floor(this.currentXp)} / ${this.xpToNextLevel} XP)`);
+        this.levelText.setText(`Level ${this.currentLevel} (${Math.floor(this.currentXp)} / ${this.xpToNextLevel} EXP)`);
         this.skillPointsText.setText(`SP: ${this.skillPoints}`);
 
         const percent = Phaser.Math.Clamp(this.currentXp / this.xpToNextLevel, 0, 1);
-        this.xpBar.displayWidth = (400 - 4) * percent;
+        this.xpBar.displayWidth = (400 - 8) * percent;
     }
 
     update(_time: number, delta: number) {
@@ -529,12 +539,17 @@ export class UIScene extends Phaser.Scene {
         }
     }
 
-    private handleXp = (e: CustomEvent<number>) => {
-        this.totalCoins += 1;
-        this.coinText.setText(this.totalCoins.toLocaleString());
-        this.coinIcon.x = this.coinText.x + this.coinText.width + 20;
-        this.sound.play('coin_pickup', { volume: 0.8 });
-        this.currentXp += e.detail;
+    private handleXp = (e: CustomEvent<any>) => {
+        const detail = typeof e.detail === 'number' ? { amount: e.detail, isDirect: false } : e.detail;
+
+        if (!detail.isDirect) {
+            this.totalCoins += 1;
+            this.coinText.setText(this.totalCoins.toLocaleString());
+            this.coinIcon.x = this.coinText.x + this.coinText.width + 20;
+            this.sound.play('coin_pickup', { volume: 0.8 });
+        }
+
+        this.currentXp += detail.amount;
         if (this.currentXp >= this.xpToNextLevel) {
             this.currentLevel++;
             this.skillPoints++;
