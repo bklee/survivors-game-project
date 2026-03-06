@@ -72,10 +72,10 @@ export class SpellSystem {
         const px = Position.x[playerEid];
         const py = Position.y[playerEid];
 
-        if ((this.spellCooldowns.get(spellId) ?? 0) > 0) return;
+        const animDuration = (this.selectedCharId === 'knight') ? 250 : 400;
         this.spellCooldowns.set(spellId, 500 * globalStats.cooldownMult);
 
-        window.dispatchEvent(new CustomEvent('combo_cast'));
+        window.dispatchEvent(new CustomEvent('combo_cast', { detail: { duration: animDuration } }));
         window.dispatchEvent(new CustomEvent('play_sound', { detail: 'fire_cast' }));
 
         if (this.selectedCharId === 'knight') {
