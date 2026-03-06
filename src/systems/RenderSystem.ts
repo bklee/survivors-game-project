@@ -143,25 +143,25 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                 frameName = `prop_spikes_${animIdx}`;
                 Animation.timer[eid] += dt;
             } else if (typeId === 36) {
+                textureKey = 'dungeon';
                 if (hasComponent(world, Interactive, eid) && Interactive.isActivated[eid]) {
-                    textureKey = `chest_empty_open_2`;
-                    frameName = '';
+                    frameName = `chest_empty_open_f2`;
                 } else {
                     const dx = Position.x[eid] - px;
                     const dy = Position.y[eid] - py;
                     if (dx * dx + dy * dy < 60 * 60) {
-                        textureKey = `chest_full_open_2`;
+                        frameName = `chest_full_open_f2`;
                     } else {
-                        textureKey = `chest_full_open_0`;
+                        frameName = `chest_full_open_f0`;
                     }
-                    frameName = '';
                 }
             } else if (typeId === 21) {
                 // Coin Animation
                 const rate = 8;
                 Animation.timer[eid] = (Animation.timer[eid] || 0) + dt;
                 const fIdx = Math.floor(Animation.timer[eid] / (1000 / rate)) % 4;
-                textureKey = `coin_f${fIdx}`;
+                textureKey = 'dungeon';
+                frameName = `coin_f${fIdx}`;
             } else if (typeId === 109 || typeId === 110) {
                 // Slash Animation
                 const rate = 12;
@@ -176,12 +176,12 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                     Animation.timer[eid] += dt;
                     const maxF = config.frames || 4;
                     const fIdx = Math.floor(Animation.timer[eid] / (1000 / rate)) % maxF;
+                    textureKey = 'dungeon';
                     if (config.hasIdleRun) {
-                        textureKey = `${config.name}_${state}_f${fIdx}`;
+                        frameName = `${config.name}_${state}_f${fIdx}`;
                     } else {
-                        textureKey = `${config.name}_f${fIdx}`;
+                        frameName = `${config.name}_f${fIdx}`;
                     }
-                    frameName = ''; // individual asset is the whole texture
                 }
             } else {
                 const rate = Animation.frameRate[eid] || 8;
