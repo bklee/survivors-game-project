@@ -140,7 +140,7 @@ export class UIScene extends Phaser.Scene {
         shine.fillRect(hpX + 4, hpY - hpHeight + 4, fullWidth - 8, (hpHeight - 8) / 2);
 
         const hpIcon = this.add.image(hpX - 1, hpY - hpHeight / 2, 'hp_icon')
-            .setDisplaySize(35, 35)
+            .setDisplaySize(40, 40)
             .setOrigin(0.5, 0.5)
             .setDepth(20);
 
@@ -172,7 +172,7 @@ export class UIScene extends Phaser.Scene {
         expShine.fillRect(expX + 4, expY - expHeight + 4, fullWidth - 8, (expHeight - 8) / 2);
 
         const expIcon = this.add.image(expX - 1, expY - expHeight / 2, 'dungeon', 'gem')
-            .setDisplaySize(35, 35)
+            .setDisplaySize(40, 40)
             .setOrigin(0.5, 0.5)
             .setDepth(20);
 
