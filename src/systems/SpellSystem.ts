@@ -91,7 +91,7 @@ export class SpellSystem {
         const fxEid = this.createBaseSpell(x + dx * 35, y + dy * 35, Math.random() > 0.5 ? 109 : 110);
         Spell.damage[fxEid] = 60 * globalStats.damageMult;
         Spell.radius[fxEid] = 60;
-        Spell.duration[fxEid] = 150;
+        Spell.duration[fxEid] = 250; // 3프레임 애니메이션을 다 보여주기 위해 250ms로 연장
         Spell.pierce[fxEid] = 10;
         Velocity.x[fxEid] = dx * 10;
         Velocity.y[fxEid] = dy * 10;
@@ -111,9 +111,9 @@ export class SpellSystem {
 
     private spawnWizardAttack(x: number, y: number, dx: number, dy: number) {
         const explosionCount = 3;
-        const spacing = 45; // 간격 최적화
-        const firstDist = 25; // 캐릭터 바로 앞부터 시작
-        const delay = 80; // 조금 더 빠른 "빵빵빵" 느낌
+        const spacing = 25; // 캐릭터 3개 범위에 맞게 간격 조절 (기존 45에서 축소)
+        const firstDist = 20; // 캐릭터 바로 앞부터 시작
+        const delay = 80; // "빵빵빵" 연쇄 폭발 간격
 
         for (let i = 0; i < explosionCount; i++) {
             this.scene.time.delayedCall(i * delay, () => {
