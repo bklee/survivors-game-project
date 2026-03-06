@@ -131,7 +131,7 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
 
             // 3. Handle Animation Framing
             let frameName: string | number = '';
-            if (typeId === 15 || typeId === 20 || (typeId >= 22 && typeId <= 31) || [33, 34, 35, 50, 51, 52, 53, 54, 55, 56, 57].includes(typeId) || (typeId >= 100 && typeId <= 107)) {
+            if (typeId === 15 || typeId === 20 || (typeId >= 22 && typeId <= 31) || [33, 34, 35, 50, 51, 52, 53, 54, 55, 56, 57].includes(typeId) || (typeId >= 101 && typeId <= 107)) {
                 frameName = charKey;
             } else if (typeId === 40) {
                 frameName = Interactive.isActivated[eid] ? 'lever_on' : 'lever_off';
@@ -227,7 +227,7 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                 if (hasComponent(world, Boss, eid)) {
                     sprite.setScale(2.5);
                 } else if (typeId === 100) {
-                    sprite.setScale(3.0); // Wizard special fire effect size
+                    sprite.setScale(1.5); // Wizard special fire effect size (adjusted to 1.5x)
                 } else {
                     sprite.setScale(1.0);
                 }
