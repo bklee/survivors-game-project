@@ -111,22 +111,21 @@ export class SpellSystem {
 
     private spawnWizardAttack(x: number, y: number, dx: number, dy: number) {
         const explosionCount = 3;
-        const spacing = 40; // Approx character size
-        const firstDist = 60;
-        const delay = 100; // ms between "빵"
+        const spacing = 45; // 간격 최적화
+        const firstDist = 25; // 캐릭터 바로 앞부터 시작
+        const delay = 80; // 조금 더 빠른 "빵빵빵" 느낌
 
         for (let i = 0; i < explosionCount; i++) {
             this.scene.time.delayedCall(i * delay, () => {
                 const castDist = firstDist + (i * spacing);
                 const eid = this.createBaseSpell(x + dx * castDist, y + dy * castDist, 100);
                 Spell.damage[eid] = 45 * globalStats.damageMult;
-                Spell.radius[eid] = 40; // Character size approx
+                Spell.radius[eid] = 45; // 범위 살짝 상향
                 Spell.duration[eid] = 400;
                 Spell.pierce[eid] = 255;
                 Velocity.x[eid] = 0;
                 Velocity.y[eid] = 0;
 
-                // Add a small shake for each 'bang'
                 window.dispatchEvent(new CustomEvent('play_sound', { detail: 'fire_cast' }));
             });
         }
