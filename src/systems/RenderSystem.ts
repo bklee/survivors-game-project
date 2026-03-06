@@ -91,6 +91,7 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
             else if (typeId === 36) charKey = 'prop_chest';
             else if (typeId === 40) charKey = 'lever';
             else if (typeId === 41) charKey = 'door';
+            else if (typeId >= 50 && typeId <= 53) charKey = 'spell_fire';
             else if (typeId >= 60 && typeId <= 82) {
                 const config = MONSTER_CONFIG[typeId];
                 if (config) {
@@ -123,7 +124,7 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
 
             // 3. Handle Animation Framing
             let frameName: string | number = '';
-            if (typeId === 15 || typeId === 20 || (typeId >= 22 && typeId <= 31) || [33, 34, 35].includes(typeId) || (typeId >= 100 && typeId <= 107)) {
+            if (typeId === 15 || typeId === 20 || (typeId >= 22 && typeId <= 31) || [33, 34, 35, 50, 51, 52, 53].includes(typeId) || (typeId >= 100 && typeId <= 107)) {
                 frameName = charKey;
             } else if (typeId === 40) {
                 frameName = Interactive.isActivated[eid] ? 'lever_on' : 'lever_off';
@@ -234,6 +235,11 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                     }
                 }
                 if (typeId === 104) sprite.tint = 0xffff00;
+                else if (typeId === 50) sprite.tint = 0x00ff00; // Green
+                else if (typeId === 51) sprite.tint = 0xffff00; // Yellow
+                else if (typeId === 52) sprite.tint = 0xffa500; // Orange
+                else if (typeId === 53) sprite.tint = 0x0000ff; // Blue
+                else sprite.clearTint();
 
                 // Render specific player weapons
                 if (isPlayer && (charKey === 'knight' || charKey === 'wizard')) {
