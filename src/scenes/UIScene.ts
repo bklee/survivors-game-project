@@ -12,6 +12,7 @@ export class UIScene extends Phaser.Scene {
     private hpBar!: Phaser.GameObjects.Rectangle;
     private hpText!: Phaser.GameObjects.Text;
     private xpBar!: Phaser.GameObjects.Rectangle;
+    private expLabel!: Phaser.GameObjects.Text;
     private skillPointsText!: Phaser.GameObjects.Text;
 
     private bossHpBar?: Phaser.GameObjects.Rectangle;
@@ -66,26 +67,20 @@ export class UIScene extends Phaser.Scene {
 
         this.uiContainer = this.add.container(0, 0);
 
-        this.stageLevelText = this.add.text(640, 10, "Stage 1", {
+        this.stageLevelText = this.add.text(10, 10, "Stage 1", {
             fontSize: '56px',
             color: '#ffff00',
             fontStyle: 'bold',
             stroke: '#000000',
             strokeThickness: 8
-        }).setOrigin(0.5, 0);
+        }).setOrigin(0, 0);
 
         const { width, height } = this.scale;
         this.joystick = new VirtualJoystick(this, width / 2, height - 100, 60);
         this.joystick.setVisible(false);
 
-        // 1. Level Text (Top Left)
-        this.levelText = this.add.text(10, 10, "Level 1 (0 / 100 EXP)", {
-            fontSize: '40px',
-            color: '#ffcc00',
-            fontStyle: 'bold',
-            stroke: '#000000',
-            strokeThickness: 6
-        });
+        // Level Text is redundant now as it's on the EXP bar
+        this.levelText = this.add.text(0, 0, "", { fontSize: '0px' }).setVisible(false);
 
         // 1.5 Skill Points Text (Bottom Right)
         this.skillPointsText = this.add.text(1270, 710, "SP: 0", {
@@ -181,7 +176,7 @@ export class UIScene extends Phaser.Scene {
             .setOrigin(0.5, 0.5)
             .setDepth(20);
 
-        const expLabel = this.add.text(expX + fullWidth / 2, expY - expHeight / 2, 'EXP', {
+        this.expLabel = this.add.text(expX + fullWidth / 2, expY - expHeight / 2, 'Level 1', {
             fontFamily: '"MedievalSharp", cursive',
             fontSize: '20px',
             color: '#ffffff',
@@ -315,7 +310,7 @@ export class UIScene extends Phaser.Scene {
             quitBtnText.setScale(1);
         });
 
-        this.uiContainer.add([this.stageLevelText, this.levelText, this.skillPointsText, this.statsText, hpFrame, this.hpBar, shine, hpIcon, this.hpText, expFrame, this.xpBar, expShine, expIcon, expLabel, this.coinText, this.coinIcon, mmBg1, mmBg2, this.minimapGraphics, this.arrowGraphics, pauseBtn]);
+        this.uiContainer.add([this.stageLevelText, this.levelText, this.skillPointsText, this.statsText, hpFrame, this.hpBar, shine, hpIcon, this.hpText, expFrame, this.xpBar, expShine, expIcon, this.expLabel, this.coinText, this.coinIcon, mmBg1, mmBg2, this.minimapGraphics, this.arrowGraphics, pauseBtn]);
         // Note: Pause overlay/buttons are not in uiContainer based on previous structure
         this.uiContainer.setVisible(false);
 
@@ -403,7 +398,7 @@ export class UIScene extends Phaser.Scene {
 
     private updateStageLevelText() {
         this.stageLevelText.setText(`Stage ${this.currentStage}`);
-        this.levelText.setText(`Level ${this.currentLevel}`);
+        this.expLabel.setText(`Level ${this.currentLevel}`);
         this.skillPointsText.setText(`SP: ${this.skillPoints}`);
 
         const percent = Phaser.Math.Clamp(this.currentXp / this.xpToNextLevel, 0, 1);
