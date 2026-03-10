@@ -205,6 +205,26 @@ export class AssetLoader {
         texture.add('doors_frame_top', 0, 32, 224, 32, 16);
         texture.add('gem', 0, 320, 336, 16, 16);
 
+        // Advance Edge Wall Tiles from 0x72_DungeonTilesetII_v1.7 (.png is 512x512)
+        texture.add('wall_edge_bottom_left', 0, 32, 168, 16, 16);
+        texture.add('wall_edge_bottom_right', 0, 48, 168, 16, 16);
+        texture.add('wall_edge_mid_left', 0, 32, 152, 16, 16);
+        texture.add('wall_edge_top_left', 0, 31, 120, 16, 16); // note x=31 in txt
+        texture.add('wall_edge_left', 0, 32, 136, 16, 16);
+        texture.add('wall_edge_top_right', 0, 48, 120, 16, 16);
+        texture.add('wall_edge_right', 0, 48, 136, 16, 16);
+        texture.add('wall_edge_mid_right', 0, 48, 152, 16, 16);
+        texture.add('wall_edge_tshape_bottom_right', 0, 64, 152, 16, 16);
+        texture.add('wall_edge_tshape_bottom_left', 0, 80, 152, 16, 16);
+        texture.add('wall_edge_tshape_right', 0, 64, 168, 16, 16);
+        texture.add('wall_edge_tshape_left', 0, 80, 168, 16, 16);
+        texture.add('wall_outer_front_right', 0, 16, 168, 16, 16);
+        texture.add('wall_outer_front_left', 0, 0, 168, 16, 16);
+        texture.add('wall_outer_mid_left', 0, 0, 152, 16, 16);
+        texture.add('wall_outer_top_left', 0, 0, 136, 16, 16);
+        texture.add('wall_outer_top_right', 0, 16, 136, 16, 16);
+        texture.add('wall_outer_mid_right', 0, 16, 152, 16, 16);
+
         const wallTex = this.scene.textures.get('walls');
         if (wallTex) {
             wallTex.add('wall_top', 0, 32, 96, 16, 32);
