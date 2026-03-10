@@ -205,37 +205,58 @@ export class AssetLoader {
         texture.add('doors_frame_top', 0, 32, 224, 32, 16);
         texture.add('gem', 0, 320, 336, 16, 16);
 
-        // Advance Edge Wall Tiles from 0x72_DungeonTilesetII_v1.7 (.png is 512x512)
-        texture.add('wall_edge_bottom_left', 0, 32, 168, 16, 16);
-        texture.add('wall_edge_bottom_right', 0, 48, 168, 16, 16);
-        texture.add('wall_edge_mid_left', 0, 32, 152, 16, 16);
-        texture.add('wall_edge_top_left', 0, 31, 120, 16, 16); // note x=31 in txt
-        texture.add('wall_edge_left', 0, 32, 136, 16, 16);
-        texture.add('wall_edge_top_right', 0, 48, 120, 16, 16);
-        texture.add('wall_edge_right', 0, 48, 136, 16, 16);
-        texture.add('wall_edge_mid_right', 0, 48, 152, 16, 16);
-        texture.add('wall_edge_tshape_bottom_right', 0, 64, 152, 16, 16);
-        texture.add('wall_edge_tshape_bottom_left', 0, 80, 152, 16, 16);
-        texture.add('wall_edge_tshape_right', 0, 64, 168, 16, 16);
-        texture.add('wall_edge_tshape_left', 0, 80, 168, 16, 16);
-        texture.add('wall_outer_front_right', 0, 16, 168, 16, 16);
-        texture.add('wall_outer_front_left', 0, 0, 168, 16, 16);
-        texture.add('wall_outer_mid_left', 0, 0, 152, 16, 16);
-        texture.add('wall_outer_top_left', 0, 0, 136, 16, 16);
-        texture.add('wall_outer_top_right', 0, 16, 136, 16, 16);
-        texture.add('wall_outer_mid_right', 0, 16, 152, 16, 16);
-
         const wallTex = this.scene.textures.get('walls');
         if (wallTex) {
-            wallTex.add('wall_top', 0, 32, 96, 16, 32);
-            wallTex.add('wall_bottom', 0, 32, 0, 16, 32);
-            wallTex.add('wall_left', 0, 16, 32, 16, 32);
-            wallTex.add('wall_right', 0, 48, 32, 16, 32);
-            wallTex.add('wall_inner', 0, 32, 32, 16, 32);
-            wallTex.add('wall_tl', 0, 16, 96, 16, 32);
-            wallTex.add('wall_tr', 0, 48, 96, 16, 32);
+            // Row 0 (y=0)
+            wallTex.add('wall_side_top_left', 0, 0, 0, 16, 32);
             wallTex.add('wall_bl', 0, 16, 0, 16, 32);
+            wallTex.add('wall_bottom', 0, 32, 0, 16, 32);
             wallTex.add('wall_br', 0, 48, 0, 16, 32);
+            wallTex.add('wall_side_top_right', 0, 64, 0, 16, 32);
+            wallTex.add('wall_end_left', 0, 80, 0, 16, 32);
+            wallTex.add('wall_end_right', 0, 96, 0, 16, 32);
+            wallTex.add('wall_mid_alt', 0, 112, 0, 16, 32);
+            wallTex.add('wall_cracked_bl', 0, 144, 0, 16, 32);
+            wallTex.add('wall_cracked_bottom', 0, 160, 0, 16, 32);
+            wallTex.add('wall_cracked_br', 0, 176, 0, 16, 32);
+
+            // Row 1 (y=32)
+            wallTex.add('wall_side_left', 0, 0, 32, 16, 32);
+            wallTex.add('wall_left', 0, 16, 32, 16, 32);
+            wallTex.add('wall_inner', 0, 32, 32, 16, 32);
+            wallTex.add('wall_right', 0, 48, 32, 16, 32);
+            wallTex.add('wall_side_right', 0, 64, 32, 16, 32);
+            wallTex.add('wall_inner_left', 0, 80, 32, 16, 32);
+            wallTex.add('wall_inner_right', 0, 96, 32, 16, 32);
+            wallTex.add('wall_inner_alt', 0, 112, 32, 16, 32);
+            wallTex.add('wall_cracked_left', 0, 144, 32, 16, 32);
+            wallTex.add('wall_cracked_inner', 0, 160, 32, 16, 32);
+            wallTex.add('wall_cracked_right', 0, 176, 32, 16, 32);
+            wallTex.add('wall_banner_green', 0, 240, 32, 16, 32);
+            wallTex.add('wall_banner_yellow', 0, 256, 32, 16, 32);
+
+            // Row 2 (y=64)
+            wallTex.add('wall_side_left_b', 0, 0, 64, 16, 32);
+            wallTex.add('wall_left_b', 0, 16, 64, 16, 32);
+            wallTex.add('wall_inner_b', 0, 32, 64, 16, 32);
+            wallTex.add('wall_right_b', 0, 48, 64, 16, 32);
+            wallTex.add('wall_side_right_b', 0, 64, 64, 16, 32);
+            wallTex.add('column', 0, 240, 64, 16, 32);
+
+            // Row 3 (y=96)
+            wallTex.add('wall_side_tl', 0, 0, 96, 16, 32);
+            wallTex.add('wall_tl', 0, 16, 96, 16, 32);
+            wallTex.add('wall_top', 0, 32, 96, 16, 32);
+            wallTex.add('wall_tr', 0, 48, 96, 16, 32);
+            wallTex.add('wall_side_tr', 0, 64, 96, 16, 32);
+            wallTex.add('wall_top_end_left', 0, 80, 96, 16, 32);
+            wallTex.add('wall_top_end_right', 0, 96, 96, 16, 32);
+            wallTex.add('wall_top_alt', 0, 112, 96, 16, 32);
+            wallTex.add('wall_cracked_tl', 0, 144, 96, 16, 32);
+            wallTex.add('wall_cracked_top', 0, 160, 96, 16, 32);
+            wallTex.add('wall_cracked_tr', 0, 176, 96, 16, 32);
+            wallTex.add('column_wall', 0, 240, 96, 16, 32);
+            wallTex.add('door_wall', 0, 256, 96, 16, 32);
         }
     }
 

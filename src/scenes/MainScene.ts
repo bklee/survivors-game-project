@@ -273,38 +273,54 @@ export class MainScene extends Phaser.Scene {
             for (let x = 0; x < mapW; x++) {
                 const cell = this.dungeon.map[y][x];
 
-                // ── Floor: draw only in actual floor/door cells → walls stay black ──
+                // ── Floor/Door base ──────────────────────────────────────────
                 if (cell === TileType.FLOOR || cell === TileType.DOOR) {
                     this.floorBlitter.create(x * TILE_SIZE, y * TILE_SIZE, 'floor');
                 }
 
+                // ── Pillars & Obstacles ──────────────────────────────────────
+                if (cell === TileType.PILLAR) {
+                    this.wallBlitter.create(x * TILE_SIZE, y * TILE_SIZE, 'column');
+                } else if (cell === TileType.OBSTACLE) {
+                    this.wallBlitter.create(x * TILE_SIZE, y * TILE_SIZE, 'wall_top_alt');
+                }
+
+                // ── Walls ───────────────────────────────────────────────────
                 if (cell === TileType.WALL) {
-                    // Determine adjacent tiles
+                    const n = (y > 0 && this.dungeon.map[y - 1][x] === TileType.WALL) ? 1 : 0;
                     const s = (y < mapH - 1 && this.dungeon.map[y + 1][x] === TileType.WALL) ? 1 : 0;
                     const w = (x > 0 && this.dungeon.map[y][x - 1] === TileType.WALL) ? 1 : 0;
                     const e = (x < mapW - 1 && this.dungeon.map[y][x + 1] === TileType.WALL) ? 1 : 0;
 
-                    // ── map_example3.png 스타일 ────────────────────────────────────────
-                    // 모든 WALL 셀 → wall_inner (어두운 석재 텍스처로 벽 내부 채움)
-                    // s==0 인 경계 셀 → 추가로 wall_tl/wall_top/wall_tr (캡+정면)
-                    // ─────────────────────────────────────────────────────────────────
-
-                    // ① 모든 벽 셀에 내부 석재 텍스처
+                    // Base Filling
                     this.wallBlitter.create(x * TILE_SIZE, y * TILE_SIZE, 'wall_inner');
 
-                    // ② 아래가 바닥인 경계선에 정면 캡 타일 추가 렌더
+                    // Advanced Boundary Logic
                     if (s === 0) {
-                        let capFrame: string;
-                        if (w === 0 && e === 1) capFrame = 'wall_tl';   // 왼쪽 끝
-                        else if (w === 1 && e === 0) capFrame = 'wall_tr';   // 오른쪽 끝
-                        else capFrame = 'wall_top';  // 중간 or 단독
-                        this.wallBlitter.create(x * TILE_SIZE, y * TILE_SIZE, capFrame);
+                        // Player-facing wall (South edge of a wall block)
+                        let frame = 'wall_top';
+                        if (w === 0) frame = (n === 1) ? 'wall_tl' : 'wall_side_tl';
+                        else if (e === 0) frame = (n === 1) ? 'wall_tr' : 'wall_side_tr';
+                        this.wallBlitter.create(x * TILE_SIZE, y * TILE_SIZE, frame);
+
+                        // Random decoration: Banners on long flat walls
+                        if (w === 1 && e === 1 && Math.random() < 0.05) {
+                            const banner = Math.random() < 0.5 ? 'wall_banner_green' : 'wall_banner_yellow';
+                            this.wallBlitter.create(x * TILE_SIZE, y * TILE_SIZE, banner);
+                        }
+                    } else if (n === 0) {
+                        // Back-facing wall (North edge of a wall block)
+                        let frame = 'wall_bottom';
+                        if (w === 0) frame = (s === 1) ? 'wall_bl' : 'wall_side_top_left';
+                        else if (e === 0) frame = (s === 1) ? 'wall_br' : 'wall_side_top_right';
+                        this.wallBlitter.create(x * TILE_SIZE, y * TILE_SIZE, frame);
+                    } else {
+                        // Side walls (Vertical corridors)
+                        if (w === 0) this.wallBlitter.create(x * TILE_SIZE, y * TILE_SIZE, 'wall_side_left');
+                        if (e === 0) this.wallBlitter.create(x * TILE_SIZE, y * TILE_SIZE, 'wall_side_right');
                     }
 
-
-
                     // Render door frames
-                    // The leftmost part of the 2-tile wide door:
                     const isLeftDoorTile = (x === 0 || this.dungeon.map[y][x - 1] !== TileType.DOOR);
                     if (isLeftDoorTile) {
                         if (x > 0 && this.dungeon.map[y][x - 1] === TileType.WALL) {
@@ -314,7 +330,6 @@ export class MainScene extends Phaser.Scene {
                             this.doorBlitter.create(x * TILE_SIZE, (y - 1) * TILE_SIZE, 'doors_frame_top');
                         }
                     } else {
-                        // The rightmost part of the 2-tile wide door
                         if (x < mapW - 1 && this.dungeon.map[y][x + 1] === TileType.WALL) {
                             this.doorBlitter.create((x + 1) * TILE_SIZE, y * TILE_SIZE, 'doors_frame_right');
                         }
