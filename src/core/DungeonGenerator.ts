@@ -240,7 +240,7 @@ export class DungeonGenerator {
         return {
             doorPixel: {
                 x: doorTX * TILE_SIZE + TILE_SIZE,            // Center of the 2-tile wide door (16*x + 16)
-                y: doorTY * TILE_SIZE + TILE_SIZE / 2         // No extra shift down, pulling it "up" visually into the wall line
+                y: doorTY * TILE_SIZE + TILE_SIZE / 2 + 8     // Adding 8 perfectly aligns the door top-left to doorTY*16
             },
             floorPixels
         };
