@@ -4,6 +4,8 @@ export enum TileType {
     WALL = 0,
     FLOOR = 1,
     DOOR = 2,
+    PILLAR = 3,
+    OBSTACLE = 4,
 }
 
 export class DungeonGenerator {
@@ -39,14 +41,14 @@ export class DungeonGenerator {
         this.fillRect(ox + 26, oy + 13, 2, 5, TileType.FLOOR);
         // 4 Pillars in a row as seen in map_example3
         for (let i = 0; i < 4; i++) {
-            this.map[oy + 24][ox + 19 + i * 3] = TileType.WALL;
+            this.map[oy + 24][ox + 19 + i * 3] = TileType.PILLAR;
         }
 
         // --- ROOM D (Long Path Right) ---
         this.fillRect(ox + 33, oy + 22, 10, 4, TileType.FLOOR); // Corridor
         this.fillRect(ox + 43, oy + 15, 12, 20, TileType.FLOOR); // Room D
-        // Central block (black hole) in Room D
-        this.fillRect(ox + 47, oy + 21, 4, 8, TileType.WALL);
+        // Central block (obstacles) in Room D
+        this.fillRect(ox + 47, oy + 21, 4, 8, TileType.OBSTACLE);
 
         // --- ROOM E (Bottom Area) ---
         // Corridor through door (central room bottom)
