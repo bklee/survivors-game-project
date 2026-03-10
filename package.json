@@ -22,7 +22,8 @@
   "license": "ISC",
   "dependencies": {
     "bitecs": "^0.3.39",
-    "phaser": "^3.88.2"
+    "phaser": "^3.88.2",
+    "rot-js": "^2.2.1"
   },
   "devDependencies": {
     "@types/node": "^22.13.5",
