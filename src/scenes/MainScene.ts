@@ -88,7 +88,7 @@ export class MainScene extends Phaser.Scene {
 
         this.spellSystem.selectedCharId = this.selectedCharId;
 
-        this.floorBlitter = this.add.blitter(0, 0, 'dungeon').setDepth(-3);
+        this.floorBlitter = this.add.blitter(0, 0, 'floors').setDepth(-3);
 
         this.wallBlitter = this.add.blitter(0, 0, 'walls').setDepth(-2);
         this.doorBlitter = this.add.blitter(0, 0, 'dungeon').setDepth(-2);
@@ -275,7 +275,7 @@ export class MainScene extends Phaser.Scene {
 
                 // ── Floor/Door base ──────────────────────────────────────────
                 if (cell === TileType.FLOOR || cell === TileType.DOOR) {
-                    this.floorBlitter.create(x * TILE_SIZE, y * TILE_SIZE, 'floor');
+                    this.floorBlitter.create(x * TILE_SIZE, y * TILE_SIZE, 'floor_1');
                 }
 
                 // ── Pillars & Obstacles ──────────────────────────────────────
