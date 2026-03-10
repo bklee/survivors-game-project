@@ -3,6 +3,7 @@ export const TILE_SIZE = 16;
 export enum TileType {
     WALL = 0,
     FLOOR = 1,
+    DOOR = 2,
 }
 
 export class DungeonGenerator {
@@ -88,20 +89,20 @@ export class DungeonGenerator {
         const tx = Math.floor(xPixel / TILE_SIZE);
         const ty = Math.floor(yPixel / TILE_SIZE);
         if (tx < 0 || tx >= this.width || ty < 0 || ty >= this.height) return false;
-        return this.map[ty][tx] === TileType.FLOOR;
+        return this.map[ty][tx] !== TileType.WALL;
     }
 
     private hasClearance(tx: number, ty: number): boolean {
         if (tx <= 1 || tx >= this.width - 2 || ty <= 1 || ty >= this.height - 2) return false;
-        return this.map[ty][tx] === TileType.FLOOR &&
-            this.map[ty - 1][tx] === TileType.FLOOR &&
-            this.map[ty + 1][tx] === TileType.FLOOR &&
-            this.map[ty][tx - 1] === TileType.FLOOR &&
-            this.map[ty][tx + 1] === TileType.FLOOR &&
-            this.map[ty - 1][tx - 1] === TileType.FLOOR &&
-            this.map[ty - 1][tx + 1] === TileType.FLOOR &&
-            this.map[ty + 1][tx - 1] === TileType.FLOOR &&
-            this.map[ty + 1][tx + 1] === TileType.FLOOR;
+        return this.map[ty][tx] !== TileType.WALL &&
+            this.map[ty - 1][tx] !== TileType.WALL &&
+            this.map[ty + 1][tx] !== TileType.WALL &&
+            this.map[ty][tx - 1] !== TileType.WALL &&
+            this.map[ty][tx + 1] !== TileType.WALL &&
+            this.map[ty - 1][tx - 1] !== TileType.WALL &&
+            this.map[ty - 1][tx + 1] !== TileType.WALL &&
+            this.map[ty + 1][tx - 1] !== TileType.WALL &&
+            this.map[ty + 1][tx + 1] !== TileType.WALL;
     }
 
     public getRandomFloorPixel(): { x: number, y: number } {
@@ -131,7 +132,7 @@ export class DungeonGenerator {
         for (let checkX = minX; checkX <= maxX; checkX++) {
             for (let checkY = minY; checkY <= maxY; checkY++) {
                 if (checkX < 0 || checkX >= this.width || checkY < 0 || checkY >= this.height) return false;
-                if (this.map[checkY][checkX] !== TileType.FLOOR) return false;
+                if (this.map[checkY][checkX] === TileType.WALL) return false;
             }
         }
         return true;
@@ -207,31 +208,39 @@ export class DungeonGenerator {
             }
         }
 
-        // 문 위치: 방 윗벽 중앙에 1칸 뚫기
-        const doorTX = roomX + Math.floor(roomW / 2);
+        // 문 위치: 방 윗벽 중앙에 2칸 뚫기 (도어 스프라이트가 32x32 이므로 2타일 차지)
+        const doorTX = roomX + Math.floor(roomW / 2) - 1;
         const doorTY = roomY - 1;
-        if (doorTY >= 0 && doorTY < this.height && doorTX >= 0 && doorTX < this.width) {
-            this.map[doorTY][doorTX] = TileType.FLOOR;
+        if (doorTY >= 0 && doorTY < this.height && doorTX >= 0 && doorTX + 1 < this.width) {
+            this.map[doorTY][doorTX] = TileType.DOOR;
+            this.map[doorTY][doorTX + 1] = TileType.DOOR;
         }
 
         // 문 위쪽으로 복도를 뚫어서 메인 던전과 연결 (최대 20타일)
         for (let cy = doorTY - 1; cy >= Math.max(0, doorTY - 20); cy--) {
-            if (doorTX >= 0 && doorTX < this.width && cy >= 0 && cy < this.height) {
+            let reachedMain = false;
+            if (doorTX >= 0 && doorTX + 1 < this.width && cy >= 0 && cy < this.height) {
                 // 이미 메인 던전의 FLOOR에 도달하면 중단
-                if (this.map[cy][doorTX] === TileType.FLOOR) break;
+                if (this.map[cy][doorTX] !== TileType.WALL || this.map[cy][doorTX + 1] !== TileType.WALL) {
+                    reachedMain = true;
+                }
                 this.map[cy][doorTX] = TileType.FLOOR;
+                this.map[cy][doorTX + 1] = TileType.FLOOR;
                 // 복도 양옆은 벽이어야 자연스러움
-                if (doorTX - 1 >= 0 && this.map[cy][doorTX - 1] === TileType.FLOOR) {
-                    // 이미 열린 공간이면 복도 완료
-                    break;
+                if (doorTX - 1 >= 0 && this.map[cy][doorTX - 1] !== TileType.WALL) {
+                    reachedMain = true;
+                }
+                if (doorTX + 2 < this.width && this.map[cy][doorTX + 2] !== TileType.WALL) {
+                    reachedMain = true;
                 }
             }
+            if (reachedMain) break;
         }
 
         return {
             doorPixel: {
-                x: doorTX * TILE_SIZE + TILE_SIZE / 2,
-                y: doorTY * TILE_SIZE + TILE_SIZE / 2
+                x: doorTX * TILE_SIZE + TILE_SIZE,            // Center of the 2-tile wide door (16*x + 16)
+                y: doorTY * TILE_SIZE + TILE_SIZE / 2 + 8     // Shift down 8 pixels to align base with wall_top
             },
             floorPixels
         };
