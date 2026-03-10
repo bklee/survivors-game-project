@@ -18,72 +18,67 @@ export class DungeonGenerator {
     }
 
     public generate() {
-        const fillProbability = 0.40;
-        this.map = Array(this.height).fill(0).map(() => Array(this.width).fill(TileType.FLOOR));
+        // Initialize with all walls
+        this.map = Array(this.height).fill(0).map(() => Array(this.width).fill(TileType.WALL));
 
-        // 1. Initial Random Fill
+        // Use a 50x50 center portion for the example layout
+        const ox = Math.floor(this.width / 2) - 25;
+        const oy = Math.floor(this.height / 2) - 20;
+
+        // --- ROOM A (Top Left) ---
+        this.fillRect(ox + 5, oy + 5, 12, 8, TileType.FLOOR);
+
+        // --- ROOM B (Top Center) ---
+        this.fillRect(ox + 22, oy + 3, 10, 10, TileType.FLOOR);
+        // Connect A to B
+        this.fillRect(ox + 17, oy + 8, 5, 2, TileType.FLOOR);
+
+        // --- ROOM C (Central Pillar Room) ---
+        this.fillRect(ox + 15, oy + 18, 18, 12, TileType.FLOOR);
+        // Connect B to C
+        this.fillRect(ox + 26, oy + 13, 2, 5, TileType.FLOOR);
+        // 4 Pillars in a row as seen in map_example3
+        for (let i = 0; i < 4; i++) {
+            this.map[oy + 24][ox + 19 + i * 3] = TileType.WALL;
+        }
+
+        // --- ROOM D (Long Path Right) ---
+        this.fillRect(ox + 33, oy + 22, 10, 4, TileType.FLOOR); // Corridor
+        this.fillRect(ox + 43, oy + 15, 12, 20, TileType.FLOOR); // Room D
+        // Central block (black hole) in Room D
+        this.fillRect(ox + 47, oy + 21, 4, 8, TileType.WALL);
+
+        // --- ROOM E (Bottom Area) ---
+        // Corridor through door (central room bottom)
+        this.map[oy + 30][ox + 23] = TileType.DOOR;
+        this.map[oy + 30][ox + 24] = TileType.DOOR;
+        this.fillRect(ox + 21, oy + 31, 6, 8, TileType.FLOOR);
+
+        // Room F (Bottom Left)
+        this.fillRect(ox + 8, oy + 31, 10, 10, TileType.FLOOR);
+        this.fillRect(ox + 18, oy + 35, 3, 2, TileType.FLOOR); // connection
+
+        // Ensure boundary
         for (let y = 0; y < this.height; y++) {
             for (let x = 0; x < this.width; x++) {
                 if (x === 0 || x === this.width - 1 || y === 0 || y === this.height - 1) {
                     this.map[y][x] = TileType.WALL;
-                } else {
-                    this.map[y][x] = (Math.random() < fillProbability) ? TileType.WALL : TileType.FLOOR;
-                }
-            }
-        }
-
-        // 2. Cellular Automata Smoothing
-        const numSteps = 5;
-        for (let i = 0; i < numSteps; i++) {
-            const nextMap = Array(this.height).fill(0).map(() => Array(this.width).fill(TileType.FLOOR));
-            for (let y = 0; y < this.height; y++) {
-                for (let x = 0; x < this.width; x++) {
-                    const wallCount = this.getSurroundingWallCount(x, y);
-                    if (this.map[y][x] === TileType.WALL) {
-                        nextMap[y][x] = wallCount >= 4 ? TileType.WALL : TileType.FLOOR;
-                    } else {
-                        nextMap[y][x] = wallCount >= 5 ? TileType.WALL : TileType.FLOOR;
-                    }
-
-                    // Enforce solid boundary
-                    const BORDER = 4;
-                    if (x < BORDER || x >= this.width - BORDER || y < BORDER || y >= this.height - BORDER) {
-                        nextMap[y][x] = TileType.WALL;
-                    }
-                }
-            }
-            this.map = nextMap;
-        }
-
-        // 3. Clear the center to guarantee a safe starting spot
-        const cx = Math.floor(this.width / 2);
-        const cy = Math.floor(this.height / 2);
-        for (let y = cy - 8; y <= cy + 8; y++) {
-            for (let x = cx - 8; x <= cx + 8; x++) {
-                if (y > 0 && y < this.height && x > 0 && x < this.width) {
-                    this.map[y][x] = TileType.FLOOR;
                 }
             }
         }
     }
 
-    private getSurroundingWallCount(gridX: number, gridY: number): number {
-        let wallCount = 0;
-        for (let y = gridY - 1; y <= gridY + 1; y++) {
-            for (let x = gridX - 1; x <= gridX + 1; x++) {
-                if (x >= 0 && x < this.width && y >= 0 && y < this.height) {
-                    if (x !== gridX || y !== gridY) {
-                        if (this.map[y][x] === TileType.WALL) {
-                            wallCount++;
-                        }
-                    }
-                } else {
-                    wallCount++;
+    private fillRect(x: number, y: number, w: number, h: number, type: TileType) {
+        for (let row = y; row < y + h; row++) {
+            for (let col = x; col < x + w; col++) {
+                if (row >= 0 && row < this.height && col >= 0 && col < this.width) {
+                    this.map[row][col] = type;
                 }
             }
         }
-        return wallCount;
     }
+
+
 
     public isFloor(xPixel: number, yPixel: number): boolean {
         const tx = Math.floor(xPixel / TILE_SIZE);
