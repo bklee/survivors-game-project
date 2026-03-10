@@ -32,6 +32,7 @@ export class MainScene extends Phaser.Scene {
     private currentBGM?: Phaser.Sound.BaseSound;
     private dungeon!: DungeonGenerator;
     private wallBlitter!: Phaser.GameObjects.Blitter;
+    private doorBlitter!: Phaser.GameObjects.Blitter;
     private floorSprite!: Phaser.GameObjects.TileSprite;
     private currentStage: number = 1;
     private isPausedForClear: boolean = false;
@@ -92,6 +93,7 @@ export class MainScene extends Phaser.Scene {
             .setDepth(-3);
 
         this.wallBlitter = this.add.blitter(0, 0, 'walls').setDepth(-2);
+        this.doorBlitter = this.add.blitter(0, 0, 'dungeon').setDepth(-2);
 
         this.buildMap(this.currentStage);
 
@@ -267,6 +269,7 @@ export class MainScene extends Phaser.Scene {
         this.cameras.main.setBounds(0, 0, wPx, hPx);
 
         this.wallBlitter.clear();
+        this.doorBlitter.clear();
         for (let y = 0; y < mapH; y++) {
             for (let x = 0; x < mapW; x++) {
                 if (this.dungeon.map[y][x] === TileType.WALL) {
@@ -282,15 +285,15 @@ export class MainScene extends Phaser.Scene {
                     const isLeftDoorTile = (x === 0 || this.dungeon.map[y][x - 1] !== TileType.DOOR);
                     if (isLeftDoorTile) {
                         if (x > 0 && this.dungeon.map[y][x - 1] === TileType.WALL) {
-                            this.wallBlitter.create((x - 1) * TILE_SIZE, y * TILE_SIZE, 'doors_frame_left');
+                            this.doorBlitter.create((x - 1) * TILE_SIZE, y * TILE_SIZE, 'doors_frame_left');
                         }
                         if (y > 0 && this.dungeon.map[y - 1][x] === TileType.WALL) {
-                            this.wallBlitter.create(x * TILE_SIZE, (y - 1) * TILE_SIZE, 'doors_frame_top');
+                            this.doorBlitter.create(x * TILE_SIZE, (y - 1) * TILE_SIZE, 'doors_frame_top');
                         }
                     } else {
                         // The rightmost part of the 2-tile wide door
                         if (x < mapW - 1 && this.dungeon.map[y][x + 1] === TileType.WALL) {
-                            this.wallBlitter.create((x + 1) * TILE_SIZE, y * TILE_SIZE, 'doors_frame_right');
+                            this.doorBlitter.create((x + 1) * TILE_SIZE, y * TILE_SIZE, 'doors_frame_right');
                         }
                     }
                 }
