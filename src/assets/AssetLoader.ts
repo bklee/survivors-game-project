@@ -15,6 +15,7 @@ export class AssetLoader {
     loadImages() {
         this.scene.load.image('dungeon', './assets/0x72_DungeonTilesetII_v1.7.png');
         this.scene.load.image('walls', './assets/atlas_walls_high-16x32.png');
+        this.scene.load.image('floors', './assets/atlas_floor-16x16.png');
         this.scene.load.image('weapon_knight_sword', './assets/frames/weapon_knight_sword.png');
         this.scene.load.image('weapon_green_magic_staff', './assets/frames/weapon_green_magic_staff.png');
         this.scene.load.image('main_bg', './assets/main.png');
@@ -257,6 +258,17 @@ export class AssetLoader {
             wallTex.add('wall_cracked_tr', 0, 176, 96, 16, 32);
             wallTex.add('column_wall', 0, 240, 96, 16, 32);
             wallTex.add('door_wall', 0, 256, 96, 16, 32);
+        }
+
+        const floorTex = this.scene.textures.get('floors');
+        if (floorTex) {
+            let idx = 1;
+            for (let r = 0; r < 7; r++) {
+                for (let c = 0; c < 7; c++) {
+                    floorTex.add(`floor_${idx}`, 0, c * 16, r * 16, 16, 16);
+                    idx++;
+                }
+            }
         }
     }
 
