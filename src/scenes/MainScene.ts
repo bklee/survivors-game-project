@@ -280,44 +280,27 @@ export class MainScene extends Phaser.Scene {
                     const e = (x < mapW - 1 && this.dungeon.map[y][x + 1] === TileType.WALL) ? 1 : 0;
 
 
-                    // ── Top-down dungeon wall rendering ──
-                    // Walls with s==0 face the player — draw top cap + brick face
-                    // Walls with s==1 are hidden behind other walls — draw outer edge cap only
-                    if (s === 0) {
-                        // Player-facing wall: show stone top + brick front
-                        let topFrame: string;
-                        let faceFrame: string;
+                    // ── Top-down wall rendering rules ──
+                    // 1. Fully enclosed (all 4 sides = wall) → skip (black void)
+                    // 2. South is NOT wall (floor below) → player-facing wall, render 16x32 front sprite
+                    // 3. Otherwise → back wall, render inner/edge sprite
 
-                        const isLeftEnd = (w === 0);
-                        const isRightEnd = (e === 0);
-
-                        if (isLeftEnd && isRightEnd) {
-                            topFrame = 'wall_top_mid'; faceFrame = 'wall_mid';
-                        } else if (isLeftEnd) {
-                            topFrame = 'wall_top_left'; faceFrame = 'wall_left';
-                        } else if (isRightEnd) {
-                            topFrame = 'wall_top_right'; faceFrame = 'wall_right';
-                        } else {
-                            topFrame = 'wall_top_mid'; faceFrame = 'wall_mid';
-                        }
-
-                        // top cap sits at the upper half of the tile
-                        this.doorBlitter.create(x * TILE_SIZE, y * TILE_SIZE, topFrame);
-                        // brick face sits at lower half of same tile row (same y, already included in 16x16 top)
-                        // We additionally draw the face tile one row lower for the 32-px-tall wall illusion
-                        this.doorBlitter.create(x * TILE_SIZE, y * TILE_SIZE + TILE_SIZE, faceFrame);
-
+                    const allEnclosed = (n === 1 && s === 1 && w === 1 && e === 1);
+                    if (allEnclosed) {
+                        // Nothing — stays black
+                    } else if (s === 0) {
+                        // Player-facing wall
+                        let wallFrame: string;
+                        if (w === 0 && e === 1) wallFrame = 'wall_tl'; // left end
+                        else if (e === 0 && w === 1) wallFrame = 'wall_tr'; // right end
+                        else if (w === 0 && e === 0) wallFrame = 'wall_top'; // standalone column
+                        else wallFrame = 'wall_top'; // mid
+                        this.wallBlitter.create(x * TILE_SIZE, y * TILE_SIZE, wallFrame);
                     } else {
-                        // Back wall (hidden face): draw outer/edge topper only
-                        let edgeFrame: string;
-
-                        if (e >= 1 && w === 0) edgeFrame = 'wall_outer_top_left';
-                        else if (w >= 1 && e === 0) edgeFrame = 'wall_outer_top_right';
-                        else if (n === 1 && s === 1 && e === 0 && w === 0) edgeFrame = 'wall_outer_mid_left';
-                        else edgeFrame = 'wall_outer_top_left';
-
-                        this.doorBlitter.create(x * TILE_SIZE, y * TILE_SIZE, edgeFrame);
+                        // Back wall (hidden from player) → inner block
+                        this.wallBlitter.create(x * TILE_SIZE, y * TILE_SIZE, 'wall_inner');
                     }
+
 
                 } else if (this.dungeon.map[y][x] === TileType.DOOR) {
                     // Render door frames
