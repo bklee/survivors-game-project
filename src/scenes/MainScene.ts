@@ -278,17 +278,20 @@ export class MainScene extends Phaser.Scene {
                     this.wallBlitter.create(x * TILE_SIZE, y * TILE_SIZE, frame);
                 } else if (this.dungeon.map[y][x] === TileType.DOOR) {
                     // Render door frames
-                    // The leftmost tile of the 2-tile wide door:
-                    if (x > 0 && this.dungeon.map[y][x - 1] === TileType.WALL) {
-                        this.wallBlitter.create(x * TILE_SIZE - 8, y * TILE_SIZE, 'doors_frame_left');
-                    }
-                    // The rightmost tile of the 2-tile wide door:
-                    if (x < mapW - 1 && this.dungeon.map[y][x + 1] === TileType.WALL) {
-                        this.wallBlitter.create(x * TILE_SIZE + TILE_SIZE + 8, y * TILE_SIZE, 'doors_frame_right');
-                    }
-                    // The top frame of the door
-                    if (y > 0 && this.dungeon.map[y - 1][x] === TileType.WALL) {
-                        this.wallBlitter.create(x * TILE_SIZE, y * TILE_SIZE - 16, 'doors_frame_top');
+                    // The leftmost part of the 2-tile wide door:
+                    const isLeftDoorTile = (x === 0 || this.dungeon.map[y][x - 1] !== TileType.DOOR);
+                    if (isLeftDoorTile) {
+                        if (x > 0 && this.dungeon.map[y][x - 1] === TileType.WALL) {
+                            this.wallBlitter.create((x - 1) * TILE_SIZE, y * TILE_SIZE, 'doors_frame_left');
+                        }
+                        if (y > 0 && this.dungeon.map[y - 1][x] === TileType.WALL) {
+                            this.wallBlitter.create(x * TILE_SIZE, (y - 1) * TILE_SIZE, 'doors_frame_top');
+                        }
+                    } else {
+                        // The rightmost part of the 2-tile wide door
+                        if (x < mapW - 1 && this.dungeon.map[y][x + 1] === TileType.WALL) {
+                            this.wallBlitter.create((x + 1) * TILE_SIZE, y * TILE_SIZE, 'doors_frame_right');
+                        }
                     }
                 }
             }
