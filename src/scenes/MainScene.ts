@@ -33,7 +33,7 @@ export class MainScene extends Phaser.Scene {
     private dungeon!: DungeonGenerator;
     private wallBlitter!: Phaser.GameObjects.Blitter;
     private doorBlitter!: Phaser.GameObjects.Blitter;
-    private floorSprite!: Phaser.GameObjects.TileSprite;
+    private floorBlitter!: Phaser.GameObjects.Blitter;
     private currentStage: number = 1;
     private isPausedForClear: boolean = false;
     private charData!: CharacterData;
@@ -88,9 +88,7 @@ export class MainScene extends Phaser.Scene {
 
         this.spellSystem.selectedCharId = this.selectedCharId;
 
-        this.floorSprite = this.add.tileSprite(0, 0, this.dungeon.width * TILE_SIZE, this.dungeon.height * TILE_SIZE, 'dungeon', 'floor')
-            .setOrigin(0, 0)
-            .setDepth(-3);
+        this.floorBlitter = this.add.blitter(0, 0, 'dungeon').setDepth(-3);
 
         this.wallBlitter = this.add.blitter(0, 0, 'walls').setDepth(-2);
         this.doorBlitter = this.add.blitter(0, 0, 'dungeon').setDepth(-2);
@@ -266,34 +264,35 @@ export class MainScene extends Phaser.Scene {
         const wPx = mapW * TILE_SIZE;
         const hPx = mapH * TILE_SIZE;
 
-        this.floorSprite.setSize(wPx, hPx);
         this.cameras.main.setBounds(0, 0, wPx, hPx);
 
+        this.floorBlitter.clear();
         this.wallBlitter.clear();
         this.doorBlitter.clear();
         for (let y = 0; y < mapH; y++) {
             for (let x = 0; x < mapW; x++) {
-                if (this.dungeon.map[y][x] === TileType.WALL) {
-                    // Determine adjacent tiles (1 = wall, 0 = not wall)
+                const cell = this.dungeon.map[y][x];
+
+                // ── Floor: draw only in actual floor/door cells → walls stay black ──
+                if (cell === TileType.FLOOR || cell === TileType.DOOR) {
+                    this.floorBlitter.create(x * TILE_SIZE, y * TILE_SIZE, 'floor');
+                }
+
+                if (cell === TileType.WALL) {
+                    // Determine adjacent tiles
                     const n = (y > 0 && this.dungeon.map[y - 1][x] === TileType.WALL) ? 1 : 0;
                     const s = (y < mapH - 1 && this.dungeon.map[y + 1][x] === TileType.WALL) ? 1 : 0;
                     const w = (x > 0 && this.dungeon.map[y][x - 1] === TileType.WALL) ? 1 : 0;
                     const e = (x < mapW - 1 && this.dungeon.map[y][x + 1] === TileType.WALL) ? 1 : 0;
 
-
-                    // ── Wall rendering ──
-                    // 1. 4방향 모두 벽 → 검정 (렌더 없음)
-                    // 2. 아래가 바닥(s==0) → 플레이어가 보는 정면 벽 (wall_top)
-                    // 3. 그 외 → 안쪽 뒤채움 벽 (wall_inner)
+                    // 사방이 모두 벽이면 검정 (아무것도 안 그림)
+                    // 아래가 벽이 아닌 경우(s==0)에만 정면 벽 렌더 → 네모 테두리 + 검정 내부
                     const allEnclosed = (n === 1 && s === 1 && w === 1 && e === 1);
-                    if (!allEnclosed) {
-                        const frame = (s === 0) ? 'wall_top' : 'wall_inner';
-                        this.wallBlitter.create(x * TILE_SIZE, y * TILE_SIZE, frame);
+                    if (!allEnclosed && s === 0) {
+                        this.wallBlitter.create(x * TILE_SIZE, y * TILE_SIZE, 'wall_top');
                     }
 
 
-
-                } else if (this.dungeon.map[y][x] === TileType.DOOR) {
                     // Render door frames
                     // The leftmost part of the 2-tile wide door:
                     const isLeftDoorTile = (x === 0 || this.dungeon.map[y][x - 1] !== TileType.DOOR);
