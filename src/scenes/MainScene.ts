@@ -279,37 +279,46 @@ export class MainScene extends Phaser.Scene {
                     const w = (x > 0 && this.dungeon.map[y][x - 1] === TileType.WALL) ? 1 : 0;
                     const e = (x < mapW - 1 && this.dungeon.map[y][x + 1] === TileType.WALL) ? 1 : 0;
 
-                    // Compute bitmask: N=1, W=2, E=4, S=8
-                    const mask = n * 1 + w * 2 + e * 4 + s * 8;
 
-                    let frame = 'wall_top'; // Default (surrounded)
+                    // ── Top-down dungeon wall rendering ──
+                    // Walls with s==0 face the player — draw top cap + brick face
+                    // Walls with s==1 are hidden behind other walls — draw outer edge cap only
+                    if (s === 0) {
+                        // Player-facing wall: show stone top + brick front
+                        let topFrame: string;
+                        let faceFrame: string;
 
-                    switch (mask) {
-                        case 0: frame = 'wall_outer_top_left'; break; // 0000: Isolated pillar
-                        case 1: frame = 'wall_outer_mid_left'; break;  // 0001: N
-                        case 8: frame = 'wall_outer_top_left'; break;   // 1000: S
-                        case 9: frame = 'wall_edge_mid_left'; break; // 1001: N, S (Vertical wall)
+                        const isLeftEnd = (w === 0);
+                        const isRightEnd = (e === 0);
 
-                        case 2: frame = 'wall_outer_top_right'; break;  // 0010: W
-                        case 4: frame = 'wall_outer_top_left'; break;   // 0100: E
-                        case 6: frame = 'wall_outer_top_left'; break;  // 0110: W, E (Horizontal wall)
+                        if (isLeftEnd && isRightEnd) {
+                            topFrame = 'wall_top_mid'; faceFrame = 'wall_mid';
+                        } else if (isLeftEnd) {
+                            topFrame = 'wall_top_left'; faceFrame = 'wall_left';
+                        } else if (isRightEnd) {
+                            topFrame = 'wall_top_right'; faceFrame = 'wall_right';
+                        } else {
+                            topFrame = 'wall_top_mid'; faceFrame = 'wall_mid';
+                        }
 
-                        case 3: frame = 'wall_edge_bottom_right'; break; // 0011: N, W (Bottom-right corner of room)
-                        case 5: frame = 'wall_edge_bottom_left'; break; // 0101: N, E (Bottom-left corner of room)
-                        case 10: frame = 'wall_edge_top_right'; break; // 1010: S, W (Top-right corner of room)
-                        case 12: frame = 'wall_edge_top_left'; break; // 1100: S, E (Top-left corner of room)
+                        // top cap sits at the upper half of the tile
+                        this.doorBlitter.create(x * TILE_SIZE, y * TILE_SIZE, topFrame);
+                        // brick face sits at lower half of same tile row (same y, already included in 16x16 top)
+                        // We additionally draw the face tile one row lower for the 32-px-tall wall illusion
+                        this.doorBlitter.create(x * TILE_SIZE, y * TILE_SIZE + TILE_SIZE, faceFrame);
 
-                        case 7: frame = 'wall_edge_tshape_bottom_left'; break; // 0111: N, W, E (T-shape pointing North)
-                        case 11: frame = 'wall_edge_tshape_left'; break; // 1011: N, S, W (T-shape pointing West)
-                        case 13: frame = 'wall_edge_tshape_right'; break; // 1101: N, S, E (T-shape pointing East)
-                        case 14: frame = 'wall_edge_tshape_bottom_left'; break; // 1110: S, W, E (T-shape pointing South)
-                        case 15: frame = 'floor'; break; // 1111: fully enclosed (inner filler)
+                    } else {
+                        // Back wall (hidden face): draw outer/edge topper only
+                        let edgeFrame: string;
+
+                        if (e >= 1 && w === 0) edgeFrame = 'wall_outer_top_left';
+                        else if (w >= 1 && e === 0) edgeFrame = 'wall_outer_top_right';
+                        else if (n === 1 && s === 1 && e === 0 && w === 0) edgeFrame = 'wall_outer_mid_left';
+                        else edgeFrame = 'wall_outer_top_left';
+
+                        this.doorBlitter.create(x * TILE_SIZE, y * TILE_SIZE, edgeFrame);
                     }
 
-                    // Render using doorBlitter because these frames are loaded into the 'dungeon' texture
-                    if (mask !== 15) {
-                        this.doorBlitter.create(x * TILE_SIZE, y * TILE_SIZE, frame);
-                    }
                 } else if (this.dungeon.map[y][x] === TileType.DOOR) {
                     // Render door frames
                     // The leftmost part of the 2-tile wide door:
