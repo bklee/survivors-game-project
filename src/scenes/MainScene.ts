@@ -285,12 +285,32 @@ export class MainScene extends Phaser.Scene {
                     const w = (x > 0 && this.dungeon.map[y][x - 1] === TileType.WALL) ? 1 : 0;
                     const e = (x < mapW - 1 && this.dungeon.map[y][x + 1] === TileType.WALL) ? 1 : 0;
 
-                    // 사방이 모두 벽이면 검정 (아무것도 안 그림)
-                    // 아래가 벽이 아닌 경우(s==0)에만 정면 벽 렌더 → 네모 테두리 + 검정 내부
+                    // ── wall_list_v0.1 기반 벽 렌더링 ──────────────────────────────────
+                    // Row3(y=96):  wall_tl | wall_top | wall_tr  ← 플레이어가 보는 정면
+                    // Row1(y=32):  wall_left | wall_inner | wall_right  ← 두께감(위 한 칸)
+                    // 내부(4방 모두 벽) → 검정 (렌더 없음)
+                    // ─────────────────────────────────────────────────────────────────
                     const allEnclosed = (n === 1 && s === 1 && w === 1 && e === 1);
+
                     if (!allEnclosed && s === 0) {
-                        this.wallBlitter.create(x * TILE_SIZE, y * TILE_SIZE, 'wall_top');
+                        // ① 정면 벽 (s == 0): 왼쪽끝/중간/오른쪽끝 선택
+                        let frontFrame: string;
+                        if (w === 0 && e === 1) frontFrame = 'wall_tl';   // 왼쪽 끝
+                        else if (w === 1 && e === 0) frontFrame = 'wall_tr';   // 오른쪽 끝
+                        else frontFrame = 'wall_top';  // 중간 or 단독
+
+                        this.wallBlitter.create(x * TILE_SIZE, y * TILE_SIZE, frontFrame);
+
+                        // ② 두께감: 정면 위 한 칸이 벽이면 Row1(inner) 타일로 두께 표현
+                        if (n === 1) {
+                            let innerFrame: string;
+                            if (w === 0 && e === 1) innerFrame = 'wall_left';
+                            else if (w === 1 && e === 0) innerFrame = 'wall_right';
+                            else innerFrame = 'wall_inner';
+                            this.wallBlitter.create(x * TILE_SIZE, (y - 1) * TILE_SIZE, innerFrame);
+                        }
                     }
+
 
 
                     // Render door frames
