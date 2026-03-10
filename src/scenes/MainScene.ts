@@ -275,7 +275,9 @@ export class MainScene extends Phaser.Scene {
 
                 // ── Floor/Door base ──────────────────────────────────────────
                 if (cell === TileType.FLOOR || cell === TileType.DOOR) {
-                    this.floorBlitter.create(x * TILE_SIZE, y * TILE_SIZE, 'floor_1');
+                    const floorIds = [1, 2, 3, 9, 10, 11, 12, 13, 14];
+                    const randomId = floorIds[Math.floor(Math.random() * floorIds.length)];
+                    this.floorBlitter.create(x * TILE_SIZE, y * TILE_SIZE, `floor_${randomId}`);
                 }
 
                 // ── Pillars & Obstacles ──────────────────────────────────────
