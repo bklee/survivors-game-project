@@ -1,3 +1,5 @@
+import * as ROT from 'rot-js';
+
 export const TILE_SIZE = 16;
 
 export enum TileType {
@@ -23,42 +25,44 @@ export class DungeonGenerator {
         // Initialize with all walls
         this.map = Array(this.height).fill(0).map(() => Array(this.width).fill(TileType.WALL));
 
-        // Use a 50x50 center portion for the example layout
-        const ox = Math.floor(this.width / 2) - 25;
-        const oy = Math.floor(this.height / 2) - 20;
+        // Use rot-js Digger algorithm for premium random dungeon layouts
+        const digger = new ROT.Map.Digger(this.width, this.height, {
+            roomWidth: [4, 12],
+            roomHeight: [4, 10],
+            corridorLength: [2, 10],
+            dugPercentage: 0.25
+        });
 
-        // --- ROOM A (Top Left) ---
-        this.fillRect(ox + 5, oy + 5, 12, 8, TileType.FLOOR);
+        digger.create((x, y, value) => {
+            // value: 0 for floor, 1 for wall in rot-js
+            if (value === 0) {
+                this.map[y][x] = TileType.FLOOR;
+            } else {
+                this.map[y][x] = TileType.WALL;
+            }
+        });
 
-        // --- ROOM B (Top Center) ---
-        this.fillRect(ox + 22, oy + 3, 10, 10, TileType.FLOOR);
-        // Connect A to B
-        this.fillRect(ox + 17, oy + 8, 5, 2, TileType.FLOOR);
+        // Add Pillars to rooms (similar to map_example3 style but randomized)
+        const rooms = digger.getRooms();
+        rooms.forEach((room) => {
+            const left = room.getLeft();
+            const top = room.getTop();
+            const right = room.getRight();
+            const bottom = room.getBottom();
 
-        // --- ROOM C (Central Pillar Room) ---
-        this.fillRect(ox + 15, oy + 18, 18, 12, TileType.FLOOR);
-        // Connect B to C
-        this.fillRect(ox + 26, oy + 13, 2, 5, TileType.FLOOR);
-        // 4 Pillars in a row as seen in map_example3
-        for (let i = 0; i < 4; i++) {
-            this.map[oy + 24][ox + 19 + i * 3] = TileType.PILLAR;
-        }
+            // Only add pillars to large enough rooms
+            if (right - left > 5 && bottom - top > 5) {
+                // Draw 2-4 pillars inside
+                const centerX = Math.floor((left + right) / 2);
+                const centerY = Math.floor((top + bottom) / 2);
 
-        // --- ROOM D (Long Path Right) ---
-        this.fillRect(ox + 33, oy + 22, 10, 4, TileType.FLOOR); // Corridor
-        this.fillRect(ox + 43, oy + 15, 12, 20, TileType.FLOOR); // Room D
-        // Central block (obstacles) in Room D
-        this.fillRect(ox + 47, oy + 21, 4, 8, TileType.OBSTACLE);
-
-        // --- ROOM E (Bottom Area) ---
-        // Corridor through door (central room bottom)
-        this.map[oy + 30][ox + 23] = TileType.DOOR;
-        this.map[oy + 30][ox + 24] = TileType.DOOR;
-        this.fillRect(ox + 21, oy + 31, 6, 8, TileType.FLOOR);
-
-        // Room F (Bottom Left)
-        this.fillRect(ox + 8, oy + 31, 10, 10, TileType.FLOOR);
-        this.fillRect(ox + 18, oy + 35, 3, 2, TileType.FLOOR); // connection
+                // Example: 2x2 pillars near center
+                this.map[centerY - 1][centerX - 1] = TileType.PILLAR;
+                this.map[centerY - 1][centerX + 1] = TileType.PILLAR;
+                this.map[centerY + 1][centerX - 1] = TileType.PILLAR;
+                this.map[centerY + 1][centerX + 1] = TileType.PILLAR;
+            }
+        });
 
         // Ensure boundary
         for (let y = 0; y < this.height; y++) {
@@ -70,15 +74,7 @@ export class DungeonGenerator {
         }
     }
 
-    private fillRect(x: number, y: number, w: number, h: number, type: TileType) {
-        for (let row = y; row < y + h; row++) {
-            for (let col = x; col < x + w; col++) {
-                if (row >= 0 && row < this.height && col >= 0 && col < this.width) {
-                    this.map[row][col] = type;
-                }
-            }
-        }
-    }
+
 
 
 
@@ -91,15 +87,15 @@ export class DungeonGenerator {
 
     private hasClearance(tx: number, ty: number): boolean {
         if (tx <= 1 || tx >= this.width - 2 || ty <= 1 || ty >= this.height - 2) return false;
-        return this.map[ty][tx] !== TileType.WALL &&
-            this.map[ty - 1][tx] !== TileType.WALL &&
-            this.map[ty + 1][tx] !== TileType.WALL &&
-            this.map[ty][tx - 1] !== TileType.WALL &&
-            this.map[ty][tx + 1] !== TileType.WALL &&
-            this.map[ty - 1][tx - 1] !== TileType.WALL &&
-            this.map[ty - 1][tx + 1] !== TileType.WALL &&
-            this.map[ty + 1][tx - 1] !== TileType.WALL &&
-            this.map[ty + 1][tx + 1] !== TileType.WALL;
+        return this.map[ty][tx] === TileType.FLOOR &&
+            this.map[ty - 1][tx] === TileType.FLOOR &&
+            this.map[ty + 1][tx] === TileType.FLOOR &&
+            this.map[ty][tx - 1] === TileType.FLOOR &&
+            this.map[ty][tx + 1] === TileType.FLOOR &&
+            this.map[ty - 1][tx - 1] === TileType.FLOOR &&
+            this.map[ty - 1][tx + 1] === TileType.FLOOR &&
+            this.map[ty + 1][tx - 1] === TileType.FLOOR &&
+            this.map[ty + 1][tx + 1] === TileType.FLOOR;
     }
 
     public getRandomFloorPixel(): { x: number, y: number } {
@@ -109,7 +105,7 @@ export class DungeonGenerator {
             tx = Math.floor(Math.random() * this.width);
             ty = Math.floor(Math.random() * this.height);
             attempts++;
-            if (attempts > 1000) {
+            if (attempts > 2000) {
                 return { x: (this.width * TILE_SIZE) / 2, y: (this.height * TILE_SIZE) / 2 };
             }
         } while (!this.hasClearance(tx, ty));
@@ -129,7 +125,7 @@ export class DungeonGenerator {
         for (let checkX = minX; checkX <= maxX; checkX++) {
             for (let checkY = minY; checkY <= maxY; checkY++) {
                 if (checkX < 0 || checkX >= this.width || checkY < 0 || checkY >= this.height) return false;
-                if (this.map[checkY][checkX] === TileType.WALL) return false;
+                if (this.map[checkY][checkX] === TileType.WALL || this.map[checkY][checkX] === TileType.PILLAR) return false;
             }
         }
         return true;
@@ -154,7 +150,7 @@ export class DungeonGenerator {
             ty = Math.max(0, Math.min(this.height - 1, ty));
 
             attempts++;
-            if (attempts > 100) {
+            if (attempts > 500) {
                 return this.getRandomFloorPixel();
             }
         } while (!this.hasClearance(tx, ty));
@@ -176,18 +172,57 @@ export class DungeonGenerator {
     public carveSecretRoom(): { doorPixel: { x: number; y: number }; floorPixels: { x: number; y: number }[] } {
         const roomW = 6; // 내부 폭
         const roomH = 5; // 내부 높이
-
-        // 맵 하단 가장자리에 방 배치 (BORDER 안쪽에 들어가도록)
         const BORDER = 6;
-        let roomX = BORDER + 2 + Math.floor(Math.random() * (this.width - roomW - BORDER * 2 - 4));
-        let roomY = this.height - BORDER - roomH - 2;
+
+        let attempts = 0;
+        let roomX = 0, roomY = 0; // Initialize to avoid 'used before assignment'
+        let foundSpot = false;
+
+        // Find a spot that is currently ALL WALLS to hide the room
+        while (attempts < 50 && !foundSpot) {
+            roomX = BORDER + Math.floor(Math.random() * (this.width - roomW - BORDER * 2));
+            roomY = BORDER + Math.floor(Math.random() * (this.height - roomH - BORDER * 2));
+
+            let allWalls = true;
+            // Check a slightly larger area to ensure clearance around the room
+            for (let dy = -2; dy <= roomH + 2; dy++) {
+                for (let dx = -2; dx <= roomW + 2; dx++) {
+                    const checkY = roomY + dy;
+                    const checkX = roomX + dx;
+                    if (checkY < 0 || checkY >= this.height || checkX < 0 || checkX >= this.width || this.map[checkY][checkX] !== TileType.WALL) {
+                        allWalls = false;
+                        break;
+                    }
+                }
+                if (!allWalls) break;
+            }
+            if (allWalls) foundSpot = true;
+            attempts++;
+        }
+
+        if (!foundSpot) {
+            // Fallback to a fixed position if no suitable random spot is found
+            roomX = Math.floor(this.width / 2) - Math.floor(roomW / 2);
+            roomY = this.height - BORDER - roomH - 2;
+            // Ensure fallback position is within bounds and clear
+            for (let dy = -2; dy <= roomH + 2; dy++) {
+                for (let dx = -2; dx <= roomW + 2; dx++) {
+                    const checkY = roomY + dy;
+                    const checkX = roomX + dx;
+                    if (checkY < 0 || checkY >= this.height || checkX < 0 || checkX >= this.width) {
+                        // Adjust if out of bounds
+                        roomY = Math.max(BORDER, Math.min(this.height - BORDER - roomH - 2, roomY));
+                        roomX = Math.max(BORDER, Math.min(this.width - BORDER - roomW - 2, roomX));
+                        break;
+                    }
+                }
+            }
+        }
 
         // 방 외벽 (roomW+2 x roomH+2)
         for (let y = roomY - 1; y <= roomY + roomH; y++) {
             for (let x = roomX - 1; x <= roomX + roomW; x++) {
-                if (y >= 0 && y < this.height && x >= 0 && x < this.width) {
-                    this.map[y][x] = TileType.WALL;
-                }
+                this.map[y][x] = TileType.WALL;
             }
         }
 
@@ -195,43 +230,27 @@ export class DungeonGenerator {
         const floorPixels: { x: number; y: number }[] = [];
         for (let y = roomY; y < roomY + roomH; y++) {
             for (let x = roomX; x < roomX + roomW; x++) {
-                if (y >= 0 && y < this.height && x >= 0 && x < this.width) {
-                    this.map[y][x] = TileType.FLOOR;
-                    floorPixels.push({
-                        x: x * TILE_SIZE + TILE_SIZE / 2,
-                        y: y * TILE_SIZE + TILE_SIZE / 2
-                    });
-                }
+                this.map[y][x] = TileType.FLOOR;
+                floorPixels.push({ x: x * TILE_SIZE + TILE_SIZE / 2, y: y * TILE_SIZE + TILE_SIZE / 2 });
             }
         }
 
         // 문 위치: 방 윗벽 중앙에 2칸 뚫기 (도어 스프라이트가 32x32 이므로 2타일 차지)
-        const doorTX = roomX + Math.floor(roomW / 2) - 1;
+        const doorTX = roomX + 2; // Adjusted to be fixed relative to roomX
         const doorTY = roomY - 1;
-        if (doorTY >= 0 && doorTY < this.height && doorTX >= 0 && doorTX + 1 < this.width) {
-            this.map[doorTY][doorTX] = TileType.DOOR;
-            this.map[doorTY][doorTX + 1] = TileType.DOOR;
-        }
+        this.map[doorTY][doorTX] = TileType.DOOR;
+        this.map[doorTY][doorTX + 1] = TileType.DOOR;
 
-        // 문 위쪽으로 복도를 뚫어서 메인 던전과 연결 (최대 20타일)
-        for (let cy = doorTY - 1; cy >= Math.max(0, doorTY - 20); cy--) {
-            let reachedMain = false;
-            if (doorTX >= 0 && doorTX + 1 < this.width && cy >= 0 && cy < this.height) {
-                // 이미 메인 던전의 FLOOR에 도달하면 중단
-                if (this.map[cy][doorTX] !== TileType.WALL || this.map[cy][doorTX + 1] !== TileType.WALL) {
-                    reachedMain = true;
-                }
-                this.map[cy][doorTX] = TileType.FLOOR;
-                this.map[cy][doorTX + 1] = TileType.FLOOR;
-                // 복도 양옆은 벽이어야 자연스러움
-                if (doorTX - 1 >= 0 && this.map[cy][doorTX - 1] !== TileType.WALL) {
-                    reachedMain = true;
-                }
-                if (doorTX + 2 < this.width && this.map[cy][doorTX + 2] !== TileType.WALL) {
-                    reachedMain = true;
-                }
+        // 문 위쪽으로 복도를 뚫어서 메인 던전과 연결
+        let cy = doorTY - 1;
+        while (cy > BORDER) { // Stop if we hit the top border
+            this.map[cy][doorTX] = TileType.FLOOR;
+            this.map[cy][doorTX + 1] = TileType.FLOOR;
+            // If the tile above the corridor is already a floor, we've connected to the main dungeon
+            if (cy - 1 >= 0 && (this.map[cy - 1][doorTX] === TileType.FLOOR || this.map[cy - 1][doorTX + 1] === TileType.FLOOR)) {
+                break;
             }
-            if (reachedMain) break;
+            cy--;
         }
 
         return {
