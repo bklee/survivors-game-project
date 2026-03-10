@@ -280,25 +280,27 @@ export class MainScene extends Phaser.Scene {
 
                 if (cell === TileType.WALL) {
                     // Determine adjacent tiles
-                    const n = (y > 0 && this.dungeon.map[y - 1][x] === TileType.WALL) ? 1 : 0;
                     const s = (y < mapH - 1 && this.dungeon.map[y + 1][x] === TileType.WALL) ? 1 : 0;
                     const w = (x > 0 && this.dungeon.map[y][x - 1] === TileType.WALL) ? 1 : 0;
                     const e = (x < mapW - 1 && this.dungeon.map[y][x + 1] === TileType.WALL) ? 1 : 0;
 
-                    // ── map_example3.png 스타일 벽 렌더링 ──────────────────────────────
-                    // s==0인 행(아래가 바닥) → 석재 경계선 타일 한 줄만 렌더
-                    // 내부(4방 모두 벽) or s==1(뒤쪽) → 검정 (렌더 없음)
-                    // wall_tl = 왼쪽 끝 캡,  wall_top = 중간,  wall_tr = 오른쪽 끝 캡
+                    // ── map_example3.png 스타일 ────────────────────────────────────────
+                    // 모든 WALL 셀 → wall_inner (어두운 석재 텍스처로 벽 내부 채움)
+                    // s==0 인 경계 셀 → 추가로 wall_tl/wall_top/wall_tr (캡+정면)
                     // ─────────────────────────────────────────────────────────────────
-                    const allEnclosed = (n === 1 && s === 1 && w === 1 && e === 1);
 
-                    if (!allEnclosed && s === 0) {
-                        let frame: string;
-                        if (w === 0 && e === 1) frame = 'wall_tl';   // 왼쪽 끝
-                        else if (w === 1 && e === 0) frame = 'wall_tr';   // 오른쪽 끝
-                        else frame = 'wall_top';  // 중간 or 단독
-                        this.wallBlitter.create(x * TILE_SIZE, y * TILE_SIZE, frame);
+                    // ① 모든 벽 셀에 내부 석재 텍스처
+                    this.wallBlitter.create(x * TILE_SIZE, y * TILE_SIZE, 'wall_inner');
+
+                    // ② 아래가 바닥인 경계선에 정면 캡 타일 추가 렌더
+                    if (s === 0) {
+                        let capFrame: string;
+                        if (w === 0 && e === 1) capFrame = 'wall_tl';   // 왼쪽 끝
+                        else if (w === 1 && e === 0) capFrame = 'wall_tr';   // 오른쪽 끝
+                        else capFrame = 'wall_top';  // 중간 or 단독
+                        this.wallBlitter.create(x * TILE_SIZE, y * TILE_SIZE, capFrame);
                     }
+
 
 
                     // Render door frames
