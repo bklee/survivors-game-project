@@ -287,38 +287,37 @@ export class MainScene extends Phaser.Scene {
 
                 // ── Walls ───────────────────────────────────────────────────
                 if (cell === TileType.WALL) {
-                    const n = (y > 0 && this.dungeon.map[y - 1][x] === TileType.WALL) ? 1 : 0;
-                    const s = (y < mapH - 1 && this.dungeon.map[y + 1][x] === TileType.WALL) ? 1 : 0;
-                    const w = (x > 0 && this.dungeon.map[y][x - 1] === TileType.WALL) ? 1 : 0;
-                    const e = (x < mapW - 1 && this.dungeon.map[y][x + 1] === TileType.WALL) ? 1 : 0;
+                    // Check if adjacent cells are open spaces (FLOOR, DOOR, etc.) -> 1 means OPEN
+                    const n = (y > 0 && this.dungeon.map[y - 1][x] !== TileType.WALL) ? 1 : 0;
+                    const s = (y < mapH - 1 && this.dungeon.map[y + 1][x] !== TileType.WALL) ? 1 : 0;
+                    const w = (x > 0 && this.dungeon.map[y][x - 1] !== TileType.WALL) ? 1 : 0;
+                    const e = (x < mapW - 1 && this.dungeon.map[y][x + 1] !== TileType.WALL) ? 1 : 0;
 
-                    // Base Filling
-                    this.wallBlitter.create(x * TILE_SIZE, y * TILE_SIZE, 'wall_inner');
+                    let frame = 'wall_inner';
 
-                    // Advanced Boundary Logic
-                    if (s === 0) {
-                        // Player-facing wall (South edge of a wall block)
-                        let frame = 'wall_top';
-                        if (w === 0) frame = (n === 1) ? 'wall_tl' : 'wall_side_tl';
-                        else if (e === 0) frame = (n === 1) ? 'wall_tr' : 'wall_side_tr';
-                        this.wallBlitter.create(x * TILE_SIZE, y * TILE_SIZE, frame);
-
-                        // Random decoration: Banners on long flat walls
-                        if (w === 1 && e === 1 && Math.random() < 0.05) {
-                            const banner = Math.random() < 0.5 ? 'wall_banner_green' : 'wall_banner_yellow';
-                            this.wallBlitter.create(x * TILE_SIZE, y * TILE_SIZE, banner);
-                        }
-                    } else if (n === 0) {
-                        // Back-facing wall (North edge of a wall block)
-                        let frame = 'wall_bottom';
-                        if (w === 0) frame = (s === 1) ? 'wall_bl' : 'wall_side_top_left';
-                        else if (e === 0) frame = (s === 1) ? 'wall_br' : 'wall_side_top_right';
-                        this.wallBlitter.create(x * TILE_SIZE, y * TILE_SIZE, frame);
+                    if (s && n) {
+                        frame = 'wall_top'; // 1-thick horizontal wall
+                    } else if (s) {
+                        // Player-facing wall (South edge)
+                        if (w && e) frame = 'wall_top_alt'; // 1-thick pillar
+                        else if (w) frame = 'wall_tl';
+                        else if (e) frame = 'wall_tr';
+                        else frame = 'wall_top';
+                    } else if (n) {
+                        // Back-facing wall (North edge)
+                        if (w && e) frame = 'wall_bottom';
+                        else if (w) frame = 'wall_bl';
+                        else if (e) frame = 'wall_br';
+                        else frame = 'wall_bottom';
                     } else {
-                        // Side walls (Vertical corridors)
-                        if (w === 0) this.wallBlitter.create(x * TILE_SIZE, y * TILE_SIZE, 'wall_side_left');
-                        if (e === 0) this.wallBlitter.create(x * TILE_SIZE, y * TILE_SIZE, 'wall_side_right');
+                        // Inner walls / Side walls
+                        if (w && e) frame = 'wall_inner_alt';
+                        else if (w) frame = 'wall_left';
+                        else if (e) frame = 'wall_right';
+                        else frame = 'wall_inner';
                     }
+
+                    this.wallBlitter.create(x * TILE_SIZE, y * TILE_SIZE, frame);
 
                     // Render door frames
                     const isLeftDoorTile = (x === 0 || this.dungeon.map[y][x - 1] !== TileType.DOOR);
