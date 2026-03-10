@@ -186,7 +186,8 @@ export class MainScene extends Phaser.Scene {
                 if (eid === this.playerId) continue; // Keep player
                 const tid = SpriteInfo.textureIndex[eid];
                 // Props (32-36), Items/Coins (20-21), Spells (100+), Enemies (60-89)
-                if ((tid >= 20 && tid <= 36) || tid >= 60) {
+                // Also remove lever(40) and secret door(41) from previous stage
+                if ((tid >= 20 && tid <= 36) || tid === 40 || tid === 41 || tid >= 60) {
                     removeEntity(world, eid);
                 }
             }
