@@ -273,10 +273,57 @@ export class MainScene extends Phaser.Scene {
         for (let y = 0; y < mapH; y++) {
             for (let x = 0; x < mapW; x++) {
                 if (this.dungeon.map[y][x] === TileType.WALL) {
-                    let frame = 'wall_top';
-                    const bottom = y < mapH - 1 ? this.dungeon.map[y + 1][x] : TileType.WALL;
-                    if (bottom === TileType.FLOOR) frame = 'wall_top';
-                    else frame = 'wall_inner';
+                    // Determine adjacent tiles (1 = wall, 0 = not wall)
+                    const n = (y > 0 && this.dungeon.map[y - 1][x] === TileType.WALL) ? 1 : 0;
+                    const s = (y < mapH - 1 && this.dungeon.map[y + 1][x] === TileType.WALL) ? 1 : 0;
+                    const w = (x > 0 && this.dungeon.map[y][x - 1] === TileType.WALL) ? 1 : 0;
+                    const e = (x < mapW - 1 && this.dungeon.map[y][x + 1] === TileType.WALL) ? 1 : 0;
+
+                    // Compute bitmask: N=1, W=2, E=4, S=8
+                    const mask = n * 1 + w * 2 + e * 4 + s * 8;
+
+                    let frame = 'wall_inner'; // Default (surrounded)
+
+                    switch (mask) {
+                        case 0:  // 0000: Isolated pillar
+                        case 1:  // 0001: N
+                        case 8:  // 1000: S
+                        case 9:  // 1001: N, S (Vertical wall)
+                            frame = 'wall_left'; // or 'wall_right' - using 'left/right' frames for vertical
+                            break;
+
+                        case 2:  // 0010: W
+                        case 4:  // 0100: E
+                        case 6:  // 0110: W, E (Horizontal wall)
+                            frame = 'wall_top'; // Top horizontal
+                            break;
+
+                        case 3:  // 0011: N, W (Bottom-right corner of room -> wall_br)
+                            frame = 'wall_br'; break;
+                        case 5:  // 0101: N, E (Bottom-left corner of room -> wall_bl)
+                            frame = 'wall_bl'; break;
+                        case 10: // 1010: S, W (Top-right corner of room -> wall_tr)
+                            frame = 'wall_tr'; break;
+                        case 12: // 1100: S, E (Top-left corner of room -> wall_tl)
+                            frame = 'wall_tl'; break;
+
+                        case 7:  // 0111: N, W, E (T-shape pointing North -> wall_top)
+                        case 11: // 1011: N, S, W (T-shape pointing West -> wall_right)
+                        case 13: // 1101: N, S, E (T-shape pointing East -> wall_left)
+                        case 14: // 1110: S, W, E (T-shape pointing South -> wall_top)
+                        case 15: // 1111: fully enclosed
+                            frame = 'wall_inner'; // inner filler
+                            break;
+                    }
+
+                    // Adjust purely based on whether it's a bottom wall edge
+                    if (s === 0 && (e === 1 || w === 1) && n === 1) {
+                        // End of a horizontal row at the bottom
+                        frame = 'wall_top';
+                    } else if (s === 0) {
+                        // For other bottom instances, keep whatever corner it got or default to wall_top
+                        if (frame === 'wall_inner') frame = 'wall_top';
+                    }
 
                     this.wallBlitter.create(x * TILE_SIZE, y * TILE_SIZE, frame);
                 } else if (this.dungeon.map[y][x] === TileType.DOOR) {
