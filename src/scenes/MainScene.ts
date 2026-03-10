@@ -278,14 +278,18 @@ export class MainScene extends Phaser.Scene {
                     this.wallBlitter.create(x * TILE_SIZE, y * TILE_SIZE, frame);
                 } else if (this.dungeon.map[y][x] === TileType.DOOR) {
                     // Render door frames
+                    // The leftmost tile of the 2-tile wide door:
                     if (x > 0 && this.dungeon.map[y][x - 1] === TileType.WALL) {
-                        this.wallBlitter.create(x * TILE_SIZE, y * TILE_SIZE, 'doors_frame_left');
+                        this.wallBlitter.create(x * TILE_SIZE - 8, y * TILE_SIZE, 'doors_frame_left');
                     }
+                    // The rightmost tile of the 2-tile wide door:
                     if (x < mapW - 1 && this.dungeon.map[y][x + 1] === TileType.WALL) {
-                        this.wallBlitter.create(x * TILE_SIZE, y * TILE_SIZE, 'doors_frame_right');
+                        this.wallBlitter.create(x * TILE_SIZE + TILE_SIZE + 8, y * TILE_SIZE, 'doors_frame_right');
                     }
-                    // The tile directly above the door could have a top frame, but door sprite usually handles the arch.
-                    // For now, ensuring the sides have frames. 
+                    // The top frame of the door
+                    if (y > 0 && this.dungeon.map[y - 1][x] === TileType.WALL) {
+                        this.wallBlitter.create(x * TILE_SIZE, y * TILE_SIZE - 16, 'doors_frame_top');
+                    }
                 }
             }
         }
