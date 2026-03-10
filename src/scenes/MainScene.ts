@@ -280,26 +280,16 @@ export class MainScene extends Phaser.Scene {
                     const e = (x < mapW - 1 && this.dungeon.map[y][x + 1] === TileType.WALL) ? 1 : 0;
 
 
-                    // ── Top-down wall rendering rules ──
-                    // 1. Fully enclosed (all 4 sides = wall) → skip (black void)
-                    // 2. South is NOT wall (floor below) → player-facing wall, render 16x32 front sprite
-                    // 3. Otherwise → back wall, render inner/edge sprite
-
+                    // ── Wall rendering ──
+                    // 1. 4방향 모두 벽 → 검정 (렌더 없음)
+                    // 2. 아래가 바닥(s==0) → 플레이어가 보는 정면 벽 (wall_top)
+                    // 3. 그 외 → 안쪽 뒤채움 벽 (wall_inner)
                     const allEnclosed = (n === 1 && s === 1 && w === 1 && e === 1);
-                    if (allEnclosed) {
-                        // Nothing — stays black
-                    } else if (s === 0) {
-                        // Player-facing wall
-                        let wallFrame: string;
-                        if (w === 0 && e === 1) wallFrame = 'wall_tl'; // left end
-                        else if (e === 0 && w === 1) wallFrame = 'wall_tr'; // right end
-                        else if (w === 0 && e === 0) wallFrame = 'wall_top'; // standalone column
-                        else wallFrame = 'wall_top'; // mid
-                        this.wallBlitter.create(x * TILE_SIZE, y * TILE_SIZE, wallFrame);
-                    } else {
-                        // Back wall (hidden from player) → inner block
-                        this.wallBlitter.create(x * TILE_SIZE, y * TILE_SIZE, 'wall_inner');
+                    if (!allEnclosed) {
+                        const frame = (s === 0) ? 'wall_top' : 'wall_inner';
+                        this.wallBlitter.create(x * TILE_SIZE, y * TILE_SIZE, frame);
                     }
+
 
 
                 } else if (this.dungeon.map[y][x] === TileType.DOOR) {
