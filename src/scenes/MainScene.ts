@@ -282,50 +282,34 @@ export class MainScene extends Phaser.Scene {
                     // Compute bitmask: N=1, W=2, E=4, S=8
                     const mask = n * 1 + w * 2 + e * 4 + s * 8;
 
-                    let frame = 'wall_inner'; // Default (surrounded)
+                    let frame = 'wall_top'; // Default (surrounded)
 
                     switch (mask) {
-                        case 0:  // 0000: Isolated pillar
-                        case 1:  // 0001: N
-                        case 8:  // 1000: S
-                        case 9:  // 1001: N, S (Vertical wall)
-                            frame = 'wall_left'; // or 'wall_right' - using 'left/right' frames for vertical
-                            break;
+                        case 0: frame = 'wall_outer_top_left'; break; // 0000: Isolated pillar
+                        case 1: frame = 'wall_outer_mid_left'; break;  // 0001: N
+                        case 8: frame = 'wall_outer_top_left'; break;   // 1000: S
+                        case 9: frame = 'wall_edge_mid_left'; break; // 1001: N, S (Vertical wall)
 
-                        case 2:  // 0010: W
-                        case 4:  // 0100: E
-                        case 6:  // 0110: W, E (Horizontal wall)
-                            frame = 'wall_top'; // Top horizontal
-                            break;
+                        case 2: frame = 'wall_outer_top_right'; break;  // 0010: W
+                        case 4: frame = 'wall_outer_top_left'; break;   // 0100: E
+                        case 6: frame = 'wall_outer_top_left'; break;  // 0110: W, E (Horizontal wall)
 
-                        case 3:  // 0011: N, W (Bottom-right corner of room -> wall_br)
-                            frame = 'wall_br'; break;
-                        case 5:  // 0101: N, E (Bottom-left corner of room -> wall_bl)
-                            frame = 'wall_bl'; break;
-                        case 10: // 1010: S, W (Top-right corner of room -> wall_tr)
-                            frame = 'wall_tr'; break;
-                        case 12: // 1100: S, E (Top-left corner of room -> wall_tl)
-                            frame = 'wall_tl'; break;
+                        case 3: frame = 'wall_edge_bottom_right'; break; // 0011: N, W (Bottom-right corner of room)
+                        case 5: frame = 'wall_edge_bottom_left'; break; // 0101: N, E (Bottom-left corner of room)
+                        case 10: frame = 'wall_edge_top_right'; break; // 1010: S, W (Top-right corner of room)
+                        case 12: frame = 'wall_edge_top_left'; break; // 1100: S, E (Top-left corner of room)
 
-                        case 7:  // 0111: N, W, E (T-shape pointing North -> wall_top)
-                        case 11: // 1011: N, S, W (T-shape pointing West -> wall_right)
-                        case 13: // 1101: N, S, E (T-shape pointing East -> wall_left)
-                        case 14: // 1110: S, W, E (T-shape pointing South -> wall_top)
-                        case 15: // 1111: fully enclosed
-                            frame = 'wall_inner'; // inner filler
-                            break;
+                        case 7: frame = 'wall_edge_tshape_bottom_left'; break; // 0111: N, W, E (T-shape pointing North)
+                        case 11: frame = 'wall_edge_tshape_left'; break; // 1011: N, S, W (T-shape pointing West)
+                        case 13: frame = 'wall_edge_tshape_right'; break; // 1101: N, S, E (T-shape pointing East)
+                        case 14: frame = 'wall_edge_tshape_bottom_left'; break; // 1110: S, W, E (T-shape pointing South)
+                        case 15: frame = 'floor'; break; // 1111: fully enclosed (inner filler)
                     }
 
-                    // Adjust purely based on whether it's a bottom wall edge
-                    if (s === 0 && (e === 1 || w === 1) && n === 1) {
-                        // End of a horizontal row at the bottom
-                        frame = 'wall_top';
-                    } else if (s === 0) {
-                        // For other bottom instances, keep whatever corner it got or default to wall_top
-                        if (frame === 'wall_inner') frame = 'wall_top';
+                    // Render using doorBlitter because these frames are loaded into the 'dungeon' texture
+                    if (mask !== 15) {
+                        this.doorBlitter.create(x * TILE_SIZE, y * TILE_SIZE, frame);
                     }
-
-                    this.wallBlitter.create(x * TILE_SIZE, y * TILE_SIZE, frame);
                 } else if (this.dungeon.map[y][x] === TileType.DOOR) {
                     // Render door frames
                     // The leftmost part of the 2-tile wide door:
