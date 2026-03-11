@@ -320,12 +320,12 @@ export class MainScene extends Phaser.Scene {
                         if (w && e) frame = 'wall_inner_alt';
                         else if (w) frame = 'wall_left';
                         else if (e) frame = 'wall_right';
-                        else frame = 'wall_cracked_tl';
+                        else frame = 'wall_cracked_left_b';
                     }
 
                     // Base Filling: Draw a solid inner wall under EVERY wall tile
                     // This prevents transparent edges on top/corners from showing the black canvas background.
-                    this.wallBlitter.create(x * TILE_SIZE, y * TILE_SIZE, 'wall_cracked_tl');
+                    this.wallBlitter.create(x * TILE_SIZE, y * TILE_SIZE, 'wall_cracked_left_b');
 
                     // Then draw the specific edge/corner over it
                     this.wallBlitter.create(x * TILE_SIZE, y * TILE_SIZE, frame);
