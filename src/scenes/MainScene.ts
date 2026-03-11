@@ -297,35 +297,35 @@ export class MainScene extends Phaser.Scene {
                     const w = (x > 0 && this.dungeon.map[y][x - 1] !== TileType.WALL) ? 1 : 0;
                     const e = (x < mapW - 1 && this.dungeon.map[y][x + 1] !== TileType.WALL) ? 1 : 0;
 
-                    let frame = 'wall_inner';
+                    let frame = 'wall_noside_inner_nobg_nocrack_0';
 
                     if (s && n) {
-                        frame = 'wall_cracked_top'; // 1-thick horizontal wall
+                        frame = 'wall_noside_top_bg_nocrack_0'; // 1-thick horizontal wall
                     } else if (s) {
                         // Player-facing wall (South edge)
-                        if (w && e) frame = 'wall_top_alt'; // 1-thick pillar
-                        else if (w) frame = 'wall_cracked_tl';
-                        else if (e) frame = 'wall_cracked_tr';
-                        else frame = 'wall_cracked_top';
+                        if (w && e) frame = 'wall_noside_topalt_bg_nocrack_0'; // 1-thick pillar
+                        else if (w) frame = 'wall_noside_topleft_bg_nocrack_0';
+                        else if (e) frame = 'wall_noside_topright_bg_nocrack_0';
+                        else frame = 'wall_noside_top_bg_nocrack_0';
                     } else if (n) {
                         // Back-facing wall (North edge)
-                        if (w && e) frame = 'wall_cracked_bottom';
-                        else if (w) frame = 'wall_cracked_bl';
-                        else if (e) frame = 'wall_cracked_br';
-                        else frame = 'wall_cracked_bottom';
+                        if (w && e) frame = 'wall_noside_bottom_nobg_nocrack_0';
+                        else if (w) frame = 'wall_noside_bottomleft_nobg_nocrack_0';
+                        else if (e) frame = 'wall_noside_bottomright_nobg_nocrack_0';
+                        else frame = 'wall_noside_bottom_nobg_nocrack_0';
                     } else {
                         // Inner walls / Side walls
-                        if (w && e) frame = 'wall_cracked_inner_b';
-                        else if (w) frame = 'wall_cracked_left_b';
-                        else if (e) frame = 'wall_cracked_right_b';
-                        else frame = 'wall_cracked_left_b';
+                        if (w && e) frame = 'wall_noside_inneralt_nobg_nocrack_0';
+                        else if (w) frame = 'wall_noside_left_nobg_nocrack_0';
+                        else if (e) frame = 'wall_noside_right_nobg_nocrack_0';
+                        else frame = 'wall_noside_inner_nobg_nocrack_0';
                     }
 
                     // Draw the specific wall edge/corner
                     this.wallBlitter.create(x * TILE_SIZE, y * TILE_SIZE, frame);
 
                     // Debug: Render text label over the wall (except for the common inner base block)
-                    if (frame !== 'wall_cracked_left_b') {
+                    if (frame !== 'wall_noside_inner_nobg_nocrack_0') {
                         const label = frame.replace('wall_', ''); // short label
                         const txt = this.add.text(x * TILE_SIZE, y * TILE_SIZE + 2, label, {
                             fontFamily: 'Arial',
