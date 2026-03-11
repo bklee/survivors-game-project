@@ -292,37 +292,13 @@ export class MainScene extends Phaser.Scene {
                 // ── Walls ───────────────────────────────────────────────────
                 if (cell === TileType.WALL) {
                     // Check if adjacent cells are open spaces (FLOOR, DOOR, etc.) -> 1 means OPEN
-                    const n = (y > 0 && this.dungeon.map[y - 1][x] !== TileType.WALL) ? 1 : 0;
-                    const s = (y < mapH - 1 && this.dungeon.map[y + 1][x] !== TileType.WALL) ? 1 : 0;
-                    const w = (x > 0 && this.dungeon.map[y][x - 1] !== TileType.WALL) ? 1 : 0;
-                    const e = (x < mapW - 1 && this.dungeon.map[y][x + 1] !== TileType.WALL) ? 1 : 0;
+                    // const n = (y > 0 && this.dungeon.map[y - 1][x] !== TileType.WALL) ? 1 : 0;
+                    // const s = (y < mapH - 1 && this.dungeon.map[y + 1][x] !== TileType.WALL) ? 1 : 0;
+                    // const w = (x > 0 && this.dungeon.map[y][x - 1] !== TileType.WALL) ? 1 : 0;
+                    // const e = (x < mapW - 1 && this.dungeon.map[y][x + 1] !== TileType.WALL) ? 1 : 0;
 
-                    let frame = 'wall_noside_inner_bg_nocrack_0'; // Seamless solid inner stone
-
-                    if (s && n) {
-                        frame = 'wall_noside_top_bg_nocrack_0'; // 1-thick horizontal wall
-                    } else if (s) {
-                        // Player-facing wall (South edge / roof edge)
-                        if (w && e) frame = 'wall_noside_topalt_bg_nocrack_0'; // 1-thick pillar
-                        else if (w) frame = 'wall_side_topleft_bg_nocrack_0';
-                        else if (e) frame = 'wall_side_topright_bg_nocrack_0';
-                        else frame = 'wall_noside_top_bg_nocrack_0';
-                    } else if (n) {
-                        // Back-facing wall (North edge)
-                        if (w && e) frame = 'wall_noside_bottom_nobg_nocrack_0';
-                        else if (w) frame = 'wall_noside_bottomleft_nobg_nocrack_0';
-                        else if (e) frame = 'wall_noside_bottomright_nobg_nocrack_0';
-                        else frame = 'wall_noside_bottom_nobg_nocrack_0';
-                    } else {
-                        // Inner walls / Side walls (Left/Right edges)
-                        if (w && e) frame = 'wall_noside_inneralt_bg_nocrack_0';
-                        else if (w) frame = 'wall_side_left_bg_nocrack_0'; // Left-facing side wall
-                        else if (e) frame = 'wall_side_right_bg_nocrack_0'; // Right-facing side wall
-                        else frame = 'wall_noside_inner_bg_nocrack_0'; // Fully enclosed center
-                    }
-
-                    // Draw the specific wall edge/corner
-                    this.wallBlitter.create(x * TILE_SIZE, y * TILE_SIZE, frame);
+                    // Removed wall rendering for now based on user request.
+                    // To re-evaluate from scratch.
 
 
 
