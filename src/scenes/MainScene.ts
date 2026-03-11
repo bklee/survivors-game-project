@@ -297,7 +297,7 @@ export class MainScene extends Phaser.Scene {
                     const w = (x > 0 && this.dungeon.map[y][x - 1] !== TileType.WALL) ? 1 : 0;
                     const e = (x < mapW - 1 && this.dungeon.map[y][x + 1] !== TileType.WALL) ? 1 : 0;
 
-                    let frame = 'wall_noside_inner_nobg_nocrack_0';
+                    let frame = 'wall_noside_left_bg_crack_0';
 
                     if (s && n) {
                         frame = 'wall_noside_top_bg_nocrack_0'; // 1-thick horizontal wall
@@ -318,7 +318,7 @@ export class MainScene extends Phaser.Scene {
                         if (w && e) frame = 'wall_noside_inneralt_nobg_nocrack_0';
                         else if (w) frame = 'wall_noside_left_nobg_nocrack_0';
                         else if (e) frame = 'wall_noside_right_nobg_nocrack_0';
-                        else frame = 'wall_noside_inner_nobg_nocrack_0';
+                        else frame = 'wall_noside_left_bg_crack_0';
                     }
 
                     // Draw the specific wall edge/corner
