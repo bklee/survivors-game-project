@@ -297,15 +297,15 @@ export class MainScene extends Phaser.Scene {
                     const w = (x > 0 && this.dungeon.map[y][x - 1] !== TileType.WALL) ? 1 : 0;
                     const e = (x < mapW - 1 && this.dungeon.map[y][x + 1] !== TileType.WALL) ? 1 : 0;
 
-                    let frame = 'wall_noside_left_bg_crack_0';
+                    let frame = 'wall_noside_inner_bg_nocrack_0'; // Seamless solid inner stone
 
                     if (s && n) {
                         frame = 'wall_noside_top_bg_nocrack_0'; // 1-thick horizontal wall
                     } else if (s) {
-                        // Player-facing wall (South edge)
+                        // Player-facing wall (South edge / roof edge)
                         if (w && e) frame = 'wall_noside_topalt_bg_nocrack_0'; // 1-thick pillar
-                        else if (w) frame = 'wall_noside_topleft_bg_nocrack_0';
-                        else if (e) frame = 'wall_noside_topright_bg_nocrack_0';
+                        else if (w) frame = 'wall_side_topleft_bg_nocrack_0';
+                        else if (e) frame = 'wall_side_topright_bg_nocrack_0';
                         else frame = 'wall_noside_top_bg_nocrack_0';
                     } else if (n) {
                         // Back-facing wall (North edge)
@@ -314,11 +314,11 @@ export class MainScene extends Phaser.Scene {
                         else if (e) frame = 'wall_noside_bottomright_nobg_nocrack_0';
                         else frame = 'wall_noside_bottom_nobg_nocrack_0';
                     } else {
-                        // Inner walls / Side walls
-                        if (w && e) frame = 'wall_noside_inneralt_nobg_nocrack_0';
-                        else if (w) frame = 'wall_noside_left_nobg_nocrack_0';
-                        else if (e) frame = 'wall_noside_right_nobg_nocrack_0';
-                        else frame = 'wall_noside_left_bg_crack_0';
+                        // Inner walls / Side walls (Left/Right edges)
+                        if (w && e) frame = 'wall_noside_inneralt_bg_nocrack_0';
+                        else if (w) frame = 'wall_side_left_bg_nocrack_0'; // Left-facing side wall
+                        else if (e) frame = 'wall_side_right_bg_nocrack_0'; // Right-facing side wall
+                        else frame = 'wall_noside_inner_bg_nocrack_0'; // Fully enclosed center
                     }
 
                     // Draw the specific wall edge/corner
