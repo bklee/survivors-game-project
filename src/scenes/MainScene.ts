@@ -330,16 +330,18 @@ export class MainScene extends Phaser.Scene {
                     // Then draw the specific edge/corner over it
                     this.wallBlitter.create(x * TILE_SIZE, y * TILE_SIZE, frame);
 
-                    // Debug: Render text label over the wall
-                    const label = frame.replace('wall_', ''); // short label
-                    const txt = this.add.text(x * TILE_SIZE, y * TILE_SIZE + 2, label, {
-                        fontFamily: 'Arial',
-                        fontSize: '8px',
-                        color: '#ffffff',
-                        backgroundColor: 'rgba(0, 0, 0, 0.7)',
-                        padding: { x: 1, y: 1 }
-                    }).setDepth(100);
-                    this.debugTexts.push(txt);
+                    // Debug: Render text label over the wall (except for the common inner base block)
+                    if (frame !== 'wall_cracked_left_b') {
+                        const label = frame.replace('wall_', ''); // short label
+                        const txt = this.add.text(x * TILE_SIZE, y * TILE_SIZE + 2, label, {
+                            fontFamily: 'Arial',
+                            fontSize: '8px',
+                            color: '#ffffff',
+                            backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                            padding: { x: 1, y: 1 }
+                        }).setDepth(100);
+                        this.debugTexts.push(txt);
+                    }
 
                     // Render door frames
                     const isLeftDoorTile = (x === 0 || this.dungeon.map[y][x - 1] !== TileType.DOOR);
