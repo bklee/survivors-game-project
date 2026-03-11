@@ -221,6 +221,13 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
 
                     sprite = _scene.add.sprite(Position.x[eid], Position.y[eid], textureArg, frameArg);
 
+                    // Adjust origin for characters to ground them better
+                    if (isPlayer || (typeId >= 60 && typeId <= 89)) {
+                        sprite.setOrigin(0.5, 0.8);
+                    } else if (charKey === 'weapon_bow' || charKey === 'weapon_sword' || charKey === 'weapon_staff' || charKey === 'weapon_arrow') {
+                        sprite.setOrigin(0.5, 0.5);
+                    }
+
                     let depth = 10;
                     if (isPlayer) depth = 30; // Player on top of everything
                     else if (typeId >= 100) depth = 20; // Spells above enemies
@@ -229,7 +236,9 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                     sprite.setDepth(depth);
                     sprites[eid] = sprite;
                 } else {
-                    sprite.setPosition(Position.x[eid], Position.y[eid]);
+                    let renderY = Position.y[eid];
+                    // Also adjust position when recycling just in case
+                    sprite.setPosition(Position.x[eid], renderY);
                     sprite.alpha = currentAlpha;
                     const frameArg = (finalFrame === '' || finalFrame === undefined) ? undefined : finalFrame as any;
                     sprite.setTexture(textureKey, frameArg);
