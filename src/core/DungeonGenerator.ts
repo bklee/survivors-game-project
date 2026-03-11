@@ -241,16 +241,46 @@ export class DungeonGenerator {
         this.map[doorTY][doorTX] = TileType.DOOR;
         this.map[doorTY][doorTX + 1] = TileType.DOOR;
 
-        // 문 위쪽으로 복도를 뚫어서 메인 던전과 연결
+        // 문 바깥에서부터 가장 가까운 기존 던전 바닥을 찾아 복도 뚫기
         let cy = doorTY - 1;
-        while (cy > BORDER) { // Stop if we hit the top border
-            this.map[cy][doorTX] = TileType.FLOOR;
-            this.map[cy][doorTX + 1] = TileType.FLOOR;
-            // If the tile above the corridor is already a floor, we've connected to the main dungeon
-            if (cy - 1 >= 0 && (this.map[cy - 1][doorTX] === TileType.FLOOR || this.map[cy - 1][doorTX + 1] === TileType.FLOOR)) {
+        let cx = doorTX;
+        let connected = false;
+
+        // 위로 계속 뚫어보다가 끝까지 가면 안되니까 메인 바닥을 만날 때까지 일단 위로
+        while (cy > 2) {
+            this.map[cy][cx] = TileType.FLOOR;
+            this.map[cy][cx + 1] = TileType.FLOOR; // 2칸 너비 복도
+
+            // 바로 근처에 다른 뚫려있는 빈 공간(방/복도)이 있는지 확인 (현재 뚫고있는 복도 제외)
+            if (cy - 1 >= 0 && (this.map[cy - 1][cx] === TileType.FLOOR || this.map[cy - 1][cx + 1] === TileType.FLOOR)) {
+                connected = true;
                 break;
             }
+            if (cx - 1 >= 0 && this.map[cy][cx - 1] === TileType.FLOOR) {
+                connected = true; break;
+            }
+            if (cx + 2 < this.width && this.map[cy][cx + 2] === TileType.FLOOR) {
+                connected = true; break;
+            }
             cy--;
+        }
+
+        // 만약 위로 쭉 뚫었는데도 연결을 못찾았다면 가로로 뚫어서라도 연결 (무조건 연결 보장)
+        if (!connected) {
+            let leftSearch = cx;
+            let rightSearch = cx;
+            while (leftSearch > 2 || rightSearch < this.width - 2) {
+                if (leftSearch > 2) {
+                    leftSearch--;
+                    this.map[cy][leftSearch] = TileType.FLOOR;
+                    if (this.map[cy - 1][leftSearch] === TileType.FLOOR || this.map[cy + 1][leftSearch] === TileType.FLOOR) break;
+                }
+                if (rightSearch < this.width - 2) {
+                    rightSearch++;
+                    this.map[cy][rightSearch] = TileType.FLOOR;
+                    if (this.map[cy - 1][rightSearch] === TileType.FLOOR || this.map[cy + 1][rightSearch] === TileType.FLOOR) break;
+                }
+            }
         }
 
         return {
