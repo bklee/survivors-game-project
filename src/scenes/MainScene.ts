@@ -323,6 +323,11 @@ export class MainScene extends Phaser.Scene {
                         else frame = 'wall_inner';
                     }
 
+                    // Base Filling: Draw a solid inner wall under EVERY wall tile
+                    // This prevents transparent edges on top/corners from showing the black canvas background.
+                    this.wallBlitter.create(x * TILE_SIZE, y * TILE_SIZE, 'wall_inner');
+
+                    // Then draw the specific edge/corner over it
                     this.wallBlitter.create(x * TILE_SIZE, y * TILE_SIZE, frame);
 
                     // Debug: Render text label over the wall
