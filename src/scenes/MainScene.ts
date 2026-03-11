@@ -281,11 +281,11 @@ export class MainScene extends Phaser.Scene {
                 // Re-evaluate from scratch.
 
                 // ── Pillars & Obstacles ──────────────────────────────────────
-                if (cell === TileType.PILLAR) {
-                    this.wallBlitter.create(x * TILE_SIZE, y * TILE_SIZE, 'column');
-                } else if (cell === TileType.OBSTACLE) {
-                    this.wallBlitter.create(x * TILE_SIZE, y * TILE_SIZE, 'wall_top_alt');
-                }
+                // if (cell === TileType.PILLAR) {
+                //     this.wallBlitter.create(x * TILE_SIZE, y * TILE_SIZE, 'column');
+                // } else if (cell === TileType.OBSTACLE) {
+                //     this.wallBlitter.create(x * TILE_SIZE, y * TILE_SIZE, 'wall_top_alt');
+                // }
 
                 // ── Walls ───────────────────────────────────────────────────
                 if (cell === TileType.WALL) {
@@ -298,22 +298,20 @@ export class MainScene extends Phaser.Scene {
                     // Removed wall rendering for now based on user request.
                     // To re-evaluate from scratch.
 
-
-
                     // Render door frames
-                    const isLeftDoorTile = (x === 0 || this.dungeon.map[y][x - 1] !== TileType.DOOR);
-                    if (isLeftDoorTile) {
-                        if (x > 0 && this.dungeon.map[y][x - 1] === TileType.WALL) {
-                            this.doorBlitter.create((x - 1) * TILE_SIZE, y * TILE_SIZE, 'doors_frame_left');
-                        }
-                        if (y > 0 && this.dungeon.map[y - 1][x] === TileType.WALL) {
-                            this.doorBlitter.create(x * TILE_SIZE, (y - 1) * TILE_SIZE, 'doors_frame_top');
-                        }
-                    } else {
-                        if (x < mapW - 1 && this.dungeon.map[y][x + 1] === TileType.WALL) {
-                            this.doorBlitter.create((x + 1) * TILE_SIZE, y * TILE_SIZE, 'doors_frame_right');
-                        }
-                    }
+                    // const isLeftDoorTile = (x === 0 || this.dungeon.map[y][x - 1] !== TileType.DOOR);
+                    // if (isLeftDoorTile) {
+                    //     if (x > 0 && this.dungeon.map[y][x - 1] === TileType.WALL) {
+                    //         this.doorBlitter.create((x - 1) * TILE_SIZE, y * TILE_SIZE, 'doors_frame_left');
+                    //     }
+                    //     if (y > 0 && this.dungeon.map[y - 1][x] === TileType.WALL) {
+                    //         this.doorBlitter.create(x * TILE_SIZE, (y - 1) * TILE_SIZE, 'doors_frame_top');
+                    //     }
+                    // } else {
+                    //     if (x < mapW - 1 && this.dungeon.map[y][x + 1] === TileType.WALL) {
+                    //         this.doorBlitter.create((x + 1) * TILE_SIZE, y * TILE_SIZE, 'doors_frame_right');
+                    //     }
+                    // }
                 }
             }
         }
