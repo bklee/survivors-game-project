@@ -38,6 +38,7 @@ export class MainScene extends Phaser.Scene {
     private isPausedForClear: boolean = false;
     private charData!: CharacterData;
     private secretRoomData?: { doorPixel: { x: number; y: number }; floorPixels: { x: number; y: number }[] };
+    private debugTexts: Phaser.GameObjects.Text[] = []; // Debug texts for walls
 
     constructor() {
         super('MainScene');
@@ -269,6 +270,9 @@ export class MainScene extends Phaser.Scene {
         this.floorBlitter.clear();
         this.wallBlitter.clear();
         this.doorBlitter.clear();
+        this.debugTexts.forEach(t => t.destroy());
+        this.debugTexts = [];
+
         for (let y = 0; y < mapH; y++) {
             for (let x = 0; x < mapW; x++) {
                 const cell = this.dungeon.map[y][x];
@@ -320,6 +324,17 @@ export class MainScene extends Phaser.Scene {
                     }
 
                     this.wallBlitter.create(x * TILE_SIZE, y * TILE_SIZE, frame);
+
+                    // Debug: Render text label over the wall
+                    const label = frame.replace('wall_', ''); // short label
+                    const txt = this.add.text(x * TILE_SIZE + 1, y * TILE_SIZE + 4, label, {
+                        fontFamily: 'monospace',
+                        fontSize: '6px',
+                        color: '#FFF200',
+                        stroke: '#000000',
+                        strokeThickness: 2
+                    }).setDepth(100);
+                    this.debugTexts.push(txt);
 
                     // Render door frames
                     const isLeftDoorTile = (x === 0 || this.dungeon.map[y][x - 1] !== TileType.DOOR);
