@@ -327,12 +327,12 @@ export class MainScene extends Phaser.Scene {
 
                     // Debug: Render text label over the wall
                     const label = frame.replace('wall_', ''); // short label
-                    const txt = this.add.text(x * TILE_SIZE + 1, y * TILE_SIZE + 4, label, {
-                        fontFamily: 'monospace',
-                        fontSize: '6px',
-                        color: '#FFF200',
-                        stroke: '#000000',
-                        strokeThickness: 2
+                    const txt = this.add.text(x * TILE_SIZE, y * TILE_SIZE + 2, label, {
+                        fontFamily: 'Arial',
+                        fontSize: '8px',
+                        color: '#ffffff',
+                        backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                        padding: { x: 1, y: 1 }
                     }).setDepth(100);
                     this.debugTexts.push(txt);
 
