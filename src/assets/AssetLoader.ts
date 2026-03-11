@@ -208,7 +208,6 @@ export class AssetLoader {
 
         const wallTex = this.scene.textures.get('walls');
         if (wallTex) {
-            // Row 0 (y=0)
             wallTex.add('wall_side_topleft_nobg_nocrack_0', 0, 0, 0, 16, 32);
             wallTex.add('wall_noside_bottomleft_nobg_nocrack_0', 0, 16, 0, 16, 32);
             wallTex.add('wall_noside_bottom_nobg_nocrack_0', 0, 32, 0, 16, 32);
@@ -217,11 +216,15 @@ export class AssetLoader {
             wallTex.add('wall_noside_endleft_nobg_nocrack_0', 0, 80, 0, 16, 32);
             wallTex.add('wall_noside_endright_nobg_nocrack_0', 0, 96, 0, 16, 32);
             wallTex.add('wall_noside_midalt_nobg_nocrack_0', 0, 112, 0, 16, 32);
+            wallTex.add('wall_noside_blank_nobg_nocrack_0', 0, 128, 0, 16, 32);
             wallTex.add('wall_noside_bottomleft_nobg_crack_0', 0, 144, 0, 16, 32);
             wallTex.add('wall_noside_bottom_nobg_crack_0', 0, 160, 0, 16, 32);
             wallTex.add('wall_noside_bottomright_nobg_crack_0', 0, 176, 0, 16, 32);
-
-            // Row 1 (y=32)
+            wallTex.add('wall_fountain_top_red_f0', 0, 192, 0, 16, 32);
+            wallTex.add('wall_fountain_top_red_f1', 0, 208, 0, 16, 32);
+            wallTex.add('wall_fountain_top_red_f2', 0, 224, 0, 16, 32);
+            wallTex.add('wall_goo_top', 0, 240, 0, 16, 32);
+            wallTex.add('wall_goo_face', 0, 256, 0, 16, 32);
             wallTex.add('wall_side_left_nobg_nocrack_0', 0, 0, 32, 16, 32);
             wallTex.add('wall_noside_left_nobg_nocrack_0', 0, 16, 32, 16, 32);
             wallTex.add('wall_noside_inner_nobg_nocrack_0', 0, 32, 32, 16, 32);
@@ -230,21 +233,31 @@ export class AssetLoader {
             wallTex.add('wall_noside_innerleft_nobg_nocrack_0', 0, 80, 32, 16, 32);
             wallTex.add('wall_noside_innerright_nobg_nocrack_0', 0, 96, 32, 16, 32);
             wallTex.add('wall_noside_inneralt_nobg_nocrack_0', 0, 112, 32, 16, 32);
+            wallTex.add('wall_noside_blank1_nobg_nocrack_0', 0, 128, 32, 16, 32);
             wallTex.add('wall_noside_left_nobg_crack_0', 0, 144, 32, 16, 32);
             wallTex.add('wall_noside_inner_nobg_crack_0', 0, 160, 32, 16, 32);
             wallTex.add('wall_noside_right_nobg_crack_0', 0, 176, 32, 16, 32);
+            wallTex.add('wall_fountain_mid_red_f0', 0, 192, 32, 16, 32);
+            wallTex.add('wall_fountain_mid_red_f1', 0, 208, 32, 16, 32);
+            wallTex.add('wall_fountain_mid_red_f2', 0, 224, 32, 16, 32);
             wallTex.add('wall_banner_green', 0, 240, 32, 16, 32);
             wallTex.add('wall_banner_yellow', 0, 256, 32, 16, 32);
-
-            // Row 2 (y=64)
             wallTex.add('wall_side_left_bg_nocrack_0', 0, 0, 64, 16, 32);
             wallTex.add('wall_noside_left_bg_nocrack_0', 0, 16, 64, 16, 32);
             wallTex.add('wall_noside_inner_bg_nocrack_0', 0, 32, 64, 16, 32);
             wallTex.add('wall_noside_right_bg_nocrack_0', 0, 48, 64, 16, 32);
             wallTex.add('wall_side_right_bg_nocrack_0', 0, 64, 64, 16, 32);
+            wallTex.add('wall_noside_innerleft_bg_nocrack_0', 0, 80, 64, 16, 32);
+            wallTex.add('wall_noside_innerright_bg_nocrack_0', 0, 96, 64, 16, 32);
+            wallTex.add('wall_noside_inneralt_bg_nocrack_0', 0, 112, 64, 16, 32);
+            wallTex.add('wall_noside_blank2_bg_nocrack_0', 0, 128, 64, 16, 32);
+            wallTex.add('wall_noside_left_bg_crack_0', 0, 144, 64, 16, 32);
+            wallTex.add('wall_noside_inner_bg_crack_0', 0, 160, 64, 16, 32);
+            wallTex.add('wall_noside_right_bg_crack_0', 0, 176, 64, 16, 32);
+            wallTex.add('wall_fountain_mid_blue_f0', 0, 192, 64, 16, 32);
+            wallTex.add('wall_fountain_mid_blue_f1', 0, 208, 64, 16, 32);
+            wallTex.add('wall_fountain_mid_blue_f2', 0, 224, 64, 16, 32);
             wallTex.add('column', 0, 240, 64, 16, 32);
-
-            // Row 3 (y=96)
             wallTex.add('wall_side_topleft_bg_nocrack_0', 0, 0, 96, 16, 32);
             wallTex.add('wall_noside_topleft_bg_nocrack_0', 0, 16, 96, 16, 32);
             wallTex.add('wall_noside_top_bg_nocrack_0', 0, 32, 96, 16, 32);
@@ -253,9 +266,13 @@ export class AssetLoader {
             wallTex.add('wall_noside_topendleft_bg_nocrack_0', 0, 80, 96, 16, 32);
             wallTex.add('wall_noside_topendright_bg_nocrack_0', 0, 96, 96, 16, 32);
             wallTex.add('wall_noside_topalt_bg_nocrack_0', 0, 112, 96, 16, 32);
+            wallTex.add('wall_noside_blank3_bg_nocrack_0', 0, 128, 96, 16, 32);
             wallTex.add('wall_noside_topleft_bg_crack_0', 0, 144, 96, 16, 32);
             wallTex.add('wall_noside_top_bg_crack_0', 0, 160, 96, 16, 32);
             wallTex.add('wall_noside_topright_bg_crack_0', 0, 176, 96, 16, 32);
+            wallTex.add('wall_fountain_top_blue_f0', 0, 192, 96, 16, 32);
+            wallTex.add('wall_fountain_top_blue_f1', 0, 208, 96, 16, 32);
+            wallTex.add('wall_fountain_top_blue_f2', 0, 224, 96, 16, 32);
             wallTex.add('column_wall', 0, 240, 96, 16, 32);
             wallTex.add('door_wall', 0, 256, 96, 16, 32);
         }
