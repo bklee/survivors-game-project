@@ -277,12 +277,10 @@ export class MainScene extends Phaser.Scene {
             for (let x = 0; x < mapW; x++) {
                 const cell = this.dungeon.map[y][x];
 
-                // ── Floor/Door base ──────────────────────────────────────────
-                if (cell === TileType.FLOOR || cell === TileType.DOOR) {
-                    const floorIds = [1, 2, 3, 9, 10, 11, 12, 13, 14];
-                    const randomId = floorIds[Math.floor(Math.random() * floorIds.length)];
-                    this.floorBlitter.create(x * TILE_SIZE, y * TILE_SIZE, `floor_${randomId}`);
-                }
+                // ── Floor base (Always draw a floor to fill transparent gaps in 2.5D walls/doors) ─────────────────
+                const floorIds = [1, 2, 3, 9, 10, 11, 12, 13, 14];
+                const randomId = floorIds[Math.floor(Math.random() * floorIds.length)];
+                this.floorBlitter.create(x * TILE_SIZE, y * TILE_SIZE, `floor_${randomId}`);
 
                 // ── Pillars & Obstacles ──────────────────────────────────────
                 if (cell === TileType.PILLAR) {
@@ -323,11 +321,7 @@ export class MainScene extends Phaser.Scene {
                         else frame = 'wall_cracked_left_b';
                     }
 
-                    // Base Filling: Draw a solid inner wall under EVERY wall tile
-                    // This prevents transparent edges on top/corners from showing the black canvas background.
-                    this.wallBlitter.create(x * TILE_SIZE, y * TILE_SIZE, 'wall_cracked_left_b');
-
-                    // Then draw the specific edge/corner over it
+                    // Draw the specific wall edge/corner
                     this.wallBlitter.create(x * TILE_SIZE, y * TILE_SIZE, frame);
 
                     // Debug: Render text label over the wall (except for the common inner base block)
