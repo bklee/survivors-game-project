@@ -302,24 +302,24 @@ export class MainScene extends Phaser.Scene {
                     let frame = 'wall_inner';
 
                     if (s && n) {
-                        frame = 'wall_top'; // 1-thick horizontal wall
+                        frame = 'wall_cracked_top'; // 1-thick horizontal wall
                     } else if (s) {
                         // Player-facing wall (South edge)
                         if (w && e) frame = 'wall_top_alt'; // 1-thick pillar
-                        else if (w) frame = 'wall_tl';
-                        else if (e) frame = 'wall_tr';
-                        else frame = 'wall_top';
+                        else if (w) frame = 'wall_cracked_tl';
+                        else if (e) frame = 'wall_cracked_tr';
+                        else frame = 'wall_cracked_top';
                     } else if (n) {
                         // Back-facing wall (North edge)
-                        if (w && e) frame = 'wall_bottom';
-                        else if (w) frame = 'wall_bl';
-                        else if (e) frame = 'wall_br';
-                        else frame = 'wall_bottom';
+                        if (w && e) frame = 'wall_cracked_bottom';
+                        else if (w) frame = 'wall_cracked_bl';
+                        else if (e) frame = 'wall_cracked_br';
+                        else frame = 'wall_cracked_bottom';
                     } else {
                         // Inner walls / Side walls
-                        if (w && e) frame = 'wall_inner_alt';
-                        else if (w) frame = 'wall_left';
-                        else if (e) frame = 'wall_right';
+                        if (w && e) frame = 'wall_cracked_inner_b';
+                        else if (w) frame = 'wall_cracked_left_b';
+                        else if (e) frame = 'wall_cracked_right_b';
                         else frame = 'wall_cracked_left_b';
                     }
 
