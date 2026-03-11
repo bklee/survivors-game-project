@@ -277,8 +277,12 @@ export class MainScene extends Phaser.Scene {
             for (let x = 0; x < mapW; x++) {
                 const cell = this.dungeon.map[y][x];
 
-                // Removed all floor rendering for now to create a completely blank slate.
-                // Re-evaluate from scratch.
+                // ── Floor base ──────────────────────────────────────────────
+                if (cell !== TileType.WALL) {
+                    const floorIds = [1, 2, 3, 9, 10, 11, 12, 13, 14];
+                    const randomId = floorIds[Math.floor(Math.random() * floorIds.length)];
+                    this.floorBlitter.create(x * TILE_SIZE, y * TILE_SIZE, `floor_${randomId}`);
+                }
 
                 // ── Pillars & Obstacles ──────────────────────────────────────
                 // if (cell === TileType.PILLAR) {
