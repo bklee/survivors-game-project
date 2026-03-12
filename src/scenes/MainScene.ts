@@ -287,8 +287,7 @@ export class MainScene extends Phaser.Scene {
                 // ── Pillars & Obstacles ──────────────────────────────────────
                 if (cell === TileType.PILLAR) {
                     const roll = Math.random();
-                    // 기둥 세트의 베이스(Base) 위치를 캐릭터 발 위치(+11px)에 맞춤
-                    // 캐릭터(Origin 0.85)가 타일 중앙(+8px)에 있을 때 발 위치가 약 +11px임
+                    // 기둥 및 분수의 베이스라인(+11px) 동기화
                     const basePX = x * TILE_SIZE + 8;
                     const basePY = y * TILE_SIZE + 11; 
 
@@ -301,19 +300,18 @@ export class MainScene extends Phaser.Scene {
                         SpriteInfo.textureIndex[ent] = typeIdx;
                     };
 
+                    // 1. 기본적으로 '온전한 기둥 한 쌍'은 무조건 생성
+                    createPart(basePX, basePY, 91); // 베이스 (column_wall)
+                    createPart(basePX, basePY - 32, 90); // 몸통 (column)
+
+                    // 2. 확률에 따라 기둥 앞에 분수 장식 추가
                     if (roll < 0.05) {
-                        // 블루 분수: 상단은 일반 기둥(90), 하단은 블루 분수 엔진(93)
-                        createPart(basePX, basePY, 93);
-                        createPart(basePX, basePY - 32, 90);
+                        // 블루 분수: 기둥 앞에 하단부만 추가 (사용자 요청: top 쓰지마)
+                        createPart(basePX, basePY, 93); 
                     } else if (roll < 0.10) {
-                        // 레드 분수 (Top: 94, Base: 95)
-                        createPart(basePX, basePY, 95);
-                        createPart(basePX, basePY - 32, 94);
-                    } else {
-                        // 일반 기둥 세트 (Top: 90/column, Base: 91/column_wall)
-                        // 상하 관계는 RenderSystem의 depth = y 로 자동 해결됨
-                        createPart(basePX, basePY, 91); // 아래쪽 (정렬 기준점)
-                        createPart(basePX, basePY - 32, 90); // 위쪽
+                        // 레드 분수: 기둥 앞에 상/하단 세트로 추가 (용암이 흐르는 연출)
+                        createPart(basePX, basePY, 95); // 하단
+                        createPart(basePX, basePY - 32, 94); // 상단
                     }
                 }
 
