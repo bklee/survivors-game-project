@@ -302,9 +302,9 @@ export class MainScene extends Phaser.Scene {
                     };
 
                     if (roll < 0.05) {
-                        // 블루 분수 (Top: 92, Base: 93)
+                        // 블루 분수: 상단은 일반 기둥(90), 하단은 블루 분수 엔진(93)
                         createPart(basePX, basePY, 93);
-                        createPart(basePX, basePY - 32, 92);
+                        createPart(basePX, basePY - 32, 90);
                     } else if (roll < 0.10) {
                         // 레드 분수 (Top: 94, Base: 95)
                         createPart(basePX, basePY, 95);
