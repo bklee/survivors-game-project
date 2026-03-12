@@ -286,14 +286,19 @@ export class DungeonGenerator {
 
         // 경로를 따라 2칸 너비 복도 뚫기
         if (found) {
+            // 1. 시작점 확실히 뚫기 (문 바로 앞)
+            this.map[startY][startX] = TileType.FLOOR;
+            this.map[startY][startX + 1] = TileType.FLOOR;
+
+            // 2. BFS가 찾은 경로 따라가며 2칸 너비 복도 생성
             for (const p of connectionPath) {
                 this.map[p.y][p.x] = TileType.FLOOR;
-                // 복도 너비 확보 (주변에 벽이 있다면 같이 뚫음)
+                // 진행 방향에 따라 수직/수평으로 2칸 확보
                 if (p.x + 1 < this.width - 1) this.map[p.y][p.x + 1] = TileType.FLOOR;
-                else if (p.x - 1 > 0) this.map[p.y][p.x - 1] = TileType.FLOOR;
+                if (p.y + 1 < this.height - 1) this.map[p.y + 1][p.x] = TileType.FLOOR;
             }
         } else {
-            // Fallback: 위로 직진 (기존 로직 유지)
+            // Fallback: 위로 직진 (시작점 포함)
             let cy = startY;
             while (cy > 2) {
                 this.map[cy][startX] = TileType.FLOOR;
