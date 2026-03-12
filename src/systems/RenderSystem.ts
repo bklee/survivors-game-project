@@ -255,7 +255,14 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
 
                 // Y-Sorting 적용: depth를 Y좌표로 설정 (프롭, 캐릭터 모두 동일 기준)
                 let depthOffset = 0;
-                if (typeId >= 100) depthOffset = 10; // 스펠은 공중에 떠있으므로 조금 더 위로
+                if (typeId >= 100) {
+                    depthOffset = 10; // 스펠은 공중에 떠있으므로 조금 더 위로
+                } else if (typeId === 90 || typeId === 92 || typeId === 94) {
+                    // 기둥 상부 파트의 깊이를 하부 베이스라인(Position.y + 32)으로 맞춤
+                    // 이렇게 해야 캐릭터가 기둥 뒤에 있을 때 전체 기둥이 캐릭터를 가림
+                    depthOffset = 32; 
+                }
+                
                 sprite.setDepth(Position.y[eid] + depthOffset);
 
                 sprite.setVisible(true);
