@@ -287,24 +287,23 @@ export class MainScene extends Phaser.Scene {
                 // ── Pillars & Obstacles ──────────────────────────────────────
                 if (cell === TileType.PILLAR) {
                     const roll = Math.random();
-                    // 기둥 세트의 기준점(Base)을 y 행에 완벽히 맞추기 위해 -16px 오프셋 적용
+                    // 기둥 세트의 베이스(Base)가 충돌 타일(y) 하단에 맞도록 -16px 오프셋 유지
                     const baseY = y * TILE_SIZE - 16; 
-                    const topY = baseY - 32;
+                    const topY = baseY - 32; // 겹치지 않게 정확히 한 칸 위로
 
                     if (roll < 0.05) {
-                        // 5% 확률: 블루 분수 세트 (Base: mid, Top: top)
-                        this.wallBlitter.create(x * TILE_SIZE, baseY, 'wall_fountain_mid_blue_f0');
+                        // 5% 블루 분수 (Top: top, Base: mid)
                         this.wallBlitter.create(x * TILE_SIZE, topY, 'wall_fountain_top_blue_f0');
+                        this.wallBlitter.create(x * TILE_SIZE, baseY, 'wall_fountain_mid_blue_f0');
                     } else if (roll < 0.10) {
-                        // 5% 확률: 레드 분수 세트
-                        this.wallBlitter.create(x * TILE_SIZE, baseY, 'wall_fountain_mid_red_f0');
+                        // 5% 레드 분수 (Top: top, Base: mid)
                         this.wallBlitter.create(x * TILE_SIZE, topY, 'wall_fountain_top_red_f0');
+                        this.wallBlitter.create(x * TILE_SIZE, baseY, 'wall_fountain_mid_red_f0');
                     } else {
-                        // 90% 확률: 일반 기둥 세트 (Base: column, Top: column_wall)
-                        // 기둥 몸통(column)을 충돌 지점인 바닥(y)에, 
-                        // 기둥 꼭대기(column_wall)를 그 위(y-2)에 배치합니다.
-                        this.wallBlitter.create(x * TILE_SIZE, baseY, 'column');
-                        this.wallBlitter.create(x * TILE_SIZE, topY, 'column_wall');
+                        // 90% 일반 기둥 세트 [column(위)] + [column_wall(아래)]
+                        // 이 순서가 사용자님이 "완벽하다"고 하신 그 구성입니다.
+                        this.wallBlitter.create(x * TILE_SIZE, topY, 'column');
+                        this.wallBlitter.create(x * TILE_SIZE, baseY, 'column_wall');
                     }
                 }
 
@@ -558,6 +557,12 @@ export class MainScene extends Phaser.Scene {
         if (!this.secretRoomData) return;
         const { doorPixel, floorPixels } = this.secretRoomData;
 
+        // ── 문 프레임 (시각적 일관성) ──
+        const tx = Math.floor(doorPixel.x / TILE_SIZE);
+        const ty = Math.floor(doorPixel.y / TILE_SIZE);
+        // 문 위쪽 프레임
+        this.doorBlitter.create((tx - 1) * TILE_SIZE, (ty - 1) * TILE_SIZE, 'doors_frame_top');
+
         // ── 잠긴 문 (비밀 방 입구) ──
         const doorId = addEntity(world);
         addComponent(world, Position, doorId);
@@ -569,8 +574,8 @@ export class MainScene extends Phaser.Scene {
         Interactive.isActivated[doorId] = 0;
         Interactive.id[doorId] = 99;
 
-        // ── 레버 (먼 곳에 배치) ──
-        const leverPos = this.dungeon.getFloorPixelNear(doorPixel.x, doorPixel.y, 400, 800);
+        // ── 레버 (너무 멀지 않게 200~500px 범위로 조정) ──
+        const leverPos = this.dungeon.getFloorPixelNear(doorPixel.x, doorPixel.y, 200, 500);
         const leverId = addEntity(world);
         addComponent(world, Position, leverId);
         addComponent(world, SpriteInfo, leverId);
