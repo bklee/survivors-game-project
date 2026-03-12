@@ -105,6 +105,9 @@ export class DungeonGenerator {
             }
         });
 
+        // 1칸 너비의 좁은 미로를 2칸으로 확장 (사용자 요청)
+        this.widenPaths();
+
         // Ensure boundary
         for (let y = 0; y < this.height; y++) {
             for (let x = 0; x < this.width; x++) {
@@ -113,6 +116,39 @@ export class DungeonGenerator {
                 }
             }
         }
+    }
+
+    /**
+     * 1칸 너비의 좁은 복도를 감지하여 2칸 너비로 확장합니다.
+     */
+    private widenPaths() {
+        const changes: { x: number, y: number }[] = [];
+        // 맵 내부를 순회하며 좁은 구간 확인
+        for (let y = 1; y < this.height - 1; y++) {
+            for (let x = 1; x < this.width - 1; x++) {
+                if (this.map[y][x] === TileType.FLOOR) {
+                    // 1. 수평으로 좁은 길 (위아래가 벽)
+                    if (this.map[y - 1][x] === TileType.WALL && this.map[y + 1][x] === TileType.WALL) {
+                        // 아래쪽 벽을 허물어 2칸 확보
+                        if (y + 1 < this.height - 1) {
+                            changes.push({ x: x, y: y + 1 });
+                        }
+                    }
+                    // 2. 수직으로 좁은 길 (좌우가 벽)
+                    if (this.map[y][x - 1] === TileType.WALL && this.map[y][x + 1] === TileType.WALL) {
+                        // 오른쪽 벽을 허물어 2칸 확보
+                        if (x + 1 < this.width - 1) {
+                            changes.push({ x: x + 1, y: y });
+                        }
+                    }
+                }
+            }
+        }
+
+        // 수집된 변경 사항 일괄 적용
+        changes.forEach(p => {
+            this.map[p.y][p.x] = TileType.FLOOR;
+        });
     }
 
 
