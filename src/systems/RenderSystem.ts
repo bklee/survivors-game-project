@@ -100,6 +100,12 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
             else if (typeId === 55) charKey = 'flask_big_yellow';
             else if (typeId === 56) charKey = 'flask_big_red';
             else if (typeId === 57) charKey = 'flask_big_blue';
+            else if (typeId === 90) { charKey = 'column'; textureKey = 'walls'; }
+            else if (typeId === 91) { charKey = 'column_wall'; textureKey = 'walls'; }
+            else if (typeId === 92) { charKey = 'wall_fountain_top_blue_f0'; textureKey = 'walls'; }
+            else if (typeId === 93) { charKey = 'wall_fountain_mid_blue_f0'; textureKey = 'walls'; }
+            else if (typeId === 94) { charKey = 'wall_fountain_top_red_f0'; textureKey = 'walls'; }
+            else if (typeId === 95) { charKey = 'wall_fountain_mid_red_f0'; textureKey = 'walls'; }
             else if (typeId >= 60 && typeId <= 82) {
                 const config = MONSTER_CONFIG[typeId];
                 if (config) {
@@ -126,7 +132,8 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
             // (bitECS 기본값 0으로 인해 wizard 스프라이트가 바닥 구조물로 나타나는 문제 방지)
             if ((typeId === 0 || typeId === 1 || typeId === 2) && !isPlayer) continue;
 
-            const requiresSprite = isPlayer || typeId >= 100 || (typeId >= 60 && typeId <= 82) || typeId >= 50 || typeId === 36 || typeId === 21 || hasComponent(world, Rotation, eid);
+            const isPillarPart = typeId >= 90 && typeId <= 95;
+            const requiresSprite = isPlayer || typeId >= 100 || (typeId >= 60 && typeId <= 82) || typeId >= 50 || typeId === 36 || typeId === 21 || isPillarPart || hasComponent(world, Rotation, eid);
 
             // 2. Identify State (Idle vs Run)
             let state = 'idle';
@@ -136,7 +143,7 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
             }
 
             // 3. Handle Animation Framing
-            if (typeId === 15 || typeId === 20 || (typeId >= 22 && typeId <= 31) || [33, 34, 35, 50, 51, 52, 53, 54, 55, 56, 57].includes(typeId) || (typeId >= 101 && typeId <= 107)) {
+            if (isPillarPart || typeId === 15 || typeId === 20 || (typeId >= 22 && typeId <= 31) || [33, 34, 35, 50, 51, 52, 53, 54, 55, 56, 57].includes(typeId) || (typeId >= 101 && typeId <= 107)) {
                 frameName = charKey;
             } else if (typeId === 40) {
                 frameName = Interactive.isActivated[eid] ? 'lever_on' : 'lever_off';
@@ -223,17 +230,13 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
 
                     // Adjust origin for characters to ground them better
                     if (isPlayer || (typeId >= 60 && typeId <= 89)) {
-                        sprite.setOrigin(0.5, 0.8);
+                        sprite.setOrigin(0.5, 0.85); // 조금 더 하단으로 조정 (0.8 -> 0.85)
+                    } else if (isPillarPart) {
+                        sprite.setOrigin(0.5, 1.0); // 기둥은 발을 바닥에 붙임
                     } else if (charKey === 'weapon_bow' || charKey === 'weapon_sword' || charKey === 'weapon_staff' || charKey === 'weapon_arrow') {
                         sprite.setOrigin(0.5, 0.5);
                     }
 
-                    let depth = 10;
-                    if (isPlayer) depth = 30; // Player on top of everything
-                    else if (typeId >= 100) depth = 20; // Spells above enemies
-                    else if (typeId >= 60 && typeId <= 89) depth = 15; // Enemies above props
-
-                    sprite.setDepth(depth);
                     sprites[eid] = sprite;
                 } else {
                     let renderY = Position.y[eid];
@@ -243,6 +246,11 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                     const frameArg = (finalFrame === '' || finalFrame === undefined) ? undefined : finalFrame as any;
                     sprite.setTexture(textureKey, frameArg);
                 }
+
+                // Y-Sorting 적용: depth를 Y좌표로 설정 (프롭, 캐릭터 모두 동일 기준)
+                let depthOffset = 0;
+                if (typeId >= 100) depthOffset = 10; // 스펠은 공중에 떠있으므로 조금 더 위로
+                sprite.setDepth(Position.y[eid] + depthOffset);
 
                 sprite.setVisible(true);
                 if (hasComponent(world, Boss, eid)) {
