@@ -317,44 +317,29 @@ export class MainScene extends Phaser.Scene {
 
                 // ── Walls ───────────────────────────────────────────────────
                 if (cell === TileType.WALL) {
-                    // 주변 4방향 타일이 바닥(FLOOR/DOOR/PILLAR)인지 확인 (Open = 1)
-                    const isOpen = (tx: number, ty: number) => {
-                        if (tx < 0 || tx >= mapW || ty < 0 || ty >= mapH) return false;
-                        const t = this.dungeon.map[ty][tx];
-                        return t === TileType.FLOOR || t === TileType.DOOR || t === TileType.PILLAR;
-                    };
+                    // Check if adjacent cells are open spaces (FLOOR, DOOR, etc.) -> 1 means OPEN
+                    // const n = (y > 0 && this.dungeon.map[y - 1][x] !== TileType.WALL) ? 1 : 0;
+                    // const s = (y < mapH - 1 && this.dungeon.map[y + 1][x] !== TileType.WALL) ? 1 : 0;
+                    // const w = (x > 0 && this.dungeon.map[y][x - 1] !== TileType.WALL) ? 1 : 0;
+                    // const e = (x < mapW - 1 && this.dungeon.map[y][x + 1] !== TileType.WALL) ? 1 : 0;
 
-                    const n = isOpen(x, y - 1);
-                    const s = isOpen(x, y + 1);
-                    const w = isOpen(x - 1, y);
-                    const e = isOpen(x + 1, y);
+                    // Removed wall rendering for now based on user request.
+                    // To re-evaluate from scratch.
 
-                    let frame = '';
-                    
-                    // 1. 코너 및 측면 판정 (Cardinal Orientation)
-                    if (s && e) frame = 'wall_s_corner_l';        // 남서 코너 (방 내부 기준)
-                    else if (s && w) frame = 'wall_s_corner_r';   // 남동 코너
-                    else if (n && e) frame = 'wall_n_corner_l';   // 북서 코너
-                    else if (n && w) frame = 'wall_n_corner_r';   // 북동 코너
-                    
-                    // 2. 직선 방향 판정
-                    else if (s) frame = 'wall_s_mid';   // 남쪽 정면 (Ledge)
-                    else if (n) frame = 'wall_n_mid';   // 북쪽 정면 (Face)
-                    else if (w) frame = 'wall_e_mid';   // 방의 오른쪽 벽 (East edge)
-                    else if (e) frame = 'wall_w_mid';   // 방의 왼쪽 벽 (West edge)
-                    
-                    if (frame) {
-                        // 10% 확률로 크랙 프레임 적용
-                        if (Math.random() < 0.1) {
-                            const crackFrame = frame + '_crack';
-                            if (this.textures.get('walls').has(crackFrame)) {
-                                frame = crackFrame;
-                            }
-                        }
-                        
-                        // Y-Offset (-16px) 적용하여 바닥 타일과 정렬
-                        this.wallBlitter.create(x * TILE_SIZE, y * TILE_SIZE - 16, frame);
-                    }
+                    // Render door frames
+                    // const isLeftDoorTile = (x === 0 || this.dungeon.map[y][x - 1] !== TileType.DOOR);
+                    // if (isLeftDoorTile) {
+                    //     if (x > 0 && this.dungeon.map[y][x - 1] === TileType.WALL) {
+                    //         this.doorBlitter.create((x - 1) * TILE_SIZE, y * TILE_SIZE, 'doors_frame_left');
+                    //     }
+                    //     if (y > 0 && this.dungeon.map[y - 1][x] === TileType.WALL) {
+                    //         this.doorBlitter.create(x * TILE_SIZE, (y - 1) * TILE_SIZE, 'doors_frame_top');
+                    //     }
+                    // } else {
+                    //     if (x < mapW - 1 && this.dungeon.map[y][x + 1] === TileType.WALL) {
+                    //         this.doorBlitter.create((x + 1) * TILE_SIZE, y * TILE_SIZE, 'doors_frame_right');
+                    //     }
+                    // }
                 }
             }
         }
