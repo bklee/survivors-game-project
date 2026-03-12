@@ -287,9 +287,10 @@ export class MainScene extends Phaser.Scene {
                 // ── Pillars & Obstacles ──────────────────────────────────────
                 if (cell === TileType.PILLAR) {
                     const roll = Math.random();
-                    // 기둥 세트의 베이스(Base) 위치를 타일의 하단 경계에 맞춤 (+16px)
+                    // 기둥 세트의 베이스(Base) 위치를 캐릭터 발 위치(+11px)에 맞춤
+                    // 캐릭터(Origin 0.85)가 타일 중앙(+8px)에 있을 때 발 위치가 약 +11px임
                     const basePX = x * TILE_SIZE + 8;
-                    const basePY = y * TILE_SIZE + 16; 
+                    const basePY = y * TILE_SIZE + 11; 
 
                     const createPart = (px: number, py: number, typeIdx: number) => {
                         const ent = addEntity(world);
