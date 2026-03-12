@@ -1,31 +1,29 @@
-# Dungeon Wall Naming & Role Rules
+# Dungeon Wall Cardinal Rules (v1.0)
 
-이 문서는 던전 방의 구조(North, South, East, West)에 기반한 직관적인 벽 타일 배치 규칙을 정의합니다. 
+이 문서는 던전의 방 구조(North, South, East, West)에 기반한 최종 벽면 타일 매핑 시스템을 정의합니다.
 
-## 1. 명명 규칙 (Naming Convention: Cardinal Directions)
+## 1. 개요 (Core Concept)
+타일의 생김새가 아닌 **"방의 어느 방향 면인가"**를 기준으로 명명합니다. 이를 통해 개발자가 직관적으로 가시성을 확보하고 배치 실수를 방지합니다.
 
-타일의 생김새(Top/Bottom)가 아닌 **방의 어느 면을 형성하는가**를 기준으로 명명합니다.
+## 2. 방향별 타일 매핑 (Mapping Table)
 
-- **`N` (North)**: 방의 위쪽 벽 (플레이어가 벽면 정면을 바라봄)
-- **`S` (South)**: 방의 아래쪽 벽 (플레이어가 벽의 윗면/Ledge를 내려다봄)
-- **`W` (West)**: 방의 왼쪽 벽 (측면 단면 노출)
-- **`E` (East)**: 방의 오른쪽 벽 (측면 단면 노출)
-
-## 2. 상황별 벽 타일 매핑 테이블 (Wall Mapping Table)
-
-| 위치 (Role) | 타일 코드명 (ID) | 속성 (Property) | 용도 및 시각적 특징 |
+| 위치 (Role) | 프레임 ID (Frame ID) | 아틀라스 좌표 (X, Y) | 시각적 특징 (Visual Feature) |
 | :--- | :--- | :--- | :--- |
-| **북쪽 일반** | `wall_n_plain` | `Row 0` / `Nobg` | 방의 천장 쪽 직선 벽면 |
-| **남쪽 일반** | `wall_s_ledge` | `Row 3` / `Bg` | 방의 아래쪽, 석재 상단 턱이 보이는 벽면 |
-| **서쪽 측면** | `wall_w_side` | `Row 2` / `Bg` | 방의 왼쪽 수직 마감 |
-| **동쪽 측면** | `wall_e_side` | `Row 2` / `Bg` | 방의 오른쪽 수직 마감 |
-| **박스형 북서 코너** | `wall_nw_corner` | `Row 0` / `Nobg` | 상단 왼쪽 바깥쪽 모서리 |
-| **박스형 남서 코너** | `wall_sw_corner` | `Row 3` / `Bg` | 하단 왼쪽 바깥쪽 모서리 |
-| **내부 꺾임 (L)** | `wall_inner_l` | `Row 1` / `Nobg` | 방 내부 구조물 등으로 인한 꺾임 지점 |
-| **균열 변형** | `wall_*_crack` | `Variant` | 15% 확률로 섞어 쓰는 파손된 벽 타일 |
+| **North (북쪽)** | `wall_n_mid` | 32, 0 | 방의 천장 쪽. 어두운 벽면 정면 노출 |
+| **South (남쪽)** | `wall_s_mid` | 32, 96 | 방의 바닥 쪽. 밝은 석재 상단 턱(Ledge) 노출 |
+| **West (서쪽)** | `wall_w_mid` | 0, 32 | 방의 왼쪽 벽. 수직 단면 노출 |
+| **East (동쪽)** | `wall_e_mid` | 64, 32 | 방의 오른쪽 벽. 수직 단면 노출 |
+| **NW Corner** | `wall_n_corner_l` | 16, 0 | 북쪽 벽과 왼쪽 벽이 만나는 지점 |
+| **NE Corner** | `wall_n_corner_r` | 48, 0 | 북쪽 벽과 오른쪽 벽이 만나는 지점 |
+| **SW Corner** | `wall_s_corner_l` | 0, 96 | 남쪽 벽과 왼쪽 벽이 만나는 지점 |
+| **SE Corner** | `wall_s_corner_r` | 64, 96 | 남쪽 벽과 오른쪽 벽이 만나는 지점 |
 
-## 3. 구현 원칙 (Implementation Rules)
+## 3. 구현 원칙 (Implementation Details)
 
-1. **Y-Offset (-16px)**: 타일 하단이 실제 좌표에 오도록 렌더링 시 Y값을 조절합니다.
-2. **Auto-Tiling**: 주변 8방향의 타일 정보를 확인하여 위의 테이블에 따라 적절한 ID의 타일을 자동으로 선택합니다.
-3. **South-Wall Priority**: `wall_s_ledge` 계열은 플레이어의 이동을 막는 충돌체와 시각적 바닥 라인 정렬이 가장 중요합니다.
+1. **Y-Offset (-16px)**: 타일은 16x32 크기이므로, 바닥 타일과의 정당한 시각적 연결을 위해 실제 Y 좌표보다 **16px 위**에서 렌더링을 시작합니다.
+2. **Auto-Tiling Logic**:
+   - `wall_s_mid` (남쪽)는 아래쪽(South)이 열린 공간(Floor)일 때 사용합니다.
+   - `wall_n_mid` (북쪽)는 위쪽(North)이 열린 공간(Floor)일 때 사용합니다.
+   - `wall_w_mid` (서쪽)는 오른쪽(East)이 열린 공간(Floor)일 때 사용합니다.
+   - `wall_e_mid` (동쪽)는 왼쪽(West)이 열린 공간(Floor)일 때 사용합니다.
+3. **Random Variance**: 자연스러운 텍스처를 위해 약 10%의 확률로 `*_crack` 프레임을 섞어서 사용합니다.
