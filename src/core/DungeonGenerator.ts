@@ -125,7 +125,17 @@ export class DungeonGenerator {
         for (let checkX = minX; checkX <= maxX; checkX++) {
             for (let checkY = minY; checkY <= maxY; checkY++) {
                 if (checkX < 0 || checkX >= this.width || checkY < 0 || checkY >= this.height) return false;
-                if (this.map[checkY][checkX] === TileType.WALL || this.map[checkY][checkX] === TileType.PILLAR) return false;
+                
+                const tile = this.map[checkY][checkX];
+                if (tile === TileType.WALL) return false;
+                
+                if (tile === TileType.PILLAR) {
+                    // 기둥의 베이스라인(+11px)과 캐릭터의 발 위치(yPixel + ph/2)를 비교하여 
+                    // 시각적으로 기둥 뒤에 있을 때만 충돌 처리
+                    const pillarBaseY = checkY * TILE_SIZE + 11;
+                    const charGroundY = yPixel + (ph / 2);
+                    if (charGroundY < pillarBaseY) return false;
+                }
             }
         }
         return true;
