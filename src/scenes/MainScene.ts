@@ -310,46 +310,8 @@ export class MainScene extends Phaser.Scene {
 
                 // ── Walls ───────────────────────────────────────────────────
                 if (cell === TileType.WALL) {
-                    const isOpen = (tx: number, ty: number) => {
-                        if (tx < 0 || tx >= mapW || ty < 0 || ty >= mapH) return false;
-                        const t = this.dungeon.map[ty][tx];
-                        return t === TileType.FLOOR || t === TileType.DOOR || t === TileType.PILLAR;
-                    };
-
-                    const n = isOpen(x, y - 1);
-                    const s = isOpen(x, y + 1);
-                    const w = isOpen(x - 1, y);
-                    const e = isOpen(x + 1, y);
-
-                    let frame = '';
-                    
-                    if (s && e) frame = 'wall_s_corner_l';
-                    else if (s && w) frame = 'wall_s_corner_r';
-                    else if (n && e) frame = 'wall_n_corner_l';
-                    else if (n && w) frame = 'wall_n_corner_r';
-                    else if (s) frame = 'wall_s_mid';
-                    else if (n) frame = 'wall_n_mid';
-                    else if (w) frame = 'wall_e_mid';
-                    else if (e) frame = 'wall_w_mid';
-                    
-                    if (frame) {
-                        if (Math.random() < 0.1) {
-                            const crackFrame = frame + '_crack';
-                            if (this.textures.get('walls').has(crackFrame)) {
-                                frame = crackFrame;
-                            }
-                        }
-                        
-                        this.wallBlitter.create(x * TILE_SIZE, y * TILE_SIZE - 16, frame);
-
-                        // [중요] 붉은 분수(가고일)는 '북쪽 정면 벽'에만 확률적으로 배치하여 개연성 확보
-                        if (frame === 'wall_n_mid' && Math.random() < 0.1) {
-                            const facePX = x * TILE_SIZE + 8;
-                            const facePY = y * TILE_SIZE + 12; // 벽면 하단 안착 위치 보정
-                            createPart(facePX, facePY, 95); // 하단 대야
-                            createPart(facePX, facePY - 32, 94); // 상단 가고일
-                        }
-                    }
+                    // 사용자 요청: 벽면 렌더링 및 붉은 가고일 분수 제거
+                    // (맵 데이터 상으로는 WALL로 남아 충돌 판정은 유지됨)
                 }
             }
         }
