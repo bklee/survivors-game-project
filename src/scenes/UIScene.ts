@@ -213,6 +213,14 @@ export class UIScene extends Phaser.Scene {
         this.minimapGraphics = this.add.graphics();
         this.arrowGraphics = this.add.graphics();
 
+        // Mute Button
+        const muteBtn = this.add.text(1210, 170, '🔊', {
+            fontSize: '32px',
+            color: '#ffffff',
+            backgroundColor: '#00000088',
+            padding: { x: 8, y: 4 }
+        }).setOrigin(1, 0).setInteractive({ useHandCursor: true });
+
         // Pause Button
         const pauseBtn = this.add.text(1270, 170, '⏸', {
             fontSize: '32px',
@@ -279,6 +287,16 @@ export class UIScene extends Phaser.Scene {
             }
         });
 
+        muteBtn.on('pointerdown', () => {
+            if (this.sound.mute) {
+                this.sound.mute = false;
+                muteBtn.setText('🔊');
+            } else {
+                this.sound.mute = true;
+                muteBtn.setText('🔇');
+            }
+        });
+
         resumeBtnBg.on('pointerdown', () => {
             const mainScene = this.scene.get('MainScene');
             mainScene.scene.resume();
@@ -310,7 +328,7 @@ export class UIScene extends Phaser.Scene {
             quitBtnText.setScale(1);
         });
 
-        this.uiContainer.add([this.stageLevelText, this.levelText, this.skillPointsText, this.statsText, hpFrame, this.hpBar, shine, hpIcon, this.hpText, expFrame, this.xpBar, expShine, expIcon, this.expLabel, this.coinText, this.coinIcon, mmBg1, mmBg2, this.minimapGraphics, this.arrowGraphics, pauseBtn]);
+        this.uiContainer.add([this.stageLevelText, this.levelText, this.skillPointsText, this.statsText, hpFrame, this.hpBar, shine, hpIcon, this.hpText, expFrame, this.xpBar, expShine, expIcon, this.expLabel, this.coinText, this.coinIcon, mmBg1, mmBg2, this.minimapGraphics, this.arrowGraphics, pauseBtn, muteBtn]);
         // Note: Pause overlay/buttons are not in uiContainer based on previous structure
         this.uiContainer.setVisible(false);
 
