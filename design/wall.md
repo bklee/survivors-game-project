@@ -9,14 +9,11 @@
 
 | 위치 (Role) | 프레임 ID (Frame ID) | 아틀라스 좌표 (X, Y) | 시각적 특징 (Visual Feature) |
 | :--- | :--- | :--- | :--- |
-| **North (북쪽)** | `wall_n_mid` | 32, 0 | 방의 천장 쪽. 어두운 벽면 정면 노출 |
-| **South (남쪽)** | `wall_s_mid` | 32, 96 | 방의 바닥 쪽. 밝은 석재 상단 턱(Ledge) 노출 |
+| **North/South (수평)** | `wall_n_mid` / `wall_s_mid` | 32, 96 | 수평 벽면. 석재 상단 턱(Ledge) 노출로 입체감 부여 |
 | **West (서쪽)** | `wall_w_mid` | 0, 32 | 방의 왼쪽 벽. 수직 단면 노출 |
 | **East (동쪽)** | `wall_e_mid` | 64, 32 | 방의 오른쪽 벽. 수직 단면 노출 |
-| **NW Corner** | `wall_n_corner_l` | 16, 0 | 북쪽 벽과 왼쪽 벽이 만나는 지점 |
-| **NE Corner** | `wall_n_corner_r` | 48, 0 | 북쪽 벽과 오른쪽 벽이 만나는 지점 |
-| **SW Corner** | `wall_s_corner_l` | 0, 96 | 남쪽 벽과 왼쪽 벽이 만나는 지점 |
-| **SE Corner** | `wall_s_corner_r` | 64, 96 | 남쪽 벽과 오른쪽 벽이 만나는 지점 |
+| **Horizontal Corner** | `wall_n_corner_l` / `wall_s_corner_l` | 0, 96 | 수평 벽의 왼쪽 모서리 |
+| **Face Wall (정면)** | `wall_face_mid` | 32, 0 | 상단 턱이 없는 정면 벽면 (특수한 내부 파사드용) |
 
 ## 3. 구현 원칙 (Implementation Details)
 
