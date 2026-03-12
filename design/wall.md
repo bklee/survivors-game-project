@@ -1,45 +1,35 @@
-# Dungeon Wall & Pillar Rendering Rules
+# Dungeon Wall Configuration Rules
 
-이 문서는 `map_example3.png` 스타일의 던전 벽면 및 장애물 렌더링 시스템의 규칙을 정의합니다. 모든 렌더링은 시각적 깊이감(Depth)과 충돌 판정의 일관성을 목표로 합니다.
+이 문서는 `map_example3.png`를 기반으로 한 던전 벽면 렌더링의 세부 규칙을 정의합니다. 모든 벽은 주변 타일과의 인접성(Context-Aware)에 따라 최적의 타일이 선택되어야 합니다.
 
-## 1. 2단 수직 구조 (Vertical Pairing)
+## 1. 개요 (General Rules)
 
-모든 벽과 기둥은 시각적으로 2개 행(32px 높이)을 차지하는 한 쌍의 타일로 구성됩니다.
+- **타일 크기**: 모든 벽 타일은 `16x32px` (높이 2타일분)입니다.
+- **오프셋**: 자연스러운 연결을 위해 타일은 실제 좌표보다 **Y축으로 -16px** 위에 배치하는 것을 기본으로 합니다. (하단 16px이 현재 타일, 상단 16px이 위쪽 공간을 차지)
+- **깊이 정렬**: `sprite.depth = position.y`를 따르며, 벽의 윗부분이 캐릭터를 가릴 수 있도록 설계합니다.
 
-- **Base (하단)**: 바닥과 맞닿는 부분 (예: `column_wall`, `wall_fountain_mid_*`).
-- **Top (상단)**: 기둥 머리나 벽 꼭대기 (예: `column`, `wall_fountain_top_*`).
-- **좌표 공식**:
-    - `Base.y = y * TILE_SIZE + 11` (캐릭터 발 위치인 11px 지점에 바닥 라인 정렬)
-    - `Top.y = Base.y - 32` (정확히 한 칸 위에 겹침 없이 배치)
+## 2. 상황별 벽 타일 구성 테이블 (Wall Configuration Table)
 
-## 2. 깊이 정렬 (Y-Sorting)
+벽 타일(WALL)의 위치와 주변 바닥(FLOOR) 타일의 관계에 따라 다음과 같이 구성합니다.
 
-캐릭터가 장애물 뒤로 숨거나 앞으로 지나가는 입체감을 위해 `Y-Sorting` 시스템을 사용합니다.
+| 케이스 (Case) | 인접 타일 조건 (Adjacency) | 추천 타일 프레임 (Tile Frame) | 시각적 특징 (Visual Characteristics) |
+| :--- | :--- | :--- | :--- |
+| **남쪽 벽 (Top Ledge)** | 아래쪽(S)이 바닥인 경우 | `wall_noside_top_bg_nocrack_0` | 석재 상단면이 보이며 입체감 강조 |
+| **북쪽 벽 (Inner/Fill)** | 위쪽(N)이 바닥인 경우 | `wall_noside_inner_nobg_nocrack_0` | 어두운 내부 면이며 바닥과 이어지는 느낌 |
+| **서쪽 벽 (Side Left)** | 오른쪽(E)이 바닥인 경우 | `wall_side_left_bg_nocrack_0` | 왼쪽 수직 단면이 노출됨 |
+| **동쪽 벽 (Side Right)** | 왼쪽(W)이 바닥인 경우 | `wall_side_right_bg_nocrack_0` | 오른쪽 수직 단면이 노출됨 |
+| **좌상단 코너 (Corner TL)** | 아래(S) & 오른쪽(E)이 바닥 | `wall_side_topleft_bg_nocrack_0` | L자형 외부 모서리 처리 |
+| **우상단 코너 (Corner TR)** | 아래(S) & 왼쪽(W)이 바닥 | `wall_side_topright_bg_nocrack_0` | 반대편 L자형 외부 모서리 처리 |
+| **좌하단 코너 (Corner BL)** | 위(N) & 오른쪽(E)이 바닥 | `wall_noside_bottomleft_nobg_nocrack_0` | 하단 둥근 모서리 마감 |
+| **우하단 코너 (Corner BR)** | 위(N) & 왼쪽(W)이 바닥 | `wall_noside_bottomright_nobg_nocrack_0` | 하단 둥근 모서리 마감 |
+| **T자형/십자형 내부** | 사방이 벽으로 둘러싸인 경우 | (렌더링 안 함) | 검은색 배경으로 처리하여 명암 대비 확보 |
 
-- **규칙**: 모든 엔티티의 `sprite.depth`는 자신의 `Position.y` 값을 따릅니다.
-- **기둥/벽의 예외 처리**:
-    - **상단 파트(Top)**는 하단 베이스라인(Base.y)과 동일한 깊이를 가져야 합니다.
-    - `Top.depth = Position.y + 32` (상단 스프라이트의 위치는 y-32이지만, 깊이는 발치인 y를 기준으로 계산되어야 캐릭터를 올바르게 가림)
-- **장식 오버레이**: 분수와 같은 장식물은 기둥 면보다 앞에 보여야 하므로 `depth + 1`을 적용합니다.
+## 3. 물리 및 레이어 규칙 (Physics & Layering)
 
-## 3. 충돌 판정 (Collision Sync)
-
-눈에 보이는 기둥의 바닥 라인과 실제 캐릭터가 멈추는 물리적 지점을 일원화합니다.
-
-- **충돌 기준선**: 타일 상단으로부터 `+11px` 지점.
-- **판정 로직**: 캐릭터의 발 위치(`yPixel + charHeight/2`)가 기둥의 베이스라인(`y * 16 + 11`)보다 위로 가려고 하면 이동을 차단합니다.
-- **결과**: 캐릭터가 기둥의 "앞면"에는 바짝 다가설 수 있지만, "뒷면"으로 가려고 하면 기둥 면에 부딪혀 멈춥니다.
-
-## 4. 특수 장식 (Fountains & Decorations)
-
-- **확률 배치**: `PILLAR` 타일 생성 시 90%는 일반 기둥, 10%는 장식 기둥(블루/레드 분수)을 생성합니다.
-- **블루 분수 (Blue Fountain)**:
-    - **상단**: 일반 기둥 몸체(`column`) 사용
-    - **하단**: 물이 솟구치는 분수 엔진(`wall_fountain_mid_blue`) 사용 (애니메이션 f0~f2)
-- **레드 분수 (Lava Fountain)**:
-    - 상/하단 모두 용암 분수 타일을 사용하여 기둥 전체에 용암이 흐르도록 연출합니다.
-
-## 5. 지형 연결성 (Connectivity)
-
-- **비밀의 방**: 메인 던전과 무조건 연결되어야 합니다.
-- **BFS 알고리즘**: 문(Door) 위치에서 가장 가까운 메인 던전 바닥(`FLOOR`)까지 BFS 탐색을 통해 최단 경로를 찾고, **2칸 너비의 복도**를 뚫어 접근성을 보장합니다.
+1.  **충돌 판정**: 벽(WALL) 타일은 16x16 영역 전체를 통과 불가 구역으로 설정합니다.
+2.  **Y-Sorting**:
+    -   남쪽 벽(`top_bg` 계열)의 경우, 캐릭터가 벽 "뒤"로 갈 수 없으므로 충돌로 차단합니다.
+    -   북쪽 벽(`inner_nobg` 계열)의 경우, 캐릭터가 벽 "앞"에 서서 벽 하단을 가릴 수 있습니다.
+3.  **랜덤 변형(Cracks)**:
+    -   자연스러운 느낌을 위해 10~20% 확률로 `nocrack` 대신 `crack_0` 프레임을 믹스합니다.
+    -   예: `wall_noside_top_bg_crack_0`
