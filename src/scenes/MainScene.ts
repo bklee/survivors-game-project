@@ -287,18 +287,24 @@ export class MainScene extends Phaser.Scene {
                 // ── Pillars & Obstacles ──────────────────────────────────────
                 if (cell === TileType.PILLAR) {
                     const roll = Math.random();
+                    // 기둥 세트의 기준점(Base)을 y 행에 완벽히 맞추기 위해 -16px 오프셋 적용
+                    const baseY = y * TILE_SIZE - 16; 
+                    const topY = baseY - 32;
+
                     if (roll < 0.05) {
-                        // 5% 확률: 블루 분수 세트 (64px)
-                        this.wallBlitter.create(x * TILE_SIZE, y * TILE_SIZE, 'wall_fountain_mid_blue_f0');
-                        this.wallBlitter.create(x * TILE_SIZE, y * TILE_SIZE - 32, 'wall_fountain_top_blue_f0');
+                        // 5% 확률: 블루 분수 세트 (Base: mid, Top: top)
+                        this.wallBlitter.create(x * TILE_SIZE, baseY, 'wall_fountain_mid_blue_f0');
+                        this.wallBlitter.create(x * TILE_SIZE, topY, 'wall_fountain_top_blue_f0');
                     } else if (roll < 0.10) {
-                        // 5% 확률: 레드 분수 세트 (64px)
-                        this.wallBlitter.create(x * TILE_SIZE, y * TILE_SIZE, 'wall_fountain_mid_red_f0');
-                        this.wallBlitter.create(x * TILE_SIZE, y * TILE_SIZE - 32, 'wall_fountain_top_red_f0');
+                        // 5% 확률: 레드 분수 세트
+                        this.wallBlitter.create(x * TILE_SIZE, baseY, 'wall_fountain_mid_red_f0');
+                        this.wallBlitter.create(x * TILE_SIZE, topY, 'wall_fountain_top_red_f0');
                     } else {
-                        // 90% 확률: 기존의 완벽한 기둥 세트 (64px)
-                        this.wallBlitter.create(x * TILE_SIZE, y * TILE_SIZE, 'column_wall');
-                        this.wallBlitter.create(x * TILE_SIZE, y * TILE_SIZE - 32, 'column');
+                        // 90% 확률: 일반 기둥 세트 (Base: column, Top: column_wall)
+                        // 기둥 몸통(column)을 충돌 지점인 바닥(y)에, 
+                        // 기둥 꼭대기(column_wall)를 그 위(y-2)에 배치합니다.
+                        this.wallBlitter.create(x * TILE_SIZE, baseY, 'column');
+                        this.wallBlitter.create(x * TILE_SIZE, topY, 'column_wall');
                     }
                 }
 
