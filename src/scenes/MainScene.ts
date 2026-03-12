@@ -293,29 +293,78 @@ export class MainScene extends Phaser.Scene {
 
                 // ── Walls ───────────────────────────────────────────────────
                 if (cell === TileType.WALL) {
-                    // Check if adjacent cells are open spaces (FLOOR, DOOR, etc.) -> 1 means OPEN
-                    // const n = (y > 0 && this.dungeon.map[y - 1][x] !== TileType.WALL) ? 1 : 0;
-                    // const s = (y < mapH - 1 && this.dungeon.map[y + 1][x] !== TileType.WALL) ? 1 : 0;
-                    // const w = (x > 0 && this.dungeon.map[y][x - 1] !== TileType.WALL) ? 1 : 0;
-                    // const e = (x < mapW - 1 && this.dungeon.map[y][x + 1] !== TileType.WALL) ? 1 : 0;
+                    const isOpen = (cx: number, cy: number) =>
+                        cx >= 0 && cx < mapW && cy >= 0 && cy < mapH &&
+                        this.dungeon.map[cy][cx] !== TileType.WALL;
 
-                    // Removed wall rendering for now based on user request.
-                    // To re-evaluate from scratch.
+                    // 8-방향 인접 확인
+                    const n  = isOpen(x, y - 1);
+                    const s  = isOpen(x, y + 1);
+                    const w  = isOpen(x - 1, y);
+                    const e  = isOpen(x + 1, y);
 
-                    // Render door frames
-                    // const isLeftDoorTile = (x === 0 || this.dungeon.map[y][x - 1] !== TileType.DOOR);
-                    // if (isLeftDoorTile) {
-                    //     if (x > 0 && this.dungeon.map[y][x - 1] === TileType.WALL) {
-                    //         this.doorBlitter.create((x - 1) * TILE_SIZE, y * TILE_SIZE, 'doors_frame_left');
-                    //     }
-                    //     if (y > 0 && this.dungeon.map[y - 1][x] === TileType.WALL) {
-                    //         this.doorBlitter.create(x * TILE_SIZE, (y - 1) * TILE_SIZE, 'doors_frame_top');
-                    //     }
-                    // } else {
-                    //     if (x < mapW - 1 && this.dungeon.map[y][x + 1] === TileType.WALL) {
-                    //         this.doorBlitter.create((x + 1) * TILE_SIZE, y * TILE_SIZE, 'doors_frame_right');
-                    //     }
-                    // }
+                    // 벽 타일 렌더링: 16x32 타일이므로 y좌표를 한 타일 위에 배치하여 자연스럽게 덮음
+                    // 단, 맨 윗줄(y=0)은 넘치지 않도록 y 위치 그대로 사용
+
+                    // 남쪽(아래)에 바닥이 있는 벽 → 플레이어가 볼 수 있는 석재 상단 노출 (Row 3: top tiles)
+                    if (s) {
+                        // 좌우 인접에 따른 코너/측면/중앙 타일 선택
+                        let frameName: string;
+                        if (w && !e) {
+                            // 왼쪽만 열림 → 왼쪽 코너
+                            frameName = 'wall_side_topleft_bg_nocrack_0';
+                        } else if (e && !w) {
+                            // 오른쪽만 열림 → 오른쪽 코너
+                            frameName = 'wall_side_topright_bg_nocrack_0';
+                        } else if (w && e) {
+                            // 양쪽 다 열림 → 독립 블록 (endleft or endright 없이 alt 사용)
+                            frameName = 'wall_noside_topalt_bg_nocrack_0';
+                        } else {
+                            // 기본 중앙 top 타일 (균등 선택)
+                            const topVariants = [
+                                'wall_noside_top_bg_nocrack_0',
+                                'wall_noside_top_bg_nocrack_0',
+                                'wall_noside_top_bg_nocrack_0',
+                                'wall_noside_top_bg_crack_0',
+                            ];
+                            frameName = topVariants[Math.floor(Math.random() * topVariants.length)];
+                        }
+                        // 16x32 타일: 현재 y 위치에서 위로 1타일(16px) 올려서 렌더링
+                        const renderY = y > 0 ? (y - 1) * TILE_SIZE : y * TILE_SIZE;
+                        this.wallBlitter.create(x * TILE_SIZE, renderY, frameName);
+                    }
+                    // 남쪽이 벽이고 북쪽이 열림 → 내부 mid 벽 (Row 1/2: inner tiles, 바닥과 먼 위쪽 벽)
+                    else if (n && !s) {
+                        let frameName: string;
+                        if (w && !e) {
+                            frameName = 'wall_side_left_nobg_nocrack_0';
+                        } else if (e && !w) {
+                            frameName = 'wall_side_right_nobg_nocrack_0';
+                        } else {
+                            const innerVariants = [
+                                'wall_noside_inner_nobg_nocrack_0',
+                                'wall_noside_inner_nobg_nocrack_0',
+                                'wall_noside_inner_nobg_crack_0',
+                            ];
+                            frameName = innerVariants[Math.floor(Math.random() * innerVariants.length)];
+                        }
+                        const renderY = y > 0 ? (y - 1) * TILE_SIZE : y * TILE_SIZE;
+                        this.wallBlitter.create(x * TILE_SIZE, renderY, frameName);
+                    }
+                    // 동쪽/서쪽 가장자리 벽 (측면만 열림, 남북 모두 막힘)
+                    else if (!n && !s && (w || e)) {
+                        let frameName: string;
+                        if (w && !e) {
+                            frameName = 'wall_side_left_bg_nocrack_0';
+                        } else if (e && !w) {
+                            frameName = 'wall_side_right_bg_nocrack_0';
+                        } else {
+                            frameName = 'wall_noside_inner_bg_nocrack_0';
+                        }
+                        const renderY = y > 0 ? (y - 1) * TILE_SIZE : y * TILE_SIZE;
+                        this.wallBlitter.create(x * TILE_SIZE, renderY, frameName);
+                    }
+                    // 완전히 막힌 내부 벽 (4방이 모두 벽) → 렌더링 없음 (검은 배경)
                 }
             }
         }
