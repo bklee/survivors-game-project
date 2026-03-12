@@ -286,15 +286,20 @@ export class MainScene extends Phaser.Scene {
 
                 // ── Pillars & Obstacles ──────────────────────────────────────
                 if (cell === TileType.PILLAR) {
-                    // [column]
-                    // [column_wall]  <- 서로 겹치지 않고 수직으로 딱 맞게 배치 (각 32px 높이)
-                    
-                    // 1. 아래쪽: column_wall (y행 위치에서 시작)
-                    this.wallBlitter.create(x * TILE_SIZE, y * TILE_SIZE, 'column_wall');
-
-                    // 2. 위쪽: column (column_wall 바로 위, 32px 위로 이동)
-                    // y좌표에서 32px를 빼서 겹침을 완전히 제거합니다.
-                    this.wallBlitter.create(x * TILE_SIZE, y * TILE_SIZE - 32, 'column');
+                    const roll = Math.random();
+                    if (roll < 0.05) {
+                        // 5% 확률: 블루 분수 세트 (64px)
+                        this.wallBlitter.create(x * TILE_SIZE, y * TILE_SIZE, 'wall_fountain_mid_blue_f0');
+                        this.wallBlitter.create(x * TILE_SIZE, y * TILE_SIZE - 32, 'wall_fountain_top_blue_f0');
+                    } else if (roll < 0.10) {
+                        // 5% 확률: 레드 분수 세트 (64px)
+                        this.wallBlitter.create(x * TILE_SIZE, y * TILE_SIZE, 'wall_fountain_mid_red_f0');
+                        this.wallBlitter.create(x * TILE_SIZE, y * TILE_SIZE - 32, 'wall_fountain_top_red_f0');
+                    } else {
+                        // 90% 확률: 기존의 완벽한 기둥 세트 (64px)
+                        this.wallBlitter.create(x * TILE_SIZE, y * TILE_SIZE, 'column_wall');
+                        this.wallBlitter.create(x * TILE_SIZE, y * TILE_SIZE - 32, 'column');
+                    }
                 }
 
                 // ── Walls ───────────────────────────────────────────────────
