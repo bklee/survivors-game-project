@@ -144,11 +144,23 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
 
             // 3. Handle Animation Framing
             if (typeId === 93) {
-                // 블루 분수 애니메이션 (f0, f1, f2 순환)
+                // 블루 분수 하단 애니메이션
                 const rate = 8;
                 Animation.timer[eid] = (Animation.timer[eid] || 0) + dt;
                 const fIdx = Math.floor(Animation.timer[eid] / (1000 / rate)) % 3;
                 frameName = `wall_fountain_mid_blue_f${fIdx}`;
+            } else if (typeId === 94) {
+                // 레드 분수 상단 애니메이션
+                const rate = 8;
+                Animation.timer[eid] = (Animation.timer[eid] || 0) + dt;
+                const fIdx = Math.floor(Animation.timer[eid] / (1000 / rate)) % 3;
+                frameName = `wall_fountain_top_red_f${fIdx}`;
+            } else if (typeId === 95) {
+                // 레드 분수 하단 애니메이션
+                const rate = 8;
+                Animation.timer[eid] = (Animation.timer[eid] || 0) + dt;
+                const fIdx = Math.floor(Animation.timer[eid] / (1000 / rate)) % 3;
+                frameName = `wall_fountain_mid_red_f${fIdx}`;
             } else if (isPillarPart || typeId === 15 || typeId === 20 || (typeId >= 22 && typeId <= 31) || [33, 34, 35, 50, 51, 52, 53, 54, 55, 56, 57].includes(typeId) || (typeId >= 101 && typeId <= 107)) {
                 frameName = charKey;
             } else if (typeId === 40) {
