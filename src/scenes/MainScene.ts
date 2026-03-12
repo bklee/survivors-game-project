@@ -287,23 +287,32 @@ export class MainScene extends Phaser.Scene {
                 // ── Pillars & Obstacles ──────────────────────────────────────
                 if (cell === TileType.PILLAR) {
                     const roll = Math.random();
-                    // 기둥 세트의 베이스(Base)가 충돌 타일(y) 하단에 맞도록 -16px 오프셋 유지
-                    const baseY = y * TILE_SIZE - 16; 
-                    const topY = baseY - 32; // 겹치지 않게 정확히 한 칸 위로
+                    // 기둥 세트의 베이스(Base) 위치를 타일의 하단 경계에 맞춤 (+16px)
+                    const basePX = x * TILE_SIZE + 8;
+                    const basePY = y * TILE_SIZE + 16; 
+
+                    const createPart = (px: number, py: number, typeIdx: number) => {
+                        const ent = addEntity(world);
+                        addComponent(world, Position, ent);
+                        addComponent(world, SpriteInfo, ent);
+                        Position.x[ent] = px;
+                        Position.y[ent] = py;
+                        SpriteInfo.textureIndex[ent] = typeIdx;
+                    };
 
                     if (roll < 0.05) {
-                        // 5% 블루 분수 (Top: top, Base: mid)
-                        this.wallBlitter.create(x * TILE_SIZE, topY, 'wall_fountain_top_blue_f0');
-                        this.wallBlitter.create(x * TILE_SIZE, baseY, 'wall_fountain_mid_blue_f0');
+                        // 블루 분수 (Top: 92, Base: 93)
+                        createPart(basePX, basePY, 93);
+                        createPart(basePX, basePY - 32, 92);
                     } else if (roll < 0.10) {
-                        // 5% 레드 분수 (Top: top, Base: mid)
-                        this.wallBlitter.create(x * TILE_SIZE, topY, 'wall_fountain_top_red_f0');
-                        this.wallBlitter.create(x * TILE_SIZE, baseY, 'wall_fountain_mid_red_f0');
+                        // 레드 분수 (Top: 94, Base: 95)
+                        createPart(basePX, basePY, 95);
+                        createPart(basePX, basePY - 32, 94);
                     } else {
-                        // 90% 일반 기둥 세트 [column(위)] + [column_wall(아래)]
-                        // 이 순서가 사용자님이 "완벽하다"고 하신 그 구성입니다.
-                        this.wallBlitter.create(x * TILE_SIZE, topY, 'column');
-                        this.wallBlitter.create(x * TILE_SIZE, baseY, 'column_wall');
+                        // 일반 기둥 세트 (Top: 90/column, Base: 91/column_wall)
+                        // 상하 관계는 RenderSystem의 depth = y 로 자동 해결됨
+                        createPart(basePX, basePY, 91); // 아래쪽 (정렬 기준점)
+                        createPart(basePX, basePY - 32, 90); // 위쪽
                     }
                 }
 
