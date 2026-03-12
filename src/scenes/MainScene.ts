@@ -535,12 +535,24 @@ export class MainScene extends Phaser.Scene {
 
     private spawnSecretRoom() {
         if (!this.secretRoomData) return;
+
         const { doorPixel, floorPixels } = this.secretRoomData;
 
-        // ── 문 프레임 (시각적 일관성) ──
+        // ── [중요] 중복 생성 방지: 기존 비밀의 방 엔티티(ID 99) 제거 ──
+        const interactives = defineQuery([Interactive])(world);
+        for (let i = 0; i < interactives.length; i++) {
+            const eid = interactives[i];
+            if (Interactive.id[eid] === 99) {
+                removeEntity(world, eid);
+            }
+        }
+
         const tx = Math.floor(doorPixel.x / TILE_SIZE);
         const ty = Math.floor(doorPixel.y / TILE_SIZE);
-        // 문 위쪽 프레임
+
+        // ── 문 프레임 배치 ──
+        // (DungeonGenerator의 문 위치와 동기화하여 시각적 완성도 높임)
+        // North/South 문 프레임 (32x16)
         this.doorBlitter.create((tx - 1) * TILE_SIZE, (ty - 1) * TILE_SIZE, 'doors_frame_top');
 
         // ── 잠긴 문 (비밀 방 입구) ──
@@ -554,8 +566,8 @@ export class MainScene extends Phaser.Scene {
         Interactive.isActivated[doorId] = 0;
         Interactive.id[doorId] = 99;
 
-        // ── 레버 (너무 멀지 않게 200~500px 범위로 조정) ──
-        const leverPos = this.dungeon.getFloorPixelNear(doorPixel.x, doorPixel.y, 200, 500);
+        // ── 레버 (너무 멀지 않게 150~400px 범위로 조정) ──
+        const leverPos = this.dungeon.getFloorPixelNear(doorPixel.x, doorPixel.y, 150, 400);
         const leverId = addEntity(world);
         addComponent(world, Position, leverId);
         addComponent(world, SpriteInfo, leverId);
@@ -570,11 +582,13 @@ export class MainScene extends Phaser.Scene {
         if (floorPixels.length < 3) return;
 
         // 보물상자 3개 (방 안 아래쪽에 균등 배치)
+        const sortedFloors = [...floorPixels].sort((a, b) => b.y - a.y);
         const chestPositions = [
-            floorPixels[Math.floor(floorPixels.length * 0.6)],
-            floorPixels[Math.floor(floorPixels.length * 0.7)],
-            floorPixels[Math.floor(floorPixels.length * 0.8)],
+            sortedFloors[Math.floor(sortedFloors.length * 0.1)],
+            sortedFloors[Math.floor(sortedFloors.length * 0.2)],
+            sortedFloors[Math.floor(sortedFloors.length * 0.3)],
         ];
+        
         for (const cPos of chestPositions) {
             const chestId = addEntity(world);
             addComponent(world, Position, chestId);
@@ -586,13 +600,13 @@ export class MainScene extends Phaser.Scene {
             Animation.timer[chestId] = 0;
         }
 
-        // 물약 2개 (방 안 랜덤 위치)
+        // 물약 2개
         for (let i = 0; i < 2; i++) {
             const pPos = floorPixels[Math.floor(Math.random() * floorPixels.length)];
             const potId = addEntity(world);
             addComponent(world, Position, potId);
             addComponent(world, SpriteInfo, potId);
-            SpriteInfo.textureIndex[potId] = 54 + Math.floor(Math.random() * 4); // big potion (54~57)
+            SpriteInfo.textureIndex[potId] = 54 + Math.floor(Math.random() * 4);
             Position.x[potId] = pPos.x;
             Position.y[potId] = pPos.y;
         }

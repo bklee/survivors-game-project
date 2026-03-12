@@ -322,15 +322,56 @@ export class DungeonGenerator {
             }
         }
 
-        // 문 위치: 방 아랫벽(남쪽) 중앙에 2칸 뚫기 (입구가 아래를 향하도록 함)
-        const doorTX = roomX + 2; 
-        const doorTY = roomY + roomH;
-        this.map[doorTY][doorTX] = TileType.DOOR;
-        this.map[doorTY][doorTX + 1] = TileType.DOOR;
+        // ── 문 위치 결정 (4방향 중 가장 가까운 길 쪽으로) ──
+        const sides = [
+            { dir: 'N', x: roomX + 2, y: roomY - 1, dx: 0, dy: -1 },
+            { dir: 'S', x: roomX + 2, y: roomY + roomH, dx: 0, dy: 1 },
+            { dir: 'W', x: roomX - 1, y: roomY + 2, dx: -1, dy: 0 },
+            { dir: 'E', x: roomX + roomW, y: roomY + 2, dx: 1, dy: 0 }
+        ];
 
-        // 문 바깥(아래쪽)에서부터 가장 가까운 기존 던전 바닥을 찾아 복도 뚫기 (BFS)
-        const startX = doorTX;
-        const startY = doorTY + 1;
+        let bestSide = sides[1]; // 기본값 남쪽
+        let minDistance = 999;
+
+        // 각 방향별로 가장 가까운 바닥(FLOOR) 탐색
+        for (const side of sides) {
+            let dist = 0;
+            let foundFloor = false;
+            let curX = side.x;
+            let curY = side.y;
+
+            // 최대 20칸까지 직선 탐색하여 길 찾기
+            for (let i = 0; i < 20; i++) {
+                curX += side.dx;
+                curY += side.dy;
+                if (curX < 0 || curX >= this.width || curY < 0 || curY >= this.height) break;
+                if (this.map[curY][curX] === TileType.FLOOR) {
+                    dist = i;
+                    foundFloor = true;
+                    break;
+                }
+            }
+
+            if (foundFloor && dist < minDistance) {
+                minDistance = dist;
+                bestSide = side;
+            }
+        }
+
+        const doorTX = bestSide.x;
+        const doorTY = bestSide.y;
+        
+        // 문 설치 (2칸 너비 확보)
+        this.map[doorTY][doorTX] = TileType.DOOR;
+        if (bestSide.dir === 'N' || bestSide.dir === 'S') {
+            if (doorTX + 1 < this.width) this.map[doorTY][doorTX + 1] = TileType.DOOR;
+        } else {
+            if (doorTY + 1 < this.height) this.map[doorTY + 1][doorTX] = TileType.DOOR;
+        }
+
+        // ── 복도 뚫기 (BFS) ──
+        const startX = doorTX + bestSide.dx;
+        const startY = doorTY + bestSide.dy;
         const queue: { x: number, y: number, path: { x: number, y: number }[] }[] = [{ x: startX, y: startY, path: [] }];
         const visited = new Set<string>();
         visited.add(`${startX},${startY}`);
@@ -341,7 +382,6 @@ export class DungeonGenerator {
         while (queue.length > 0) {
             const { x, y, path } = queue.shift()!;
             
-            // 주변에 이미 뚫린 바닥이 있는지 확인 (현재 뚫고 있는 방/문/보호구역 제외)
             if (this.map[y][x] === TileType.FLOOR && (y < roomY - 1 || y > roomY + roomH || x < roomX - 1 || x > roomX + roomW)) {
                 connectionPath = path;
                 found = true;
@@ -352,51 +392,41 @@ export class DungeonGenerator {
             for (const { dx, dy } of directions) {
                 const nx = x + dx;
                 const ny = y + dy;
-                // 맵 가장자리 2칸을 제외한 영역 탐색
                 if (ny >= 2 && ny < this.height - 2 && nx >= 2 && nx < this.width - 2 && !visited.has(`${nx},${ny}`)) {
                     visited.add(`${nx},${ny}`);
                     queue.push({ x: nx, y: ny, path: [...path, { x: nx, y: ny }] });
                 }
             }
-            if (queue.length > 5000) break;
+            if (queue.length > 3000) break;
         }
 
-        // 경로를 따라 2칸 너비 복도 뚫기
+        const isProtected = (tx: number, ty: number) => {
+            return tx >= roomX - 1 && tx <= roomX + roomW &&
+                   ty >= roomY - 1 && ty <= roomY + roomH;
+        };
+
         if (found) {
-            // 방 보호 영역 판정 함수 (방 본체 + 외벽 1칸)
-            const isProtected = (tx: number, ty: number) => {
-                return tx >= roomX - 1 && tx <= roomX + roomW &&
-                       ty >= roomY - 1 && ty <= roomY + roomH;
-            };
-
-            // 1. 시작점 확실히 뚫기 (문 바로 앞)
             this.map[startY][startX] = TileType.FLOOR;
-            this.map[startY][startX + 1] = TileType.FLOOR;
-
-            // 2. BFS가 찾은 경로 따라가며 복도 생성 (2칸 너비 확보하되 방은 침범 안 함)
             for (const p of connectionPath) {
                 this.map[p.y][p.x] = TileType.FLOOR;
-                
-                // 확장 시 보호 구역 검사
-                if (p.x + 1 < this.width - 1 && !isProtected(p.x + 1, p.y)) this.map[p.y][p.x + 1] = TileType.FLOOR;
-                if (p.y + 1 < this.height - 1 && !isProtected(p.x, p.y + 1)) this.map[p.y + 1][p.x] = TileType.FLOOR;
-            }
-        } else {
-            // Fallback: 아래로 진행
-            let cy = startY;
-            while (cy < this.height - 2) {
-                this.map[cy][startX] = TileType.FLOOR;
-                this.map[cy][startX + 1] = TileType.FLOOR;
-                if (this.map[cy + 1][startX] === TileType.FLOOR) break;
-                cy++;
+                // 진행 방향에 따라 2칸 너비 확보
+                if (bestSide.dir === 'N' || bestSide.dir === 'S') {
+                    if (p.x + 1 < this.width - 1 && !isProtected(p.x + 1, p.y)) this.map[p.y][p.x + 1] = TileType.FLOOR;
+                } else {
+                    if (p.y + 1 < this.height - 1 && !isProtected(p.x, p.y + 1)) this.map[p.y + 1][p.x] = TileType.FLOOR;
+                }
             }
         }
 
+        // 문 픽셀 좌표 보정 (스프라이트 중심)
+        let pixelX = doorTX * TILE_SIZE + TILE_SIZE;
+        let pixelY = doorTY * TILE_SIZE + TILE_SIZE / 2;
+
+        if (bestSide.dir === 'S') pixelY -= 8;
+        else if (bestSide.dir === 'N') pixelY += 8;
+
         return {
-            doorPixel: {
-                x: doorTX * TILE_SIZE + TILE_SIZE,            
-                y: doorTY * TILE_SIZE + TILE_SIZE / 2 - 8     // 남쪽 벽에 문이 안착되도록 위치 조정
-            },
+            doorPixel: { x: pixelX, y: pixelY },
             floorPixels
         };
     }
