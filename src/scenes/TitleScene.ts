@@ -13,6 +13,22 @@ export class TitleScene extends Phaser.Scene {
         this.add.image(width / 2, height / 2, 'main_bg')
             .setDisplaySize(width, height);
 
+        // Home Button (Top Left)
+        const homeBtn = this.add.text(20, 20, '🏠 Home', {
+            fontFamily: '"MedievalSharp", cursive',
+            fontSize: '24px',
+            color: '#ffffff',
+            backgroundColor: '#00000088',
+            padding: { x: 10, y: 5 }
+        }).setInteractive({ useHandCursor: true });
+        
+        homeBtn.on('pointerdown', () => {
+             window.location.href = 'https://games.blocktalker.co.kr/';
+        });
+
+        homeBtn.on('pointerover', () => homeBtn.setTint(0xffff00));
+        homeBtn.on('pointerout', () => homeBtn.clearTint());
+
         // START Button (Same style as GameOver RETRY)
         const startBtn = this.add.rectangle(width / 2, height / 2 + 150, 240, 70, 0x3d2b1f, 0.8)
             .setInteractive({ useHandCursor: true })
