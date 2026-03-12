@@ -304,18 +304,17 @@ export class MainScene extends Phaser.Scene {
                     createPart(basePX, basePY, 91); // 베이스 (column_wall)
                     createPart(basePX, basePY - 32, 90); // 몸통 (column)
 
-                    // 2. 확률에 따라 기둥 장식 추가 (분수)
+                    // 2. 확률에 따라 기둥 전면에 장식 추가 (분수)
                     if (roll < 0.15) {
-                        const isBack = Math.random() < 0.5; // 50% 확률로 기둥 뒤편에 배치
-                        const zOffset = isBack ? -0.5 : 0.5; // y좌표 차이를 통해 전후면 판정 (0.5px)
+                        const frontOffset = 0.5; // 기둥보다 항상 약간 앞에 배치 (Y-Sorting)
 
                         if (roll < 0.075) {
-                            // 블루 분수 (하단 장식)
-                            createPart(basePX, basePY + zOffset, 93);
+                            // 블루 분수 (하단 단독)
+                            createPart(basePX, basePY + frontOffset, 93);
                         } else {
-                            // 레드 분수 (상/하단 세트)
-                            createPart(basePX, basePY + zOffset, 95); // 하단
-                            createPart(basePX, (basePY - 32) + zOffset, 94); // 상단
+                            // 레드 분수 (가고일 상단 + 하단 세트)
+                            createPart(basePX, basePY + frontOffset, 95); // 하단
+                            createPart(basePX, (basePY - 32) + frontOffset, 94); // 상단
                         }
                     }
                 }
