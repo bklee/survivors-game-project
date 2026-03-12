@@ -363,19 +363,31 @@ export class DungeonGenerator {
 
         // 경로를 따라 2칸 너비 복도 뚫기
         if (found) {
+            // 방 보호 영역 판정 함수 (방 본체 + 외벽 1칸)
+            const isProtected = (tx: number, ty: number) => {
+                return tx >= roomX - 1 && tx <= roomX + roomW &&
+                       ty >= roomY - 1 && ty <= roomY + roomH;
+            };
+
             // 1. 시작점 확실히 뚫기 (문 바로 앞)
             this.map[startY][startX] = TileType.FLOOR;
             this.map[startY][startX + 1] = TileType.FLOOR;
 
-            // 2. BFS가 찾은 경로 따라가며 2칸 너비 복도 생성
+            // 2. BFS가 찾은 경로 따라가며 복도 생성 (2칸 너비 확보하되 방은 침범 안 함)
             for (const p of connectionPath) {
                 this.map[p.y][p.x] = TileType.FLOOR;
-                // 진행 방향에 따라 수직/수평으로 2칸 확보
-                if (p.x + 1 < this.width - 1) this.map[p.y][p.x + 1] = TileType.FLOOR;
-                if (p.y + 1 < this.height - 1) this.map[p.y + 1][p.x] = TileType.FLOOR;
+                
+                // 오른쪽으로 확장 시도
+                if (p.x + 1 < this.width - 1 && !isProtected(p.x + 1, p.y)) {
+                    this.map[p.y][p.x + 1] = TileType.FLOOR;
+                }
+                // 아래쪽으로 확장 시도
+                if (p.y + 1 < this.height - 1 && !isProtected(p.x, p.y + 1)) {
+                    this.map[p.y + 1][p.x] = TileType.FLOOR;
+                }
             }
         } else {
-            // Fallback: 위로 직진 (시작점 포함)
+            // Fallback: 위로 직진 (방 영역은 건드리지 않음)
             let cy = startY;
             while (cy > 2) {
                 this.map[cy][startX] = TileType.FLOOR;
