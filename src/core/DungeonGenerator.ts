@@ -241,45 +241,55 @@ export class DungeonGenerator {
         this.map[doorTY][doorTX] = TileType.DOOR;
         this.map[doorTY][doorTX + 1] = TileType.DOOR;
 
-        // 문 바깥에서부터 가장 가까운 기존 던전 바닥을 찾아 복도 뚫기
-        let cy = doorTY - 1;
-        let cx = doorTX;
-        let connected = false;
+        // 문 바깥에서부터 가장 가까운 기존 던전 바닥을 찾아 복도 뚫기 (BFS)
+        const startX = doorTX;
+        const startY = doorTY - 1;
+        const queue: { x: number, y: number, path: { x: number, y: number }[] }[] = [{ x: startX, y: startY, path: [] }];
+        const visited = new Set<string>();
+        visited.add(`${startX},${startY}`);
 
-        // 위로 계속 뚫어보다가 끝까지 가면 안되니까 메인 바닥을 만날 때까지 일단 위로
-        while (cy > 2) {
-            this.map[cy][cx] = TileType.FLOOR;
-            this.map[cy][cx + 1] = TileType.FLOOR; // 2칸 너비 복도
+        let connectionPath: { x: number, y: number }[] = [];
+        let found = false;
 
-            // 바로 근처에 다른 뚫려있는 빈 공간(방/복도)이 있는지 확인 (현재 뚫고있는 복도 제외)
-            if (cy - 1 >= 0 && (this.map[cy - 1][cx] === TileType.FLOOR || this.map[cy - 1][cx + 1] === TileType.FLOOR)) {
-                connected = true;
+        while (queue.length > 0) {
+            const { x, y, path } = queue.shift()!;
+            
+            // 주변에 이미 뚫린 바닥이 있는지 확인 (현재 뚫고 있는 방/문 구역 제외)
+            if (this.map[y][x] === TileType.FLOOR && (y < roomY - 1 || y > roomY + roomH || x < roomX - 1 || x > roomX + roomW)) {
+                connectionPath = path;
+                found = true;
                 break;
             }
-            if (cx - 1 >= 0 && this.map[cy][cx - 1] === TileType.FLOOR) {
-                connected = true; break;
+
+            const directions = [{ dx: 0, dy: -1 }, { dx: 0, dy: 1 }, { dx: -1, dy: 0 }, { dx: 1, dy: 0 }];
+            for (const { dx, dy } of directions) {
+                const nx = x + dx;
+                const ny = y + dy;
+                // 맵 가장자리 2칸을 제외한 영역 탐색
+                if (ny >= 2 && ny < this.height - 2 && nx >= 2 && nx < this.width - 2 && !visited.has(`${nx},${ny}`)) {
+                    visited.add(`${nx},${ny}`);
+                    queue.push({ x: nx, y: ny, path: [...path, { x: nx, y: ny }] });
+                }
             }
-            if (cx + 2 < this.width && this.map[cy][cx + 2] === TileType.FLOOR) {
-                connected = true; break;
-            }
-            cy--;
+            if (queue.length > 5000) break; // 탐색 범위를 5000으로 대폭 확장
         }
 
-        // 만약 위로 쭉 뚫었는데도 연결을 못찾았다면 가로로 뚫어서라도 연결 (무조건 연결 보장)
-        if (!connected) {
-            let leftSearch = cx;
-            let rightSearch = cx;
-            while (leftSearch > 2 || rightSearch < this.width - 2) {
-                if (leftSearch > 2) {
-                    leftSearch--;
-                    this.map[cy][leftSearch] = TileType.FLOOR;
-                    if (this.map[cy - 1][leftSearch] === TileType.FLOOR || this.map[cy + 1][leftSearch] === TileType.FLOOR) break;
-                }
-                if (rightSearch < this.width - 2) {
-                    rightSearch++;
-                    this.map[cy][rightSearch] = TileType.FLOOR;
-                    if (this.map[cy - 1][rightSearch] === TileType.FLOOR || this.map[cy + 1][rightSearch] === TileType.FLOOR) break;
-                }
+        // 경로를 따라 2칸 너비 복도 뚫기
+        if (found) {
+            for (const p of connectionPath) {
+                this.map[p.y][p.x] = TileType.FLOOR;
+                // 복도 너비 확보 (주변에 벽이 있다면 같이 뚫음)
+                if (p.x + 1 < this.width - 1) this.map[p.y][p.x + 1] = TileType.FLOOR;
+                else if (p.x - 1 > 0) this.map[p.y][p.x - 1] = TileType.FLOOR;
+            }
+        } else {
+            // Fallback: 위로 직진 (기존 로직 유지)
+            let cy = startY;
+            while (cy > 2) {
+                this.map[cy][startX] = TileType.FLOOR;
+                this.map[cy][startX + 1] = TileType.FLOOR;
+                if (this.map[cy - 1][startX] === TileType.FLOOR || this.map[cy][startX - 1] === TileType.FLOOR) break;
+                cy--;
             }
         }
 
