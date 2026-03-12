@@ -9,11 +9,11 @@
 
 | 위치 (Role) | 프레임 ID (Frame ID) | 아틀라스 좌표 (X, Y) | 시각적 특징 (Visual Feature) |
 | :--- | :--- | :--- | :--- |
-| **North/South (수평)** | `wall_n_mid` / `wall_s_mid` | 32, 96 | 수평 벽면. 석재 상단 턱(Ledge) 노출로 입체감 부여 |
-| **West (서쪽)** | `wall_w_mid` | 0, 32 | 방의 왼쪽 벽. 수직 단면 노출 |
-| **East (동쪽)** | `wall_e_mid` | 64, 32 | 방의 오른쪽 벽. 수직 단면 노출 |
-| **Horizontal Corner** | `wall_n_corner_l` / `wall_s_corner_l` | 0, 96 | 수평 벽의 왼쪽 모서리 |
-| **Face Wall (정면)** | `wall_face_mid` | 32, 0 | 상단 턱이 없는 정면 벽면 (특수한 내부 파사드용) |
+| **North/South (수평)** | `wall_n_mid` / `wall_s_mid` | 32, 96 | 수평 벽면. 석재 상단 턱(Ledge) 노출 |
+| **West (서쪽)** | `wall_w_mid` | 0, 96 | 수직 왼쪽 벽면 (Corner L과 동일 비주얼 사용) |
+| **East (동쪽)** | `wall_e_mid` | 64, 96 | 수직 오른쪽 벽면 (Corner R과 동일 비주얼 사용) |
+| **Horizontal Corner** | `wall_n_corner_l` / `wall_s_corner_l` | 0, 96 | 수평 벽의 왼쪽 모서리 연계 |
+| **Face Wall (정면)** | `wall_face_mid` | 32, 0 | 상단 턱이 없는 정면 벽면 |
 
 ## 3. 구현 원칙 (Implementation Details)
 
