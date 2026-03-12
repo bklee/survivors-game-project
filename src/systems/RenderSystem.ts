@@ -270,12 +270,11 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                 if (typeId >= 100) {
                     depthOffset = 10; // 스펠은 공중에 떠있으므로 조금 더 위로
                 } else if (typeId === 90 || typeId === 92 || typeId === 94) {
-                    // 기둥 상부 파트의 깊이를 하부 베이스라인(Position.y + 32)으로 맞춤
-                    // 분수 상단(92, 94)은 기둥 상단(90)보다 아주 살짝 앞에 둡니다 (+1)
-                    depthOffset = 32 + (typeId !== 90 ? 1 : 0); 
+                    // 기둥 및 분수 상부 파트의 깊이를 하부 베이스라인(Position.y + 32)으로 통합 투영
+                    depthOffset = 32; 
                 } else if (typeId === 93 || typeId === 95) {
-                    // 분수 하단 파트도 기둥 베이스(91)보다 아주 살짝 앞에 둡니다 (+1)
-                    depthOffset = 1;
+                    // 하단 파트는 별도 상향 오프셋 없이 자신의 Y 좌표를 그대로 따름 (MainScene에서 개별 조정)
+                    depthOffset = 0;
                 }
                 
                 sprite.setDepth(Position.y[eid] + depthOffset);
