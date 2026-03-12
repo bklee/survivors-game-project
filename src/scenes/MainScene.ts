@@ -331,28 +331,28 @@ export class MainScene extends Phaser.Scene {
 
                     let frame = '';
                     
-                    // 1. 코너 우선 판정 (Corners)
-                    if (s && e) frame = 'wall_side_topleft_bg_nocrack_0';
-                    else if (s && w) frame = 'wall_side_topright_bg_nocrack_0';
-                    else if (n && e) frame = 'wall_noside_bottomleft_nobg_nocrack_0';
-                    else if (n && w) frame = 'wall_noside_bottomright_nobg_nocrack_0';
+                    // 1. 코너 및 측면 판정 (Cardinal Orientation)
+                    if (s && e) frame = 'wall_s_corner_l';        // 남서 코너 (방 내부 기준)
+                    else if (s && w) frame = 'wall_s_corner_r';   // 남동 코너
+                    else if (n && e) frame = 'wall_n_corner_l';   // 북서 코너
+                    else if (n && w) frame = 'wall_n_corner_r';   // 북동 코너
                     
-                    // 2. 직선 방향 판정 (Straight walls)
-                    else if (s) frame = 'wall_noside_top_bg_nocrack_0';     // 남쪽 벽 (Ledge)
-                    else if (n) frame = 'wall_noside_inner_nobg_nocrack_0'; // 북쪽 벽 (Face)
-                    else if (w) frame = 'wall_side_right_bg_nocrack_0';     // 동쪽 측면
-                    else if (e) frame = 'wall_side_left_bg_nocrack_0';      // 서쪽 측면
+                    // 2. 직선 방향 판정
+                    else if (s) frame = 'wall_s_mid';   // 남쪽 정면 (Ledge)
+                    else if (n) frame = 'wall_n_mid';   // 북쪽 정면 (Face)
+                    else if (w) frame = 'wall_e_mid';   // 방의 오른쪽 벽 (East edge)
+                    else if (e) frame = 'wall_w_mid';   // 방의 왼쪽 벽 (West edge)
                     
                     if (frame) {
-                        // 10% 확률로 크랙 프레임 적용 (변형)
+                        // 10% 확률로 크랙 프레임 적용
                         if (Math.random() < 0.1) {
-                            const crackFrame = frame.replace('nocrack', 'crack');
+                            const crackFrame = frame + '_crack';
                             if (this.textures.get('walls').has(crackFrame)) {
                                 frame = crackFrame;
                             }
                         }
                         
-                        // 모든 벽은 시각적 정리를 위해 Y축으로 -16px 오프셋 상향 배치
+                        // Y-Offset (-16px) 적용하여 바닥 타일과 정렬
                         this.wallBlitter.create(x * TILE_SIZE, y * TILE_SIZE - 16, frame);
                     }
                 }
