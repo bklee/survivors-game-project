@@ -286,12 +286,14 @@ export class MainScene extends Phaser.Scene {
 
                 // ── Pillars & Obstacles ──────────────────────────────────────
                 if (cell === TileType.PILLAR) {
-                    // column(기둥 몸통 16x32): 위쪽 행(y-1)에 배치
-                    const bodyY = y > 0 ? (y - 1) * TILE_SIZE : 0;
-                    this.wallBlitter.create(x * TILE_SIZE, bodyY, 'column');
-                    
-                    // column_wall(상단 캡 16x32): 현재 행(y)에 배치
+                    // 사용자 요청에 따른 [column] + [column_wall] 세로 한 쌍 결합
+                    // 1. 아래쪽 파트: column_wall을 y행에 먼저 그림 (레이어 아래쪽)
                     this.wallBlitter.create(x * TILE_SIZE, y * TILE_SIZE, 'column_wall');
+
+                    // 2. 위쪽 파트: column(몸통)을 y-1행에 나중에 그림 (레이어 위쪽으로 올려서 가시성 확보)
+                    if (y > 0) {
+                        this.wallBlitter.create(x * TILE_SIZE, (y - 1) * TILE_SIZE, 'column');
+                    }
                 }
 
                 // ── Walls ───────────────────────────────────────────────────
