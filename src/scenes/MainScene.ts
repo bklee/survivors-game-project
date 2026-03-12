@@ -274,6 +274,15 @@ export class MainScene extends Phaser.Scene {
         this.debugTexts = [];
 
         for (let y = 0; y < mapH; y++) {
+            const createPart = (px: number, py: number, typeIdx: number) => {
+                const ent = addEntity(world);
+                addComponent(world, Position, ent);
+                addComponent(world, SpriteInfo, ent);
+                Position.x[ent] = px;
+                Position.y[ent] = py;
+                SpriteInfo.textureIndex[ent] = typeIdx;
+            };
+
             for (let x = 0; x < mapW; x++) {
                 const cell = this.dungeon.map[y][x];
 
@@ -286,64 +295,61 @@ export class MainScene extends Phaser.Scene {
 
                 // ── Pillars & Obstacles ──────────────────────────────────────
                 if (cell === TileType.PILLAR) {
-                    const roll = Math.random();
-                    // 기둥 및 분수의 베이스라인(+11px) 동기화
                     const basePX = x * TILE_SIZE + 8;
                     const basePY = y * TILE_SIZE + 11; 
 
-                    const createPart = (px: number, py: number, typeIdx: number) => {
-                        const ent = addEntity(world);
-                        addComponent(world, Position, ent);
-                        addComponent(world, SpriteInfo, ent);
-                        Position.x[ent] = px;
-                        Position.y[ent] = py;
-                        SpriteInfo.textureIndex[ent] = typeIdx;
-                    };
+                    // 기본 기둥 (몸통 + 베이스)
+                    createPart(basePX, basePY, 91); // column_wall
+                    createPart(basePX, basePY - 32, 90); // column
 
-                    // 1. 기본적으로 '온전한 기둥 한 쌍'은 무조건 생성
-                    createPart(basePX, basePY, 91); // 베이스 (column_wall)
-                    createPart(basePX, basePY - 32, 90); // 몸통 (column)
-
-                    // 2. 확률에 따라 기둥 전면에 장식 추가 (분수)
-                    if (roll < 0.15) {
-                        const frontOffset = 0.5; // 기둥보다 항상 약간 앞에 배치 (Y-Sorting)
-
-                        if (roll < 0.075) {
-                            // 블루 분수 (하단 단독)
-                            createPart(basePX, basePY + frontOffset, 93);
-                        } else {
-                            // 레드 분수 (가고일 상단 + 하단 세트)
-                            createPart(basePX, basePY + frontOffset, 95); // 하단
-                            createPart(basePX, (basePY - 32) + frontOffset, 94); // 상단
-                        }
+                    // 기둥에는 바닥 웅덩이인 '푸른 분수'만 자연스럽게 배치 (개연성 확보)
+                    if (Math.random() < 0.1) {
+                        createPart(basePX, basePY + 0.5, 93); 
                     }
                 }
 
                 // ── Walls ───────────────────────────────────────────────────
                 if (cell === TileType.WALL) {
-                    // Check if adjacent cells are open spaces (FLOOR, DOOR, etc.) -> 1 means OPEN
-                    // const n = (y > 0 && this.dungeon.map[y - 1][x] !== TileType.WALL) ? 1 : 0;
-                    // const s = (y < mapH - 1 && this.dungeon.map[y + 1][x] !== TileType.WALL) ? 1 : 0;
-                    // const w = (x > 0 && this.dungeon.map[y][x - 1] !== TileType.WALL) ? 1 : 0;
-                    // const e = (x < mapW - 1 && this.dungeon.map[y][x + 1] !== TileType.WALL) ? 1 : 0;
+                    const isOpen = (tx: number, ty: number) => {
+                        if (tx < 0 || tx >= mapW || ty < 0 || ty >= mapH) return false;
+                        const t = this.dungeon.map[ty][tx];
+                        return t === TileType.FLOOR || t === TileType.DOOR || t === TileType.PILLAR;
+                    };
 
-                    // Removed wall rendering for now based on user request.
-                    // To re-evaluate from scratch.
+                    const n = isOpen(x, y - 1);
+                    const s = isOpen(x, y + 1);
+                    const w = isOpen(x - 1, y);
+                    const e = isOpen(x + 1, y);
 
-                    // Render door frames
-                    // const isLeftDoorTile = (x === 0 || this.dungeon.map[y][x - 1] !== TileType.DOOR);
-                    // if (isLeftDoorTile) {
-                    //     if (x > 0 && this.dungeon.map[y][x - 1] === TileType.WALL) {
-                    //         this.doorBlitter.create((x - 1) * TILE_SIZE, y * TILE_SIZE, 'doors_frame_left');
-                    //     }
-                    //     if (y > 0 && this.dungeon.map[y - 1][x] === TileType.WALL) {
-                    //         this.doorBlitter.create(x * TILE_SIZE, (y - 1) * TILE_SIZE, 'doors_frame_top');
-                    //     }
-                    // } else {
-                    //     if (x < mapW - 1 && this.dungeon.map[y][x + 1] === TileType.WALL) {
-                    //         this.doorBlitter.create((x + 1) * TILE_SIZE, y * TILE_SIZE, 'doors_frame_right');
-                    //     }
-                    // }
+                    let frame = '';
+                    
+                    if (s && e) frame = 'wall_s_corner_l';
+                    else if (s && w) frame = 'wall_s_corner_r';
+                    else if (n && e) frame = 'wall_n_corner_l';
+                    else if (n && w) frame = 'wall_n_corner_r';
+                    else if (s) frame = 'wall_s_mid';
+                    else if (n) frame = 'wall_n_mid';
+                    else if (w) frame = 'wall_e_mid';
+                    else if (e) frame = 'wall_w_mid';
+                    
+                    if (frame) {
+                        if (Math.random() < 0.1) {
+                            const crackFrame = frame + '_crack';
+                            if (this.textures.get('walls').has(crackFrame)) {
+                                frame = crackFrame;
+                            }
+                        }
+                        
+                        this.wallBlitter.create(x * TILE_SIZE, y * TILE_SIZE - 16, frame);
+
+                        // [중요] 붉은 분수(가고일)는 '북쪽 정면 벽'에만 확률적으로 배치하여 개연성 확보
+                        if (frame === 'wall_n_mid' && Math.random() < 0.1) {
+                            const facePX = x * TILE_SIZE + 8;
+                            const facePY = y * TILE_SIZE + 12; // 벽면 하단 안착 위치 보정
+                            createPart(facePX, facePY, 95); // 하단 대야
+                            createPart(facePX, facePY - 32, 94); // 상단 가고일
+                        }
+                    }
                 }
             }
         }
