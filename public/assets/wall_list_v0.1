@@ -1,14 +1,17 @@
-# wall_list_v0.1 (Cardinal Direction Mapping)
+# wall_list_v0.1 (Cardinal Direction Mapping - Unified Ledge)
 # atlas_walls_high-16x32.png (384 x 128 px)
 # Format: name  x  y  width  height
 
-# --- North Walls (Top of Room, Front Face) ---
-wall_n_mid                  32    0   16  32
-wall_n_corner_l             16    0   16  32
-wall_n_corner_r             48    0   16  32
-wall_n_end_l                80    0   16  32
-wall_n_end_r                96    0   16  32
-wall_n_mid_crack            160   0   16  32
+# --- Unified Horizontal Walls (North & South use Ledge style for thickness) ---
+wall_n_mid                  32   96   16  32
+wall_n_corner_l             0    96   16  32
+wall_n_corner_r             64   96   16  32
+wall_n_mid_crack            160  96   16  32
+
+wall_s_mid                  32   96   16  32
+wall_s_corner_l             0    96   16  32
+wall_s_corner_r             64   96   16  32
+wall_s_mid_crack            160  96   16  32
 
 # --- West/East side walls ---
 wall_w_mid                  0    32   16  32
@@ -16,11 +19,10 @@ wall_e_mid                  64   32   16  32
 wall_w_mid_bg               0    64   16  32
 wall_e_mid_bg               64   64   16  32
 
-# --- South Walls (Bottom of Room, Ledge Visible) ---
-wall_s_mid                  32   96   16  32
-wall_s_corner_l             0    96   16  32
-wall_s_corner_r             64   96   16  32
-wall_s_mid_crack            160  96   16  32
+# --- Front Face Walls (Previously North, now for internal facades or special use) ---
+wall_face_mid               32    0   16  32
+wall_face_corner_l          16    0   16  32
+wall_face_corner_r          48    0   16  32
 
 # --- Internal / Fill Walls ---
 wall_inner_mid              32   32   16  32
