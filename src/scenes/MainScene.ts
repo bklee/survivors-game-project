@@ -317,29 +317,44 @@ export class MainScene extends Phaser.Scene {
 
                 // ── Walls ───────────────────────────────────────────────────
                 if (cell === TileType.WALL) {
-                    // Check if adjacent cells are open spaces (FLOOR, DOOR, etc.) -> 1 means OPEN
-                    // const n = (y > 0 && this.dungeon.map[y - 1][x] !== TileType.WALL) ? 1 : 0;
-                    // const s = (y < mapH - 1 && this.dungeon.map[y + 1][x] !== TileType.WALL) ? 1 : 0;
-                    // const w = (x > 0 && this.dungeon.map[y][x - 1] !== TileType.WALL) ? 1 : 0;
-                    // const e = (x < mapW - 1 && this.dungeon.map[y][x + 1] !== TileType.WALL) ? 1 : 0;
+                    // 주변 4방향 타일이 바닥(FLOOR/DOOR/PILLAR)인지 확인 (Open = 1)
+                    const isOpen = (tx: number, ty: number) => {
+                        if (tx < 0 || tx >= mapW || ty < 0 || ty >= mapH) return false;
+                        const t = this.dungeon.map[ty][tx];
+                        return t === TileType.FLOOR || t === TileType.DOOR || t === TileType.PILLAR;
+                    };
 
-                    // Removed wall rendering for now based on user request.
-                    // To re-evaluate from scratch.
+                    const n = isOpen(x, y - 1);
+                    const s = isOpen(x, y + 1);
+                    const w = isOpen(x - 1, y);
+                    const e = isOpen(x + 1, y);
 
-                    // Render door frames
-                    // const isLeftDoorTile = (x === 0 || this.dungeon.map[y][x - 1] !== TileType.DOOR);
-                    // if (isLeftDoorTile) {
-                    //     if (x > 0 && this.dungeon.map[y][x - 1] === TileType.WALL) {
-                    //         this.doorBlitter.create((x - 1) * TILE_SIZE, y * TILE_SIZE, 'doors_frame_left');
-                    //     }
-                    //     if (y > 0 && this.dungeon.map[y - 1][x] === TileType.WALL) {
-                    //         this.doorBlitter.create(x * TILE_SIZE, (y - 1) * TILE_SIZE, 'doors_frame_top');
-                    //     }
-                    // } else {
-                    //     if (x < mapW - 1 && this.dungeon.map[y][x + 1] === TileType.WALL) {
-                    //         this.doorBlitter.create((x + 1) * TILE_SIZE, y * TILE_SIZE, 'doors_frame_right');
-                    //     }
-                    // }
+                    let frame = '';
+                    
+                    // 1. 코너 우선 판정 (Corners)
+                    if (s && e) frame = 'wall_side_topleft_bg_nocrack_0';
+                    else if (s && w) frame = 'wall_side_topright_bg_nocrack_0';
+                    else if (n && e) frame = 'wall_noside_bottomleft_nobg_nocrack_0';
+                    else if (n && w) frame = 'wall_noside_bottomright_nobg_nocrack_0';
+                    
+                    // 2. 직선 방향 판정 (Straight walls)
+                    else if (s) frame = 'wall_noside_top_bg_nocrack_0';     // 남쪽 벽 (Ledge)
+                    else if (n) frame = 'wall_noside_inner_nobg_nocrack_0'; // 북쪽 벽 (Face)
+                    else if (w) frame = 'wall_side_right_bg_nocrack_0';     // 동쪽 측면
+                    else if (e) frame = 'wall_side_left_bg_nocrack_0';      // 서쪽 측면
+                    
+                    if (frame) {
+                        // 10% 확률로 크랙 프레임 적용 (변형)
+                        if (Math.random() < 0.1) {
+                            const crackFrame = frame.replace('nocrack', 'crack');
+                            if (this.textures.get('walls').has(crackFrame)) {
+                                frame = crackFrame;
+                            }
+                        }
+                        
+                        // 모든 벽은 시각적 정리를 위해 Y축으로 -16px 오프셋 상향 배치
+                        this.wallBlitter.create(x * TILE_SIZE, y * TILE_SIZE - 16, frame);
+                    }
                 }
             }
         }
