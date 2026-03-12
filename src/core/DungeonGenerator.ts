@@ -322,15 +322,15 @@ export class DungeonGenerator {
             }
         }
 
-        // 문 위치: 방 윗벽 중앙에 2칸 뚫기 (도어 스프라이트가 32x32 이므로 2타일 차지)
-        const doorTX = roomX + 2; // Adjusted to be fixed relative to roomX
-        const doorTY = roomY - 1;
+        // 문 위치: 방 아랫벽(남쪽) 중앙에 2칸 뚫기 (입구가 아래를 향하도록 함)
+        const doorTX = roomX + 2; 
+        const doorTY = roomY + roomH;
         this.map[doorTY][doorTX] = TileType.DOOR;
         this.map[doorTY][doorTX + 1] = TileType.DOOR;
 
-        // 문 바깥에서부터 가장 가까운 기존 던전 바닥을 찾아 복도 뚫기 (BFS)
+        // 문 바깥(아래쪽)에서부터 가장 가까운 기존 던전 바닥을 찾아 복도 뚫기 (BFS)
         const startX = doorTX;
-        const startY = doorTY - 1;
+        const startY = doorTY + 1;
         const queue: { x: number, y: number, path: { x: number, y: number }[] }[] = [{ x: startX, y: startY, path: [] }];
         const visited = new Set<string>();
         visited.add(`${startX},${startY}`);
@@ -341,14 +341,14 @@ export class DungeonGenerator {
         while (queue.length > 0) {
             const { x, y, path } = queue.shift()!;
             
-            // 주변에 이미 뚫린 바닥이 있는지 확인 (현재 뚫고 있는 방/문 구역 제외)
+            // 주변에 이미 뚫린 바닥이 있는지 확인 (현재 뚫고 있는 방/문/보호구역 제외)
             if (this.map[y][x] === TileType.FLOOR && (y < roomY - 1 || y > roomY + roomH || x < roomX - 1 || x > roomX + roomW)) {
                 connectionPath = path;
                 found = true;
                 break;
             }
 
-            const directions = [{ dx: 0, dy: -1 }, { dx: 0, dy: 1 }, { dx: -1, dy: 0 }, { dx: 1, dy: 0 }];
+            const directions = [{ dx: 0, dy: 1 }, { dx: 0, dy: -1 }, { dx: -1, dy: 0 }, { dx: 1, dy: 0 }];
             for (const { dx, dy } of directions) {
                 const nx = x + dx;
                 const ny = y + dy;
@@ -358,7 +358,7 @@ export class DungeonGenerator {
                     queue.push({ x: nx, y: ny, path: [...path, { x: nx, y: ny }] });
                 }
             }
-            if (queue.length > 5000) break; // 탐색 범위를 5000으로 대폭 확장
+            if (queue.length > 5000) break;
         }
 
         // 경로를 따라 2칸 너비 복도 뚫기
@@ -377,30 +377,25 @@ export class DungeonGenerator {
             for (const p of connectionPath) {
                 this.map[p.y][p.x] = TileType.FLOOR;
                 
-                // 오른쪽으로 확장 시도
-                if (p.x + 1 < this.width - 1 && !isProtected(p.x + 1, p.y)) {
-                    this.map[p.y][p.x + 1] = TileType.FLOOR;
-                }
-                // 아래쪽으로 확장 시도
-                if (p.y + 1 < this.height - 1 && !isProtected(p.x, p.y + 1)) {
-                    this.map[p.y + 1][p.x] = TileType.FLOOR;
-                }
+                // 확장 시 보호 구역 검사
+                if (p.x + 1 < this.width - 1 && !isProtected(p.x + 1, p.y)) this.map[p.y][p.x + 1] = TileType.FLOOR;
+                if (p.y + 1 < this.height - 1 && !isProtected(p.x, p.y + 1)) this.map[p.y + 1][p.x] = TileType.FLOOR;
             }
         } else {
-            // Fallback: 위로 직진 (방 영역은 건드리지 않음)
+            // Fallback: 아래로 진행
             let cy = startY;
-            while (cy > 2) {
+            while (cy < this.height - 2) {
                 this.map[cy][startX] = TileType.FLOOR;
                 this.map[cy][startX + 1] = TileType.FLOOR;
-                if (this.map[cy - 1][startX] === TileType.FLOOR || this.map[cy][startX - 1] === TileType.FLOOR) break;
-                cy--;
+                if (this.map[cy + 1][startX] === TileType.FLOOR) break;
+                cy++;
             }
         }
 
         return {
             doorPixel: {
-                x: doorTX * TILE_SIZE + TILE_SIZE,            // Center of the 2-tile wide door (16*x + 16)
-                y: doorTY * TILE_SIZE + TILE_SIZE / 2 + 8     // Adding 8 perfectly aligns the door top-left to doorTY*16
+                x: doorTX * TILE_SIZE + TILE_SIZE,            
+                y: doorTY * TILE_SIZE + TILE_SIZE / 2 - 8     // 남쪽 벽에 문이 안착되도록 위치 조정
             },
             floorPixels
         };
