@@ -285,11 +285,13 @@ export class MainScene extends Phaser.Scene {
                 }
 
                 // ── Pillars & Obstacles ──────────────────────────────────────
-                // if (cell === TileType.PILLAR) {
-                //     this.wallBlitter.create(x * TILE_SIZE, y * TILE_SIZE, 'column');
-                // } else if (cell === TileType.OBSTACLE) {
-                //     this.wallBlitter.create(x * TILE_SIZE, y * TILE_SIZE, 'wall_top_alt');
-                // }
+                if (cell === TileType.PILLAR) {
+                    // column_wall(상단 캡 16x32): 한 행 위에 배치 → 기둥 꼭대기 돌 노출
+                    const capY = y > 0 ? (y - 1) * TILE_SIZE : y * TILE_SIZE;
+                    this.wallBlitter.create(x * TILE_SIZE, capY, 'column_wall');
+                    // column(기둥 몸통 16x32): 현재 행에 배치 → 바닥 위에 기둥 몸체
+                    this.wallBlitter.create(x * TILE_SIZE, y * TILE_SIZE, 'column');
+                }
 
                 // ── Walls ───────────────────────────────────────────────────
                 if (cell === TileType.WALL) {
