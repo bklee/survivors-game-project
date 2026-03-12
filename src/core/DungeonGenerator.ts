@@ -27,14 +27,13 @@ export class DungeonGenerator {
 
         // Use rot-js Digger algorithm for premium random dungeon layouts
         const digger = new ROT.Map.Digger(this.width, this.height, {
-            roomWidth: [4, 12],
-            roomHeight: [4, 10],
+            roomWidth: [4, 16],
+            roomHeight: [4, 16],
             corridorLength: [2, 10],
             dugPercentage: 0.25
         });
 
         digger.create((x, y, value) => {
-            // value: 0 for floor, 1 for wall in rot-js
             if (value === 0) {
                 this.map[y][x] = TileType.FLOOR;
             } else {
@@ -42,25 +41,67 @@ export class DungeonGenerator {
             }
         });
 
-        // Add Pillars to rooms (similar to map_example3 style but randomized)
+        // Add Pillars to rooms with variety
         const rooms = digger.getRooms();
         rooms.forEach((room) => {
+            const rw = room.getRight() - room.getLeft() + 1;
+            const rh = room.getBottom() - room.getTop() + 1;
             const left = room.getLeft();
             const top = room.getTop();
             const right = room.getRight();
             const bottom = room.getBottom();
 
-            // Only add pillars to large enough rooms
-            if (right - left > 5 && bottom - top > 5) {
-                // Draw 2-4 pillars inside
-                const centerX = Math.floor((left + right) / 2);
-                const centerY = Math.floor((top + bottom) / 2);
+            // 70% chance to have any pillars at all
+            if (Math.random() < 0.3) return;
 
-                // Example: 2x2 pillars near center
-                this.map[centerY - 1][centerX - 1] = TileType.PILLAR;
-                this.map[centerY - 1][centerX + 1] = TileType.PILLAR;
-                this.map[centerY + 1][centerX - 1] = TileType.PILLAR;
-                this.map[centerY + 1][centerX + 1] = TileType.PILLAR;
+            const patternRoll = Math.random();
+            const centerX = Math.floor((left + right) / 2);
+            const centerY = Math.floor((top + bottom) / 2);
+
+            if (rw >= 7 && rh >= 7) {
+                // Large Room Patterns
+                if (patternRoll < 0.4) {
+                    // Classic 2x2
+                    this.map[centerY - 1][centerX - 1] = TileType.PILLAR;
+                    this.map[centerY - 1][centerX + 1] = TileType.PILLAR;
+                    this.map[centerY + 1][centerX - 1] = TileType.PILLAR;
+                    this.map[centerY + 1][centerX + 1] = TileType.PILLAR;
+                } else if (patternRoll < 0.7) {
+                    // Cross pattern (3 pillars)
+                    this.map[centerY][centerX] = TileType.PILLAR;
+                    if (rh >= 9) {
+                        this.map[centerY - 2][centerX] = TileType.PILLAR;
+                        this.map[centerY + 2][centerX] = TileType.PILLAR;
+                    }
+                } else {
+                    // Scattered (3-5 pillars)
+                    const count = 3 + Math.floor(Math.random() * 3);
+                    for (let i = 0; i < count; i++) {
+                        const px = left + 1 + Math.floor(Math.random() * (rw - 2));
+                        const py = top + 1 + Math.floor(Math.random() * (rh - 2));
+                        if (this.map[py][px] === TileType.FLOOR) this.map[py][px] = TileType.PILLAR;
+                    }
+                }
+            } else if (rw >= 5 && rh >= 5) {
+                // Medium Room Patterns
+                if (patternRoll < 0.5) {
+                    // Solo Pillar
+                    this.map[centerY][centerX] = TileType.PILLAR;
+                } else {
+                    // Horizontal or Vertical Pair
+                    if (rw > rh) {
+                        this.map[centerY][centerX - 1] = TileType.PILLAR;
+                        this.map[centerY][centerX + 1] = TileType.PILLAR;
+                    } else {
+                        this.map[centerY - 1][centerX] = TileType.PILLAR;
+                        this.map[centerY + 1][centerX] = TileType.PILLAR;
+                    }
+                }
+            } else if (rw >= 4 && rh >= 4) {
+                // Small Room: 30% chance of a solo pillar
+                if (Math.random() < 0.3) {
+                    this.map[centerY][centerX] = TileType.PILLAR;
+                }
             }
         });
 
