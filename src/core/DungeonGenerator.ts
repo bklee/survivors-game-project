@@ -129,16 +129,39 @@ export class DungeonGenerator {
                 if (this.map[y][x] === TileType.FLOOR) {
                     // 1. 수평으로 좁은 길 (위아래가 벽)
                     if (this.map[y - 1][x] === TileType.WALL && this.map[y + 1][x] === TileType.WALL) {
-                        // 아래쪽 벽을 허물어 2칸 확보
-                        if (y + 1 < this.height - 1) {
-                            changes.push({ x: x, y: y + 1 });
-                        }
+                        if (y + 1 < this.height - 1) changes.push({ x, y: y + 1 });
                     }
                     // 2. 수직으로 좁은 길 (좌우가 벽)
                     if (this.map[y][x - 1] === TileType.WALL && this.map[y][x + 1] === TileType.WALL) {
-                        // 오른쪽 벽을 허물어 2칸 확보
-                        if (x + 1 < this.width - 1) {
-                            changes.push({ x: x + 1, y: y });
+                        if (x + 1 < this.width - 1) changes.push({ x: x + 1, y });
+                    }
+
+                    // 3. 대각선 좁은 길 (Diagonal Chokepoint) 제거
+                    // (x,y) 기준 우측 하단 2x2 영역 체크
+                    if (x < this.width - 1 && y < this.height - 1) {
+                        // 패턴 1: 
+                        // Floor  Wall
+                        // Wall   Floor
+                        if (this.map[y][x + 1] === TileType.WALL && 
+                            this.map[y + 1][x] === TileType.WALL && 
+                            this.map[y + 1][x + 1] === TileType.FLOOR) {
+                            changes.push({ x: x + 1, y: y }); // 우측 벽을 허묾
+                        }
+
+                        // 패턴 2: 
+                        // Wall   Floor
+                        // Floor  Wall
+                        // (x-1, y) 가 Floor 이고 (x, y) 가 Wall 인 경우를 별도로 체크하기 위해
+                        // 루프를 돌면서 모든 2x2를 체크하는 방식으로 이해하면 됨
+                    }
+                } else if (this.map[y][x] === TileType.WALL) {
+                    // Wall   Floor
+                    // Floor  Wall
+                    if (x < this.width - 1 && y < this.height - 1) {
+                        if (this.map[y][x + 1] === TileType.FLOOR && 
+                            this.map[y + 1][x] === TileType.FLOOR && 
+                            this.map[y + 1][x + 1] === TileType.WALL) {
+                            changes.push({ x, y }); // 현재 벽을 허묾
                         }
                     }
                 }
