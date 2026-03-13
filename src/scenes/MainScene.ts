@@ -414,6 +414,23 @@ export class MainScene extends Phaser.Scene {
                             const targetEid = interactives[j];
                             if (targetEid !== eid && hasComponent(world, Interactive, targetEid) && Interactive.id[targetEid] === linkId) {
                                 Interactive.isActivated[targetEid] = 1;
+                                
+                                // 비밀 문(ID 41)이 활성화되면 맵의 DOOR 타일을 FLOOR로 변경하여 충돌 해제
+                                if (SpriteInfo.textureIndex[targetEid] === 41) {
+                                    const dtx = Math.floor(Position.x[targetEid] / TILE_SIZE);
+                                    const dty = Math.floor(Position.y[targetEid] / TILE_SIZE);
+                                    for (let dy = -1; dy <= 1; dy++) {
+                                        for (let dx = -1; dx <= 1; dx++) {
+                                            const yy = dty + dy;
+                                            const xx = dtx + dx;
+                                            if (yy >= 0 && yy < this.dungeon.height && xx >= 0 && xx < this.dungeon.width) {
+                                                if (this.dungeon.map[yy][xx] === TileType.DOOR) {
+                                                    this.dungeon.map[yy][xx] = TileType.FLOOR;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
