@@ -3,6 +3,7 @@ import { Position, Spell, Health, Item, Velocity, SpriteInfo, Boss, Player, Enem
 import { world } from '../core/World';
 import { JuicePipeline } from '../fx/JuicePipeline';
 import { enemySpatialHash } from './PhysicsSystem';
+import { globalStats } from '../core/PlayerStats';
 
 const spellQuery = defineQuery([Position, Spell]);
 const playerHealthQuery = defineQuery([Player, Position, Health]);
@@ -168,8 +169,10 @@ export const createCombatSystem = (juice: JuicePipeline) => {
                 const tx = Position.x[targetId];
                 const ty = Position.y[targetId];
 
-                // Direct XP Gain on Death (100% as requested)
-                const totalXp = isBoss ? 500 : 10;
+                // 사용자 요청: 스테이지가 올라갈수록 몬스터가 주는 경험치도 비례해서 상승 (스테이지당 20%씩 복리 증가)
+                const stageScale = Math.pow(1.2, globalStats.currentStage - 1);
+                const totalXp = Math.floor((isBoss ? 500 : 10) * stageScale);
+                
                 window.dispatchEvent(new CustomEvent('xp_collected', {
                     detail: { amount: totalXp, isDirect: true }
                 }));
