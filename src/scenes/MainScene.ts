@@ -471,9 +471,15 @@ export class MainScene extends Phaser.Scene {
                         }
                     }
                 }
-            } else if (typeId === 32) {
-                const animIdx = Math.floor(Animation.timer[eid] * 4 / 1000) % 4;
-                if (animIdx >= 2) {
+            } else if (typeId === 32 || typeId === 37) {
+                // 32: Spikes, 37: Hole
+                let canDamage = true;
+                if (typeId === 32) {
+                    const animIdx = Math.floor(Animation.timer[eid] * 4 / 1000) % 4;
+                    canDamage = animIdx >= 2;
+                }
+
+                if (canDamage) {
                     if (distSq < 20 * 20) {
                         Health.current[this.playerId] -= 0.1;
                         window.dispatchEvent(new CustomEvent('hp_updated', {
@@ -656,7 +662,8 @@ export class MainScene extends Phaser.Scene {
                 addComponent(world, Animation, eid);
                 Animation.timer[eid] = 0;
             } else if (roll > 0.7) {
-                SpriteInfo.textureIndex[eid] = 32; // 가시덫 (20%)
+                // 장애물 (20%): 가시덫과 구멍을 5:5 비율로 배치
+                SpriteInfo.textureIndex[eid] = Math.random() < 0.5 ? 32 : 37; 
                 addComponent(world, Animation, eid);
                 Animation.timer[eid] = Math.random() * 1000;
             } else {
