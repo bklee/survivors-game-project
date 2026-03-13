@@ -1,50 +1,64 @@
-# wall_list_v0.1 (Cardinal Direction Mapping - Refined Sides)
+# wall_list_v0.1 (Comprehensive Mapping - All Assets)
 # atlas_walls_high-16x32.png (384 x 128 px)
 # Format: name  x  y  width  height
 
-# --- Unified Horizontal Walls (North & South use Ledge style) ---
-wall_n_mid                  32   96   16  32
-wall_n_corner_l             0    96   16  32
+# --- North Walls (Simple & Fancy) ---
+wall_n_mid                  32   96   16  32  # Simple Straight
+wall_n_corner_l              0   96   16  32
 wall_n_corner_r             64   96   16  32
-wall_n_mid_crack            160  96   16  32
-
-wall_s_mid                  32   96   16  32
-wall_s_corner_l             0    96   16  32
-wall_s_corner_r             64   96   16  32
-wall_s_mid_crack            160  96   16  32
-
-# --- West/East side walls (Refined to match corner profiles for consistency) ---
-wall_w_mid                  0    96   16  32
-wall_e_mid                  64   96   16  32
-wall_w_mid_bg               0    64   16  32
-wall_e_mid_bg               64   64   16  32
-
-# --- Front Face Walls ---
-wall_face_mid               32    0   16  32
+wall_n_mid_crack           160   96   16  32
+wall_face_mid               32    0   16  32  # Fancy Face
 wall_face_corner_l          16    0   16  32
 wall_face_corner_r          48    0   16  32
 
-# --- Internal / Fill Walls ---
+# --- South/Side Walls ---
+wall_s_mid                  32   96   16  32
+wall_w_mid                   0   96   16  32
+wall_e_mid                  64   96   16  32
+wall_w_mid_bg                0   64   16  32
+wall_e_mid_bg               64   64   16  32
+
+# --- Internal / Fill ---
 wall_inner_mid              32   32   16  32
 wall_inner_l                16   32   16  32
 wall_inner_r                48   32   16  32
 
-# --- Special Props ---
-column                      240  64   16  32
-column_wall                 240  96   16  32
-door_wall                   256  96   16  32
+# --- Special Entrances (Large 48x64) ---
+wall_door_wood_closed      288   64   48  64
+wall_door_arch_open        336   64   48  64
+wall_arch_top_small        144    0   48  32
+wall_arch_mid_small        144   32   48  32
+
+# --- Banners & Props (16x16) ---
+wall_banner_green          240   32   16  16
+wall_banner_yellow         256   32   16  16
+wall_banner_red            272   32   16  16
+wall_banner_blue           288   32   16  16
+wall_prop_skull_1          240   48   16  16
+wall_prop_skull_2          256   48   16  16
+wall_prop_skull_3          272   48   16  16
+
+# --- Slime & Holes (Interactive/Decor) ---
+wall_goo_green_top         240    0   16  16
+wall_goo_green_mid         240   16   16  16
+wall_goo_green_drip        256    0   16  16
+wall_hole_small             256   64   16  32
+
+# --- Pillars & Specials ---
+column                     240   64   16  32
+column_wall                240   96   16  32
+door_wall                  256   96   16  32
 
 # --- Fountains (Animated) ---
-wall_fountain_mid_blue_f0   192  64   16  32
-wall_fountain_mid_blue_f1   208  64   16  32
-wall_fountain_mid_blue_f2   224  64   16  32
-wall_fountain_top_blue_f0   192  96   16  32
-wall_fountain_top_blue_f1   208  96   16  32
-wall_fountain_top_blue_f2   224  96   16  32
-
-wall_fountain_mid_red_f0    192  32   16  32
-wall_fountain_mid_red_f1    208  32   16  32
-wall_fountain_mid_red_f2    224  32   16  32
-wall_fountain_top_red_f0    192   0   16  32
-wall_fountain_top_red_f1    208   0   16  32
-wall_fountain_top_red_f2    224   0   16  32
+wall_fountain_top_red_f0   192    0   16  32
+wall_fountain_top_red_f1   208    0   16  32
+wall_fountain_top_red_f2   224    0   16  32
+wall_fountain_mid_red_f0   192   32   16  32
+wall_fountain_mid_red_f1   208   32   16  32
+wall_fountain_mid_red_f2   224   32   16  32
+wall_fountain_mid_blue_f0  192   64   16  32
+wall_fountain_mid_blue_f1  208   64   16  32
+wall_fountain_mid_blue_f2  224   64   16  32
+wall_fountain_top_blue_f0  192   96   16  32
+wall_fountain_top_blue_f1  208   96   16  32
+wall_fountain_top_blue_f2  224   96   16  32

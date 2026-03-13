@@ -208,8 +208,8 @@ export class AssetLoader {
 
         const wallTex = this.scene.textures.get('walls');
         if (wallTex) {
-            // --- North Walls (Row 0) ---
-            wallTex.add('wall_n_mid', 0, 32, 0, 16, 32);
+            // --- North Walls (Row 0 -> Row 3의 심플한 일자벽으로 매핑 변경) ---
+            wallTex.add('wall_n_mid', 0, 32, 96, 16, 32); 
             wallTex.add('wall_n_corner_l', 0, 16, 0, 16, 32);
             wallTex.add('wall_n_corner_r', 0, 48, 0, 16, 32);
             wallTex.add('wall_n_end_l', 0, 80, 0, 16, 32);
@@ -238,6 +238,10 @@ export class AssetLoader {
             wallTex.add('column', 0, 240, 64, 16, 32);
             wallTex.add('column_wall', 0, 240, 96, 16, 32);
             wallTex.add('door_wall', 0, 256, 96, 16, 32);
+
+            // --- Slime/Goo Decorations ---
+            wallTex.add('wall_goo_top', 0, 240, 0, 16, 16);
+            wallTex.add('wall_goo_mid', 0, 240, 16, 16, 16);
 
             // --- Fountains ---
             for (let i = 0; i < 3; i++) {
