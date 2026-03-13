@@ -174,9 +174,10 @@ export class MainScene extends Phaser.Scene {
                 this.scene.pause();
                 this.scene.launch('RecipeScene');
             }
-            // Debug: Skip to boss stage
+            // Debug: Skip to next boss stage (3, 6, 9, 12...)
             if (e.code === 'KeyB' && e.shiftKey) {
-                this.currentStage = 2; // Will become 3 in nextStageHandler
+                const nextBossStage = (Math.floor(this.currentStage / 3) + 1) * 3;
+                this.currentStage = nextBossStage - 1; // It will be incremented in nextStageHandler
                 window.dispatchEvent(new CustomEvent('next_stage'));
             }
             // Debug: Trigger stage clear
