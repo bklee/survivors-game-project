@@ -113,10 +113,9 @@ export class DungeonGenerator {
             }
         });
 
-        // 1칸 너비의 좁은 미로를 2칸으로 확장 (사용자 요청)
-        this.widenPaths();
-
         this.ensureBoundary();
+        this.widenPaths();
+        this.removeIsolatedAreas();
     }
 
     private generateArena() {
@@ -198,9 +197,55 @@ export class DungeonGenerator {
         changes.forEach(p => this.map[p.y][p.x] = TileType.FLOOR);
     }
 
+    private removeIsolatedAreas() {
+        if (this.map.length === 0) return;
 
+        const visited = Array(this.height).fill(0).map(() => Array(this.width).fill(false));
+        const components: { x: number, y: number }[][] = [];
 
+        for (let y = 0; y < this.height; y++) {
+            for (let x = 0; x < this.width; x++) {
+                const cell = this.map[y][x];
+                const isTraversable = cell === TileType.FLOOR || cell === TileType.PILLAR || cell === TileType.SECRET_FLOOR || cell === TileType.DOOR;
+                
+                if (isTraversable && !visited[y][x]) {
+                    const component: { x: number, y: number }[] = [];
+                    const stack: [number, number][] = [[x, y]];
+                    visited[y][x] = true;
+                    
+                    while (stack.length > 0) {
+                        const [cx, cy] = stack.pop()!;
+                        component.push({ x: cx, y: cy });
+                        
+                        const dirs = [[0, 1], [0, -1], [1, 0], [-1, 0]];
+                        for (const [dx, dy] of dirs) {
+                            const nx = cx + dx;
+                            const ny = cy + dy;
+                            if (nx >= 0 && nx < this.width && ny >= 0 && ny < this.height && !visited[ny][nx]) {
+                                const nCell = this.map[ny][nx];
+                                const nTraversable = nCell === TileType.FLOOR || nCell === TileType.PILLAR || nCell === TileType.SECRET_FLOOR || nCell === TileType.DOOR;
+                                if (nTraversable) {
+                                    visited[ny][nx] = true;
+                                    stack.push([nx, ny]);
+                                }
+                            }
+                        }
+                    }
+                    components.push(component);
+                }
+            }
+        }
 
+        if (components.length <= 1) return;
+
+        components.sort((a, b) => b.length - a.length);
+
+        for (let i = 1; i < components.length; i++) {
+            for (const tile of components[i]) {
+                this.map[tile.y][tile.x] = TileType.WALL;
+            }
+        }
+    }
 
     public isFloor(xPixel: number, yPixel: number): boolean {
         const tx = Math.floor(xPixel / TILE_SIZE);
