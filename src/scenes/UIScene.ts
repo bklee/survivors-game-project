@@ -51,6 +51,9 @@ export class UIScene extends Phaser.Scene {
     // Minimap
     private minimapGraphics!: Phaser.GameObjects.Graphics;
     private readonly MINIMAP_SIZE = 150;
+    private minimapContainer!: Phaser.GameObjects.Container;
+    private minimapOverlay!: Phaser.GameObjects.Rectangle;
+    private isMinimapEnlarged = false;
 
     public joystick!: VirtualJoystick;
     private minimapTimer = 0;
@@ -75,6 +78,7 @@ export class UIScene extends Phaser.Scene {
         this.spawningComplete = false;
         this.dungeonMap = [];
         this.discoveredMap = [];
+        this.isMinimapEnlarged = false;
         // ------------------------------------
 
         this.uiContainer = this.add.container(0, 0);
@@ -91,10 +95,9 @@ export class UIScene extends Phaser.Scene {
         this.joystick = new VirtualJoystick(this, width / 2, height - 100, 60);
         this.joystick.setVisible(false);
 
-        // Level Text is redundant now as it's on the EXP bar
+        // redundnant dummy text to keep compatibility if referenced elsewhere
         this.levelText = this.add.text(0, 0, "", { fontSize: '0px' }).setVisible(false);
 
-        // 1.5 Skill Points Text (Bottom Right)
         this.skillPointsText = this.add.text(1270, 710, "SP: 0", {
             fontSize: '48px',
             color: '#ffcc00',
@@ -103,7 +106,6 @@ export class UIScene extends Phaser.Scene {
             strokeThickness: 6
         }).setOrigin(1, 1);
 
-        // 2. Coin UI (Fine-tuned position)
         this.coinText = this.add.text(10, 115, '0', {
             fontFamily: '"MedievalSharp", cursive',
             fontSize: '56px',
@@ -117,14 +119,12 @@ export class UIScene extends Phaser.Scene {
             .setScale(5.0)
             .setOrigin(0, 0.5);
 
-        // 3. Stats Text (Adjusted Y to prevent overlap)
         this.statsText = this.add.text(10, 170, this.getStatsString(), {
             fontSize: '32px',
             color: '#00ff00',
             backgroundColor: '#00000088'
         }).setVisible(false);
 
-        // Stats Toggle (Shift + A)
         this.input.keyboard?.on('keydown-A', (event: KeyboardEvent) => {
             if (event.shiftKey) {
                 const isVisible = this.statsText.visible;
@@ -132,7 +132,6 @@ export class UIScene extends Phaser.Scene {
             }
         });
 
-        // --- Stylized HP Bar Elements ---
         const hpX = 20;
         const fullWidth = 400;
         const barHeight = 30;
@@ -145,7 +144,6 @@ export class UIScene extends Phaser.Scene {
             fontFamily: '"MedievalSharp", cursive', fontSize: '20px', color: '#ffffff', fontStyle: 'bold', stroke: '#000000', strokeThickness: 4
         }).setOrigin(0.5, 0.5).setDepth(6);
 
-        // --- Mana Bar (Container) ---
         this.mpContainer = this.add.container(0, 0);
         const mpFrameGraphic = this.add.graphics();
         this.mpBar = this.add.rectangle(hpX + 4, 0, fullWidth - 8, barHeight - 8, 0x0099ff).setOrigin(0, 0);
@@ -156,7 +154,6 @@ export class UIScene extends Phaser.Scene {
         }).setOrigin(0.5, 0.5).setDepth(6);
         this.mpContainer.add([mpFrameGraphic, this.mpBar, mpShineGraphic, mpIconImg, this.mpText]);
 
-        // --- EXP Bar Elements ---
         this.expFrame = this.add.graphics();
         this.xpBar = this.add.rectangle(hpX + 4, 0, 1, barHeight - 8, 0x00ff00).setOrigin(0, 0);
         this.expShine = this.add.graphics();
@@ -165,170 +162,121 @@ export class UIScene extends Phaser.Scene {
             fontFamily: '"MedievalSharp", cursive', fontSize: '20px', color: '#ffffff', fontStyle: 'bold', stroke: '#000000', strokeThickness: 4
         }).setOrigin(0.5, 0.5).setDepth(6);
 
-        // --- Initial Positioning ---
         this.repositionUIBars();
 
-        // --- Boss HP Bar ---
         this.bossHpContainer = this.add.container(640, 80).setVisible(false).setAlpha(0.8);
         const bossBarW = 600;
         const bossBarH = 24;
-
         const bFrame = this.add.graphics();
         bFrame.lineStyle(3, 0x888888);
         bFrame.strokeRect(-bossBarW / 2, -bossBarH / 2, bossBarW, bossBarH);
         bFrame.fillStyle(0x111111, 0.9);
         bFrame.fillRect(-bossBarW / 2, -bossBarH / 2, bossBarW, bossBarH);
-
-        this.bossHpBar = this.add.rectangle(-bossBarW / 2 + 3, 0, bossBarW - 6, bossBarH - 6, 0xff0000)
-            .setOrigin(0, 0.5);
-
+        this.bossHpBar = this.add.rectangle(-bossBarW / 2 + 3, 0, bossBarW - 6, bossBarH - 6, 0xff0000).setOrigin(0, 0.5);
         this.bossHpText = this.add.text(0, 0, 'BOSS HP', {
             fontSize: '20px', color: '#ffffff', fontStyle: 'bold', stroke: '#000', strokeThickness: 4
         }).setOrigin(0.5);
-
         this.bossHpContainer.add([bFrame, this.bossHpBar, this.bossHpText]);
 
         // --- Minimap ---
-        const mmX = 1280 - 10;
-        const mmY = 10;
-        const mmBg1 = this.add.rectangle(mmX, mmY, this.MINIMAP_SIZE + 4, this.MINIMAP_SIZE + 4, 0x222222, 1).setOrigin(1, 0);
-        const mmBg2 = this.add.rectangle(mmX - 2, mmY + 2, this.MINIMAP_SIZE, this.MINIMAP_SIZE, 0x111111, 1).setOrigin(1, 0);
+        this.minimapContainer = this.add.container(1280 - 10, 10).setDepth(800);
+        const mmBg1 = this.add.graphics();
+        mmBg1.fillStyle(0x000000, 0.8);
+        mmBg1.fillRoundedRect(-(this.MINIMAP_SIZE + 4), 0, this.MINIMAP_SIZE + 4, this.MINIMAP_SIZE + 4, 10); // x, y, width, height, radius
+        const mmBg2 = this.add.rectangle(0, 0, this.MINIMAP_SIZE, this.MINIMAP_SIZE, 0x333333, 0.9).setOrigin(1, 0);
         this.minimapGraphics = this.add.graphics();
         this.arrowGraphics = this.add.graphics();
+        const mmHitArea = this.add.rectangle(0, 0, this.MINIMAP_SIZE, this.MINIMAP_SIZE, 0x000000, 0).setOrigin(1, 0).setInteractive({ useHandCursor: true });
+        this.minimapContainer.add([mmBg1, mmBg2, this.minimapGraphics, this.arrowGraphics, mmHitArea]);
+        this.minimapContainer.setVisible(false); // Initially hidden, shown on game_started
 
-        // Mute Button
+        this.minimapOverlay = this.add.rectangle(640, 360, 1280, 720, 0x000000, 0).setVisible(false).setDepth(850).setInteractive();
+        
+        mmHitArea.on('pointerdown', () => this.toggleMinimap());
+        this.minimapOverlay.on('pointerdown', () => this.toggleMinimap());
+
+        // Buttons
         const muteBtn = this.add.text(1210, 170, '🔊', {
-            fontSize: '32px',
-            color: '#ffffff',
-            backgroundColor: '#00000088',
-            padding: { x: 8, y: 4 }
+            fontSize: '32px', color: '#ffffff', backgroundColor: '#00000088', padding: { x: 8, y: 4 }
         }).setOrigin(1, 0).setInteractive({ useHandCursor: true });
 
-        // Pause Button
         const pauseBtn = this.add.text(1270, 170, '⏸', {
-            fontSize: '32px',
-            color: '#ffffff',
-            backgroundColor: '#00000088',
-            padding: { x: 8, y: 4 }
+            fontSize: '32px', color: '#ffffff', backgroundColor: '#00000088', padding: { x: 8, y: 4 }
         }).setOrigin(1, 0).setInteractive({ useHandCursor: true });
 
         // Pause Overlays
         const pauseOverlay = this.add.rectangle(640, 360, 1280, 720, 0x000000, 0.7).setVisible(false).setDepth(900);
         const pauseText = this.add.text(640, 300, 'PAUSED', {
-            fontFamily: '"MedievalSharp", cursive',
-            fontSize: '72px',
-            color: '#ffd700',
-            fontStyle: 'bold',
-            stroke: '#000000',
-            strokeThickness: 8
+            fontFamily: '"MedievalSharp", cursive', fontSize: '72px', color: '#ffd700', fontStyle: 'bold', stroke: '#000000', strokeThickness: 8
         }).setOrigin(0.5).setVisible(false).setDepth(901);
-
-        const resumeBtnBg = this.add.rectangle(640, 400, 300, 60, 0x3d2b1f, 0.9)
-            .setStrokeStyle(2, 0xffd700)
-            .setOrigin(0.5)
-            .setInteractive({ useHandCursor: true })
-            .setVisible(false)
-            .setDepth(901);
+        const resumeBtnBg = this.add.rectangle(640, 400, 300, 60, 0x3d2b1f, 0.9).setStrokeStyle(2, 0xffd700).setOrigin(0.5).setInteractive({ useHandCursor: true }).setVisible(false).setDepth(901);
         const resumeBtnText = this.add.text(640, 400, '▶ RESUME', {
-            fontFamily: '"MedievalSharp", cursive',
-            fontSize: '32px',
-            color: '#ffffff',
-            fontStyle: 'bold'
+            fontFamily: '"MedievalSharp", cursive', fontSize: '32px', color: '#ffffff', fontStyle: 'bold'
         }).setOrigin(0.5).setVisible(false).setDepth(902);
-
-        const quitBtnBg = this.add.rectangle(640, 480, 300, 60, 0x3d2b1f, 0.9)
-            .setStrokeStyle(2, 0xff9999)
-            .setOrigin(0.5)
-            .setInteractive({ useHandCursor: true })
-            .setVisible(false)
-            .setDepth(901);
+        const quitBtnBg = this.add.rectangle(640, 480, 300, 60, 0x3d2b1f, 0.9).setStrokeStyle(2, 0xff9999).setOrigin(0.5).setInteractive({ useHandCursor: true }).setVisible(false).setDepth(901);
         const quitBtnText = this.add.text(640, 480, '🏠 MAIN MENU', {
-            fontFamily: '"MedievalSharp", cursive',
-            fontSize: '32px',
-            color: '#ff9999',
-            fontStyle: 'bold'
+            fontFamily: '"MedievalSharp", cursive', fontSize: '32px', color: '#ff9999', fontStyle: 'bold'
         }).setOrigin(0.5).setVisible(false).setDepth(902);
 
-        // UI helper to show/hide pause menu
-        const setPauseVisible = (visible: boolean) => {
-            pauseOverlay.setVisible(visible);
-            pauseText.setVisible(visible);
-            resumeBtnBg.setVisible(visible);
-            resumeBtnText.setVisible(visible);
-            quitBtnBg.setVisible(visible);
-            quitBtnText.setVisible(visible);
+        const setPauseVisible = (v: boolean) => {
+            pauseOverlay.setVisible(v); pauseText.setVisible(v);
+            resumeBtnBg.setVisible(v); resumeBtnText.setVisible(v);
+            quitBtnBg.setVisible(v); quitBtnText.setVisible(v);
         };
 
         pauseBtn.on('pointerdown', () => {
-            const mainScene = this.scene.get('MainScene');
-            if (mainScene.scene.isPaused()) {
-                mainScene.scene.resume();
-                setPauseVisible(false);
-            } else {
-                mainScene.scene.pause();
-                setPauseVisible(true);
-            }
+            const ms = this.scene.get('MainScene');
+            if (ms.scene.isActive()) { ms.scene.pause(); setPauseVisible(true); }
+            else { ms.scene.resume(); setPauseVisible(false); }
         });
 
-        muteBtn.on('pointerdown', () => {
-            if (this.sound.mute) {
-                this.sound.mute = false;
-                muteBtn.setText('🔊');
-            } else {
-                this.sound.mute = true;
-                muteBtn.setText('🔇');
-            }
-        });
+        resumeBtnBg.on('pointerdown', () => { this.scene.get('MainScene').scene.resume(); setPauseVisible(false); });
+        quitBtnBg.on('pointerdown', () => { this.sound.stopAll(); this.scene.stop('MainScene'); this.scene.stop('UIScene'); this.scene.start('TitleScene'); });
 
-        resumeBtnBg.on('pointerdown', () => {
-            const mainScene = this.scene.get('MainScene');
-            mainScene.scene.resume();
-            setPauseVisible(false);
-        });
-
-        resumeBtnBg.on('pointerover', () => {
-            resumeBtnBg.setFillStyle(0x5a4030, 1).setScale(1.05);
-            resumeBtnText.setScale(1.05);
-        });
-        resumeBtnBg.on('pointerout', () => {
-            resumeBtnBg.setFillStyle(0x3d2b1f, 0.9).setScale(1);
-            resumeBtnText.setScale(1);
-        });
-
-        quitBtnBg.on('pointerdown', () => {
-            this.sound.stopAll();
-            this.scene.stop('MainScene');
-            this.scene.stop('UIScene');
-            this.scene.start('TitleScene');
-        });
-
-        quitBtnBg.on('pointerover', () => {
-            quitBtnBg.setFillStyle(0x5a4030, 1).setScale(1.05);
-            quitBtnText.setScale(1.05);
-        });
-        quitBtnBg.on('pointerout', () => {
-            quitBtnBg.setFillStyle(0x3d2b1f, 0.9).setScale(1);
-            quitBtnText.setScale(1);
-        });
-        this.uiContainer.add([this.stageLevelText, this.levelText, this.skillPointsText, this.statsText, this.hpFrame, this.hpBar, this.hpShine, this.hpIcon, this.hpText, this.expFrame, this.xpBar, this.expShine, this.expIcon, this.expLabel, this.mpContainer, this.coinText, this.coinIcon, mmBg1, mmBg2, this.minimapGraphics, this.arrowGraphics, pauseBtn, muteBtn]);
-        // Note: Pause overlay/buttons are not in uiContainer based on previous structure
+        this.uiContainer.add([this.stageLevelText, this.levelText, this.skillPointsText, this.statsText, this.hpFrame, this.hpBar, this.hpShine, this.hpIcon, this.hpText, this.expFrame, this.xpBar, this.expShine, this.expIcon, this.expLabel, this.mpContainer, this.coinText, this.coinIcon, pauseBtn, muteBtn]);
         this.uiContainer.setVisible(false);
 
         this.bossWarningText = this.add.text(640, 360, 'BOSS APPROACHING!', {
-            fontSize: '72px',
-            color: '#ff0000',
-            fontStyle: 'bold',
-            stroke: '#000000',
-            strokeThickness: 8,
-        }).setOrigin(0.5, 0.5).setVisible(false).setDepth(999);
+            fontSize: '72px', color: '#ff0000', fontStyle: 'bold', stroke: '#000000', strokeThickness: 8,
+        }).setOrigin(0.5).setVisible(false).setDepth(999);
 
         this.stageClearText = this.add.text(640, 360, 'STAGE CLEAR!', {
-            fontSize: '96px',
-            color: '#ffff00',
-            fontStyle: 'bold',
-            stroke: '#000000',
-            strokeThickness: 10,
-        }).setOrigin(0.5, 0.5).setVisible(false).setDepth(999);
+            fontSize: '96px', color: '#ffff00', fontStyle: 'bold', stroke: '#000000', strokeThickness: 10,
+        }).setOrigin(0.5).setVisible(false).setDepth(999);
+
+        // Define Handlers
+        const gameStartedHandler = () => {
+            this.uiContainer.setVisible(true);
+            this.joystick.setVisible(true);
+            this.minimapContainer.setVisible(true);
+        };
+        const spawningCompleteHandler = () => this.spawningComplete = true;
+        const stageUpdatedHandler = ((e: CustomEvent<number>) => {
+            this.currentStage = e.detail; this.spawningComplete = false; this.updateStageLevelText(); this.bossHpContainer?.setVisible(false);
+        }) as EventListener;
+        const mapGeneratedHandler = ((e: CustomEvent<number[][]>) => {
+            this.dungeonMap = e.detail;
+            const h = this.dungeonMap.length; const w = h > 0 ? this.dungeonMap[0].length : 0;
+            this.discoveredMap = Array.from({ length: h }, () => Array(w).fill(false));
+        }) as EventListener;
+
+        // Register Handlers
+        window.addEventListener('game_started', gameStartedHandler);
+        window.addEventListener('spawning_complete', spawningCompleteHandler);
+        window.addEventListener('xp_collected', this.handleXp as EventListener);
+        window.addEventListener('xp_percent_collected', this.handleXpPercent as EventListener);
+        window.addEventListener('coin_collected', this.handleCoinCollected as EventListener);
+        window.addEventListener('boss_spawned', this.handleBossSpawn as EventListener);
+        window.addEventListener('boss_hp', this.handleBossHp as EventListener);
+        window.addEventListener('hp_updated', this.handleHp as EventListener);
+        window.addEventListener('stage_clear', this.handleStageClear as EventListener);
+        window.addEventListener('stage_updated', stageUpdatedHandler);
+        window.addEventListener('map_generated', mapGeneratedHandler);
+        window.addEventListener('mp_updated', this.handleMp as EventListener);
+        window.addEventListener('char_selected', ((e: CustomEvent<string>) => {
+            this.selectedCharId = e.detail;
+            this.repositionUIBars();
+        }) as EventListener);
 
         this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
             window.removeEventListener('game_started', gameStartedHandler);
@@ -341,62 +289,41 @@ export class UIScene extends Phaser.Scene {
             window.removeEventListener('hp_updated', this.handleHp as EventListener);
             window.removeEventListener('stage_clear', this.handleStageClear as EventListener);
             window.removeEventListener('stage_updated', stageUpdatedHandler);
-            window.removeEventListener('player_died', playerDiedHandler);
             window.removeEventListener('map_generated', mapGeneratedHandler);
-            this.bossWarningTween?.stop();
+            window.removeEventListener('mp_updated', this.handleMp as EventListener);
+            window.removeEventListener('char_selected', ((e: CustomEvent<string>) => {
+                this.selectedCharId = e.detail;
+                this.repositionUIBars();
+            }) as EventListener);
         });
 
-        // Store handlers to be able to remove them
-        const gameStartedHandler = () => {
-            this.uiContainer.setVisible(true);
-            this.joystick.setVisible(true);
-        };
-        const spawningCompleteHandler = () => this.spawningComplete = true;
-        const stageUpdatedHandler = ((e: CustomEvent<number>) => {
-            this.currentStage = e.detail;
-            this.spawningComplete = false;
-            this.updateStageLevelText();
-            // --- Reset Boss UI for new stage ---
-            this.bossHpContainer?.setVisible(false);
-        }) as EventListener;
-        const playerDiedHandler = () => this.sound.stopAll();
-        const mapGeneratedHandler = ((e: CustomEvent<number[][]>) => {
-            this.dungeonMap = e.detail;
-            const h = this.dungeonMap.length;
-            const w = h > 0 ? this.dungeonMap[0].length : 0;
-            this.discoveredMap = Array.from({ length: h }, () => Array(w).fill(false));
-        }) as EventListener;
 
-        window.addEventListener('game_started', gameStartedHandler);
-        window.addEventListener('spawning_complete', spawningCompleteHandler);
-        window.addEventListener('xp_collected', this.handleXp as EventListener);
-        window.addEventListener('xp_percent_collected', this.handleXpPercent as EventListener);
-        window.addEventListener('coin_collected', this.handleCoinCollected as EventListener);
-        window.addEventListener('boss_spawned', this.handleBossSpawn as EventListener);
-        window.addEventListener('boss_hp', this.handleBossHp as EventListener);
-        window.addEventListener('hp_updated', this.handleHp as EventListener);
-        window.addEventListener('stage_clear', this.handleStageClear as EventListener);
-        window.addEventListener('stage_updated', stageUpdatedHandler);
-        window.addEventListener('player_died', playerDiedHandler);
-        window.addEventListener('map_generated', mapGeneratedHandler);
-        window.addEventListener('mp_updated', this.handleMp as EventListener);
-        window.addEventListener('char_selected', ((e: CustomEvent<string>) => {
-            this.selectedCharId = e.detail;
-            this.repositionUIBars();
-        }) as EventListener);
 
-        // If game is already started (could happen if UIScene is launched late), make it visible
-        const mainScene = this.scene.get('MainScene') as any;
-        if (mainScene && mainScene.scene.isActive()) {
-            this.uiContainer.setVisible(true);
-            this.joystick.setVisible(true);
-        }
-
-        // --- Initial Display Update ---
         this.updateStageLevelText();
-        this.coinText.setText(this.totalCoins.toLocaleString());
-        this.coinIcon.x = this.coinText.x + this.coinText.width + 20;
-        // ------------------------------
+    }
+
+    private toggleMinimap() {
+        const ms = this.scene.get('MainScene');
+        this.isMinimapEnlarged = !this.isMinimapEnlarged;
+
+        if (this.isMinimapEnlarged) {
+            ms.scene.pause();
+            this.minimapOverlay.setVisible(true).setAlpha(0);
+            this.tweens.add({ targets: this.minimapOverlay, alpha: 0.6, duration: 300 });
+            this.tweens.add({
+                targets: this.minimapContainer,
+                x: 640 + (this.MINIMAP_SIZE * 3.5) / 2, y: 360 - (this.MINIMAP_SIZE * 3.5) / 2,
+                scale: 3.5, duration: 500, ease: 'Cubic.easeOut'
+            });
+        } else {
+            ms.scene.resume();
+            this.tweens.add({ targets: this.minimapOverlay, alpha: 0, duration: 300, onComplete: () => this.minimapOverlay.setVisible(false) });
+            this.tweens.add({
+                targets: this.minimapContainer,
+                x: 1280 - 10, y: 10,
+                scale: 1, duration: 400, ease: 'Back.easeIn'
+            });
+        }
     }
 
     private getStatsString() {
@@ -407,17 +334,13 @@ export class UIScene extends Phaser.Scene {
         this.stageLevelText.setText(`Stage ${this.currentStage}`);
         this.expLabel.setText(`Level ${this.currentLevel}`);
         this.skillPointsText.setText(`SP: ${this.skillPoints}`);
-
-        const percent = Phaser.Math.Clamp(this.currentXp / this.xpToNextLevel, 0, 1);
-        this.xpBar.width = Math.max(1, (400 - 8) * percent);
+        const p = Phaser.Math.Clamp(this.currentXp / this.xpToNextLevel, 0, 1);
+        this.xpBar.width = Math.max(1, (400 - 8) * p);
     }
 
-    update(_time: number, delta: number) {
+    update(_t: number, delta: number) {
         this.minimapTimer += delta;
-        if (this.minimapTimer >= 500) {
-            this.updateMinimap();
-            this.minimapTimer = 0;
-        }
+        if (this.minimapTimer >= 500) { this.updateMinimap(); this.minimapTimer = 0; }
         this.updateTargetArrows();
         this.statsText.setText(this.getStatsString());
     }
@@ -426,50 +349,46 @@ export class UIScene extends Phaser.Scene {
         this.arrowGraphics.clear();
         const players = this.playerQuery(world);
         if (players.length === 0) return;
-
-        const px = Position.x[players[0]];
-        const py = Position.y[players[0]];
-
+        const px = Position.x[players[0]]; const py = Position.y[players[0]];
         const targets: { x: number, y: number, color: number }[] = [];
-
         const bosses = this.bossQuery(world);
-        for (let i = 0; i < bosses.length; i++) {
-            targets.push({ x: Position.x[bosses[i]], y: Position.y[bosses[i]], color: 0xff00ff }); // Magenta boss arrow
-        }
+        for (let i = 0; i < bosses.length; i++) targets.push({ x: Position.x[bosses[i]], y: Position.y[bosses[i]], color: 0xff00ff });
 
         if (this.spawningComplete && bosses.length === 0) {
             const enemies = this.enemyQuery(world);
             if (enemies.length > 0 && enemies.length < 5) {
-                for (let i = 0; i < enemies.length; i++) {
-                    targets.push({ x: Position.x[enemies[i]], y: Position.y[enemies[i]], color: 0xff0000 }); // Red enemy arrow
-                }
+                for (let i = 0; i < enemies.length; i++) targets.push({ x: Position.x[enemies[i]], y: Position.y[enemies[i]], color: 0xff0000 });
             }
         }
 
-        const cx = 640;
-        const cy = 360;
-        const radius = 280;
+        const arrowDist = this.MINIMAP_SIZE / 2 - 10;
+        const mmCenterRelX = -this.MINIMAP_SIZE / 2 - 2;
+        const mmCenterRelY = this.MINIMAP_SIZE / 2 + 2;
 
+        for (const t of targets) {
+            const angle = Math.atan2(t.y - py, t.x - px);
+            const ax = mmCenterRelX + Math.cos(angle) * arrowDist;
+            const ay = mmCenterRelY + Math.sin(angle) * arrowDist;
+            this.arrowGraphics.fillStyle(t.color, 1);
+            this.arrowGraphics.fillTriangle(
+                ax + Math.cos(angle) * 8, ay + Math.sin(angle) * 8,
+                ax + Math.cos(angle + 2.4) * 5, ay + Math.sin(angle + 2.4) * 5,
+                ax + Math.cos(angle - 2.4) * 5, ay + Math.sin(angle - 2.4) * 5
+            );
+        }
+
+        // Screen boundary arrows
+        const cx = 640; const cy = 360; const radius = 280;
         targets.forEach(t => {
-            const dx = t.x - px;
-            const dy = t.y - py;
-            const dist = Math.sqrt(dx * dx + dy * dy);
-
-            if (dist > 300) {
+            const dx = t.x - px; const dy = t.y - py;
+            if (Math.sqrt(dx * dx + dy * dy) > 300) {
                 const angle = Math.atan2(dy, dx);
-
-                this.arrowGraphics.fillStyle(t.color, 1);
-                this.arrowGraphics.lineStyle(2, 0xffffff, 1);
-
-                const ptX = cx + Math.cos(angle) * radius;
-                const ptY = cy + Math.sin(angle) * radius;
-                const bL_X = cx + Math.cos(angle - 0.2) * (radius - 24);
-                const bL_Y = cy + Math.sin(angle - 0.2) * (radius - 24);
-                const bR_X = cx + Math.cos(angle + 0.2) * (radius - 24);
-                const bR_Y = cy + Math.sin(angle + 0.2) * (radius - 24);
-
-                this.arrowGraphics.fillTriangle(ptX, ptY, bL_X, bL_Y, bR_X, bR_Y);
-                this.arrowGraphics.strokeTriangle(ptX, ptY, bL_X, bL_Y, bR_X, bR_Y);
+                this.arrowGraphics.fillStyle(t.color, 1).lineStyle(2, 0xffffff, 1);
+                const pX = cx + Math.cos(angle) * radius; const pY = cy + Math.sin(angle) * radius;
+                const bLX = cx + Math.cos(angle - 0.2) * (radius - 24); const bLY = cy + Math.sin(angle - 0.2) * (radius - 24);
+                const bRX = cx + Math.cos(angle + 0.2) * (radius - 24); const bRY = cy + Math.sin(angle + 0.2) * (radius - 24);
+                this.arrowGraphics.fillTriangle(pX, pY, bLX, bLY, bRX, bRY);
+                this.arrowGraphics.strokeTriangle(pX, pY, bLX, bLY, bRX, bRY);
             }
         });
     }
@@ -477,141 +396,76 @@ export class UIScene extends Phaser.Scene {
     private updateMinimap() {
         this.minimapGraphics.clear();
         if (this.dungeonMap.length === 0) return;
-
         const players = this.playerQuery(world);
-        let pxWorld = 0;
-        let pyWorld = 0;
         if (players.length > 0) {
-            pxWorld = Position.x[players[0]];
-            pyWorld = Position.y[players[0]];
-
-            // Uncover map around player
-            const tileX = Math.floor(pxWorld / 16);
-            const tileY = Math.floor(pyWorld / 16);
-            const sightRadius = 15;
-            for (let dy = -sightRadius; dy <= sightRadius; dy++) {
-                for (let dx = -sightRadius; dx <= sightRadius; dx++) {
-                    if (dx * dx + dy * dy <= sightRadius * sightRadius) {
-                        const nx = tileX + dx;
-                        const ny = tileY + dy;
-                        if (ny >= 0 && ny < this.dungeonMap.length && nx >= 0 && nx < this.dungeonMap[0].length) {
-                            this.discoveredMap[ny][nx] = true;
-                        }
+            const tX = Math.floor(Position.x[players[0]] / 16); const tY = Math.floor(Position.y[players[0]] / 16);
+            for (let dy = -15; dy <= 15; dy++) {
+                for (let dx = -15; dx <= 15; dx++) {
+                    if (dx * dx + dy * dy <= 225) {
+                        const nx = tX + dx; const ny = tY + dy;
+                        if (ny >= 0 && ny < this.dungeonMap.length && nx >= 0 && nx < this.dungeonMap[0].length) this.discoveredMap[ny][nx] = true;
                     }
                 }
             }
         }
-
-        const mapW = this.dungeonMap[0].length * 16;
-        const mapH = this.dungeonMap.length * 16;
-        const maxDim = Math.max(mapW, mapH);
-        const scale = this.MINIMAP_SIZE / maxDim;
-
-        const offsetX = 1280 - 12 - this.MINIMAP_SIZE;
-        const offsetY = 12;
+        const scale = this.MINIMAP_SIZE / Math.max(this.dungeonMap[0].length * 16, this.dungeonMap.length * 16);
+        const oX = -2 - this.MINIMAP_SIZE; const oY = 2;
 
         for (let y = 0; y < this.dungeonMap.length; y++) {
             for (let x = 0; x < this.dungeonMap[0].length; x++) {
-                if (this.dungeonMap[y][x] === 1) {
-                    this.minimapGraphics.fillStyle(this.discoveredMap[y][x] ? 0x888888 : 0x222222, 1.0);
-                } else {
-                    this.minimapGraphics.fillStyle(0x000000, 1.0);
-                }
-                this.minimapGraphics.fillRect(
-                    offsetX + x * 16 * scale,
-                    offsetY + y * 16 * scale,
-                    Math.ceil(16 * scale),
-                    Math.ceil(16 * scale)
-                );
+                if (this.dungeonMap[y][x] === 1) this.minimapGraphics.fillStyle(this.discoveredMap[y][x] ? 0x888888 : 0x222222, 1.0);
+                else this.minimapGraphics.fillStyle(0x000000, 1.0);
+                this.minimapGraphics.fillRect(oX + x * 16 * scale, oY + y * 16 * scale, Math.ceil(16 * scale), Math.ceil(16 * scale));
             }
         }
 
         const enemies = this.enemyQuery(world);
-
         for (let i = 0; i < enemies.length; i++) {
-            const eid = enemies[i];
-            const isBoss = hasComponent(world, Boss, eid);
-            const x = offsetX + (Position.x[eid] * scale);
-            const y = offsetY + (Position.y[eid] * scale);
-            
-            if (isBoss) {
-                // 보스는 더 크고 선명한 빨간색 원으로 표시
-                this.minimapGraphics.fillStyle(0xff0000, 1.0);
-                this.minimapGraphics.fillCircle(x, y, 4);
-            } else {
-                // 일반 적은 기존 규격(2x2) 유지
-                this.minimapGraphics.fillStyle(0xff0000, 0.8);
-                this.minimapGraphics.fillRect(x - 1, y - 1, 2, 2);
-            }
+            const eid = enemies[i]; const ex = oX + (Position.x[eid] * scale); const ey = oY + (Position.y[eid] * scale);
+            if (hasComponent(world, Boss, eid)) { this.minimapGraphics.fillStyle(0xff0000, 1).fillCircle(ex, ey, 4); }
+            else { this.minimapGraphics.fillStyle(0xff0000, 0.8).fillRect(ex - 1, ey - 1, 2, 2); }
         }
-
         if (players.length > 0) {
             const peid = players[0];
-            const px = offsetX + (Position.x[peid] * scale);
-            const py = offsetY + (Position.y[peid] * scale);
-            this.minimapGraphics.fillStyle(0xffffff, 1);
-            this.minimapGraphics.fillCircle(px, py, 3);
+            this.minimapGraphics.fillStyle(0xffffff, 1).fillCircle(oX + (Position.x[peid] * scale), oY + (Position.y[peid] * scale), 3);
         }
     }
 
     private handleCoinCollected = (e: CustomEvent<any>) => {
-        const amount = e.detail?.amount || 1;
-        this.totalCoins += amount;
+        this.totalCoins += e.detail?.amount || 1;
         this.coinText.setText(this.totalCoins.toLocaleString());
         this.coinIcon.x = this.coinText.x + this.coinText.width + 20;
         this.sound.play('coin_pickup', { volume: 0.8 });
     }
 
     private handleXpPercent = (e: CustomEvent<number>) => {
-        const percent = e.detail / 100;
-        const amount = Math.floor(this.xpToNextLevel * percent);
+        const amount = Math.floor(this.xpToNextLevel * (e.detail / 100));
         this.handleXp(new CustomEvent('xp_collected', { detail: { amount, isDirect: true } }));
     }
 
     private handleXp = (e: CustomEvent<any>) => {
         const amount = typeof e.detail === 'number' ? e.detail : e.detail.amount;
-
         this.currentXp += amount;
         if (this.currentXp >= this.xpToNextLevel) {
-            this.currentLevel++;
-            globalStats.currentLevel = this.currentLevel;
-            this.skillPoints++;
-            this.currentXp -= this.xpToNextLevel;
-            this.xpToNextLevel = Math.floor(this.xpToNextLevel * 1.5);
+            this.currentLevel++; globalStats.currentLevel = this.currentLevel; this.skillPoints++;
+            this.currentXp -= this.xpToNextLevel; this.xpToNextLevel = Math.floor(this.xpToNextLevel * 1.5);
             this.sound.play('level_up', { volume: 0.5 });
-
             this.statsText.setScale(1.5).setTint(0xffff00);
-            this.time.delayedCall(1000, () => {
-                this.statsText.setScale(1).clearTint();
-            });
+            this.time.delayedCall(1000, () => { this.statsText.setScale(1).clearTint(); });
 
-            // --- USER REQUEST: Level Up Recovery & Stat Growth (HP/MP/ATK/SPD) ---
             const players = this.playerQuery(world);
             if (players.length > 0) {
                 const peid = players[0];
-                
-                // Max HP 5% 상승 및 완전 회복
                 Health.max[peid] = Math.ceil(Health.max[peid] * 1.05);
                 Health.current[peid] = Health.max[peid];
-                window.dispatchEvent(new CustomEvent('hp_updated', {
-                    detail: { current: Health.current[peid], max: Health.max[peid] }
-                }));
-
+                window.dispatchEvent(new CustomEvent('hp_updated', { detail: { current: Health.current[peid], max: Health.max[peid] } }));
                 if (hasComponent(world, Mana, peid)) {
-                    // Max MP 5% 상승 및 완전 회복
                     globalStats.mana.max = Math.ceil(globalStats.mana.max * 1.05);
                     globalStats.mana.current = globalStats.mana.max;
-                    Mana.current[peid] = globalStats.mana.current;
-                    Mana.max[peid] = globalStats.mana.max;
-                    
-                    window.dispatchEvent(new CustomEvent('mp_updated', {
-                        detail: { current: globalStats.mana.current, max: globalStats.mana.max }
-                    }));
+                    Mana.current[peid] = Mana.max[peid] = globalStats.mana.max;
+                    window.dispatchEvent(new CustomEvent('mp_updated', { detail: { current: Mana.current[peid], max: Mana.max[peid] } }));
                 }
-
-                // 사용자 요청: 공격력(ATK) 5%, 이동속도(SPD) 3% 영구 상승
-                globalStats.damageMult *= 1.05;
-                globalStats.moveSpeedMult *= 1.03;
+                globalStats.damageMult *= 1.05; globalStats.moveSpeedMult *= 1.03;
             }
         }
         this.updateStageLevelText();
@@ -619,104 +473,57 @@ export class UIScene extends Phaser.Scene {
 
     private handleHp = (e: CustomEvent<{ current: number, max: number }>) => {
         const { current, max } = e.detail;
-        const percent = Phaser.Math.Clamp(current / max, 0, 1);
-        const fullWidth = 400 - 8;
-        this.hpBar.displayWidth = fullWidth * percent;
+        const p = Phaser.Math.Clamp(current / max, 0, 1);
+        this.hpBar.displayWidth = (400 - 8) * p;
         this.hpText.setText(`${Math.ceil(current)} / ${max}`);
-
-        if (percent > 0.20) this.hpBar.setFillStyle(0xffcc00);
-        else this.hpBar.setFillStyle(0xff0000);
+        this.hpBar.setFillStyle(p > 0.20 ? 0xffcc00 : 0xff0000);
     }
 
     private handleMp = (e: CustomEvent<{ current: number, max: number }>) => {
-        const { current, max } = e.detail;
-        const percent = Phaser.Math.Clamp(current / max, 0, 1);
-        const fullWidth = 400 - 8;
-        this.mpBar.displayWidth = fullWidth * percent;
-        this.mpText.setText(`${Math.ceil(current)} / ${max}`);
+        const p = Phaser.Math.Clamp(e.detail.current / e.detail.max, 0, 1);
+        this.mpBar.displayWidth = (400 - 8) * p;
+        this.mpText.setText(`${Math.ceil(e.detail.current)} / ${e.detail.max}`);
     }
 
     private handleBossHp = (e: CustomEvent<{ current: number, max: number, name?: string }>) => {
         if (!this.bossHpContainer || !this.bossHpBar) return;
-        const { current, max, name } = e.detail;
-        this.bossHpContainer.setVisible(current > 0);
-        const percent = Phaser.Math.Clamp(current / max, 0, 1);
-        this.bossHpBar.displayWidth = (600 - 6) * percent;
-        if (name && this.bossHpText) {
-            this.bossHpText.setText(`${name.toUpperCase()}`);
-        }
+        this.bossHpContainer.setVisible(e.detail.current > 0);
+        this.bossHpBar.displayWidth = (600 - 6) * Phaser.Math.Clamp(e.detail.current / e.detail.max, 0, 1);
+        if (e.detail.name && this.bossHpText) this.bossHpText.setText(e.detail.name.toUpperCase());
     }
 
     private handleBossSpawn = () => {
-        this.bossWarningTween?.stop();
-        this.bossWarningText.setVisible(true).setAlpha(1);
-        this.bossWarningTween = this.tweens.add({
-            targets: this.bossWarningText,
-            alpha: 0.2,
-            duration: 150,
-            yoyo: true,
-            repeat: 20,
-        });
-        this.time.delayedCall(3000, () => {
-            this.bossWarningText.setVisible(false);
-        });
+        this.bossWarningTween?.stop(); this.bossWarningText.setVisible(true).setAlpha(1);
+        this.bossWarningTween = this.tweens.add({ targets: this.bossWarningText, alpha: 0.2, duration: 150, yoyo: true, repeat: 20 });
+        this.time.delayedCall(3000, () => this.bossWarningText.setVisible(false));
     }
 
     private handleStageClear = () => {
-        // --- Safeguard: Hide boss HP bar immediately on clear ---
         this.bossHpContainer?.setVisible(false);
-
         const panel = this.add.rectangle(640, 360, 600, 340, 0x000000, 0.9).setStrokeStyle(4, 0xffd700).setDepth(998);
         this.stageClearText.setVisible(true).setPosition(640, 280).setText(`STAGE ${this.currentStage} CLEAR!`);
-        
-        const reward = this.add.text(640, 360, "BATTLE REWARD:\nALL STATS +10%", {
-            fontSize: '32px', color: '#00ff00', align: 'center', fontStyle: 'bold'
-        }).setOrigin(0.5).setDepth(999);
-
-        const tapToContinue = this.add.text(640, 460, "- Touch to continue -", {
-            fontSize: '24px', color: '#ffffff', fontStyle: 'italic'
-        }).setOrigin(0.5).setDepth(999);
+        const reward = this.add.text(640, 360, "BATTLE REWARD:\nALL STATS +10%", { fontSize: '32px', color: '#00ff00', align: 'center', fontStyle: 'bold' }).setOrigin(0.5).setDepth(999);
+        const tapToContinue = this.add.text(640, 460, "- Touch to continue -", { fontSize: '24px', color: '#ffffff', fontStyle: 'italic' }).setOrigin(0.5).setDepth(999);
 
         this.tweens.add({
             targets: [panel, this.stageClearText, reward, tapToContinue],
-            scale: { from: 0.8, to: 1 },
-            alpha: { from: 0, to: 1 },
-            duration: 500,
-            ease: 'Back.easeOut',
+            scale: { from: 0.8, to: 1 }, alpha: { from: 0, to: 1 }, duration: 500, ease: 'Back.easeOut',
             onComplete: () => {
-                // 사용자 요청: 마우스 클릭뿐만 아니라 아무 키보드 키나 눌러도 진행되도록 개선
                 const proceed = () => {
-                    this.input.off('pointerdown', proceed);
-                    this.input.keyboard?.off('keydown', proceed);
-                    panel.destroy();
-                    reward.destroy();
-                    tapToContinue.destroy();
-                    this.stageClearText.setVisible(false);
-                    window.dispatchEvent(new CustomEvent('next_stage'));
+                    this.input.off('pointerdown', proceed); this.input.keyboard?.off('keydown', proceed);
+                    panel.destroy(); reward.destroy(); tapToContinue.destroy();
+                    this.stageClearText.setVisible(false); window.dispatchEvent(new CustomEvent('next_stage'));
                 };
-
-                this.input.once('pointerdown', proceed);
-                this.input.keyboard?.once('keydown', proceed);
+                this.input.once('pointerdown', proceed); this.input.keyboard?.once('keydown', proceed);
             }
         });
     }
 
     private repositionUIBars() {
-        const hpX = 20;
-        const bottomY = 710; // Aligned with SP 포인트 라인
-        const barHeight = 28;
-        const fullWidth = 400;
-        const spacing = 34; // Gap between bars
-
+        const hpX = 20; const bottomY = 710; const barHeight = 28; const fullWidth = 400; const spacing = 34;
         const needsMana = (this.selectedCharId === 'wizard' || this.selectedCharId === 'elf');
         this.mpContainer.setVisible(needsMana);
 
-        // Positions calculated from bottom up
-        // Slot 0 (Bottom): EXP
-        // Slot 1 (Middle): MP (if exists) or HP
-        // Slot 2 (Top): HP (if MP exists)
-
-        // 1. Position EXP Bar (Always at bottom)
         const expY = bottomY;
         this.expFrame.clear().lineStyle(4, 0xffffff).strokeRoundedRect(hpX, expY - barHeight, fullWidth, barHeight, 4).fillStyle(0x000000, 0.8).fillRoundedRect(hpX, expY - barHeight, fullWidth, barHeight, 4);
         this.xpBar.setPosition(hpX + 4, expY - barHeight + 4);
@@ -726,26 +533,20 @@ export class UIScene extends Phaser.Scene {
         this.expLabel.setPosition(hpX + fullWidth / 2, expY - barHeight / 2);
 
         let nextY = expY - spacing;
-
-        // 2. Position Mana Bar (if needed)
         if (needsMana) {
-            const mpY = nextY;
-            this.mpContainer.setPosition(0, mpY); // Absolute position since it's on scene directly or relative to 0
+            this.mpContainer.setPosition(0, nextY);
             const mpFrame = this.mpContainer.list[0] as Phaser.GameObjects.Graphics;
             const mpShine = this.mpContainer.list[2] as Phaser.GameObjects.Graphics;
             const mpIcon = this.mpContainer.list[3] as Phaser.GameObjects.Image;
-            
             mpFrame.clear().lineStyle(4, 0xffffff).strokeRoundedRect(hpX, -barHeight, fullWidth, barHeight, 4).fillStyle(0x000000, 0.8).fillRoundedRect(hpX, -barHeight, fullWidth, barHeight, 4);
             this.mpBar.setPosition(hpX + 4, -barHeight + 4);
             this.mpBar.height = barHeight - 8;
             mpShine.clear().fillStyle(0xffffff, 0.2).fillRect(hpX + 4, -barHeight + 4, fullWidth - 8, (barHeight - 8) / 2);
             mpIcon.setPosition(hpX - 1, -barHeight / 2);
             this.mpText.setPosition(hpX + fullWidth / 2, -barHeight / 2);
-            
             nextY -= spacing;
         }
 
-        // 3. Position HP Bar (At the top of the stack)
         const hpY = nextY;
         this.hpFrame.clear().lineStyle(4, 0xffffff).strokeRoundedRect(hpX, hpY - barHeight, fullWidth, barHeight, 4).fillStyle(0x000000, 0.8).fillRoundedRect(hpX, hpY - barHeight, fullWidth, barHeight, 4);
         this.hpBar.setPosition(hpX + 4, hpY - barHeight + 4);
