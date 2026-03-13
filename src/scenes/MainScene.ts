@@ -385,8 +385,9 @@ export class MainScene extends Phaser.Scene {
                     );
 
                     if (isSouthWall) {
-                        // 사용자 요청: 남쪽 벽은 wall_fountain_top_blue_f0 에셋 적용
-                        this.wallBlitter.create(x * TILE_SIZE, y * TILE_SIZE, 'wall_fountain_top_blue_f0');
+                        // 사용자 요청: wall_fountain_top_blue_f0와 f1을 랜덤하게 적용
+                        const fountainAsset = Math.random() < 0.5 ? 'wall_fountain_top_blue_f0' : 'wall_fountain_top_blue_f1';
+                        this.wallBlitter.create(x * TILE_SIZE, y * TILE_SIZE, fountainAsset);
                     }
                 }
             }
