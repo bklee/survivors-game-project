@@ -18,4 +18,4 @@ echo "===> Deploying files using rsync from $LOCAL_DIR to $HOST:$REMOTE_DIR"
 rsync -avz -e "ssh $SSH_OPTS" $LOCAL_DIR $HOST:$REMOTE_DIR/
 
 echo "===> Deployment finished!"
-echo "===> Live URL: http://REDACTED_IP/survivors/"
+echo "===> Live URL: https://games.blocktalker.co.kr/survivors/"

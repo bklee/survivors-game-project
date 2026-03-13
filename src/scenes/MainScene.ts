@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { defineQuery, addEntity, addComponent, hasComponent, removeEntity } from 'bitecs';
 import { world } from '../core/World';
-import { Position, Velocity, Player, SpriteInfo, Animation, Health, Interactive, Item, Enemy } from '../components';
+import { Position, Velocity, Player, SpriteInfo, Animation, Health, Mana, Interactive, Item, Enemy } from '../components';
 import { createPhysicsSystem } from '../systems/PhysicsSystem';
 import { createRenderSystem } from '../systems/RenderSystem';
 import { PlayerSystem } from '../systems/PlayerSystem';
@@ -107,6 +107,13 @@ export class MainScene extends Phaser.Scene {
         addComponent(world, Animation, this.playerId);
         addComponent(world, Health, this.playerId);
 
+        // Add Mana component if character uses mana
+        if (this.selectedCharId === 'wizard' || this.selectedCharId === 'elf') {
+            addComponent(world, Mana, this.playerId);
+            Mana.current[this.playerId] = this.charData.baseStats.mana;
+            Mana.max[this.playerId] = this.charData.baseStats.mana;
+        }
+
         const startPos = this.dungeon.getRandomFloorPixel();
         Position.x[this.playerId] = startPos.x;
         Position.y[this.playerId] = startPos.y;
@@ -124,11 +131,19 @@ export class MainScene extends Phaser.Scene {
             window.dispatchEvent(new CustomEvent('hp_updated', {
                 detail: { current: Health.current[this.playerId], max: Health.max[this.playerId] }
             }));
+            if (hasComponent(world, Mana, this.playerId)) {
+                window.dispatchEvent(new CustomEvent('mp_updated', {
+                    detail: { current: Mana.current[this.playerId], max: Mana.max[this.playerId] }
+                }));
+            }
             window.dispatchEvent(new CustomEvent('stage_updated', { detail: this.currentStage }));
+            window.dispatchEvent(new CustomEvent('char_selected', { detail: this.selectedCharId }));
         }, 100);
 
         import('../core/PlayerStats').then(m => {
             m.globalStats.damageMult = charData.baseStats.damage;
+            m.globalStats.mana.max = charData.baseStats.mana; // Initialize global mana max
+            m.globalStats.mana.current = charData.baseStats.mana; // Initialize global mana current
         });
 
         this.cameras.main.setZoom(2.5);
@@ -204,6 +219,13 @@ export class MainScene extends Phaser.Scene {
             window.dispatchEvent(new CustomEvent('hp_updated', {
                 detail: { current: Health.current[this.playerId], max: Health.max[this.playerId] }
             }));
+            // Restore MP to 100% on new stage if applicable
+            if (hasComponent(world, Mana, this.playerId)) {
+                Mana.current[this.playerId] = Mana.max[this.playerId];
+                window.dispatchEvent(new CustomEvent('mp_updated', {
+                    detail: { current: Mana.current[this.playerId], max: Mana.max[this.playerId] }
+                }));
+            }
 
             // Re-spawn props on new map
             this.spawnDungeonProps();
@@ -310,8 +332,26 @@ export class MainScene extends Phaser.Scene {
 
                 // ── Walls ───────────────────────────────────────────────────
                 if (cell === TileType.WALL) {
-                    // 사용자 요청: 벽면 렌더링 및 붉은 가고일 분수 제거
-                    // (맵 데이터 상으로는 WALL로 남아 충돌 판정은 유지됨)
+                    // 북쪽 벽 판정: 타일 바로 아래(y+1)가 바닥(FLOOR), 문(DOOR) 또는 기둥(PILLAR)인 경우
+                    const isNorthWall = y < mapH - 1 && (
+                        this.dungeon.map[y + 1][x] === TileType.FLOOR || 
+                        this.dungeon.map[y + 1][x] === TileType.DOOR || 
+                        this.dungeon.map[y + 1][x] === TileType.PILLAR
+                    );
+
+                    if (isNorthWall) {
+                        // 에셋 매핑 수정으로 wall_n_mid가 심플한 일자벽을 가리키게 됨
+                        this.wallBlitter.create(x * TILE_SIZE, y * TILE_SIZE, 'wall_n_mid');
+
+                        // 사용자 요청: 북쪽 벽에만 2% 확률로 슬라임(Goo) 장식 추가
+                        if (Math.random() < 0.02) {
+                            const wx = x * TILE_SIZE;
+                            const wy = y * TILE_SIZE;
+                            // 바닥(Floor) 쪽으로 더 내려와서 붙도록 +12px 오프셋 적용
+                            this.wallBlitter.create(wx, wy + 12, 'wall_goo_top');
+                            this.wallBlitter.create(wx, wy + 28, 'wall_goo_mid');
+                        }
+                    }
                 }
             }
         }
@@ -418,26 +458,49 @@ export class MainScene extends Phaser.Scene {
                         const multiplier = isBig ? 1.5 : 1.0;
                         const randomPercent = (40 + Math.random() * 20) * multiplier;
                         window.dispatchEvent(new CustomEvent('xp_percent_collected', { detail: randomPercent }));
-                    } else if (baseType === 51) { // Yellow: Refill Health 100%
-                        Health.current[this.playerId] = Health.max[this.playerId];
+                    } else if (baseType === 51) { // Yellow: Refill Health
+                        if (isBig) {
+                            Health.current[this.playerId] = Health.max[this.playerId];
+                        } else {
+                            // 소형: 최대 체력의 1/2만큼 회복 (최대치 초과 불가)
+                            const healAmount = Health.max[this.playerId] / 2;
+                            Health.current[this.playerId] = Math.min(Health.max[this.playerId], Health.current[this.playerId] + healAmount);
+                        }
                         window.dispatchEvent(new CustomEvent('hp_updated', {
                             detail: { current: Health.current[this.playerId], max: Health.max[this.playerId] }
                         }));
-                    } else if (baseType === 52) { // Red/Orange: Kill nearby monsters
-                        const multiplier = isBig ? 2.0 : 1.0;
-                        const killRadiusSq = (400 * multiplier) * (400 * multiplier);
-                        for (let j = 0; j < enemies.length; j++) {
-                            const enemyEid = enemies[j];
-                            const edx = Position.x[enemyEid] - px;
-                            const edy = Position.y[enemyEid] - py;
-                            if (edx * edx + edy * edy < killRadiusSq) {
-                                Health.current[enemyEid] = 0;
+                    } else if (baseType === 52) { // Red: Kill monsters
+                        if (isBig) {
+                            // 대형: 반경 400px 내 섬멸 및 약간의 화면 흔들림
+                            const killRadiusSq = 400 * 400;
+                            for (let j = 0; j < enemies.length; j++) {
+                                const enemyEid = enemies[j];
+                                const edx = Position.x[enemyEid] - px;
+                                const edy = Position.y[enemyEid] - py;
+                                if (edx * edx + edy * edy < killRadiusSq) {
+                                    Health.current[enemyEid] = 0;
+                                }
                             }
+                            this.juicePipeline.screenShake(0.005, 400);
+                        } else {
+                            // 소형: 화면 내(현재 활성화된 모든 적) 섬멸
+                            for (let j = 0; j < enemies.length; j++) {
+                                Health.current[enemies[j]] = 0;
+                            }
+                            this.juicePipeline.screenShake(0.01, 500);
                         }
-                        this.juicePipeline.screenShake(0.01 * multiplier, 500);
                         this.juicePipeline.vfx.playFireHit(px, py);
-                    } else if (baseType === 53) { // Blue: Refill MP (Not Implemented yet)
-                        // TODO: Add MP refill logic when MP system is added
+                    } else if (baseType === 53) { // Blue: Refill MP
+                        if (isBig) {
+                            globalStats.mana.current = globalStats.mana.max;
+                        } else {
+                            // 소형: 최대 마나의 1/2만큼 회복 (최대치 초과 불가)
+                            const refillAmount = globalStats.mana.max / 2;
+                            globalStats.mana.current = Math.min(globalStats.mana.max, globalStats.mana.current + refillAmount);
+                        }
+                        window.dispatchEvent(new CustomEvent('mp_updated', {
+                            detail: { current: globalStats.mana.current, max: globalStats.mana.max }
+                        }));
                     }
 
                     window.dispatchEvent(new CustomEvent('play_sound', { detail: 'level_up' }));
@@ -476,14 +539,19 @@ export class MainScene extends Phaser.Scene {
                     }
 
                     // Always spawn a random potion (Green, Yellow, Red/Orange, Blue)
-                    // Randomly choose between Small (50-53) and Big (54-57)
-                    const isBig = Math.random() > 0.7; // 30% chance for big potion
+                    const isBig = Math.random() > 0.7;
                     const potionBase = isBig ? 54 : 50;
                     const potId = addEntity(world);
                     addComponent(world, Position, potId);
                     addComponent(world, SpriteInfo, potId);
                     Position.x[potId] = Position.x[eid];
-                    Position.y[potId] = Position.y[eid] + 16;
+                    
+                    // 사용자 요청: 물약이 던전을 벗어나지 않도록 바닥 여부 확인 후 위치 결정
+                    let potY = Position.y[eid] + 16;
+                    if (!this.dungeon.isFloor(Position.x[potId], potY)) {
+                        potY = Position.y[eid] - 8; // 아래가 벽이면 상자 위쪽으로 배치
+                    }
+                    Position.y[potId] = potY;
                     SpriteInfo.textureIndex[potId] = potionBase + Math.floor(Math.random() * 4);
 
                     window.dispatchEvent(new CustomEvent('play_sound', { detail: 'level_up' }));
