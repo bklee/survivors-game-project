@@ -288,7 +288,6 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                     // --- 루프 반복 시 색상 변경 (매 9스테이지/1사이클 마다 점진적 변화) ---
                     const cycleCount = Math.floor((globalStats.currentStage - 1) / 9);
                     if (cycleCount > 0) {
-                        // 사이클에 따라 색상을 60도씩 회전시켜 변화를 직관적으로 보이게 함
                         const hue = (cycleCount * 60) % 360; 
                         const colorObj = Phaser.Display.Color.HSVToRGB(hue / 360, 0.8, 1);
                         sprite.setTint(colorObj.color);
@@ -296,19 +295,20 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                         sprite.clearTint();
                     }
                 } else if (typeId === 100) {
-                    sprite.setScale(1.5); // Wizard special fire effect size (adjusted to 1.5x)
+                    sprite.setScale(1.5);
                     sprite.clearTint();
                 } else {
                     sprite.setScale(1.0);
                     if (typeId === 104) {
                         sprite.tint = 0xffff00;
                     } else if (isPlayer) {
-                        // --- 캐릭터 색상 진화 (레벨에 따른 Tint 변화) ---
+                        // --- 캐릭터 색상 진화 (요청하신 청록색 위저드 스타일 반영) ---
                         const level = globalStats.currentLevel;
-                        if (level >= 30) sprite.setTint(0xffd700);      // Level 30+: Gold
-                        else if (level >= 20) sprite.setTint(0xff00ff); // Level 20+: Purple
-                        else if (level >= 10) sprite.setTint(0x00ffff); // Level 10+: Cyan (요청하신 이미지 스타일)
-                        else if (level >= 5) sprite.setTint(0x00ff00);  // Level 5+: Green
+                        // XP가 많아도 레벨업 로직이 돌아야 적용되므로 UI에서 레벨업 체크 확인 필수
+                        if (level >= 30) sprite.setTint(0xffd700);      // Lv 30+ Gold
+                        else if (level >= 20) sprite.setTint(0xff00ff); // Lv 20+ Purple
+                        else if (level >= 10) sprite.setTint(0x00ffff); // Lv 10+ Cyan
+                        else if (level >= 5) sprite.setTint(0x00ff00);  // Lv 5+ Green
                         else sprite.clearTint();
                     } else {
                         sprite.clearTint();
@@ -332,8 +332,9 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                         sprite.flipY = false;
                     }
                 }
-                if (typeId === 104) sprite.tint = 0xffff00;
-                else sprite.clearTint();
+                // 이전 중복 Tint 초기화 코드 제거 (이곳에서 clearTint를 호출하여 위에서 설정한 색상이 무효화되고 있었음)
+                // if (typeId === 104) sprite.tint = 0xffff00;
+                // else sprite.clearTint();
 
                 // Render specific player weapons
                 if (isPlayer && (charKey === 'knight' || charKey === 'wizard' || charKey === 'elf')) {
