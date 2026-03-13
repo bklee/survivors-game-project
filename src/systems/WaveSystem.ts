@@ -1,10 +1,11 @@
 import { addEntity, addComponent, defineQuery, hasComponent, removeEntity } from 'bitecs';
 import { world } from '../core/World';
-import { Animation, Position, Velocity, Health, SpriteInfo, Enemy, Player, Boss, EnemyProjectile, Lifespan, Scale } from '../components';
+import { Animation, Position, Velocity, Health, SpriteInfo, Enemy, Player, Boss, EnemyProjectile, Lifespan, Scale, ActionState } from '../components';
 import { DungeonGenerator } from '../core/DungeonGenerator';
 
 const enemyQuery = defineQuery([Enemy, Position, Velocity]);
 const playerQuery = defineQuery([Player, Position]);
+const actionStateQuery = defineQuery([ActionState]);
 
 export class NightDirector {
     private timeElapsed: number = 0; // ms
@@ -27,6 +28,14 @@ export class NightDirector {
     }
 
     public update(dt: number) {
+        const actionStates = actionStateQuery(world);
+        for (let i = 0; i < actionStates.length; i++) {
+            const eid = actionStates[i];
+            if (ActionState.attackTimer[eid] > 0) {
+                ActionState.attackTimer[eid] = Math.max(0, ActionState.attackTimer[eid] - dt);
+            }
+        }
+
         if (this.stageClearDispatched) return;
         this.timeElapsed += dt;
 
@@ -100,7 +109,7 @@ export class NightDirector {
 
             if (hasComponent(world, Boss, eid)) {
                 this.bossBarrageTimer += dt;
-                if (this.bossBarrageTimer >= 3000) { // 공격 주기 4초 -> 3초로 단축 (긴장감 강화)
+                if (this.bossBarrageTimer >= 3000) { // 공격 주기 3초
                     this.bossBarrageTimer = 0;
                     const typeId = SpriteInfo.textureIndex[eid];
                     const bx = Position.x[eid];
@@ -108,11 +117,10 @@ export class NightDirector {
 
                     if (typeId === 69) { // Big Demon (대악마)
                         this.spawnDemonFireAttack(bx, by, playerX, playerY);
-                    } else if (typeId === 79) { // Big Zombie (대왕 좀비)
-                        this.spawnZombiePoisonAttack(playerX, playerY);
                     } else if (typeId === 89) { // Ogre (오우거)
-                        this.spawnOgreSlamAttack(bx, by);
+                        this.spawnOgreSlamAttack(eid, bx, by);
                     } else {
+                        // Big Zombie 및 기타 보스는 기본 탄막 유지
                         this.spawnBarrage(bx, by);
                     }
                 }
@@ -217,6 +225,11 @@ export class NightDirector {
         Animation.frameRate[eid] = 6;
         Animation.timer[eid] = 0;
 
+        if (typeId === 89) { // Ogre
+            addComponent(world, ActionState, eid);
+            ActionState.attackDuration[eid] = 600;
+        }
+
         const bName = typeId === 69 ? "BIG DEMON" : (typeId === 79 ? "BIG ZOMBIE" : "OGRE");
         window.dispatchEvent(new CustomEvent('boss_hp', {
             detail: { current: hp, max: hp, name: bName }
@@ -283,38 +296,13 @@ export class NightDirector {
         }
     }
 
-    private spawnZombiePoisonAttack(px: number, py: number) {
-        // 플레이어 위치 주변에 8개의 독구름 서서히 생성 (역병의 영역)
-        const count = 8;
-        for (let i = 0; i < count; i++) {
-            const angle = (i / count) * Math.PI * 2;
-            const radius = 50;
-            const spawnX = px + Math.cos(angle) * radius;
-            const spawnY = py + Math.sin(angle) * radius;
 
-            const feid = addEntity(world);
-            addComponent(world, Position, feid);
-            addComponent(world, Velocity, feid);
-            addComponent(world, EnemyProjectile, feid);
-            addComponent(world, SpriteInfo, feid);
-            addComponent(world, Lifespan, feid);
-            addComponent(world, Animation, feid);
-            addComponent(world, Scale, feid);
-
-            Position.x[feid] = spawnX;
-            Position.y[feid] = spawnY;
-            Velocity.x[feid] = 0;
-            Velocity.y[feid] = 0;
-            SpriteInfo.textureIndex[feid] = 102; // Wizard's Poison Gas (Spell Gas)
-            Scale.value[feid] = 1.25; 
-            Lifespan.duration[feid] = 1500; // 독은 좀 더 오래 유지됨
-            Animation.timer[feid] = 0;
-
-            window.dispatchEvent(new CustomEvent('play_sound', { detail: 'poison_cast' }));
+    private spawnOgreSlamAttack(eid: number, bx: number, by: number) {
+        // 배트 휘두르기 애니메이션 트리거
+        if (hasComponent(world, ActionState, eid)) {
+            ActionState.attackTimer[eid] = ActionState.attackDuration[eid];
         }
-    }
 
-    private spawnOgreSlamAttack(bx: number, by: number) {
         // 보스 중심에서 퍼져나가는 고밀도 충격파 (지면 강타)
         const count = 16;
         for (let i = 0; i < count; i++) {
