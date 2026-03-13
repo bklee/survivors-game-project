@@ -1,6 +1,6 @@
 import { addEntity, addComponent, defineQuery, hasComponent, removeEntity } from 'bitecs';
 import { world } from '../core/World';
-import { Animation, Position, Velocity, Health, SpriteInfo, Enemy, Player, Boss, EnemyProjectile, Lifespan } from '../components';
+import { Animation, Position, Velocity, Health, SpriteInfo, Enemy, Player, Boss, EnemyProjectile, Lifespan, Scale } from '../components';
 import { DungeonGenerator } from '../core/DungeonGenerator';
 
 const enemyQuery = defineQuery([Enemy, Position, Velocity]);
@@ -18,9 +18,11 @@ export class NightDirector {
     private globalDifficultyMultiplier = 1.0;
     private lastSpawnTime: number = 0;
     private dungeon: DungeonGenerator;
+    private scene: Phaser.Scene;
 
-    constructor(dungeon: DungeonGenerator) {
+    constructor(dungeon: DungeonGenerator, scene: Phaser.Scene) {
         this.dungeon = dungeon;
+        this.scene = scene;
         this.resetForNextStage(1);
     }
 
@@ -98,9 +100,18 @@ export class NightDirector {
 
             if (hasComponent(world, Boss, eid)) {
                 this.bossBarrageTimer += dt;
-                if (this.bossBarrageTimer >= 4000) {
+                if (this.bossBarrageTimer >= 3000) { // 공격 주기 4초 -> 3초로 단축 (긴장감 강화)
                     this.bossBarrageTimer = 0;
-                    this.spawnBarrage(Position.x[eid], Position.y[eid]);
+                    const typeId = SpriteInfo.textureIndex[eid];
+                    const bx = Position.x[eid];
+                    const by = Position.y[eid];
+
+                    if (typeId === 69) { // Big Demon (대악마)
+                        this.spawnDemonFireAttack(bx, by, playerX, playerY);
+                    } else {
+                        // 다른 보스들은 추후 업그레이드 전까지 기본 탄막 유지
+                        this.spawnBarrage(bx, by);
+                    }
                 }
             }
         }
@@ -225,6 +236,48 @@ export class NightDirector {
             Velocity.y[beid] = Math.sin(angle) * 150;
             Lifespan.duration[beid] = 1200;
             SpriteInfo.textureIndex[beid] = 104;
+        }
+    }
+
+    private spawnDemonFireAttack(bx: number, by: number, px: number, py: number) {
+        // 플레이어 방향으로 5개의 연쇄 불기둥 생성 (공포의 흔적)
+        const count = 5;
+        const dx = px - bx;
+        const dy = py - by;
+        const dist = Math.hypot(dx, dy);
+        const ux = dx / dist;
+        const uy = dy / dist;
+
+        // 공격 시작 시 화면 흔들림 효과 (대악마의 위압감)
+        window.dispatchEvent(new CustomEvent('screen_shake', { detail: { intensity: 0.015, duration: 300 } }));
+
+        for (let i = 0; i < count; i++) {
+            // 0.2초 간격으로 연쇄 발동
+            this.scene.time.delayedCall(i * 200, () => {
+                const spawnX = bx + ux * (i * 60 + 40);
+                const spawnY = by + uy * (i * 60 + 40);
+
+                const feid = addEntity(world);
+                addComponent(world, Position, feid);
+                addComponent(world, Velocity, feid);
+                addComponent(world, EnemyProjectile, feid);
+                addComponent(world, SpriteInfo, feid);
+                addComponent(world, Lifespan, feid);
+                addComponent(world, Animation, feid);
+                addComponent(world, Scale, feid);
+
+                Position.x[feid] = spawnX;
+                Position.y[feid] = spawnY;
+                Velocity.x[feid] = 0;
+                Velocity.y[feid] = 0;
+                SpriteInfo.textureIndex[feid] = 100; // Wizard's Fire Pillar (Spell Fire)
+                Scale.value[feid] = 2.5; // 대장급 공격이므로 큼직하게 (2.5배)
+                Lifespan.duration[feid] = 800; // 애니메이션을 충분히 보여줄 수 있는 기간
+                Animation.timer[feid] = 0;
+
+                // 불기둥 소환 시 효과음
+                window.dispatchEvent(new CustomEvent('play_sound', { detail: 'fire_cast' }));
+            });
         }
     }
 

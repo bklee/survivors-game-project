@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { defineQuery, hasComponent } from 'bitecs';
-import { Animation, Position, SpriteInfo, Velocity, Health, Interactive, Rotation, Boss, Player } from '../components';
+import { Animation, Position, SpriteInfo, Velocity, Health, Interactive, Rotation, Boss, Player, Scale } from '../components';
 import { world } from '../core/World';
 import { globalStats } from '../core/PlayerStats';
 
@@ -283,7 +283,10 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
 
                 sprite.setVisible(true);
                 const isBoss = hasComponent(world, Boss, eid);
-                if (isBoss) {
+                if (hasComponent(world, Scale, eid)) {
+                    sprite.setScale(Scale.value[eid]);
+                    sprite.clearTint();
+                } else if (isBoss) {
                     sprite.setScale(2.5);
                     // --- 루프 반복 시 색상 변경 (매 9스테이지/1사이클 마다 점진적 변화) ---
                     const cycleCount = Math.floor((globalStats.currentStage - 1) / 9);
