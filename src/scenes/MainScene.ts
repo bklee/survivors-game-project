@@ -375,7 +375,7 @@ export class MainScene extends Phaser.Scene {
                         // 사용자 요청: 북쪽 벽에만 2% 확률로 구멍(Wall Hole) 장식 추가
                         if (Math.random() < 0.02) {
                             const wx = x * TILE_SIZE + 8; // Center X
-                            const wy = y * TILE_SIZE + 16; // Adjust Y position for wall integration
+                            const wy = y * TILE_SIZE + 22; // 자연스럽게 보이기 위해 아래쪽으로 더 이동 (+16 -> +22)
                             const holeAsset = Math.random() < 0.5 ? 'wall_hole_1' : 'wall_hole_2';
                             const deco = this.add.image(wx, wy, holeAsset);
                             deco.setDepth(y * TILE_SIZE + 32); // Match wall depth
