@@ -385,9 +385,13 @@ export class MainScene extends Phaser.Scene {
                     );
 
                     if (isSouthWall) {
-                        // 사용자 요청: wall_fountain_top_blue_f0와 f1을 랜덤하게 적용
+                        // 사용자 요청: wall_fountain_top_blue_f0와 f1을 랜덤하게 적용하되 180도 회전(flipX, flipY)
                         const fountainAsset = Math.random() < 0.5 ? 'wall_fountain_top_blue_f0' : 'wall_fountain_top_blue_f1';
-                        this.wallBlitter.create(x * TILE_SIZE, y * TILE_SIZE, fountainAsset);
+                        const bob = this.wallBlitter.create(x * TILE_SIZE, y * TILE_SIZE, fountainAsset);
+                        if (bob) {
+                            bob.flipX = true;
+                            bob.flipY = true;
+                        }
                     }
                 }
             }
