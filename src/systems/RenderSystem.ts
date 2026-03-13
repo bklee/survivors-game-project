@@ -369,10 +369,20 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                         if (charKey === 'knight') {
                             swingRot = Math.sin(progress * Math.PI) * (Math.PI * 0.8);
                         }
-                        else if (charKey === 'wizard') swingRot = Math.sin(progress * Math.PI) * (Math.PI / 15); // 까딱(약 12도) 하는 효과로 최소화
-                        else swingRot = Math.sin(progress * Math.PI) * (Math.PI / 4);
+                        else if (charKey === 'wizard') {
+                            swingRot = Math.sin(progress * Math.PI) * (Math.PI / 15);
+                        }
+                        else if (charKey === 'elf') {
+                            // 활만 움직이도록 (회전 없이 프레임 애니메이션만 적용)
+                            swingRot = 0; 
+                            const frame = (playerAttackTimer > 50 && playerAttackTimer < 350) ? 'weapon_bow_2' : 'weapon_bow';
+                            wSprite.setFrame(frame);
+                        }
                     } else if (state === 'run') {
                         swingRot = Math.sin(Animation.timer[eid] / 100) * 0.15;
+                        if (charKey === 'elf') wSprite.setFrame('weapon_bow');
+                    } else {
+                        if (charKey === 'elf') wSprite.setFrame('weapon_bow');
                     }
 
                     if (sprite.flipX) {
