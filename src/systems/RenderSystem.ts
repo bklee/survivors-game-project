@@ -385,7 +385,7 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                         wSprite = _scene.add.sprite(Position.x[eid], Position.y[eid], weaponTex, weaponFrame);
                         // Ogre의 배트는 조금 더 위쪽 정렬 및 확실한 고정
                         wSprite.setOrigin(0.5, (charKey === 'ogre') ? 1.0 : ((charKey === 'wizard' || charKey === 'elf') ? 1.0 : 0.8));
-                        wSprite.setDepth(sprite.depth + 1); 
+                        wSprite.setDepth(isBoss && charKey === 'ogre' ? sprite.depth - 1 : sprite.depth + 1); 
                         playerWeaponSprites[eid] = wSprite;
                     }
 
@@ -394,11 +394,11 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                     if (hasComponent(world, Scale, eid)) {
                         wScale = Scale.value[eid] * 1.5; // 보스 무기는 조금 더 크게 (1.5배)
                     } else if (isBoss) {
-                        wScale = (charKey === 'ogre') ? 4.0 : 2.0; // 오우거는 특별히 거대하게 (4.0)
+                        wScale = (charKey === 'ogre') ? 3.2 : 2.0; // 오우거는 특별히 거대하게 (4.0 -> 80% 축소로 3.2)
                     }
                     wSprite.setScale(wScale);
 
-                    const wx = charKey === 'wizard' ? 4 : (charKey === 'elf' ? 5 : (charKey === 'ogre' ? 25 : 5)); 
+                    const wx = charKey === 'wizard' ? 4 : (charKey === 'elf' ? 5 : (charKey === 'ogre' ? 15 : 5)); 
                     const wy = (charKey === 'wizard' || charKey === 'elf') ? 4 : (charKey === 'ogre' ? 10 : -7); 
                     let baseRot = (charKey === 'knight' || charKey === 'ogre') ? -Math.PI / 4 : 0;
 
@@ -441,7 +441,7 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                         wSprite.rotation = baseRot + swingRot;
                     }
 
-                    wSprite.setDepth(sprite.depth + 1); // Depth consistency
+                    wSprite.setDepth(isBoss && charKey === 'ogre' ? sprite.depth - 1 : sprite.depth + 1); // Depth consistency
                     wSprite.setVisible(true);
                     wSprite.alpha = currentAlpha;
 
