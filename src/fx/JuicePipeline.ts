@@ -68,7 +68,7 @@ export class JuicePipeline {
     public damageNumber(x: number, y: number, amount: number) {
         const text = this.getDamageText();
         text
-            .setText(amount.toString())
+            .setText(Math.floor(amount).toString())
             .setPosition(x, y)
             .setAlpha(1)
             .setScale(1)
