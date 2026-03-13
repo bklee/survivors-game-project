@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { defineQuery } from 'bitecs';
+import { defineQuery, hasComponent } from 'bitecs';
 import { world } from '../core/World';
 import { Position, Player, Enemy, Boss } from '../components';
 import { globalStats } from '../core/PlayerStats';
@@ -527,12 +527,21 @@ export class UIScene extends Phaser.Scene {
 
         const enemies = this.enemyQuery(world);
 
-        this.minimapGraphics.fillStyle(0xff0000, 0.8);
         for (let i = 0; i < enemies.length; i++) {
             const eid = enemies[i];
+            const isBoss = hasComponent(world, Boss, eid);
             const x = offsetX + (Position.x[eid] * scale);
             const y = offsetY + (Position.y[eid] * scale);
-            this.minimapGraphics.fillRect(x, y, 2, 2);
+            
+            if (isBoss) {
+                // 보스는 더 크고 선명한 빨간색 원으로 표시
+                this.minimapGraphics.fillStyle(0xff0000, 1.0);
+                this.minimapGraphics.fillCircle(x, y, 4);
+            } else {
+                // 일반 적은 기존 규격(2x2) 유지
+                this.minimapGraphics.fillStyle(0xff0000, 0.8);
+                this.minimapGraphics.fillRect(x - 1, y - 1, 2, 2);
+            }
         }
 
         if (players.length > 0) {
@@ -626,22 +635,29 @@ export class UIScene extends Phaser.Scene {
         // --- Safeguard: Hide boss HP bar immediately on clear ---
         this.bossHpContainer?.setVisible(false);
 
-        const panel = this.add.rectangle(640, 360, 600, 300, 0x000000, 0.9).setStrokeStyle(4, 0xffd700).setDepth(998);
-        this.stageClearText.setVisible(true).setPosition(640, 300).setText(`STAGE ${this.currentStage} CLEAR!`);
-        const reward = this.add.text(640, 400, "BATTLE REWARD:\nALL STATS +10%", {
+        const panel = this.add.rectangle(640, 360, 600, 340, 0x000000, 0.9).setStrokeStyle(4, 0xffd700).setDepth(998);
+        this.stageClearText.setVisible(true).setPosition(640, 280).setText(`STAGE ${this.currentStage} CLEAR!`);
+        
+        const reward = this.add.text(640, 360, "BATTLE REWARD:\nALL STATS +10%", {
             fontSize: '32px', color: '#00ff00', align: 'center', fontStyle: 'bold'
         }).setOrigin(0.5).setDepth(999);
 
+        const tapToContinue = this.add.text(640, 460, "- Touch to continue -", {
+            fontSize: '24px', color: '#ffffff', fontStyle: 'italic'
+        }).setOrigin(0.5).setDepth(999);
+
         this.tweens.add({
-            targets: [panel, this.stageClearText, reward],
+            targets: [panel, this.stageClearText, reward, tapToContinue],
             scale: { from: 0.8, to: 1 },
             alpha: { from: 0, to: 1 },
             duration: 500,
             ease: 'Back.easeOut',
             onComplete: () => {
-                this.time.delayedCall(3000, () => {
+                // 한 번의 클릭/터치 이벤트를 대기
+                this.input.once('pointerdown', () => {
                     panel.destroy();
                     reward.destroy();
+                    tapToContinue.destroy();
                     this.stageClearText.setVisible(false);
                     window.dispatchEvent(new CustomEvent('next_stage'));
                 });

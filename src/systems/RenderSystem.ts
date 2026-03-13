@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { defineQuery, hasComponent } from 'bitecs';
 import { Animation, Position, SpriteInfo, Velocity, Health, Interactive, Rotation, Boss, Player } from '../components';
 import { world } from '../core/World';
+import { globalStats } from '../core/PlayerStats';
 
 const MONSTER_CONFIG: Record<number, { name: string, hasIdleRun: boolean, frames?: number }> = {
     // Demons
@@ -133,7 +134,8 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
             if ((typeId === 0 || typeId === 1 || typeId === 2) && !isPlayer) continue;
 
             const isPillarPart = typeId >= 90 && typeId <= 95;
-            const requiresSprite = isPlayer || typeId >= 100 || (typeId >= 60 && typeId <= 82) || typeId >= 50 || typeId === 36 || typeId === 21 || isPillarPart || hasComponent(world, Rotation, eid);
+            // BOSS IDs: 69, 79, 89. Ogre(89)가 누락되지 않도록 범위를 89까지 확장.
+            const requiresSprite = isPlayer || typeId >= 100 || (typeId >= 60 && typeId <= 89) || typeId >= 50 || typeId === 36 || typeId === 21 || isPillarPart || hasComponent(world, Rotation, eid);
 
             // 2. Identify State (Idle vs Run)
             let state = 'idle';
@@ -280,12 +282,25 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                 sprite.setDepth(Position.y[eid] + depthOffset);
 
                 sprite.setVisible(true);
-                if (hasComponent(world, Boss, eid)) {
+                const isBoss = hasComponent(world, Boss, eid);
+                if (isBoss) {
                     sprite.setScale(2.5);
+                    // --- 10세트(30스테이지)마다 보스 색상 보색 계통으로 변경 ---
+                    const cycleLevel = Math.floor((globalStats.currentStage - 1) / 30);
+                    if (cycleLevel > 0) {
+                        const hue = (cycleLevel * 120) % 360; 
+                        const colorObj = Phaser.Display.Color.HSVToRGB(hue / 360, 0.7, 1);
+                        sprite.setTint(colorObj.color);
+                    } else {
+                        sprite.clearTint();
+                    }
                 } else if (typeId === 100) {
                     sprite.setScale(1.5); // Wizard special fire effect size (adjusted to 1.5x)
+                    sprite.clearTint();
                 } else {
                     sprite.setScale(1.0);
+                    if (typeId === 104) sprite.tint = 0xffff00;
+                    else sprite.clearTint();
                 }
 
                 if (hasComponent(world, Velocity, eid) && !hasComponent(world, Rotation, eid)) {
