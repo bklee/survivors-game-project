@@ -76,31 +76,60 @@ export class SpellSystem {
         this.spellCooldowns.set(spellId, 500 * globalStats.cooldownMult);
 
         window.dispatchEvent(new CustomEvent('combo_cast', { detail: { duration: animDuration } }));
-        
+
+        const extraProjectiles = Math.floor((globalStats.currentLevel || 1) / 10);
+
         if (this.selectedCharId === 'knight') {
             window.dispatchEvent(new CustomEvent('play_sound', { detail: 'fire_cast' }));
-            this.spawnKnightAttack(px, py, this.lastFacingX, this.lastFacingY);
+            for (let i = 0; i <= extraProjectiles; i++) {
+                const angle = this.calculateAngleOffset(i);
+                const dir = this.rotateVector(this.lastFacingX, this.lastFacingY, angle);
+                this.spawnKnightAttack(px, py, dir.x, dir.y);
+            }
         } else if (this.selectedCharId === 'elf') {
-            // "당겼다 놓기" 연출을 위해 300ms 지연 후 화살 발사 및 소리 재생
             this.scene.time.delayedCall(300, () => {
                 const playersNow = playerQuery(world);
                 if (playersNow.length > 0) {
                     const eidNow = playersNow[0];
                     window.dispatchEvent(new CustomEvent('play_sound', { detail: 'fire_cast' }));
-                    this.spawnElfAttack(Position.x[eidNow], Position.y[eidNow], this.lastFacingX, this.lastFacingY);
+                    for (let i = 0; i <= extraProjectiles; i++) {
+                        const angle = this.calculateAngleOffset(i);
+                        const dir = this.rotateVector(this.lastFacingX, this.lastFacingY, angle);
+                        this.spawnElfAttack(Position.x[eidNow], Position.y[eidNow], dir.x, dir.y);
+                    }
                 }
             });
         } else {
             window.dispatchEvent(new CustomEvent('play_sound', { detail: 'fire_cast' }));
-            this.spawnWizardAttack(px, py, this.lastFacingX, this.lastFacingY);
+            for (let i = 0; i <= extraProjectiles; i++) {
+                const angle = this.calculateAngleOffset(i);
+                const dir = this.rotateVector(this.lastFacingX, this.lastFacingY, angle);
+                this.spawnWizardAttack(px, py, dir.x, dir.y, i === 0);
+            }
         }
+    }
+
+    private calculateAngleOffset(index: number): number {
+        if (index === 0) return 0;
+        // 1 -> 15, 2 -> -15, 3 -> 30, 4 -> -30...
+        return 15 * Math.ceil(index / 2) * (index % 2 === 1 ? 1 : -1);
+    }
+
+    private rotateVector(x: number, y: number, angleDeg: number): { x: number, y: number } {
+        const rad = angleDeg * (Math.PI / 180);
+        const cos = Math.cos(rad);
+        const sin = Math.sin(rad);
+        return {
+            x: x * cos - y * sin,
+            y: x * sin + y * cos
+        };
     }
 
     private spawnKnightAttack(x: number, y: number, dx: number, dy: number) {
         const fxEid = this.createBaseSpell(x + dx * 35, y + dy * 35, Math.random() > 0.5 ? 109 : 110);
         Spell.damage[fxEid] = 60 * globalStats.damageMult;
         Spell.radius[fxEid] = 60;
-        Spell.duration[fxEid] = 250; // 3프레임 애니메이션을 다 보여주기 위해 250ms로 연장
+        Spell.duration[fxEid] = 250;
         Spell.pierce[fxEid] = 10;
         Velocity.x[fxEid] = dx * 10;
         Velocity.y[fxEid] = dy * 10;
@@ -108,34 +137,36 @@ export class SpellSystem {
     }
 
     private spawnElfAttack(x: number, y: number, dx: number, dy: number) {
-        const eid = this.createBaseSpell(x, y, 106); // typeId 106 (weapon_arrow)
+        const eid = this.createBaseSpell(x, y, 106);
         Spell.damage[eid] = 30 * globalStats.damageMult;
-        Spell.radius[eid] = 15; // 공격 판정 범위 70% 축소 (47 -> 15): 정밀 타격감 강화
-        Spell.duration[eid] = 400; // 사거리 2배 상향: 속도 400 * 0.4초 = 약 160px 이동 후 소멸
+        Spell.radius[eid] = 15;
+        Spell.duration[eid] = 400;
         Spell.pierce[eid] = 3;
-        Velocity.x[eid] = dx * 400; // 속도 400
+        Velocity.x[eid] = dx * 400;
         Velocity.y[eid] = dy * 400;
         Rotation.angle[eid] = Math.atan2(dy, dx);
     }
 
-    private spawnWizardAttack(x: number, y: number, dx: number, dy: number) {
+    private spawnWizardAttack(x: number, y: number, dx: number, dy: number, playSound: boolean) {
         const explosionCount = 3;
-        const spacing = 25; // 캐릭터 3개 범위에 맞게 간격 조절 (기존 45에서 축소)
-        const firstDist = 20; // 캐릭터 바로 앞부터 시작
-        const delay = 80; // "빵빵빵" 연쇄 폭발 간격
+        const spacing = 25;
+        const firstDist = 20;
+        const delay = 80;
 
         for (let i = 0; i < explosionCount; i++) {
             this.scene.time.delayedCall(i * delay, () => {
                 const castDist = firstDist + (i * spacing);
                 const eid = this.createBaseSpell(x + dx * castDist, y + dy * castDist, 100);
                 Spell.damage[eid] = 45 * globalStats.damageMult;
-                Spell.radius[eid] = 45; // 범위 살짝 상향
+                Spell.radius[eid] = 45;
                 Spell.duration[eid] = 400;
                 Spell.pierce[eid] = 255;
                 Velocity.x[eid] = 0;
                 Velocity.y[eid] = 0;
 
-                window.dispatchEvent(new CustomEvent('play_sound', { detail: 'fire_cast' }));
+                if (playSound) {
+                    window.dispatchEvent(new CustomEvent('play_sound', { detail: 'fire_cast' }));
+                }
             });
         }
     }
