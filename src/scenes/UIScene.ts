@@ -118,12 +118,12 @@ export class UIScene extends Phaser.Scene {
         this.coinIcon = this.add.image(this.coinText.x + this.coinText.width + 20, 115, 'dungeon', 'coin_f0')
             .setScale(5.0)
             .setOrigin(0, 0.5);
-
         this.statsText = this.add.text(10, 170, this.getStatsString(), {
             fontSize: '32px',
             color: '#00ff00',
             backgroundColor: '#00000088'
         }).setVisible(false);
+
 
         this.input.keyboard?.on('keydown-A', (event: KeyboardEvent) => {
             if (event.shiftKey) {
@@ -162,8 +162,6 @@ export class UIScene extends Phaser.Scene {
             fontFamily: '"MedievalSharp", cursive', fontSize: '20px', color: '#ffffff', fontStyle: 'bold', stroke: '#000000', strokeThickness: 4
         }).setOrigin(0.5, 0.5).setDepth(6);
 
-        this.repositionUIBars();
-
         this.bossHpContainer = this.add.container(640, 80).setVisible(false).setAlpha(0.8);
         const bossBarW = 600;
         const bossBarH = 24;
@@ -182,13 +180,13 @@ export class UIScene extends Phaser.Scene {
         this.minimapContainer = this.add.container(1280 - 10, 10).setDepth(800);
         const mmBg1 = this.add.graphics();
         mmBg1.fillStyle(0x000000, 0.8);
-        mmBg1.fillRoundedRect(-(this.MINIMAP_SIZE + 4), 0, this.MINIMAP_SIZE + 4, this.MINIMAP_SIZE + 4, 10); // x, y, width, height, radius
+        mmBg1.fillRoundedRect(-(this.MINIMAP_SIZE + 4), 0, this.MINIMAP_SIZE + 4, this.MINIMAP_SIZE + 4, 10);
         const mmBg2 = this.add.rectangle(0, 0, this.MINIMAP_SIZE, this.MINIMAP_SIZE, 0x333333, 0.9).setOrigin(1, 0);
         this.minimapGraphics = this.add.graphics();
         this.arrowGraphics = this.add.graphics();
         const mmHitArea = this.add.rectangle(0, 0, this.MINIMAP_SIZE, this.MINIMAP_SIZE, 0x000000, 0).setOrigin(1, 0).setInteractive({ useHandCursor: true });
         this.minimapContainer.add([mmBg1, mmBg2, this.minimapGraphics, this.arrowGraphics, mmHitArea]);
-        this.minimapContainer.setVisible(false); // Initially hidden, shown on game_started
+        this.minimapContainer.setVisible(false);
 
         this.minimapOverlay = this.add.rectangle(640, 360, 1280, 720, 0x000000, 0).setVisible(false).setDepth(850).setInteractive();
         
@@ -245,10 +243,16 @@ export class UIScene extends Phaser.Scene {
         }).setOrigin(0.5).setVisible(false).setDepth(999);
 
         // Define Handlers
-        const gameStartedHandler = () => {
+        const showUI = () => {
             this.uiContainer.setVisible(true);
             this.joystick.setVisible(true);
             this.minimapContainer.setVisible(true);
+            this.syncInitialState();
+            this.repositionUIBars();
+        };
+
+        const gameStartedHandler = () => {
+            showUI();
         };
         const spawningCompleteHandler = () => this.spawningComplete = true;
         const stageUpdatedHandler = ((e: CustomEvent<number>) => {
@@ -297,7 +301,10 @@ export class UIScene extends Phaser.Scene {
             }) as EventListener);
         });
 
-
+        const mainScene = this.scene.get('MainScene') as any;
+        if (mainScene && mainScene.scene.isActive()) {
+            showUI();
+        }
 
         this.updateStageLevelText();
     }
@@ -377,16 +384,14 @@ export class UIScene extends Phaser.Scene {
             );
         }
 
-        // Screen boundary arrows
-        const cx = 640; const cy = 360; const radius = 280;
         targets.forEach(t => {
             const dx = t.x - px; const dy = t.y - py;
             if (Math.sqrt(dx * dx + dy * dy) > 300) {
                 const angle = Math.atan2(dy, dx);
                 this.arrowGraphics.fillStyle(t.color, 1).lineStyle(2, 0xffffff, 1);
-                const pX = cx + Math.cos(angle) * radius; const pY = cy + Math.sin(angle) * radius;
-                const bLX = cx + Math.cos(angle - 0.2) * (radius - 24); const bLY = cy + Math.sin(angle - 0.2) * (radius - 24);
-                const bRX = cx + Math.cos(angle + 0.2) * (radius - 24); const bRY = cy + Math.sin(angle + 0.2) * (radius - 24);
+                const pX = 640 + Math.cos(angle) * 280; const pY = 360 + Math.sin(angle) * 280;
+                const bLX = 640 + Math.cos(angle - 0.2) * (280 - 24); const bLY = 360 + Math.sin(angle - 0.2) * (280 - 24);
+                const bRX = 640 + Math.cos(angle + 0.2) * (280 - 24); const bRY = 360 + Math.sin(angle + 0.2) * (280 - 24);
                 this.arrowGraphics.fillTriangle(pX, pY, bLX, bLY, bRX, bRY);
                 this.arrowGraphics.strokeTriangle(pX, pY, bLX, bLY, bRX, bRY);
             }
@@ -422,7 +427,7 @@ export class UIScene extends Phaser.Scene {
         const enemies = this.enemyQuery(world);
         for (let i = 0; i < enemies.length; i++) {
             const eid = enemies[i]; const ex = oX + (Position.x[eid] * scale); const ey = oY + (Position.y[eid] * scale);
-            if (hasComponent(world, Boss, eid)) { this.minimapGraphics.fillStyle(0xff0000, 1).fillCircle(ex, ey, 4); }
+            if (hasComponent(world, Boss, eid)) { this.minimapGraphics.fillStyle(0xff00ff, 1).fillCircle(ex, ey, 4); }
             else { this.minimapGraphics.fillStyle(0xff0000, 0.8).fillRect(ex - 1, ey - 1, 2, 2); }
         }
         if (players.length > 0) {
@@ -517,6 +522,22 @@ export class UIScene extends Phaser.Scene {
                 this.input.once('pointerdown', proceed); this.input.keyboard?.once('keydown', proceed);
             }
         });
+    }
+
+    private syncInitialState() {
+        this.currentLevel = globalStats.currentLevel || 1;
+        this.currentStage = globalStats.currentStage || 1;
+        const players = this.playerQuery(world);
+        if (players.length > 0) {
+            const pid = players[0];
+            if (hasComponent(world, Health, pid)) {
+                this.handleHp({ detail: { current: Health.current[pid], max: Health.max[pid] } } as any);
+            }
+            if (hasComponent(world, Mana, pid)) {
+                this.handleMp({ detail: { current: Mana.current[pid], max: Mana.max[pid] } } as any);
+            }
+        }
+        this.updateStageLevelText();
     }
 
     private repositionUIBars() {
