@@ -376,22 +376,20 @@ export class MainScene extends Phaser.Scene {
                         }
                     }
 
-                    // ── 남쪽 벽 판정 및 렌더링 ────────────────────────────────
-                    // 남쪽 벽: 타일 바로 위(y-1)가 바닥(FLOOR), 문(DOOR) 또는 기둥(PILLAR)인 경우
+                    // ── 남쪽 벽 판정 및 렌더링 (Floor 4-7 사용) ──────────────────
+                    // 남쪽 벽: 타일 바로 위(y-1)가 바닥(FLOOR/SECRET_FLOOR), 문(DOOR) 또는 기둥(PILLAR)인 경우
                     const isSouthWall = y > 0 && (
                         this.dungeon.map[y - 1][x] === TileType.FLOOR || 
+                        this.dungeon.map[y - 1][x] === TileType.SECRET_FLOOR || 
                         this.dungeon.map[y - 1][x] === TileType.DOOR || 
                         this.dungeon.map[y - 1][x] === TileType.PILLAR
                     );
 
                     if (isSouthWall) {
-                        // 사용자 요청: wall_fountain_top_blue_f0와 f1을 랜덤하게 적용하되 180도 회전(flipX, flipY)
-                        const fountainAsset = Math.random() < 0.5 ? 'wall_fountain_top_blue_f0' : 'wall_fountain_top_blue_f1';
-                        const bob = this.wallBlitter.create(x * TILE_SIZE, y * TILE_SIZE, fountainAsset);
-                        if (bob) {
-                            bob.flipX = true;
-                            bob.flipY = true;
-                        }
+                        // 사용자 요청: floor_4 ~ floor_7 중 랜덤하게 배치하여 남쪽 벽으로 사용
+                        const wallFloorIds = [4, 5, 6, 7];
+                        const randomId = wallFloorIds[Math.floor(Math.random() * wallFloorIds.length)];
+                        this.floorBlitter.create(x * TILE_SIZE, y * TILE_SIZE, `floor_${randomId}`);
                     }
                 }
             }
