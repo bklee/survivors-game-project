@@ -264,6 +264,11 @@ export class UIScene extends Phaser.Scene {
             this.discoveredMap = Array.from({ length: h }, () => Array(w).fill(false));
         }) as EventListener;
 
+        const charSelectedHandler = ((e: CustomEvent<string>) => {
+            this.selectedCharId = e.detail;
+            this.repositionUIBars();
+        }) as EventListener;
+
         // Register Handlers
         window.addEventListener('game_started', gameStartedHandler);
         window.addEventListener('spawning_complete', spawningCompleteHandler);
@@ -277,10 +282,7 @@ export class UIScene extends Phaser.Scene {
         window.addEventListener('stage_updated', stageUpdatedHandler);
         window.addEventListener('map_generated', mapGeneratedHandler);
         window.addEventListener('mp_updated', this.handleMp as EventListener);
-        window.addEventListener('char_selected', ((e: CustomEvent<string>) => {
-            this.selectedCharId = e.detail;
-            this.repositionUIBars();
-        }) as EventListener);
+        window.addEventListener('char_selected', charSelectedHandler);
 
         this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
             window.removeEventListener('game_started', gameStartedHandler);
@@ -295,10 +297,7 @@ export class UIScene extends Phaser.Scene {
             window.removeEventListener('stage_updated', stageUpdatedHandler);
             window.removeEventListener('map_generated', mapGeneratedHandler);
             window.removeEventListener('mp_updated', this.handleMp as EventListener);
-            window.removeEventListener('char_selected', ((e: CustomEvent<string>) => {
-                this.selectedCharId = e.detail;
-                this.repositionUIBars();
-            }) as EventListener);
+            window.removeEventListener('char_selected', charSelectedHandler);
         });
 
         const mainScene = this.scene.get('MainScene') as any;
@@ -527,6 +526,24 @@ export class UIScene extends Phaser.Scene {
     private syncInitialState() {
         this.currentLevel = globalStats.currentLevel || 1;
         this.currentStage = globalStats.currentStage || 1;
+
+        const mainScene = this.scene.get('MainScene') as any;
+        if (mainScene) {
+            // Pull map data if already generated
+            if (mainScene.dungeon && mainScene.dungeon.map && mainScene.dungeon.map.length > 0) {
+                this.dungeonMap = mainScene.dungeon.map;
+                const h = this.dungeonMap.length;
+                const w = this.dungeonMap[0].length;
+                if (this.discoveredMap.length !== h || (h > 0 && this.discoveredMap[0].length !== w)) {
+                    this.discoveredMap = Array.from({ length: h }, () => Array(w).fill(false));
+                }
+            }
+            // Pull char ID if available
+            if (mainScene.selectedCharId) {
+                this.selectedCharId = mainScene.selectedCharId;
+            }
+        }
+
         const players = this.playerQuery(world);
         if (players.length > 0) {
             const pid = players[0];
