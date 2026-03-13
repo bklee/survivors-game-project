@@ -355,6 +355,8 @@ export class UIScene extends Phaser.Scene {
             this.currentStage = e.detail;
             this.spawningComplete = false;
             this.updateStageLevelText();
+            // --- Reset Boss UI for new stage ---
+            this.bossHpContainer?.setVisible(false);
         }) as EventListener;
         const playerDiedHandler = () => this.sound.stopAll();
         const mapGeneratedHandler = ((e: CustomEvent<number[][]>) => {
@@ -621,6 +623,9 @@ export class UIScene extends Phaser.Scene {
     }
 
     private handleStageClear = () => {
+        // --- Safeguard: Hide boss HP bar immediately on clear ---
+        this.bossHpContainer?.setVisible(false);
+
         const panel = this.add.rectangle(640, 360, 600, 300, 0x000000, 0.9).setStrokeStyle(4, 0xffd700).setDepth(998);
         this.stageClearText.setVisible(true).setPosition(640, 300).setText(`STAGE ${this.currentStage} CLEAR!`);
         const reward = this.add.text(640, 400, "BATTLE REWARD:\nALL STATS +10%", {
