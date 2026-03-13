@@ -108,8 +108,11 @@ export class NightDirector {
 
                     if (typeId === 69) { // Big Demon (대악마)
                         this.spawnDemonFireAttack(bx, by, playerX, playerY);
+                    } else if (typeId === 79) { // Big Zombie (대왕 좀비)
+                        this.spawnZombiePoisonAttack(playerX, playerY);
+                    } else if (typeId === 89) { // Ogre (오우거)
+                        this.spawnOgreSlamAttack(bx, by);
                     } else {
-                        // 다른 보스들은 추후 업그레이드 전까지 기본 탄막 유지
                         this.spawnBarrage(bx, by);
                     }
                 }
@@ -278,6 +281,63 @@ export class NightDirector {
                 window.dispatchEvent(new CustomEvent('play_sound', { detail: 'fire_cast' }));
             });
         }
+    }
+
+    private spawnZombiePoisonAttack(px: number, py: number) {
+        // 플레이어 위치 주변에 8개의 독구름 서서히 생성 (역병의 영역)
+        const count = 8;
+        for (let i = 0; i < count; i++) {
+            const angle = (i / count) * Math.PI * 2;
+            const radius = 50;
+            const spawnX = px + Math.cos(angle) * radius;
+            const spawnY = py + Math.sin(angle) * radius;
+
+            const feid = addEntity(world);
+            addComponent(world, Position, feid);
+            addComponent(world, Velocity, feid);
+            addComponent(world, EnemyProjectile, feid);
+            addComponent(world, SpriteInfo, feid);
+            addComponent(world, Lifespan, feid);
+            addComponent(world, Animation, feid);
+            addComponent(world, Scale, feid);
+
+            Position.x[feid] = spawnX;
+            Position.y[feid] = spawnY;
+            Velocity.x[feid] = 0;
+            Velocity.y[feid] = 0;
+            SpriteInfo.textureIndex[feid] = 102; // Wizard's Poison Gas (Spell Gas)
+            Scale.value[feid] = 1.25; 
+            Lifespan.duration[feid] = 1500; // 독은 좀 더 오래 유지됨
+            Animation.timer[feid] = 0;
+
+            window.dispatchEvent(new CustomEvent('play_sound', { detail: 'poison_cast' }));
+        }
+    }
+
+    private spawnOgreSlamAttack(bx: number, by: number) {
+        // 보스 중심에서 퍼져나가는 고밀도 충격파 (지면 강타)
+        const count = 16;
+        for (let i = 0; i < count; i++) {
+            const angle = (i / count) * Math.PI * 2;
+            const feid = addEntity(world);
+            addComponent(world, Position, feid);
+            addComponent(world, Velocity, feid);
+            addComponent(world, EnemyProjectile, feid);
+            addComponent(world, SpriteInfo, feid);
+            addComponent(world, Lifespan, feid);
+            addComponent(world, Animation, feid);
+            addComponent(world, Scale, feid);
+
+            Position.x[feid] = bx;
+            Position.y[feid] = by;
+            Velocity.x[feid] = Math.cos(angle) * 200;
+            Velocity.y[feid] = Math.sin(angle) * 200;
+            SpriteInfo.textureIndex[feid] = 101; // Wizard's Ice (Spell Ice) - 충격파 대용
+            Scale.value[feid] = 1.0; 
+            Lifespan.duration[feid] = 1000;
+            Animation.timer[feid] = 0;
+        }
+        window.dispatchEvent(new CustomEvent('play_sound', { detail: 'hit' }));
     }
 
     public resetForNextStage(stage: number = 1) {
