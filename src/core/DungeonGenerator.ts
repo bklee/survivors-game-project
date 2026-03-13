@@ -8,6 +8,7 @@ export enum TileType {
     DOOR = 2,
     PILLAR = 3,
     OBSTACLE = 4,
+    SECRET_FLOOR = 5,
 }
 
 export class DungeonGenerator {
@@ -364,7 +365,7 @@ export class DungeonGenerator {
         const floorPixels: { x: number; y: number }[] = [];
         for (let y = roomY; y < roomY + roomH; y++) {
             for (let x = roomX; x < roomX + roomW; x++) {
-                this.map[y][x] = TileType.FLOOR;
+                this.map[y][x] = TileType.SECRET_FLOOR;
                 floorPixels.push({ x: x * TILE_SIZE + TILE_SIZE / 2, y: y * TILE_SIZE + TILE_SIZE / 2 });
             }
         }
