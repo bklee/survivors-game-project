@@ -18,10 +18,17 @@ export class DungeonGenerator {
     constructor(width: number, height: number) {
         this.width = width;
         this.height = height;
-        this.generate();
     }
 
-    public generate() {
+    public generate(isBossStage: boolean = false) {
+        if (isBossStage) {
+            this.generateArena();
+        } else {
+            this.generateNormalDungeon();
+        }
+    }
+
+    private generateNormalDungeon() {
         // Initialize with all walls
         this.map = Array(this.height).fill(0).map(() => Array(this.width).fill(TileType.WALL));
 
@@ -108,10 +115,37 @@ export class DungeonGenerator {
         // 1칸 너비의 좁은 미로를 2칸으로 확장 (사용자 요청)
         this.widenPaths();
 
+        this.ensureBoundary();
+    }
+
+    private generateArena() {
+        // 보스전용 평지 맵 생성 (미로 제거)
+        this.map = Array(this.height).fill(0).map(() => Array(this.width).fill(TileType.FLOOR));
+
+        // 가장자리에 벽만 생성
+        this.ensureBoundary();
+
+        // 중앙에 약간의 기둥만 배치 (완전 밋밋한 방지용, 4개 구석 정도)
+        const margin = 15;
+        const cornerPillars = [
+            { x: margin, y: margin },
+            { x: this.width - margin, y: margin },
+            { x: margin, y: this.height - margin },
+            { x: this.width - margin, y: this.height - margin }
+        ];
+
+        cornerPillars.forEach(p => {
+            if (p.x >= 0 && p.x < this.width && p.y >= 0 && p.y < this.height) {
+                this.map[p.y][p.x] = TileType.PILLAR;
+            }
+        });
+    }
+
+    private ensureBoundary() {
         // Ensure boundary
         for (let y = 0; y < this.height; y++) {
             for (let x = 0; x < this.width; x++) {
-                if (x === 0 || x === this.width - 1 || y === 0 || y === this.height - 1) {
+                if (x <= 1 || x >= this.width - 2 || y <= 1 || y >= this.height - 2) {
                     this.map[y][x] = TileType.WALL;
                 }
             }

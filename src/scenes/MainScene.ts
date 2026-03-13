@@ -76,6 +76,7 @@ export class MainScene extends Phaser.Scene {
         this.isPausedForClear = false;
 
         this.dungeon = new DungeonGenerator(100, 100);
+        this.buildMap(this.currentStage);
 
         const charData = CHARACTERS[this.selectedCharId.toUpperCase()] || CHARACTERS.WIZARD;
         this.charData = charData; // Store it for update loop
@@ -95,7 +96,7 @@ export class MainScene extends Phaser.Scene {
         this.wallBlitter = this.add.blitter(0, 0, 'walls').setDepth(-2);
         this.doorBlitter = this.add.blitter(0, 0, 'dungeon').setDepth(-2);
 
-        this.buildMap(this.currentStage);
+        // Initial buildMap is now handled right after dungeon is created
 
         const charBlitter = this.add.blitter(0, 0, 'dungeon').setDepth(0);
         this.renderSystem = createRenderSystem(this, charBlitter);
@@ -287,10 +288,15 @@ export class MainScene extends Phaser.Scene {
 
         this.dungeon.width = mapW;
         this.dungeon.height = mapH;
-        this.dungeon.generate();
+        const isBossStage = stage % 3 === 0;
+        this.dungeon.generate(isBossStage);
 
-        // 비밀 방 생성 (맵 타일을 수정하므로 벽 렌더링 전에 호출)
-        this.secretRoomData = this.dungeon.carveSecretRoom();
+        // 비밀 방 생성 (보스 대전에서는 미로가 없으므로 제외)
+        if (!isBossStage) {
+            this.secretRoomData = this.dungeon.carveSecretRoom();
+        } else {
+            this.secretRoomData = undefined;
+        }
 
         const wPx = mapW * TILE_SIZE;
         const hPx = mapH * TILE_SIZE;
@@ -601,6 +607,13 @@ export class MainScene extends Phaser.Scene {
     }
 
     private spawnDungeonProps() {
+        const isBossStage = this.currentStage % 3 === 0;
+        if (isBossStage) {
+            // 보스 스테이지에서는 평지를 유지하기 위해 소품 스폰 건너뜀
+            this.spawnSecretRoom(); 
+            return;
+        }
+
         for (let i = 0; i < 80; i++) {
             const eid = addEntity(world);
             addComponent(world, Position, eid);
