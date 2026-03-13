@@ -533,8 +533,8 @@ export class MainScene extends Phaser.Scene {
                         }));
                     } else if (baseType === 52) { // Red: Kill monsters
                         if (isBig) {
-                            // 대형: 반경 400px 내 섬멸 및 약간의 화면 흔들림
-                            const killRadiusSq = 400 * 400;
+                            // 대형: 반경 50px 내 섬멸 및 약간의 화면 흔들림
+                            const killRadiusSq = 50 * 50;
                             for (let j = 0; j < enemies.length; j++) {
                                 const enemyEid = enemies[j];
                                 const edx = Position.x[enemyEid] - px;
