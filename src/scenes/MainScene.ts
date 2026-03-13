@@ -76,10 +76,38 @@ export class MainScene extends Phaser.Scene {
         this.isPausedForClear = false;
 
         this.dungeon = new DungeonGenerator(100, 100);
-        this.buildMap(this.currentStage);
+        
+        // --- 4. Create Player FIRST so other systems can reference it ---
+        this.playerId = addEntity(world);
+        addComponent(world, Position, this.playerId);
+        addComponent(world, Velocity, this.playerId);
+        addComponent(world, Player, this.playerId);
+        addComponent(world, SpriteInfo, this.playerId);
+        addComponent(world, Animation, this.playerId);
+        addComponent(world, Health, this.playerId);
 
         const charData = CHARACTERS[this.selectedCharId.toUpperCase()] || CHARACTERS.WIZARD;
-        this.charData = charData; // Store it for update loop
+        this.charData = charData;
+
+        // Add Mana component if character uses mana
+        if (this.selectedCharId === 'wizard' || this.selectedCharId === 'elf') {
+            addComponent(world, Mana, this.playerId);
+            Mana.current[this.playerId] = this.charData.baseStats.mana;
+            Mana.max[this.playerId] = this.charData.baseStats.mana;
+        }
+
+        let charTypeId = 1;
+        if (this.selectedCharId === 'knight') charTypeId = 0;
+        else if (this.selectedCharId === 'elf') charTypeId = 2;
+
+        SpriteInfo.textureIndex[this.playerId] = charTypeId;
+        Animation.frameRate[this.playerId] = 10;
+        Health.current[this.playerId] = this.charData.baseStats.health;
+        Health.max[this.playerId] = this.charData.baseStats.health;
+
+        // Player initial position (temp, will be refined after buildMap)
+        Position.x[this.playerId] = 0;
+        Position.y[this.playerId] = 0;
 
         this.physicsSystem = createPhysicsSystem(this.dungeon);
         this.playerSystem = new PlayerSystem(charData);
@@ -96,38 +124,15 @@ export class MainScene extends Phaser.Scene {
         this.wallBlitter = this.add.blitter(0, 0, 'walls').setDepth(-2);
         this.doorBlitter = this.add.blitter(0, 0, 'dungeon').setDepth(-2);
 
-        // Initial buildMap is now handled right after dungeon is created
+        this.buildMap(this.currentStage);
 
         const charBlitter = this.add.blitter(0, 0, 'dungeon').setDepth(0);
         this.renderSystem = createRenderSystem(this, charBlitter);
 
-        this.playerId = addEntity(world);
-        addComponent(world, Position, this.playerId);
-        addComponent(world, Velocity, this.playerId);
-        addComponent(world, Player, this.playerId);
-        addComponent(world, SpriteInfo, this.playerId);
-        addComponent(world, Animation, this.playerId);
-        addComponent(world, Health, this.playerId);
-
-        // Add Mana component if character uses mana
-        if (this.selectedCharId === 'wizard' || this.selectedCharId === 'elf') {
-            addComponent(world, Mana, this.playerId);
-            Mana.current[this.playerId] = this.charData.baseStats.mana;
-            Mana.max[this.playerId] = this.charData.baseStats.mana;
-        }
-
+        // Character initial position refined
         const startPos = this.dungeon.getRandomFloorPixel();
         Position.x[this.playerId] = startPos.x;
         Position.y[this.playerId] = startPos.y;
-
-        let charTypeId = 1;
-        if (this.selectedCharId === 'knight') charTypeId = 0;
-        else if (this.selectedCharId === 'elf') charTypeId = 2;
-
-        SpriteInfo.textureIndex[this.playerId] = charTypeId;
-        Animation.frameRate[this.playerId] = 10;
-        Health.current[this.playerId] = this.charData.baseStats.health;
-        Health.max[this.playerId] = this.charData.baseStats.health;
 
         setTimeout(() => {
             window.dispatchEvent(new CustomEvent('hp_updated', {
