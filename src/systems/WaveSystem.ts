@@ -107,19 +107,20 @@ export class NightDirector {
     }
 
     private getStageEnemyType(): number {
-        const cycle = (this.stage - 1) % 3;
+        // 3개 스테이지 단위로 카테고리(0:Undead, 1:Orc, 2:Demon) 고정
+        const categoryIndex = Math.floor((this.stage - 1) / 3) % 3;
         let pool: number[] = [];
-        if (cycle === 0) pool = [70, 71, 72, 73, 74, 75]; // Undead (tiny_zombie, necromancer, skelet, zombie, doc, ice_zombie)
-        else if (cycle === 1) pool = [80, 81, 82, 83]; // Orc (shaman, warrior, goblin, masked_orc)
-        else pool = [60, 61, 62]; // Demon (chort, imp, wogol)
+        if (categoryIndex === 0) pool = [70, 71, 72, 73, 74, 75]; // Undead
+        else if (categoryIndex === 1) pool = [80, 81, 82, 83]; // Orc
+        else pool = [60, 61, 62]; // Demon
         return pool[Math.floor(Math.random() * pool.length)];
     }
 
     private getStageBossType(): number {
-        // 보스 스테이지(3, 6, 9...) 순서에 맞춰 0, 1, 2 순으로 순환하도록 수정
-        const bossIndex = (Math.floor(this.stage / 3) - 1) % 3;
-        if (bossIndex === 0) return 79; // Big Zombie
-        if (bossIndex === 1) return 89; // Ogre
+        // 몹 카테고리와 동일한 인덱스를 사용하여 보스 결정
+        const categoryIndex = Math.floor((this.stage - 1) / 3) % 3;
+        if (categoryIndex === 0) return 79; // Big Zombie
+        if (categoryIndex === 1) return 89; // Ogre
         return 69; // Big Demon
     }
 
