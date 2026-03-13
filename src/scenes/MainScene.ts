@@ -77,7 +77,7 @@ export class MainScene extends Phaser.Scene {
         this.isPausedForClear = false;
 
         this.dungeon = new DungeonGenerator(100, 100);
-        
+
         // --- 4. Create Player FIRST so other systems can reference it ---
         this.playerId = addEntity(world);
         addComponent(world, Position, this.playerId);
@@ -347,7 +347,7 @@ export class MainScene extends Phaser.Scene {
                 // ── Pillars & Obstacles ──────────────────────────────────────
                 if (cell === TileType.PILLAR) {
                     const basePX = x * TILE_SIZE + 8;
-                    const basePY = y * TILE_SIZE + 11; 
+                    const basePY = y * TILE_SIZE + 11;
 
                     // 기본 기둥 (몸통 + 베이스)
                     createPart(basePX, basePY, 91); // column_wall
@@ -355,7 +355,7 @@ export class MainScene extends Phaser.Scene {
 
                     // 기둥에는 바닥 웅덩이인 '푸른 분수'만 자연스럽게 배치 (개연성 확보)
                     if (Math.random() < 0.1) {
-                        createPart(basePX, basePY + 0.5, 93); 
+                        createPart(basePX, basePY + 0.5, 93);
                     }
                 }
 
@@ -363,8 +363,8 @@ export class MainScene extends Phaser.Scene {
                 if (cell === TileType.WALL) {
                     // 북쪽 벽 판정: 타일 바로 아래(y+1)가 바닥(FLOOR), 문(DOOR) 또는 기둥(PILLAR)인 경우
                     const isNorthWall = y < mapH - 1 && (
-                        this.dungeon.map[y + 1][x] === TileType.FLOOR || 
-                        this.dungeon.map[y + 1][x] === TileType.DOOR || 
+                        this.dungeon.map[y + 1][x] === TileType.FLOOR ||
+                        this.dungeon.map[y + 1][x] === TileType.DOOR ||
                         this.dungeon.map[y + 1][x] === TileType.PILLAR
                     );
 
@@ -375,7 +375,7 @@ export class MainScene extends Phaser.Scene {
                         // 사용자 요청: 북쪽 벽에만 2% 확률로 구멍(Wall Hole) 장식 추가
                         if (Math.random() < 0.02) {
                             const wx = x * TILE_SIZE + 8; // Center X
-                            const wy = y * TILE_SIZE + 23; // 1픽셀 더 아래로 (+22 -> +23)
+                            const wy = y * TILE_SIZE + 24; // 1픽셀 더 아래로 (+22 -> +23)
                             const holeAsset = Math.random() < 0.5 ? 'wall_hole_1' : 'wall_hole_2';
                             const deco = this.add.image(wx, wy, holeAsset);
                             deco.setDepth(y * TILE_SIZE + 32); // Match wall depth
@@ -386,9 +386,9 @@ export class MainScene extends Phaser.Scene {
                     // ── 남쪽 벽 판정 및 렌더링 (Floor 4-7 사용) ──────────────────
                     // 남쪽 벽: 타일 바로 위(y-1)가 바닥(FLOOR/SECRET_FLOOR), 문(DOOR) 또는 기둥(PILLAR)인 경우
                     const isSouthWall = y > 0 && (
-                        this.dungeon.map[y - 1][x] === TileType.FLOOR || 
-                        this.dungeon.map[y - 1][x] === TileType.SECRET_FLOOR || 
-                        this.dungeon.map[y - 1][x] === TileType.DOOR || 
+                        this.dungeon.map[y - 1][x] === TileType.FLOOR ||
+                        this.dungeon.map[y - 1][x] === TileType.SECRET_FLOOR ||
+                        this.dungeon.map[y - 1][x] === TileType.DOOR ||
                         this.dungeon.map[y - 1][x] === TileType.PILLAR
                     );
 
@@ -457,7 +457,7 @@ export class MainScene extends Phaser.Scene {
                             const targetEid = interactives[j];
                             if (targetEid !== eid && hasComponent(world, Interactive, targetEid) && Interactive.id[targetEid] === linkId) {
                                 Interactive.isActivated[targetEid] = 1;
-                                
+
                                 // 비밀 문(ID 41)이 활성화되면 맵의 DOOR 타일을 FLOOR로 변경하여 충돌 해제
                                 if (SpriteInfo.textureIndex[targetEid] === 41) {
                                     const dtx = Math.floor(Position.x[targetEid] / TILE_SIZE);
@@ -614,11 +614,11 @@ export class MainScene extends Phaser.Scene {
                     addComponent(world, Position, potId);
                     addComponent(world, SpriteInfo, potId);
                     Position.x[potId] = Position.x[eid];
-                    
+
                     // 사용자 요청: 물약이 던전을 벗어나지 않도록 바닥 여부 확인 후 위치 결정
                     let potY = Position.y[eid] + 16;
                     if (!this.dungeon.isFloor(Position.x[potId], potY)) {
-                        potY = Position.y[eid] - 8; 
+                        potY = Position.y[eid] - 8;
                         // 상자 위쪽도 바닥이 아니면 상자 자체의 위치(확실한 바닥)로 결정
                         if (!this.dungeon.isFloor(Position.x[potId], potY)) {
                             potY = Position.y[eid];
@@ -648,7 +648,7 @@ export class MainScene extends Phaser.Scene {
         const isBossStage = this.currentStage % 3 === 0;
         if (isBossStage) {
             // 보스 스테이지에서는 평지를 유지하기 위해 소품 스폰 건너뜀
-            this.spawnSecretRoom(); 
+            this.spawnSecretRoom();
             return;
         }
 
@@ -672,7 +672,7 @@ export class MainScene extends Phaser.Scene {
                 // 장애물 (20%): 가시덫과 구멍을 5:5 비율로 배치
                 const isHole = Math.random() < 0.5;
                 const typeIdx = isHole ? 37 : 32;
-                SpriteInfo.textureIndex[eid] = typeIdx; 
+                SpriteInfo.textureIndex[eid] = typeIdx;
                 addComponent(world, Animation, eid);
                 Animation.timer[eid] = Math.random() * 1000;
 
@@ -744,7 +744,7 @@ export class MainScene extends Phaser.Scene {
         // 문 근처(64px 이내)에는 상자나 물약을 배치하지 않음 (사용자 요청)
         const spawnableFloors = floorPixels.filter(fp => {
             const dist = Phaser.Math.Distance.Between(fp.x, fp.y, doorPixel.x, doorPixel.y);
-            return dist > 64; 
+            return dist > 64;
         });
 
         if (spawnableFloors.length < 5) return;
@@ -759,7 +759,7 @@ export class MainScene extends Phaser.Scene {
             sortedFloors[Math.floor(sortedFloors.length * 0.5)],
             sortedFloors[Math.floor(sortedFloors.length * 0.6)],
         ];
-        
+
         for (const cPos of chestPositions) {
             const chestId = addEntity(world);
             addComponent(world, Position, chestId);
