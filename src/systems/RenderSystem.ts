@@ -375,7 +375,9 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                         else if (charKey === 'elf') {
                             // 활만 움직이도록 (회전 없이 프레임 애니메이션만 적용)
                             swingRot = 0; 
-                            const frame = (playerAttackTimer > 50 && playerAttackTimer < 350) ? 'weapon_bow_2' : 'weapon_bow';
+                            // 400ms 중 초기 300ms(400~100)는 시위를 당긴 상태(weapon_bow_2), 
+                            // 마지막 100ms(100~0)는 발사 후 snap 상태(weapon_bow)
+                            const frame = (playerAttackTimer > 100) ? 'weapon_bow_2' : 'weapon_bow';
                             wSprite.setFrame(frame);
                         }
                     } else if (state === 'run') {

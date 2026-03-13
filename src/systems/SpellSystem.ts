@@ -76,13 +76,22 @@ export class SpellSystem {
         this.spellCooldowns.set(spellId, 500 * globalStats.cooldownMult);
 
         window.dispatchEvent(new CustomEvent('combo_cast', { detail: { duration: animDuration } }));
-        window.dispatchEvent(new CustomEvent('play_sound', { detail: 'fire_cast' }));
-
+        
         if (this.selectedCharId === 'knight') {
+            window.dispatchEvent(new CustomEvent('play_sound', { detail: 'fire_cast' }));
             this.spawnKnightAttack(px, py, this.lastFacingX, this.lastFacingY);
         } else if (this.selectedCharId === 'elf') {
-            this.spawnElfAttack(px, py, this.lastFacingX, this.lastFacingY);
+            // "당겼다 놓기" 연출을 위해 300ms 지연 후 화살 발사 및 소리 재생
+            this.scene.time.delayedCall(300, () => {
+                const playersNow = playerQuery(world);
+                if (playersNow.length > 0) {
+                    const eidNow = playersNow[0];
+                    window.dispatchEvent(new CustomEvent('play_sound', { detail: 'fire_cast' }));
+                    this.spawnElfAttack(Position.x[eidNow], Position.y[eidNow], this.lastFacingX, this.lastFacingY);
+                }
+            });
         } else {
+            window.dispatchEvent(new CustomEvent('play_sound', { detail: 'fire_cast' }));
             this.spawnWizardAttack(px, py, this.lastFacingX, this.lastFacingY);
         }
     }
