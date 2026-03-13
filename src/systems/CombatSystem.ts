@@ -60,8 +60,8 @@ export const createCombatSystem = (juice: JuicePipeline) => {
                 const dy = py - Position.y[epid];
                 const typeId = SpriteInfo.textureIndex[epid];
                 
-                // 불기둥(100)은 범위가 더 넓음 (25px), 일반 탄막은 15px
-                const hitRadius = (typeId === 100) ? 25 : 15;
+                // 불기둥(100)은 범위가 기존보다 축소됨 (25 -> 12.5), 일반 탄막은 15
+                const hitRadius = (typeId === 100) ? 12.5 : 15;
                 const damage = (typeId === 100) ? 25 : 15;
 
                 if (dx * dx + dy * dy < hitRadius * hitRadius) {
