@@ -11,9 +11,20 @@ export class UIScene extends Phaser.Scene {
     private statsText!: Phaser.GameObjects.Text;
     private hpBar!: Phaser.GameObjects.Rectangle;
     private hpText!: Phaser.GameObjects.Text;
+    private hpFrame!: Phaser.GameObjects.Graphics;
+    private hpShine!: Phaser.GameObjects.Graphics;
+    private hpIcon!: Phaser.GameObjects.Image;
+
     private xpBar!: Phaser.GameObjects.Rectangle;
     private expLabel!: Phaser.GameObjects.Text;
+    private expFrame!: Phaser.GameObjects.Graphics;
+    private expShine!: Phaser.GameObjects.Graphics;
+    private expIcon!: Phaser.GameObjects.Image;
+    private mpBar!: Phaser.GameObjects.Rectangle;
+    private mpText!: Phaser.GameObjects.Text;
+    private mpContainer!: Phaser.GameObjects.Container;
     private skillPointsText!: Phaser.GameObjects.Text;
+    private selectedCharId: string = 'wizard';
 
     private bossHpBar?: Phaser.GameObjects.Rectangle;
     private bossHpText?: Phaser.GameObjects.Text;
@@ -120,70 +131,41 @@ export class UIScene extends Phaser.Scene {
             }
         });
 
-        // --- Stylized HP Bar ---
+        // --- Stylized HP Bar Elements ---
         const hpX = 20;
-        const hpY = 660; // Moved up to make room for XP bar
-        const hpHeight = 30;
         const fullWidth = 400;
+        const barHeight = 30;
 
-        const hpFrame = this.add.graphics();
-        hpFrame.lineStyle(4, 0xffffff);
-        hpFrame.strokeRoundedRect(hpX, hpY - hpHeight, fullWidth, hpHeight, 4);
-        hpFrame.fillStyle(0x000000, 0.8);
-        hpFrame.fillRoundedRect(hpX, hpY - hpHeight, fullWidth, hpHeight, 4);
-
-        this.hpBar = this.add.rectangle(hpX + 4, hpY - hpHeight + 4, fullWidth - 8, hpHeight - 8, 0xffcc00)
-            .setOrigin(0, 0);
-
-        const shine = this.add.graphics();
-        shine.fillStyle(0xffffff, 0.2);
-        shine.fillRect(hpX + 4, hpY - hpHeight + 4, fullWidth - 8, (hpHeight - 8) / 2);
-
-        const hpIcon = this.add.image(hpX - 1, hpY - hpHeight / 2, 'hp_icon')
-            .setDisplaySize(40, 40)
-            .setOrigin(0.5, 0.5)
-            .setDepth(20);
-
-        this.hpText = this.add.text(hpX + fullWidth / 2, hpY - hpHeight / 2, '100 / 100', {
-            fontFamily: '"MedievalSharp", cursive',
-            fontSize: '20px',
-            color: '#ffffff',
-            fontStyle: 'bold',
-            stroke: '#000000',
-            strokeThickness: 4
+        this.hpFrame = this.add.graphics();
+        this.hpBar = this.add.rectangle(hpX + 4, 0, fullWidth - 8, barHeight - 8, 0xffcc00).setOrigin(0, 0);
+        this.hpShine = this.add.graphics();
+        this.hpIcon = this.add.image(hpX - 1, 0, 'hp_icon').setDisplaySize(40, 40).setOrigin(0.5, 0.5).setDepth(20);
+        this.hpText = this.add.text(hpX + fullWidth / 2, 0, '100 / 100', {
+            fontFamily: '"MedievalSharp", cursive', fontSize: '20px', color: '#ffffff', fontStyle: 'bold', stroke: '#000000', strokeThickness: 4
         }).setOrigin(0.5, 0.5).setDepth(6);
 
-        // --- EXP Bar (Below HP Bar) ---
-        const expX = hpX;
-        const expY = hpY + 45; // Same spacing as HP bar
-        const expHeight = 30;
-
-        const expFrame = this.add.graphics();
-        expFrame.lineStyle(4, 0xffffff);
-        expFrame.strokeRoundedRect(expX, expY - expHeight, fullWidth, expHeight, 4);
-        expFrame.fillStyle(0x000000, 0.8);
-        expFrame.fillRoundedRect(expX, expY - expHeight, fullWidth, expHeight, 4);
-
-        this.xpBar = this.add.rectangle(expX + 4, expY - expHeight + 4, 1, expHeight - 8, 0x00ff00)
-            .setOrigin(0, 0);
-
-        const expShine = this.add.graphics();
-        expShine.fillStyle(0xffffff, 0.2);
-        expShine.fillRect(expX + 4, expY - expHeight + 4, fullWidth - 8, (expHeight - 8) / 2);
-
-        const expIcon = this.add.image(expX - 1, expY - expHeight / 2, 'dungeon', 'gem')
-            .setDisplaySize(40, 40)
-            .setOrigin(0.5, 0.5)
-            .setDepth(20);
-
-        this.expLabel = this.add.text(expX + fullWidth / 2, expY - expHeight / 2, 'Level 1', {
-            fontFamily: '"MedievalSharp", cursive',
-            fontSize: '20px',
-            color: '#ffffff',
-            fontStyle: 'bold',
-            stroke: '#000000',
-            strokeThickness: 4
+        // --- Mana Bar (Container) ---
+        this.mpContainer = this.add.container(0, 0);
+        const mpFrameGraphic = this.add.graphics();
+        this.mpBar = this.add.rectangle(hpX + 4, 0, fullWidth - 8, barHeight - 8, 0x0099ff).setOrigin(0, 0);
+        const mpShineGraphic = this.add.graphics();
+        const mpIconImg = this.add.image(hpX - 1, 0, 'dungeon', 'flask_big_blue').setDisplaySize(40, 40).setOrigin(0.5, 0.5).setDepth(20);
+        this.mpText = this.add.text(hpX + fullWidth / 2, 0, '100 / 100', {
+            fontFamily: '"MedievalSharp", cursive', fontSize: '20px', color: '#ffffff', fontStyle: 'bold', stroke: '#000000', strokeThickness: 4
         }).setOrigin(0.5, 0.5).setDepth(6);
+        this.mpContainer.add([mpFrameGraphic, this.mpBar, mpShineGraphic, mpIconImg, this.mpText]);
+
+        // --- EXP Bar Elements ---
+        this.expFrame = this.add.graphics();
+        this.xpBar = this.add.rectangle(hpX + 4, 0, 1, barHeight - 8, 0x00ff00).setOrigin(0, 0);
+        this.expShine = this.add.graphics();
+        this.expIcon = this.add.image(hpX - 1, 0, 'dungeon', 'flask_big_green').setDisplaySize(40, 40).setOrigin(0.5, 0.5).setDepth(20);
+        this.expLabel = this.add.text(hpX + fullWidth / 2, 0, 'Level 1', {
+            fontFamily: '"MedievalSharp", cursive', fontSize: '20px', color: '#ffffff', fontStyle: 'bold', stroke: '#000000', strokeThickness: 4
+        }).setOrigin(0.5, 0.5).setDepth(6);
+
+        // --- Initial Positioning ---
+        this.repositionUIBars();
 
         // --- Boss HP Bar ---
         this.bossHpContainer = this.add.container(640, 80).setVisible(false).setAlpha(0.8);
@@ -327,8 +309,7 @@ export class UIScene extends Phaser.Scene {
             quitBtnBg.setFillStyle(0x3d2b1f, 0.9).setScale(1);
             quitBtnText.setScale(1);
         });
-
-        this.uiContainer.add([this.stageLevelText, this.levelText, this.skillPointsText, this.statsText, hpFrame, this.hpBar, shine, hpIcon, this.hpText, expFrame, this.xpBar, expShine, expIcon, this.expLabel, this.coinText, this.coinIcon, mmBg1, mmBg2, this.minimapGraphics, this.arrowGraphics, pauseBtn, muteBtn]);
+        this.uiContainer.add([this.stageLevelText, this.levelText, this.skillPointsText, this.statsText, this.hpFrame, this.hpBar, this.hpShine, this.hpIcon, this.hpText, this.expFrame, this.xpBar, this.expShine, this.expIcon, this.expLabel, this.mpContainer, this.coinText, this.coinIcon, mmBg1, mmBg2, this.minimapGraphics, this.arrowGraphics, pauseBtn, muteBtn]);
         // Note: Pause overlay/buttons are not in uiContainer based on previous structure
         this.uiContainer.setVisible(false);
 
@@ -395,6 +376,11 @@ export class UIScene extends Phaser.Scene {
         window.addEventListener('stage_updated', stageUpdatedHandler);
         window.addEventListener('player_died', playerDiedHandler);
         window.addEventListener('map_generated', mapGeneratedHandler);
+        window.addEventListener('mp_updated', this.handleMp as EventListener);
+        window.addEventListener('char_selected', ((e: CustomEvent<string>) => {
+            this.selectedCharId = e.detail;
+            this.repositionUIBars();
+        }) as EventListener);
 
         // If game is already started (could happen if UIScene is launched late), make it visible
         const mainScene = this.scene.get('MainScene') as any;
@@ -600,6 +586,14 @@ export class UIScene extends Phaser.Scene {
         else this.hpBar.setFillStyle(0xff0000);
     }
 
+    private handleMp = (e: CustomEvent<{ current: number, max: number }>) => {
+        const { current, max } = e.detail;
+        const percent = Phaser.Math.Clamp(current / max, 0, 1);
+        const fullWidth = 400 - 8;
+        this.mpBar.displayWidth = fullWidth * percent;
+        this.mpText.setText(`${Math.ceil(current)} / ${max}`);
+    }
+
     private handleBossHp = (e: CustomEvent<{ current: number, max: number, name?: string }>) => {
         if (!this.bossHpContainer || !this.bossHpBar) return;
         const { current, max, name } = e.detail;
@@ -648,6 +642,59 @@ export class UIScene extends Phaser.Scene {
                 });
             }
         });
-        this.sound.stopAll();
+    }
+
+    private repositionUIBars() {
+        const hpX = 20;
+        const bottomY = 710; // Aligned with SP 포인트 라인
+        const barHeight = 28;
+        const fullWidth = 400;
+        const spacing = 34; // Gap between bars
+
+        const needsMana = (this.selectedCharId === 'wizard' || this.selectedCharId === 'elf');
+        this.mpContainer.setVisible(needsMana);
+
+        // Positions calculated from bottom up
+        // Slot 0 (Bottom): EXP
+        // Slot 1 (Middle): MP (if exists) or HP
+        // Slot 2 (Top): HP (if MP exists)
+
+        // 1. Position EXP Bar (Always at bottom)
+        const expY = bottomY;
+        this.expFrame.clear().lineStyle(4, 0xffffff).strokeRoundedRect(hpX, expY - barHeight, fullWidth, barHeight, 4).fillStyle(0x000000, 0.8).fillRoundedRect(hpX, expY - barHeight, fullWidth, barHeight, 4);
+        this.xpBar.setPosition(hpX + 4, expY - barHeight + 4);
+        this.xpBar.height = barHeight - 8;
+        this.expShine.clear().fillStyle(0xffffff, 0.2).fillRect(hpX + 4, expY - barHeight + 4, fullWidth - 8, (barHeight - 8) / 2);
+        this.expIcon.setPosition(hpX - 1, expY - barHeight / 2);
+        this.expLabel.setPosition(hpX + fullWidth / 2, expY - barHeight / 2);
+
+        let nextY = expY - spacing;
+
+        // 2. Position Mana Bar (if needed)
+        if (needsMana) {
+            const mpY = nextY;
+            this.mpContainer.setPosition(0, mpY); // Absolute position since it's on scene directly or relative to 0
+            const mpFrame = this.mpContainer.list[0] as Phaser.GameObjects.Graphics;
+            const mpShine = this.mpContainer.list[2] as Phaser.GameObjects.Graphics;
+            const mpIcon = this.mpContainer.list[3] as Phaser.GameObjects.Image;
+            
+            mpFrame.clear().lineStyle(4, 0xffffff).strokeRoundedRect(hpX, -barHeight, fullWidth, barHeight, 4).fillStyle(0x000000, 0.8).fillRoundedRect(hpX, -barHeight, fullWidth, barHeight, 4);
+            this.mpBar.setPosition(hpX + 4, -barHeight + 4);
+            this.mpBar.height = barHeight - 8;
+            mpShine.clear().fillStyle(0xffffff, 0.2).fillRect(hpX + 4, -barHeight + 4, fullWidth - 8, (barHeight - 8) / 2);
+            mpIcon.setPosition(hpX - 1, -barHeight / 2);
+            this.mpText.setPosition(hpX + fullWidth / 2, -barHeight / 2);
+            
+            nextY -= spacing;
+        }
+
+        // 3. Position HP Bar (At the top of the stack)
+        const hpY = nextY;
+        this.hpFrame.clear().lineStyle(4, 0xffffff).strokeRoundedRect(hpX, hpY - barHeight, fullWidth, barHeight, 4).fillStyle(0x000000, 0.8).fillRoundedRect(hpX, hpY - barHeight, fullWidth, barHeight, 4);
+        this.hpBar.setPosition(hpX + 4, hpY - barHeight + 4);
+        this.hpBar.height = barHeight - 8;
+        this.hpShine.clear().fillStyle(0xffffff, 0.2).fillRect(hpX + 4, hpY - barHeight + 4, fullWidth - 8, (barHeight - 8) / 2);
+        this.hpIcon.setPosition(hpX - 1, hpY - barHeight / 2);
+        this.hpText.setPosition(hpX + fullWidth / 2, hpY - barHeight / 2);
     }
 }

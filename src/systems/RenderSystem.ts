@@ -323,13 +323,14 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                         }
 
                         wSprite = _scene.add.sprite(Position.x[eid], Position.y[eid], weaponTex, weaponFrame);
-                        wSprite.setOrigin(0.5, (charKey === 'wizard' || charKey === 'elf') ? 0.5 : 0.8);
-                        wSprite.setDepth(29); // 플레이어(30)보다 뒤에 위치하도록 조정
+                        // Wizard와 Elf의 무기(지팡이, 활)은 하단 끝(1.0)을 기준으로 정렬하여 발끝과 맞춤
+                        wSprite.setOrigin(0.5, (charKey === 'wizard' || charKey === 'elf') ? 1.0 : 0.8);
+                        wSprite.setDepth(29); 
                         playerWeaponSprites[eid] = wSprite;
                     }
 
-                    const wx = charKey === 'wizard' ? 7 : 5; // 검사 무기를 캐릭터 쪽으로 더 밀착 (7 -> 5)
-                    const wy = charKey === 'wizard' ? 2 : 3; // 세로 위치 조정 (2 -> 3)
+                    const wx = charKey === 'wizard' ? 4 : (charKey === 'elf' ? 5 : 5); 
+                    const wy = (charKey === 'wizard' || charKey === 'elf') ? 4 : -7; 
                     let baseRot = charKey === 'knight' ? -Math.PI / 4 : 0;
 
                     let swingRot = 0;
