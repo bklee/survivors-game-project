@@ -42,6 +42,17 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
     return (dt: number) => {
         if (playerAttackTimer > 0) playerAttackTimer -= dt;
 
+        // --- Boss ActionState (AttackTimer) Decrement ---
+        const actionEntities = defineQuery([ActionState])(world);
+        for (let i = 0; i < actionEntities.length; i++) {
+            const eid = actionEntities[i];
+            if (!hasComponent(world, Player, eid)) {
+                if (ActionState.attackTimer[eid] > 0) {
+                    ActionState.attackTimer[eid] -= dt;
+                }
+            }
+        }
+
         const ents = renderQuery(world);
         const activeEids = new Set(ents);
 
@@ -372,9 +383,9 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                         }
 
                         wSprite = _scene.add.sprite(Position.x[eid], Position.y[eid], weaponTex, weaponFrame);
-                        // Ogre의 배트는 조금 더 위쪽 정렬
-                        wSprite.setOrigin(0.5, (charKey === 'ogre') ? 0.9 : ((charKey === 'wizard' || charKey === 'elf') ? 1.0 : 0.8));
-                        wSprite.setDepth(29); 
+                        // Ogre의 배트는 조금 더 위쪽 정렬 및 확실한 고정
+                        wSprite.setOrigin(0.5, (charKey === 'ogre') ? 1.0 : ((charKey === 'wizard' || charKey === 'elf') ? 1.0 : 0.8));
+                        wSprite.setDepth(sprite.depth + 1); 
                         playerWeaponSprites[eid] = wSprite;
                     }
 
@@ -383,12 +394,12 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                     if (hasComponent(world, Scale, eid)) {
                         wScale = Scale.value[eid] * 1.5; // 보스 무기는 조금 더 크게 (1.5배)
                     } else if (isBoss) {
-                        wScale = 2.0; // 오우거 기본 배트 크기
+                        wScale = (charKey === 'ogre') ? 4.0 : 2.0; // 오우거는 특별히 거대하게 (4.0)
                     }
                     wSprite.setScale(wScale);
 
-                    const wx = charKey === 'wizard' ? 4 : (charKey === 'elf' ? 5 : (charKey === 'ogre' ? 20 : 5)); 
-                    const wy = (charKey === 'wizard' || charKey === 'elf') ? 4 : (charKey === 'ogre' ? 5 : -7); 
+                    const wx = charKey === 'wizard' ? 4 : (charKey === 'elf' ? 5 : (charKey === 'ogre' ? 25 : 5)); 
+                    const wy = (charKey === 'wizard' || charKey === 'elf') ? 4 : (charKey === 'ogre' ? 10 : -7); 
                     let baseRot = (charKey === 'knight' || charKey === 'ogre') ? -Math.PI / 4 : 0;
 
                     let swingRot = 0;
@@ -430,6 +441,7 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                         wSprite.rotation = baseRot + swingRot;
                     }
 
+                    wSprite.setDepth(sprite.depth + 1); // Depth consistency
                     wSprite.setVisible(true);
                     wSprite.alpha = currentAlpha;
 
