@@ -32,15 +32,14 @@ const renderQuery = defineQuery([Position, SpriteInfo]);
 const bobs: (Phaser.GameObjects.Bob | undefined)[] = [];
 const sprites: (Phaser.GameObjects.Sprite | undefined)[] = [];
 const playerWeaponSprites: (Phaser.GameObjects.Sprite | undefined)[] = [];
-let playerAttackTimer = 0;
 
 window.addEventListener('combo_cast', (e: any) => {
-    playerAttackTimer = e.detail?.duration || 400;
+    (window as any).playerAttackTimer = e.detail?.duration || 400;
 });
 
 export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObjects.Blitter) => {
     return (dt: number) => {
-        if (playerAttackTimer > 0) playerAttackTimer -= dt;
+        if ((window as any).playerAttackTimer > 0) (window as any).playerAttackTimer -= dt;
 
         // --- Boss ActionState (AttackTimer) Decrement ---
         const actionEntities = defineQuery([ActionState])(world);
@@ -425,7 +424,7 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
 
                     let swingRot = 0;
                     // Player uses global timer, Bosses use their own ActionState
-                    const currentAttackTimer = isPlayer ? (window as any).playerAttackTimer || 0 : (hasComponent(world, ActionState, eid) ? ActionState.attackTimer[eid] : 0);
+                    const currentAttackTimer = isPlayer ? ((window as any).playerAttackTimer || 0) : (hasComponent(world, ActionState, eid) ? ActionState.attackTimer[eid] : 0);
                     const currentAttackDuration = isPlayer ? ((charKey === 'knight') ? 250 : 400) : (hasComponent(world, ActionState, eid) ? ActionState.attackDuration[eid] : 400);
 
                     if (currentAttackTimer > 0) {

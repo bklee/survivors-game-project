@@ -38,6 +38,7 @@ export class MainScene extends Phaser.Scene {
     private isPausedForClear: boolean = false;
     private charData!: CharacterData;
     private secretRoomData?: { doorPixel: { x: number; y: number }; floorPixels: { x: number; y: number }[] };
+    private wallDecoGroup!: Phaser.GameObjects.Group;
     private debugTexts: Phaser.GameObjects.Text[] = []; // Debug texts for walls
 
     constructor() {
@@ -123,6 +124,10 @@ export class MainScene extends Phaser.Scene {
 
         this.wallBlitter = this.add.blitter(0, 0, 'walls').setDepth(-2);
         this.doorBlitter = this.add.blitter(0, 0, 'dungeon').setDepth(-2);
+        this.wallDecoGroup = this.add.group();
+        // wallDecoGroup manages North wall specific decorations like wall_holes
+        // wallDecoGroup doesn't have setDepth, but images added to it can have depths. 
+        // We'll set depths on creation or just leave as group.
 
         this.buildMap(this.currentStage);
 
@@ -315,6 +320,7 @@ export class MainScene extends Phaser.Scene {
         this.floorBlitter.clear();
         this.wallBlitter.clear();
         this.doorBlitter.clear();
+        this.wallDecoGroup.clear(true, true);
         this.debugTexts.forEach(t => t.destroy());
         this.debugTexts = [];
 
@@ -366,13 +372,14 @@ export class MainScene extends Phaser.Scene {
                         // 에셋 매핑 수정으로 wall_n_mid가 심플한 일자벽을 가리키게 됨
                         this.wallBlitter.create(x * TILE_SIZE, y * TILE_SIZE, 'wall_n_mid');
 
-                        // 사용자 요청: 북쪽 벽에만 2% 확률로 슬라임(Goo) 장식 추가
+                        // 사용자 요청: 북쪽 벽에만 2% 확률로 구멍(Wall Hole) 장식 추가
                         if (Math.random() < 0.02) {
-                            const wx = x * TILE_SIZE;
-                            const wy = y * TILE_SIZE;
-                            // 바닥(Floor) 쪽으로 더 내려와서 붙도록 +12px 오프셋 적용
-                            this.wallBlitter.create(wx, wy + 12, 'wall_goo_top');
-                            this.wallBlitter.create(wx, wy + 28, 'wall_goo_mid');
+                            const wx = x * TILE_SIZE + 8; // Center X
+                            const wy = y * TILE_SIZE + 16; // Adjust Y position for wall integration
+                            const holeAsset = Math.random() < 0.5 ? 'wall_hole_1' : 'wall_hole_2';
+                            const deco = this.add.image(wx, wy, holeAsset);
+                            deco.setDepth(y * TILE_SIZE + 32); // Match wall depth
+                            this.wallDecoGroup.add(deco);
                         }
                     }
 
