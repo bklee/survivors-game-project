@@ -276,7 +276,7 @@ export class MainScene extends Phaser.Scene {
     }
 
     private buildMap(stage: number) {
-        const scale = Math.pow(1.10, Math.max(0, stage - 1));
+        const scale = Math.pow(1.01, Math.max(0, stage - 1));
         const mapW = Math.floor(100 * scale);
         const mapH = Math.floor(100 * scale);
 

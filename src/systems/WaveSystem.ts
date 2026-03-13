@@ -236,14 +236,12 @@ export class NightDirector {
         this.stageClearDispatched = false;
         this.spawningCompleteDispatched = false;
         this.lastSpawnTime = 0;
-        this.globalDifficultyMultiplier = 1.0 + ((stage - 1) * 0.25);
+        // 매 스테이지마다 적의 체력과 공격력이 25%씩 중첩(복리)되어 강화
+        this.globalDifficultyMultiplier = Math.pow(1.25, stage - 1);
 
-        if (this.stage % 3 === 0) {
-            this.maxEnemiesToSpawn = 50 * stage;
-        } else {
-            // Normal stages have reasonable counts
-            this.maxEnemiesToSpawn = 20 * stage;
-        }
+        // 적 생성 수량: 현재 스테이지 번호 × 20마리, 최대 100마리 제한
+        this.maxEnemiesToSpawn = Math.min(stage * 20, 100);
+        
         this.spawnedEnemiesCount = 0;
 
         const enemies = enemyQuery(world);
