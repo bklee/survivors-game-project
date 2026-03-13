@@ -199,6 +199,10 @@ export class MainScene extends Phaser.Scene {
             if (e.code === 'KeyR' && e.shiftKey) {
                 window.dispatchEvent(new CustomEvent('player_died'));
             }
+            // Debug: Level Up
+            if (e.code === 'KeyL' && e.shiftKey) {
+                window.dispatchEvent(new CustomEvent('xp_percent_collected', { detail: 100 }));
+            }
         };
         window.addEventListener('keydown', recipeHandler);
 
