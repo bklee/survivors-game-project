@@ -585,7 +585,7 @@ export class UIScene extends Phaser.Scene {
                 this.statsText.setScale(1).clearTint();
             });
 
-            // --- USER REQUEST: Level Up Recovery & Stat Growth (HP/MP +5%) ---
+            // --- USER REQUEST: Level Up Recovery & Stat Growth (HP/MP/ATK/SPD) ---
             const players = this.playerQuery(world);
             if (players.length > 0) {
                 const peid = players[0];
@@ -608,6 +608,10 @@ export class UIScene extends Phaser.Scene {
                         detail: { current: globalStats.mana.current, max: globalStats.mana.max }
                     }));
                 }
+
+                // 사용자 요청: 공격력(ATK) 5%, 이동속도(SPD) 3% 영구 상승
+                globalStats.damageMult *= 1.05;
+                globalStats.moveSpeedMult *= 1.03;
             }
         }
         this.updateStageLevelText();
@@ -680,14 +684,19 @@ export class UIScene extends Phaser.Scene {
             duration: 500,
             ease: 'Back.easeOut',
             onComplete: () => {
-                // 한 번의 클릭/터치 이벤트를 대기
-                this.input.once('pointerdown', () => {
+                // 사용자 요청: 마우스 클릭뿐만 아니라 아무 키보드 키나 눌러도 진행되도록 개선
+                const proceed = () => {
+                    this.input.off('pointerdown', proceed);
+                    this.input.keyboard?.off('keydown', proceed);
                     panel.destroy();
                     reward.destroy();
                     tapToContinue.destroy();
                     this.stageClearText.setVisible(false);
                     window.dispatchEvent(new CustomEvent('next_stage'));
-                });
+                };
+
+                this.input.once('pointerdown', proceed);
+                this.input.keyboard?.once('keydown', proceed);
             }
         });
     }
