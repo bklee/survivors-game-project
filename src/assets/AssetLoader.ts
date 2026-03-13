@@ -24,6 +24,8 @@ export class AssetLoader {
         this.scene.load.image('game_over', './assets/game_over.png');
         this.scene.load.image('weapon_baton_with_spikes', './assets/frames/weapon_baton_with_spikes.png');
         this.scene.load.image('hole', './assets/frames/hole.png');
+        this.scene.load.image('wall_hole_1', './assets/frames/wall_hole_1.png');
+        this.scene.load.image('wall_hole_2', './assets/frames/wall_hole_2.png');
 
         for (let i = 0; i < 3; i++) {
             this.scene.load.image(`sword_slash_f${i}`, `assets/frames/sword_slash_f${i}.png`);
