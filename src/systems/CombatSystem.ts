@@ -58,11 +58,20 @@ export const createCombatSystem = (juice: JuicePipeline) => {
 
                 const dx = px - Position.x[epid];
                 const dy = py - Position.y[epid];
-                if (dx * dx + dy * dy < 15 * 15) {
-                    Health.current[playerEid] -= 15;
+                const typeId = SpriteInfo.textureIndex[epid];
+                
+                // 불기둥(100)은 범위가 더 넓음 (25px), 일반 탄막은 15px
+                const hitRadius = (typeId === 100) ? 25 : 15;
+                const damage = (typeId === 100) ? 25 : 15;
+
+                if (dx * dx + dy * dy < hitRadius * hitRadius) {
+                    Health.current[playerEid] -= damage;
                     window.dispatchEvent(new CustomEvent('hp_updated', {
                         detail: { current: Health.current[playerEid], max: Health.max[playerEid] }
                     }));
+                    
+                    // 불기둥은 피격 시 사라지게 할지, 아니면 일정 시간 유지할지 결정
+                    // 현재는 투사체 로직을 공유하므로 히트 시 제거
                     removeEntity(world, epid);
                 }
             }
