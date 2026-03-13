@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { defineQuery, hasComponent } from 'bitecs';
 import { world } from '../core/World';
-import { Position, Player, Enemy, Boss } from '../components';
+import { Position, Player, Enemy, Boss, Health, Mana } from '../components';
 import { globalStats } from '../core/PlayerStats';
 import { VirtualJoystick } from '../ui/VirtualJoystick';
 
@@ -584,6 +584,24 @@ export class UIScene extends Phaser.Scene {
             this.time.delayedCall(1000, () => {
                 this.statsText.setScale(1).clearTint();
             });
+
+            // --- USER REQUEST: Level Up Recovery (HP/MP 100%) ---
+            const players = this.playerQuery(world);
+            if (players.length > 0) {
+                const peid = players[0];
+                Health.current[peid] = Health.max[peid];
+                window.dispatchEvent(new CustomEvent('hp_updated', {
+                    detail: { current: Health.current[peid], max: Health.max[peid] }
+                }));
+
+                if (hasComponent(world, Mana, peid)) {
+                    Mana.current[peid] = Mana.max[peid];
+                    globalStats.mana.current = globalStats.mana.max;
+                    window.dispatchEvent(new CustomEvent('mp_updated', {
+                        detail: { current: globalStats.mana.current, max: globalStats.mana.max }
+                    }));
+                }
+            }
         }
         this.updateStageLevelText();
     }

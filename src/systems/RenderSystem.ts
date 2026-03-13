@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { defineQuery, hasComponent } from 'bitecs';
-import { Animation, Position, SpriteInfo, Velocity, Health, Interactive, Rotation, Boss, Player, Scale } from '../components';
+import { Animation, Position, SpriteInfo, Velocity, Health, Interactive, Rotation, Boss, Player, Scale, ActionState } from '../components';
 import { world } from '../core/World';
 import { globalStats } from '../core/PlayerStats';
 
@@ -305,14 +305,27 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                     if (typeId === 104) {
                         sprite.tint = 0xffff00;
                     } else if (isPlayer) {
-                        // --- 캐릭터 색상 진화 (요청하신 청록색 위저드 스타일 반영) ---
+                        sprite.clearTint();
+                        // --- 캐릭터 오오라 효과 (Level thresholds) ---
                         const level = globalStats.currentLevel;
-                        // XP가 많아도 레벨업 로직이 돌아야 적용되므로 UI에서 레벨업 체크 확인 필수
-                        if (level >= 30) sprite.setTint(0xffd700);      // Lv 30+ Gold
-                        else if (level >= 20) sprite.setTint(0xff00ff); // Lv 20+ Purple
-                        else if (level >= 10) sprite.setTint(0x00ffff); // Lv 10+ Cyan
-                        else if (level >= 5) sprite.setTint(0x00ff00);  // Lv 5+ Green
-                        else sprite.clearTint();
+                        let glowColor = 0;
+                        if (level >= 30) glowColor = 0xffd700;
+                        else if (level >= 20) glowColor = 0xff00ff;
+                        else if (level >= 10) glowColor = 0x00ffff;
+                        else if (level >= 5) glowColor = 0x00ff00;
+
+                        if (glowColor !== 0) {
+                            if ((sprite as any).lastGlowColor !== glowColor) {
+                                sprite.postFX.clear();
+                                sprite.postFX.addGlow(glowColor, 2, 0);
+                                (sprite as any).lastGlowColor = glowColor;
+                            }
+                        } else {
+                            if ((sprite as any).lastGlowColor && (sprite as any).lastGlowColor !== 0) {
+                                sprite.postFX.clear();
+                                (sprite as any).lastGlowColor = 0;
+                            }
+                        }
                     } else {
                         sprite.clearTint();
                     }
@@ -339,37 +352,54 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                 // if (typeId === 104) sprite.tint = 0xffff00;
                 // else sprite.clearTint();
 
-                // Render specific player weapons
-                if (isPlayer && (charKey === 'knight' || charKey === 'wizard' || charKey === 'elf')) {
+                // Render specific weapons (Players & Ogre Boss)
+                if (isPlayer || (isBoss && charKey === 'ogre')) {
                     let wSprite = playerWeaponSprites[eid];
                     if (!wSprite) {
                         let weaponTex = 'dungeon';
                         let weaponFrame: string | undefined = undefined;
 
-                        if (charKey === 'knight') weaponTex = 'weapon_knight_sword';
-                        else if (charKey === 'wizard') weaponTex = 'weapon_green_magic_staff';
-                        else {
-                            weaponTex = 'dungeon';
-                            weaponFrame = 'weapon_bow';
+                        if (isPlayer) {
+                            if (charKey === 'knight') weaponTex = 'weapon_knight_sword';
+                            else if (charKey === 'wizard') weaponTex = 'weapon_green_magic_staff';
+                            else {
+                                weaponTex = 'dungeon';
+                                weaponFrame = 'weapon_bow';
+                            }
+                        } else {
+                            // Boss Weapon (Ogre)
+                            weaponTex = 'weapon_baton_with_spikes';
                         }
 
                         wSprite = _scene.add.sprite(Position.x[eid], Position.y[eid], weaponTex, weaponFrame);
-                        // Wizard와 Elf의 무기(지팡이, 활)은 하단 끝(1.0)을 기준으로 정렬하여 발끝과 맞춤
-                        wSprite.setOrigin(0.5, (charKey === 'wizard' || charKey === 'elf') ? 1.0 : 0.8);
+                        // Ogre의 배트는 조금 더 위쪽 정렬
+                        wSprite.setOrigin(0.5, (charKey === 'ogre') ? 0.9 : ((charKey === 'wizard' || charKey === 'elf') ? 1.0 : 0.8));
                         wSprite.setDepth(29); 
                         playerWeaponSprites[eid] = wSprite;
                     }
 
-                    const wx = charKey === 'wizard' ? 4 : (charKey === 'elf' ? 5 : 5); 
-                    const wy = (charKey === 'wizard' || charKey === 'elf') ? 4 : -7; 
-                    let baseRot = charKey === 'knight' ? -Math.PI / 4 : 0;
+                    // Boss Scale reflect on weapon
+                    let wScale = 1.0;
+                    if (hasComponent(world, Scale, eid)) {
+                        wScale = Scale.value[eid] * 1.5; // 보스 무기는 조금 더 크게 (1.5배)
+                    } else if (isBoss) {
+                        wScale = 2.0; // 오우거 기본 배트 크기
+                    }
+                    wSprite.setScale(wScale);
+
+                    const wx = charKey === 'wizard' ? 4 : (charKey === 'elf' ? 5 : (charKey === 'ogre' ? 20 : 5)); 
+                    const wy = (charKey === 'wizard' || charKey === 'elf') ? 4 : (charKey === 'ogre' ? 5 : -7); 
+                    let baseRot = (charKey === 'knight' || charKey === 'ogre') ? -Math.PI / 4 : 0;
 
                     let swingRot = 0;
-                    if (playerAttackTimer > 0) {
-                        const animDuration = (charKey === 'knight') ? 250 : 400;
-                        const progress = Math.max(0, 1 - (playerAttackTimer / animDuration));
+                    // Player uses global timer, Bosses use their own ActionState
+                    const currentAttackTimer = isPlayer ? (window as any).playerAttackTimer || 0 : (hasComponent(world, ActionState, eid) ? ActionState.attackTimer[eid] : 0);
+                    const currentAttackDuration = isPlayer ? ((charKey === 'knight') ? 250 : 400) : (hasComponent(world, ActionState, eid) ? ActionState.attackDuration[eid] : 400);
 
-                        if (charKey === 'knight') {
+                    if (currentAttackTimer > 0) {
+                        const progress = Math.max(0, 1 - (currentAttackTimer / currentAttackDuration));
+
+                        if (charKey === 'knight' || charKey === 'ogre') {
                             swingRot = Math.sin(progress * Math.PI) * (Math.PI * 0.8);
                         }
                         else if (charKey === 'wizard') {
@@ -380,7 +410,7 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                             swingRot = 0; 
                             // 400ms 중 초기 300ms(400~100)는 시위를 당긴 상태(weapon_bow_2), 
                             // 마지막 100ms(100~0)는 발사 후 snap 상태(weapon_bow)
-                            const frame = (playerAttackTimer > 100) ? 'weapon_bow_2' : 'weapon_bow';
+                            const frame = (currentAttackTimer > 100) ? 'weapon_bow_2' : 'weapon_bow';
                             wSprite.setFrame(frame);
                         }
                     } else if (state === 'run') {
@@ -403,13 +433,31 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                     wSprite.setVisible(true);
                     wSprite.alpha = currentAlpha;
 
-                    // --- 무기도 캐릭터 색상 진화에 맞춰 Tint 동기화 ---
-                    const level = globalStats.currentLevel;
-                    if (level >= 30) wSprite.setTint(0xffd700);
-                    else if (level >= 20) wSprite.setTint(0xff00ff);
-                    else if (level >= 10) wSprite.setTint(0x00ffff);
-                    else if (level >= 5) wSprite.setTint(0x00ff00);
-                    else wSprite.clearTint();
+                    // --- 무기도 캐릭터 색상 진화에 맞춰 오오라 동기화 (플레이어만) ---
+                    if (isPlayer) {
+                        wSprite.clearTint();
+                        const level = globalStats.currentLevel;
+                        let glowColor = 0;
+                        if (level >= 30) glowColor = 0xffd700;
+                        else if (level >= 20) glowColor = 0xff00ff;
+                        else if (level >= 10) glowColor = 0x00ffff;
+                        else if (level >= 5) glowColor = 0x00ff00;
+
+                        if (glowColor !== 0) {
+                            if ((wSprite as any).lastGlowColor !== glowColor) {
+                                wSprite.postFX.clear();
+                                wSprite.postFX.addGlow(glowColor, 1, 0);
+                                (wSprite as any).lastGlowColor = glowColor;
+                            }
+                        } else {
+                            if ((wSprite as any).lastGlowColor && (wSprite as any).lastGlowColor !== 0) {
+                                wSprite.postFX.clear();
+                                (wSprite as any).lastGlowColor = 0;
+                            }
+                        }
+                    } else {
+                        wSprite.clearTint();
+                    }
                 }
 
             } else {
