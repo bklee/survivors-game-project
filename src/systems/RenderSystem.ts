@@ -98,6 +98,7 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
             else if (typeId === 30) charKey = 'prop_crate';
             else if (typeId === 31) charKey = 'prop_skull';
             else if (typeId === 32) charKey = 'prop_spikes';
+            else if (typeId === 37) { charKey = 'hole'; textureKey = 'hole'; }
             else if (typeId === 33) charKey = 'prop_column';
             else if (typeId === 34) charKey = 'prop_crate';
             else if (typeId === 35) charKey = 'spell_fire';
@@ -146,7 +147,7 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
 
             const isPillarPart = typeId >= 90 && typeId <= 95;
             // BOSS IDs: 69, 79, 89. Ogre(89)가 누락되지 않도록 범위를 89까지 확장.
-            const requiresSprite = isPlayer || typeId >= 100 || (typeId >= 60 && typeId <= 89) || typeId >= 50 || typeId === 36 || typeId === 21 || isPillarPart || hasComponent(world, Rotation, eid);
+            const requiresSprite = isPlayer || typeId === 37 || typeId >= 100 || (typeId >= 60 && typeId <= 89) || typeId >= 50 || typeId === 36 || typeId === 21 || isPillarPart || hasComponent(world, Rotation, eid);
 
             // 2. Identify State (Idle vs Run)
             let state = 'idle';
