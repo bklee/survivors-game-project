@@ -123,55 +123,44 @@ export class DungeonGenerator {
      */
     private widenPaths() {
         const changes: { x: number, y: number }[] = [];
-        // 맵 내부를 순회하며 좁은 구간 확인
+        
+        // 1. 수직/수평 좁은 길 확장 (1칸 -> 2칸)
         for (let y = 1; y < this.height - 1; y++) {
             for (let x = 1; x < this.width - 1; x++) {
                 if (this.map[y][x] === TileType.FLOOR) {
-                    // 1. 수평으로 좁은 길 (위아래가 벽)
                     if (this.map[y - 1][x] === TileType.WALL && this.map[y + 1][x] === TileType.WALL) {
                         if (y + 1 < this.height - 1) changes.push({ x, y: y + 1 });
                     }
-                    // 2. 수직으로 좁은 길 (좌우가 벽)
                     if (this.map[y][x - 1] === TileType.WALL && this.map[y][x + 1] === TileType.WALL) {
                         if (x + 1 < this.width - 1) changes.push({ x: x + 1, y });
-                    }
-
-                    // 3. 대각선 좁은 길 (Diagonal Chokepoint) 제거
-                    // (x,y) 기준 우측 하단 2x2 영역 체크
-                    if (x < this.width - 1 && y < this.height - 1) {
-                        // 패턴 1: 
-                        // Floor  Wall
-                        // Wall   Floor
-                        if (this.map[y][x + 1] === TileType.WALL && 
-                            this.map[y + 1][x] === TileType.WALL && 
-                            this.map[y + 1][x + 1] === TileType.FLOOR) {
-                            changes.push({ x: x + 1, y: y }); // 우측 벽을 허묾
-                        }
-
-                        // 패턴 2: 
-                        // Wall   Floor
-                        // Floor  Wall
-                        // (x-1, y) 가 Floor 이고 (x, y) 가 Wall 인 경우를 별도로 체크하기 위해
-                        // 루프를 돌면서 모든 2x2를 체크하는 방식으로 이해하면 됨
-                    }
-                } else if (this.map[y][x] === TileType.WALL) {
-                    // Wall   Floor
-                    // Floor  Wall
-                    if (x < this.width - 1 && y < this.height - 1) {
-                        if (this.map[y][x + 1] === TileType.FLOOR && 
-                            this.map[y + 1][x] === TileType.FLOOR && 
-                            this.map[y + 1][x + 1] === TileType.WALL) {
-                            changes.push({ x, y }); // 현재 벽을 허묾
-                        }
                     }
                 }
             }
         }
+        changes.forEach(p => this.map[p.y][p.x] = TileType.FLOOR);
+        changes.length = 0;
 
-        // 수집된 변경 사항 일괄 적용
-        changes.forEach(p => {
-            this.map[p.y][p.x] = TileType.FLOOR;
-        });
+        // 2. 대각선 병목(Diagonal Chokepoint) 완전 제거 (2x2 공간 확보)
+        for (let y = 1; y < this.height - 1; y++) {
+            for (let x = 1; x < this.width - 1; x++) {
+                // 패턴 A: ┘ ┌ 형태대각선 (Top-Left Floor, Bottom-Right Floor)
+                if (this.map[y][x] === TileType.FLOOR && 
+                    this.map[y + 1][x + 1] === TileType.FLOOR &&
+                    this.map[y][x + 1] === TileType.WALL &&
+                    this.map[y + 1][x] === TileType.WALL) {
+                    changes.push({ x: x + 1, y: y }, { x: x, y: y + 1 });
+                }
+
+                // 패턴 B: └ ┐ 형태 대각선 (Top-Right Floor, Bottom-Left Floor)
+                if (this.map[y][x] === TileType.WALL && 
+                    this.map[y + 1][x + 1] === TileType.WALL &&
+                    this.map[y][x + 1] === TileType.FLOOR &&
+                    this.map[y + 1][x] === TileType.FLOOR) {
+                    changes.push({ x: x, y: y }, { x: x + 1, y: y + 1 });
+                }
+            }
+        }
+        changes.forEach(p => this.map[p.y][p.x] = TileType.FLOOR);
     }
 
 
