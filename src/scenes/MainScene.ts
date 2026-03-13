@@ -478,13 +478,10 @@ export class MainScene extends Phaser.Scene {
                         }
                     }
                 }
-            } else if (typeId === 32 || typeId === 37) {
-                // 32: Spikes, 37: Hole
-                let canDamage = true;
-                if (typeId === 32) {
-                    const animIdx = Math.floor(Animation.timer[eid] * 4 / 1000) % 4;
-                    canDamage = animIdx >= 2;
-                }
+            } else if (typeId === 32) {
+                // 32: Spikes (인접 시 데미지, 애니메이션 프레임 기반)
+                const animIdx = Math.floor(Animation.timer[eid] * 4 / 1000) % 4;
+                const canDamage = animIdx >= 2;
 
                 if (canDamage) {
                     if (distSq < 20 * 20) {

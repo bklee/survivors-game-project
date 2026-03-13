@@ -585,18 +585,25 @@ export class UIScene extends Phaser.Scene {
                 this.statsText.setScale(1).clearTint();
             });
 
-            // --- USER REQUEST: Level Up Recovery (HP/MP 100%) ---
+            // --- USER REQUEST: Level Up Recovery & Stat Growth (HP/MP +5%) ---
             const players = this.playerQuery(world);
             if (players.length > 0) {
                 const peid = players[0];
+                
+                // Max HP 5% 상승 및 완전 회복
+                Health.max[peid] = Math.ceil(Health.max[peid] * 1.05);
                 Health.current[peid] = Health.max[peid];
                 window.dispatchEvent(new CustomEvent('hp_updated', {
                     detail: { current: Health.current[peid], max: Health.max[peid] }
                 }));
 
                 if (hasComponent(world, Mana, peid)) {
-                    Mana.current[peid] = Mana.max[peid];
+                    // Max MP 5% 상승 및 완전 회복
+                    globalStats.mana.max = Math.ceil(globalStats.mana.max * 1.05);
                     globalStats.mana.current = globalStats.mana.max;
+                    Mana.current[peid] = globalStats.mana.current;
+                    Mana.max[peid] = globalStats.mana.max;
+                    
                     window.dispatchEvent(new CustomEvent('mp_updated', {
                         detail: { current: globalStats.mana.current, max: globalStats.mana.max }
                     }));
