@@ -286,7 +286,7 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                     // 기둥 및 분수 상부 파트의 깊이를 하부 베이스라인(Position.y + 32)으로 통합 투영
                     depthOffset = 32; 
                 } else if (typeId === 93 || typeId === 95) {
-                    // 하단 파트는 별도 상향 오프셋 없이 자신의 Y 좌표를 그대로 따름 (MainScene에서 개별 조정)
+                    // 하단 파트는 별도 상향 오프셋 없이 자신의 Y 좌표를 그대로 따름
                     depthOffset = 0;
                 }
                 
@@ -299,14 +299,33 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                     sprite.clearTint();
                 } else if (isBoss) {
                     sprite.setScale(2.5);
-                    // --- 루프 반복 시 색상 변경 (매 9스테이지/1사이클 마다 점진적 변화) ---
-                    const cycleCount = Math.floor((globalStats.currentStage - 1) / 9);
-                    if (cycleCount > 0) {
-                        const hue = (cycleCount * 60) % 360; 
-                        const colorObj = Phaser.Display.Color.HSVToRGB(hue / 360, 0.8, 1);
-                        sprite.setTint(colorObj.color);
+                    const hpPercent = Health.current[eid] / Health.max[eid];
+                    if (hpPercent <= 0.5) {
+                        // 폭주 연출: 붉은색 점멸 및 오오라
+                        const flash = Math.sin(_scene.time.now / 100) > 0;
+                        if (flash) sprite.setTint(0xff0000);
+                        else sprite.setTint(0xff8888);
+
+                        if ((sprite as any).lastGlowColor !== 0xff0000) {
+                            sprite.postFX.clear();
+                            sprite.postFX.addGlow(0xff0000, 4, 0); // 거대한 붉은 광채
+                            (sprite as any).lastGlowColor = 0xff0000;
+                        }
                     } else {
-                        sprite.clearTint();
+                        // 일반 사이클 틴트 적용 (매 9스테이지/1사이클 마다 점진적 변화)
+                        const cycleCount = Math.floor((globalStats.currentStage - 1) / 9);
+                        if (cycleCount > 0) {
+                            const hue = (cycleCount * 60) % 360; 
+                            const colorObj = Phaser.Display.Color.HSVToRGB(hue / 360, 0.8, 1);
+                            sprite.setTint(colorObj.color);
+                        } else {
+                            sprite.clearTint();
+                        }
+                        
+                        if ((sprite as any).lastGlowColor === 0xff0000) {
+                            sprite.postFX.clear();
+                            (sprite as any).lastGlowColor = 0;
+                        }
                     }
                 } else if (typeId === 100) {
                     sprite.setScale(1.5);
@@ -398,8 +417,9 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                     }
                     wSprite.setScale(wScale);
 
-                    const wx = charKey === 'wizard' ? 4 : (charKey === 'elf' ? 5 : (charKey === 'ogre' ? 15 : 5)); 
-                    const wy = (charKey === 'wizard' || charKey === 'elf') ? 4 : (charKey === 'ogre' ? 10 : -7); 
+                    const wx = charKey === 'wizard' ? 4 : (charKey === 'elf' ? 5 : (charKey === 'ogre' ? 12 : 5)); 
+                    // wy: Negative moves it UP. Ogre hand is roughly at shoulders, so moving it higher (-10)
+                    const wy = (charKey === 'wizard' || charKey === 'elf') ? 4 : (charKey === 'ogre' ? -10 : -7); 
                     let baseRot = (charKey === 'knight' || charKey === 'ogre') ? -Math.PI / 4 : 0;
 
                     let swingRot = 0;
