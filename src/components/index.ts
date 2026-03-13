@@ -74,3 +74,7 @@ export const Rotation = defineComponent({
     angle: Types.f32
 });
 
+export const ActionState = defineComponent({
+    attackTimer: Types.f32,
+    attackDuration: Types.f32
+});

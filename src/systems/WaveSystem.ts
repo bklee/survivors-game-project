@@ -108,20 +108,24 @@ export class NightDirector {
             }
 
             if (hasComponent(world, Boss, eid)) {
+                const hpPercent = Health.current[eid] / Health.max[eid];
+                const isBerserk = hpPercent <= 0.5;
+                const attackInterval = isBerserk ? 1500 : 3000; // 폭주 시 공격 주기 2배 빨라짐
+
                 this.bossBarrageTimer += dt;
-                if (this.bossBarrageTimer >= 3000) { // 공격 주기 3초
+                if (this.bossBarrageTimer >= attackInterval) {
                     this.bossBarrageTimer = 0;
                     const typeId = SpriteInfo.textureIndex[eid];
                     const bx = Position.x[eid];
                     const by = Position.y[eid];
 
                     if (typeId === 69) { // Big Demon (대악마)
-                        this.spawnDemonFireAttack(bx, by, playerX, playerY);
+                        this.spawnDemonFireAttack(bx, by, playerX, playerY, isBerserk);
                     } else if (typeId === 89) { // Ogre (오우거)
-                        this.spawnOgreSlamAttack(eid, bx, by);
+                        this.spawnOgreSlamAttack(eid, bx, by, isBerserk);
                     } else {
                         // Big Zombie 및 기타 보스는 기본 탄막 유지
-                        this.spawnBarrage(bx, by);
+                        this.spawnBarrage(bx, by, isBerserk);
                     }
                 }
             }
@@ -237,8 +241,9 @@ export class NightDirector {
     }
 
 
-    private spawnBarrage(x: number, y: number) {
-        const count = 12;
+    private spawnBarrage(x: number, y: number, isBerserk: boolean = false) {
+        const baseCount = 12;
+        const count = isBerserk ? baseCount * 2 : baseCount; // 폭주 시 탄막 수 2배
         for (let i = 0; i < count; i++) {
             const angle = (i / count) * Math.PI * 2;
             const beid = addEntity(world);
@@ -255,21 +260,20 @@ export class NightDirector {
         }
     }
 
-    private spawnDemonFireAttack(bx: number, by: number, px: number, py: number) {
-        // 플레이어 방향으로 5개의 연쇄 불기둥 생성 (공포의 흔적)
-        const count = 5;
+    private spawnDemonFireAttack(bx: number, by: number, px: number, py: number, isBerserk: boolean = false) {
+        // 플레이어 방향으로 연쇄 불기둥 생성
+        const baseCount = 5;
+        const count = isBerserk ? baseCount * 2 : baseCount; // 폭주 시 불기둥 10개 (거리 증가)
         const dx = px - bx;
         const dy = py - by;
         const dist = Math.hypot(dx, dy);
         const ux = dx / dist;
         const uy = dy / dist;
 
-        // 화면 흔들림 효과 제거 (사용자 요청)
-
         for (let i = 0; i < count; i++) {
-            // 0.2초 간격으로 연쇄 발동
-            this.scene.time.delayedCall(i * 200, () => {
-                const spawnX = bx + ux * (i * 30 + 30); // 간격 60 -> 30 (1/2 축소)
+            const delay = isBerserk ? i * 100 : i * 200; // 폭주 시 더 빠르게 연쇄 발동
+            this.scene.time.delayedCall(delay, () => {
+                const spawnX = bx + ux * (i * 30 + 30);
                 const spawnY = by + uy * (i * 30 + 30);
 
                 const feid = addEntity(world);
@@ -297,14 +301,15 @@ export class NightDirector {
     }
 
 
-    private spawnOgreSlamAttack(eid: number, bx: number, by: number) {
+    private spawnOgreSlamAttack(eid: number, bx: number, by: number, isBerserk: boolean = false) {
         // 배트 휘두르기 애니메이션 트리거
         if (hasComponent(world, ActionState, eid)) {
             ActionState.attackTimer[eid] = ActionState.attackDuration[eid];
         }
 
         // 보스 중심에서 퍼져나가는 고밀도 충격파 (지면 강타)
-        const count = 16;
+        const baseCount = 16;
+        const count = isBerserk ? baseCount * 2 : baseCount; // 폭주 시 32개 충격파
         for (let i = 0; i < count; i++) {
             const angle = (i / count) * Math.PI * 2;
             const feid = addEntity(world);
