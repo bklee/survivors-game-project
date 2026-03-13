@@ -300,8 +300,19 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                     sprite.clearTint();
                 } else {
                     sprite.setScale(1.0);
-                    if (typeId === 104) sprite.tint = 0xffff00;
-                    else sprite.clearTint();
+                    if (typeId === 104) {
+                        sprite.tint = 0xffff00;
+                    } else if (isPlayer) {
+                        // --- 캐릭터 색상 진화 (레벨에 따른 Tint 변화) ---
+                        const level = globalStats.currentLevel;
+                        if (level >= 30) sprite.setTint(0xffd700);      // Level 30+: Gold
+                        else if (level >= 20) sprite.setTint(0xff00ff); // Level 20+: Purple
+                        else if (level >= 10) sprite.setTint(0x00ffff); // Level 10+: Cyan (요청하신 이미지 스타일)
+                        else if (level >= 5) sprite.setTint(0x00ff00);  // Level 5+: Green
+                        else sprite.clearTint();
+                    } else {
+                        sprite.clearTint();
+                    }
                 }
 
                 if (hasComponent(world, Velocity, eid) && !hasComponent(world, Rotation, eid)) {
@@ -375,6 +386,14 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
 
                     wSprite.setVisible(true);
                     wSprite.alpha = currentAlpha;
+
+                    // --- 무기도 캐릭터 색상 진화에 맞춰 Tint 동기화 ---
+                    const level = globalStats.currentLevel;
+                    if (level >= 30) wSprite.setTint(0xffd700);
+                    else if (level >= 20) wSprite.setTint(0xff00ff);
+                    else if (level >= 10) wSprite.setTint(0x00ffff);
+                    else if (level >= 5) wSprite.setTint(0x00ff00);
+                    else wSprite.clearTint();
                 }
 
             } else {
