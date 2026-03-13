@@ -116,9 +116,10 @@ export class NightDirector {
     }
 
     private getStageBossType(): number {
-        const cycle = (this.stage - 1) % 3;
-        if (cycle === 0) return 79; // Big Zombie
-        if (cycle === 1) return 89; // Ogre
+        // 보스 스테이지(3, 6, 9...) 순서에 맞춰 0, 1, 2 순으로 순환하도록 수정
+        const bossIndex = (Math.floor(this.stage / 3) - 1) % 3;
+        if (bossIndex === 0) return 79; // Big Zombie
+        if (bossIndex === 1) return 89; // Ogre
         return 69; // Big Demon
     }
 
