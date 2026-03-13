@@ -107,7 +107,7 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
             else if (typeId === 93) { charKey = 'wall_fountain_mid_blue_f0'; textureKey = 'walls'; }
             else if (typeId === 94) { charKey = 'wall_fountain_top_red_f0'; textureKey = 'walls'; }
             else if (typeId === 95) { charKey = 'wall_fountain_mid_red_f0'; textureKey = 'walls'; }
-            else if (typeId >= 60 && typeId <= 82) {
+            else if (typeId >= 60 && typeId <= 89) {
                 const config = MONSTER_CONFIG[typeId];
                 if (config) {
                     charKey = config.name;
@@ -285,11 +285,12 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                 const isBoss = hasComponent(world, Boss, eid);
                 if (isBoss) {
                     sprite.setScale(2.5);
-                    // --- 10세트(30스테이지)마다 보스 색상 보색 계통으로 변경 ---
-                    const cycleLevel = Math.floor((globalStats.currentStage - 1) / 30);
-                    if (cycleLevel > 0) {
-                        const hue = (cycleLevel * 120) % 360; 
-                        const colorObj = Phaser.Display.Color.HSVToRGB(hue / 360, 0.7, 1);
+                    // --- 루프 반복 시 색상 변경 (매 9스테이지/1사이클 마다 점진적 변화) ---
+                    const cycleCount = Math.floor((globalStats.currentStage - 1) / 9);
+                    if (cycleCount > 0) {
+                        // 사이클에 따라 색상을 60도씩 회전시켜 변화를 직관적으로 보이게 함
+                        const hue = (cycleCount * 60) % 360; 
+                        const colorObj = Phaser.Display.Color.HSVToRGB(hue / 360, 0.8, 1);
                         sprite.setTint(colorObj.color);
                     } else {
                         sprite.clearTint();
