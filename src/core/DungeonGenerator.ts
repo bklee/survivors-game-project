@@ -207,7 +207,7 @@ export class DungeonGenerator {
         const ty = Math.floor(yPixel / TILE_SIZE);
         if (tx < 0 || tx >= this.width || ty < 0 || ty >= this.height) return false;
         const tile = this.map[ty][tx];
-        return tile !== TileType.WALL && tile !== TileType.DOOR;
+        return tile !== TileType.WALL && tile !== TileType.DOOR && tile !== TileType.OBSTACLE;
     }
 
     private hasClearance(tx: number, ty: number): boolean {
@@ -252,7 +252,7 @@ export class DungeonGenerator {
                 if (checkX < 0 || checkX >= this.width || checkY < 0 || checkY >= this.height) return false;
                 
                 const tile = this.map[checkY][checkX];
-                if (tile === TileType.WALL || tile === TileType.DOOR) return false;
+                if (tile === TileType.WALL || tile === TileType.DOOR || tile === TileType.OBSTACLE) return false;
                 
                 if (tile === TileType.PILLAR) {
                     // 기둥의 베이스라인(+11px)과 캐릭터의 발 위치(yPixel + ph/2)를 비교하여 

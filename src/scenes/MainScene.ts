@@ -663,9 +663,20 @@ export class MainScene extends Phaser.Scene {
                 Animation.timer[eid] = 0;
             } else if (roll > 0.7) {
                 // 장애물 (20%): 가시덫과 구멍을 5:5 비율로 배치
-                SpriteInfo.textureIndex[eid] = Math.random() < 0.5 ? 32 : 37; 
+                const isHole = Math.random() < 0.5;
+                const typeIdx = isHole ? 37 : 32;
+                SpriteInfo.textureIndex[eid] = typeIdx; 
                 addComponent(world, Animation, eid);
                 Animation.timer[eid] = Math.random() * 1000;
+
+                // 구멍(37)인 경우 해당 위치의 맵 타일을 OBSTACLE로 변경하여 통행 불가 처리
+                if (isHole) {
+                    const tx = Math.floor(pos.x / TILE_SIZE);
+                    const ty = Math.floor(pos.y / TILE_SIZE);
+                    if (ty >= 0 && ty < this.dungeon.height && tx >= 0 && tx < this.dungeon.width) {
+                        this.dungeon.map[ty][tx] = TileType.OBSTACLE;
+                    }
+                }
             } else {
                 SpriteInfo.textureIndex[eid] = 31; // 해골 소품 (70%)
                 addComponent(world, Animation, eid);
