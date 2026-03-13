@@ -698,14 +698,25 @@ export class MainScene extends Phaser.Scene {
         Interactive.id[leverId] = 99;
 
         // ── 방 내부에 보물 배치 ──
-        if (floorPixels.length < 3) return;
+        if (floorPixels.length < 10) return;
 
-        // 보물상자 3개 (방 안 아래쪽에 균등 배치)
-        const sortedFloors = [...floorPixels].sort((a, b) => b.y - a.y);
+        // 문 근처(64px 이내)에는 상자나 물약을 배치하지 않음 (사용자 요청)
+        const spawnableFloors = floorPixels.filter(fp => {
+            const dist = Phaser.Math.Distance.Between(fp.x, fp.y, doorPixel.x, doorPixel.y);
+            return dist > 64; 
+        });
+
+        if (spawnableFloors.length < 5) return;
+
+        // 보물상자 6개 (방 크기가 커졌으므로 갯수 상향)
+        const sortedFloors = [...spawnableFloors].sort((a, b) => b.y - a.y);
         const chestPositions = [
             sortedFloors[Math.floor(sortedFloors.length * 0.1)],
             sortedFloors[Math.floor(sortedFloors.length * 0.2)],
             sortedFloors[Math.floor(sortedFloors.length * 0.3)],
+            sortedFloors[Math.floor(sortedFloors.length * 0.4)],
+            sortedFloors[Math.floor(sortedFloors.length * 0.5)],
+            sortedFloors[Math.floor(sortedFloors.length * 0.6)],
         ];
         
         for (const cPos of chestPositions) {
@@ -719,9 +730,9 @@ export class MainScene extends Phaser.Scene {
             Animation.timer[chestId] = 0;
         }
 
-        // 물약 2개
-        for (let i = 0; i < 2; i++) {
-            const pPos = floorPixels[Math.floor(Math.random() * floorPixels.length)];
+        // 물약 5개
+        for (let i = 0; i < 5; i++) {
+            const pPos = spawnableFloors[Math.floor(Math.random() * spawnableFloors.length)];
             const potId = addEntity(world);
             addComponent(world, Position, potId);
             addComponent(world, SpriteInfo, potId);

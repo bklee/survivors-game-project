@@ -304,8 +304,8 @@ export class DungeonGenerator {
      * @returns 문 위치(픽셀), 방 내부 바닥 좌표들(픽셀)
      */
     public carveSecretRoom(): { doorPixel: { x: number; y: number }; floorPixels: { x: number; y: number }[] } {
-        const roomW = 6; // 내부 폭
-        const roomH = 5; // 내부 높이
+        const roomW = 16; // 내부 폭 (Updated: 6 -> 16)
+        const roomH = 16; // 내부 높이 (Updated: 5 -> 16)
         const BORDER = 6;
 
         let attempts = 0;
