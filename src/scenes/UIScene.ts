@@ -66,6 +66,7 @@ export class UIScene extends Phaser.Scene {
     create() {
         // --- Reset State for Fresh Start ---
         this.currentLevel = 1;
+        globalStats.currentLevel = 1;
         this.currentStage = 1;
         this.currentXp = 0;
         this.xpToNextLevel = 100;
@@ -573,6 +574,7 @@ export class UIScene extends Phaser.Scene {
         this.currentXp += amount;
         if (this.currentXp >= this.xpToNextLevel) {
             this.currentLevel++;
+            globalStats.currentLevel = this.currentLevel;
             this.skillPoints++;
             this.currentXp -= this.xpToNextLevel;
             this.xpToNextLevel = Math.floor(this.xpToNextLevel * 1.5);
