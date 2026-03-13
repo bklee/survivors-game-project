@@ -185,6 +185,7 @@ export class AssetLoader {
         texture.add('weapon_sword', 0, 339, 98, 10, 29);
         texture.add('weapon_arrow', 0, 324, 202, 7, 21);
         texture.add('weapon_bow', 0, 289, 195, 14, 26);
+        texture.add('weapon_bow_2', 0, 305, 195, 14, 26);
         texture.add('weapon_staff', 0, 324, 129, 8, 30);
 
         // Props
@@ -245,10 +246,13 @@ export class AssetLoader {
 
             // --- Fountains ---
             for (let i = 0; i < 3; i++) {
-                wallTex.add(`wall_fountain_mid_blue_f${i}`, 0, 192 + (i * 16), 64, 16, 32);
+                // Blue Fountain: Tip (Top) is at 96, Body (Mid) is at 64
                 wallTex.add(`wall_fountain_top_blue_f${i}`, 0, 192 + (i * 16), 96, 16, 32);
-                wallTex.add(`wall_fountain_mid_red_f${i}`, 0, 192 + (i * 16), 32, 16, 32);
+                wallTex.add(`wall_fountain_mid_blue_f${i}`, 0, 192 + (i * 16), 64, 16, 32);
+                
+                // Red Fountain: Tip (Top) is at 0, Body (Mid) is at 32
                 wallTex.add(`wall_fountain_top_red_f${i}`, 0, 192 + (i * 16), 0, 16, 32);
+                wallTex.add(`wall_fountain_mid_red_f${i}`, 0, 192 + (i * 16), 32, 16, 32);
             }
         }
 
