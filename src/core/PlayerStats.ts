@@ -4,5 +4,6 @@ export const globalStats = {
     cooldownMult: 1, 
     pickupRadiusMult: 1,
     mana: { current: 100, max: 100 },
-    currentStage: 1
+    currentStage: 1,
+    currentLevel: 1
 };
