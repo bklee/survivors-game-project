@@ -202,9 +202,9 @@ export class MainScene extends Phaser.Scene {
                 const eid = allEntities[i];
                 if (eid === this.playerId) continue; // Keep player
                 const tid = SpriteInfo.textureIndex[eid];
-                // Props (32-36), Items/Coins (20-21), Spells (100+), Enemies (60-89)
+                // Props (31-36), Items/Coins (20-21), Potions (50-57), Spells (100+), Enemies (60-89)
                 // Also remove lever(40) and secret door(41) from previous stage
-                if ((tid >= 20 && tid <= 36) || tid === 40 || tid === 41 || tid >= 60) {
+                if ((tid >= 20 && tid <= 36) || (tid >= 50 && tid <= 57) || tid === 40 || tid === 41 || tid >= 60) {
                     removeEntity(world, eid);
                 }
             }
@@ -569,7 +569,11 @@ export class MainScene extends Phaser.Scene {
                     // 사용자 요청: 물약이 던전을 벗어나지 않도록 바닥 여부 확인 후 위치 결정
                     let potY = Position.y[eid] + 16;
                     if (!this.dungeon.isFloor(Position.x[potId], potY)) {
-                        potY = Position.y[eid] - 8; // 아래가 벽이면 상자 위쪽으로 배치
+                        potY = Position.y[eid] - 8; 
+                        // 상자 위쪽도 바닥이 아니면 상자 자체의 위치(확실한 바닥)로 결정
+                        if (!this.dungeon.isFloor(Position.x[potId], potY)) {
+                            potY = Position.y[eid];
+                        }
                     }
                     Position.y[potId] = potY;
                     SpriteInfo.textureIndex[potId] = potionBase + Math.floor(Math.random() * 4);
