@@ -60,9 +60,20 @@ export const createCombatSystem = (juice: JuicePipeline) => {
                 const dy = py - Position.y[epid];
                 const typeId = SpriteInfo.textureIndex[epid];
                 
-                // 불기둥(100)은 범위가 기존보다 축소됨 (25 -> 12.5), 일반 탄막은 15
-                const hitRadius = (typeId === 100) ? 12.5 : 15;
-                const damage = (typeId === 100) ? 25 : 15;
+                // 보스 투사체별 특성 설정
+                let hitRadius = 15;
+                let damage = 15;
+
+                if (typeId === 100) { // 대악마 불기둥
+                    hitRadius = 12.5;
+                    damage = 25;
+                } else if (typeId === 102) { // 좀비 독구름
+                    hitRadius = 18; // 1.25배 스케일 반영
+                    damage = 15;
+                } else if (typeId === 101) { // 오우거 충격파
+                    hitRadius = 15;
+                    damage = 20;
+                }
 
                 if (dx * dx + dy * dy < hitRadius * hitRadius) {
                     Health.current[playerEid] -= damage;
