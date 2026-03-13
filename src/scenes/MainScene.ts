@@ -72,6 +72,7 @@ export class MainScene extends Phaser.Scene {
         // -------------------------
 
         this.currentStage = 1;
+        globalStats.currentStage = 1;
         this.isPausedForClear = false;
 
         this.dungeon = new DungeonGenerator(100, 100);
@@ -191,6 +192,7 @@ export class MainScene extends Phaser.Scene {
 
         const nextStageHandler = () => {
             this.currentStage++;
+            globalStats.currentStage = this.currentStage;
             this.isPausedForClear = false;
 
             // Remove old props, items, and spells from previous stage
