@@ -82,7 +82,7 @@ export class MainScene extends Phaser.Scene {
 
         this.physicsSystem = createPhysicsSystem(this.dungeon);
         this.playerSystem = new PlayerSystem(charData);
-        this.nightDirector = new NightDirector(this.dungeon);
+        this.nightDirector = new NightDirector(this.dungeon, this);
         this.juicePipeline = new JuicePipeline(this);
         this.combatSystem = createCombatSystem(this.juicePipeline);
         this.spellSystem = new SpellSystem(this);
@@ -168,6 +168,11 @@ export class MainScene extends Phaser.Scene {
             });
         };
         window.addEventListener('player_died', deathHandler);
+        window.addEventListener('screen_shake', (e: any) => {
+            const intensity = e.detail?.intensity || 0.01;
+            const duration = e.detail?.duration || 200;
+            this.juicePipeline.screenShake(intensity, duration);
+        });
 
         const recipeHandler = (e: KeyboardEvent) => {
             if (e.code === 'KeyE') {
