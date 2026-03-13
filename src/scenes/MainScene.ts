@@ -375,6 +375,19 @@ export class MainScene extends Phaser.Scene {
                             this.wallBlitter.create(wx, wy + 28, 'wall_goo_mid');
                         }
                     }
+
+                    // ── 남쪽 벽 판정 및 렌더링 ────────────────────────────────
+                    // 남쪽 벽: 타일 바로 위(y-1)가 바닥(FLOOR), 문(DOOR) 또는 기둥(PILLAR)인 경우
+                    const isSouthWall = y > 0 && (
+                        this.dungeon.map[y - 1][x] === TileType.FLOOR || 
+                        this.dungeon.map[y - 1][x] === TileType.DOOR || 
+                        this.dungeon.map[y - 1][x] === TileType.PILLAR
+                    );
+
+                    if (isSouthWall) {
+                        // 사용자 요청: 남쪽 벽은 wall_fountain_mid_blue_f0 에셋 적용
+                        this.wallBlitter.create(x * TILE_SIZE, y * TILE_SIZE, 'wall_fountain_mid_blue_f0');
+                    }
                 }
             }
         }
