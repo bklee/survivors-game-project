@@ -248,14 +248,13 @@ export class NightDirector {
         const ux = dx / dist;
         const uy = dy / dist;
 
-        // 공격 시작 시 화면 흔들림 효과 (대악마의 위압감)
-        window.dispatchEvent(new CustomEvent('screen_shake', { detail: { intensity: 0.015, duration: 300 } }));
+        // 화면 흔들림 효과 제거 (사용자 요청)
 
         for (let i = 0; i < count; i++) {
             // 0.2초 간격으로 연쇄 발동
             this.scene.time.delayedCall(i * 200, () => {
-                const spawnX = bx + ux * (i * 60 + 40);
-                const spawnY = by + uy * (i * 60 + 40);
+                const spawnX = bx + ux * (i * 30 + 30); // 간격 60 -> 30 (1/2 축소)
+                const spawnY = by + uy * (i * 30 + 30);
 
                 const feid = addEntity(world);
                 addComponent(world, Position, feid);
@@ -271,8 +270,8 @@ export class NightDirector {
                 Velocity.x[feid] = 0;
                 Velocity.y[feid] = 0;
                 SpriteInfo.textureIndex[feid] = 100; // Wizard's Fire Pillar (Spell Fire)
-                Scale.value[feid] = 2.5; // 대장급 공격이므로 큼직하게 (2.5배)
-                Lifespan.duration[feid] = 800; // 애니메이션을 충분히 보여줄 수 있는 기간
+                Scale.value[feid] = 1.25; // 크기 2.5 -> 1.25 (1/2 축소)
+                Lifespan.duration[feid] = 800;
                 Animation.timer[feid] = 0;
 
                 // 불기둥 소환 시 효과음
