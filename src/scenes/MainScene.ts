@@ -644,7 +644,25 @@ export class MainScene extends Phaser.Scene {
     private spawnDungeonProps() {
         const isBossStage = this.currentStage % 3 === 0;
         if (isBossStage) {
-            // 보스 스테이지에서는 평지를 유지하기 위해 소품 스폰 건너뜀
+            // 사용자 요청: 보스 스테이지의 네 귀퉁이에 물약 랜덤 배치
+            const margin = 5;
+            const corners = [
+                { x: margin, y: margin },
+                { x: this.dungeon.width - margin, y: margin },
+                { x: margin, y: this.dungeon.height - margin },
+                { x: this.dungeon.width - margin, y: this.dungeon.height - margin }
+            ];
+
+            corners.forEach(pos => {
+                const potId = addEntity(world);
+                addComponent(world, Position, potId);
+                addComponent(world, SpriteInfo, potId);
+                // 대형 물약(54-57: HP, MP, EXP, Kill) 중 랜덤 배치
+                SpriteInfo.textureIndex[potId] = 54 + Math.floor(Math.random() * 4);
+                Position.x[potId] = pos.x * TILE_SIZE;
+                Position.y[potId] = pos.y * TILE_SIZE;
+            });
+
             this.spawnSecretRoom();
             return;
         }
