@@ -80,16 +80,16 @@ export const SYNERGIES: SynergyDef[] = [
         description: '적 처치 시 25% 확률 잔해 폭발 (반경 60, 100dmg)',
     },
     {
-        id: 'thunderstrike',
-        name: 'Thunderstrike',
+        id: 'blizzard_strike',
+        name: 'Blizzard Strike',
         elements: sortTuple(Element.FIRE, Element.ICE, Element.AIR),
-        description: '플레이어 위 3초마다 낙뢰 (반경 80, 180dmg)',
+        description: '플레이어 위 3초마다 빙판 낙하 (반경 80, 180dmg + 0.5초 둔화)',
     },
     {
-        id: 'venom_cloud',
-        name: 'Venom Cloud',
+        id: 'magma_field',
+        name: 'Magma Field',
         elements: sortTuple(Element.FIRE, Element.LIGHTNING, Element.EARTH),
-        description: '플레이어 주변 반경 120 독 안개 (틱당 max HP 2%)',
+        description: '플레이어 주변 반경 120 용암 지대 (틱당 max HP 2% + 마비 5%)',
     },
     {
         id: 'arc_lightning',
@@ -98,16 +98,16 @@ export const SYNERGIES: SynergyDef[] = [
         description: '공격 시 25% 확률 인근 적 2명 체인 (50dmg)',
     },
     {
-        id: 'rockfall',
-        name: 'Rockfall',
+        id: 'plague_wind',
+        name: 'Plague Wind',
         elements: sortTuple(Element.FIRE, Element.POISON, Element.AIR),
-        description: '8초마다 화면 무작위 4곳 돌덩이 (반경 70, 200dmg)',
+        description: '8초마다 화면 무작위 4곳 독풍 (반경 70, 200dmg + DOT)',
     },
     {
-        id: 'sandstorm',
-        name: 'Sandstorm',
+        id: 'blight_storm',
+        name: 'Blight Storm',
         elements: sortTuple(Element.FIRE, Element.LIGHTNING, Element.POISON),
-        description: '플레이어 주변 회오리 (반경 180) 적 둔화 40% + 시야 차단',
+        description: '플레이어 주변 회오리 (반경 180) 적 둔화 40% + 중독',
     },
     {
         id: 'whirlwind',
@@ -128,10 +128,10 @@ export const SYNERGIES: SynergyDef[] = [
         description: '8초마다 화면 무작위 위치 늪 (반경 80, 3초 지속, 둔화+중독)',
     },
     {
-        id: 'poison_nova',
-        name: 'Poison Nova',
+        id: 'glacial_nova',
+        name: 'Glacial Nova',
         elements: sortTuple(Element.ICE, Element.EARTH, Element.AIR),
-        description: '10초마다 플레이어 중심 독 폭발 (반경 200, 100dmg)',
+        description: '10초마다 플레이어 중심 냉기 폭발 (반경 200, 100dmg + 0.5초 둔화)',
     },
     {
         id: 'static_field',
@@ -140,10 +140,10 @@ export const SYNERGIES: SynergyDef[] = [
         description: '플레이어 주변 반경 180 전기장 (틱당 25dmg + 5% 마비)',
     },
     {
-        id: 'earthquake',
-        name: 'Earthquake',
+        id: 'toxic_tempest',
+        name: 'Toxic Tempest',
         elements: sortTuple(Element.LIGHTNING, Element.POISON, Element.AIR),
-        description: '12초마다 전체 지진 (모든 적 1초 스턴 + 50dmg)',
+        description: '12초마다 전체 독 충격파 (모든 적 1초 마비 + 50dmg DOT)',
     },
     {
         id: 'cyclone',
