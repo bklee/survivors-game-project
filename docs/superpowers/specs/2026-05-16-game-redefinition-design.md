@@ -1,7 +1,7 @@
 # Survivors Game: 정체성 재정립 & 상업화 디자인 명세
 
 **문서 ID**: 2026-05-16-game-redefinition-design
-**작성자**: Antigravity (robert.lee@bdacs.co.kr)
+**작성자**: hangup2(bkxx.2)
 **작성일**: 2026-05-16
 **상태**: 브레인스토밍 완료 → 구현 계획 작성 대기
 **방법론**: Claude Code Superpowers `brainstorming` 스킬 (멀티 에이전트 디스커버리)
@@ -37,7 +37,7 @@
 | **플랫폼 우선순위** | ① 모바일 웹 PWA → ② 데스크탑 웹 → ③ Steam (확장 옵션) |
 | **수익 모델** | F2P + 광고(부활/2x XP) + IAP(No-Ads Pass ₩5,500, Character Pack ₩9,900) |
 | **개발 기간** | 24주 (6개월) — 정식 런치 |
-| **개발 명의** | Antigravity (BDACS 소속) |
+| **개발 명의** | hangup2(bkxx.2) |
 
 ### Anti-Identity (명확히 "아닌 것")
 - ❌ Steam Premium 게임 (가격대 정당화 못 함)
@@ -332,7 +332,7 @@ TriggerButton press → 강화 활성 (5초 타이머)
 12개월: 다운로드 1M+, ARPDAU ₩50+, 시즌 2, Steam 진출 평가
 
 ### D. 자원 / 비용
-- 개발: **1인 100% 자체 제작** (robert.lee/Antigravity)
+- 개발: **1인 100% 자체 제작** (hangup2(bkxx.2))
 - 외주: **없음** (₩0)
 - 아트 자체 제작 전략:
   - 0x72 던전 타일셋 + Itch.io 무료 픽셀 애셋 활용
@@ -361,7 +361,6 @@ M4(인프라)는 M1 후 M2와 병렬 가능 → 일정 단축 옵션
 
 ## 7. Open Questions / 향후 결정 사항
 
-- [ ] BDACS 회사 사업 영역 확인 (B2B 시너지 가능성)
 - [ ] 24주 동안 풀타임 vs 파트타임 — 일정 가중치
 - [ ] AI 도구 구독 (Stable Diffusion 로컬 vs Replicate API, Suno Pro 등) 확정
 - [ ] 한국 출시 시점 (6개월 후 vs 글로벌 동시)
