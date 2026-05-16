@@ -46,6 +46,7 @@ import { Cascade } from '../fx/Cascade';
 import { createCombatSystem } from '../systems/CombatSystem';
 import { SpellSystem } from '../systems/SpellSystem';
 import { ItemSystem } from '../systems/ItemSystem';
+import { NecromancerSystem } from '../systems/NecromancerSystem';
 import { DungeonGenerator, TILE_SIZE, TileType } from '../core/DungeonGenerator';
 import { globalStats } from '../core/PlayerStats';
 import { CharacterData } from '../constants/CharacterConfig';
@@ -81,6 +82,7 @@ export class MainScene extends Phaser.Scene {
     private toxicTempest!: ToxicTempest;
     private cyclone!: Cyclone;
     private cascade!: Cascade;
+    private necromancerSystem!: NecromancerSystem;
     private selectedCharId: string = 'wizard';
     private currentBGM?: Phaser.Sound.BaseSound;
     private dungeon!: DungeonGenerator;
@@ -188,6 +190,8 @@ export class MainScene extends Phaser.Scene {
         this.cyclone.setPlayerEid(this.playerId);
         this.cascade = new Cascade(this);
         this.cascade.setPlayerEid(this.playerId);
+        this.necromancerSystem = new NecromancerSystem(this, this.selectedCharId === 'necromancer');
+        this.necromancerSystem.setPlayerEid(this.playerId);
         SynergyEffect.boostActiveUntil[this.playerId] = 0;
         SynergyEffect.boostCooldownUntil[this.playerId] = 0;
 
@@ -195,7 +199,11 @@ export class MainScene extends Phaser.Scene {
         this.charData = charData;
 
         // Add Mana component if character uses mana
-        if (this.selectedCharId === 'wizard' || this.selectedCharId === 'elf') {
+        if (
+            this.selectedCharId === 'wizard' ||
+            this.selectedCharId === 'elf' ||
+            this.selectedCharId === 'necromancer'
+        ) {
             addComponent(world, Mana, this.playerId);
             Mana.current[this.playerId] = this.charData.baseStats.mana;
             Mana.max[this.playerId] = this.charData.baseStats.mana;
@@ -204,6 +212,7 @@ export class MainScene extends Phaser.Scene {
         let charTypeId = 1;
         if (this.selectedCharId === 'knight') charTypeId = 0;
         else if (this.selectedCharId === 'elf') charTypeId = 2;
+        else if (this.selectedCharId === 'necromancer') charTypeId = 3;
 
         addComponent(world, WeaponEvolution, this.playerId);
         WeaponEvolution.evolutionId[this.playerId] = -1;
@@ -427,6 +436,7 @@ export class MainScene extends Phaser.Scene {
             if (this.whirlwind) this.whirlwind.destroy();
             if (this.staticField) this.staticField.destroy();
             if (this.cyclone) this.cyclone.destroy();
+            if (this.necromancerSystem) this.necromancerSystem.destroy();
         });
 
         this.startBGM('main_bgm');
@@ -588,6 +598,7 @@ export class MainScene extends Phaser.Scene {
         this.toxicTempest.tick();
         this.cyclone.tick();
         this.cascade.tick();
+        this.necromancerSystem.tick();
         this.renderSystem(delta);
         this.handleInteractions();
 
