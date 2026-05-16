@@ -1,7 +1,11 @@
 import { Identity } from '../core/Identity';
 
+// PWA 가 /survivors/ 에 서빙되는 환경: BASE_URL 이 '/survivors/' 라 API_BASE 가 /survivors/api 가 됨.
+// dev 환경 (base '/'): /api 그대로.
+// import.meta.env.VITE_API_BASE_URL 로 override 가능 (다른 환경 배포 시).
 const API_BASE =
-    (import.meta.env.VITE_API_BASE_URL as string | undefined) || `${window.location.origin}/api`;
+    (import.meta.env.VITE_API_BASE_URL as string | undefined) ||
+    `${window.location.origin}${import.meta.env.BASE_URL.replace(/\/$/, '')}/api`;
 
 export type EventType =
     | 'session_start'
