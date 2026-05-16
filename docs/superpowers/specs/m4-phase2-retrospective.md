@@ -91,7 +91,7 @@
 ## 🚧 미해결 / 운영 항목 (Contabo 배포 시 수행)
 
 1. **SSL 인증서 발급** — `docker-compose run --rm --service-ports certbot certonly --standalone -d games.blocktalker.co.kr ...` (one-time, README 가이드 따라)
-2. **인증서 갱신 후 nginx reload** — 현재 자동 갱신은 동작하나 nginx 가 새 cert 를 픽업하려면 SIGHUP 필요. cron 또는 deploy hook 으로 보강 권장.
+2. ~~**인증서 갱신 후 nginx reload**~~ — ✅ 해결: nginx 컨테이너가 6시간마다 `nginx -s reload` 자동 실행 (docker-compose `command` 오버라이드).
 3. **LS_WEBHOOK_SECRET** — Lemon Squeezy dashboard 에서 받은 값을 `.env` 에 설정 후 `docker-compose up -d api` 재시작.
 4. **수동 검증**
    - `curl https://games.blocktalker.co.kr/api/health` → `{status:ok, db:connected}`
