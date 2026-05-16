@@ -31,6 +31,7 @@ export class AlchemySlotUI {
                 0.75,
             );
             rect.setStrokeStyle(2, 0xffffff, 0.4);
+            rect.setScrollFactor(0);
             this.container.add(rect);
             this.slotRects.push(rect);
 
@@ -41,6 +42,7 @@ export class AlchemySlotUI {
                 { fontSize: '24px', color: '#888888' },
             );
             icon.setOrigin(0.5);
+            icon.setScrollFactor(0);
             this.container.add(icon);
             this.slotIcons.push(icon);
         }
