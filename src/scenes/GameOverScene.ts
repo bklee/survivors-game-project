@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { MetaProgress } from '../core/MetaProgress';
 import { PokiSDK } from '../integrations/PokiSDK';
+import { LemonSqueezy } from '../integrations/LemonSqueezy';
 
 export class GameOverScene extends Phaser.Scene {
     private stage: number = 1;
@@ -99,10 +100,13 @@ export class GameOverScene extends Phaser.Scene {
             retryBtn.setScale(1);
         });
 
-        // 6. 광고 보고 부활 버튼 (게임당 1회)
+        // 6. 부활 버튼 (게임당 1회) — No-Ads Pass 보유 시 광고 없이 즉시 부활
         if (!this.reviveUsed) {
+            const hasNoAds = LemonSqueezy.hasProduct('no_ads_pass');
+            const reviveLabel = hasNoAds ? '✦ 부활' : '광고 보고 부활';
+
             const reviveBtn = this.add
-                .text(width / 2, height / 2 + 60, '광고 보고 부활', {
+                .text(width / 2, height / 2 + 60, reviveLabel, {
                     fontFamily: '"MedievalSharp", cursive',
                     fontSize: '24px',
                     color: '#ffd700',
@@ -114,7 +118,7 @@ export class GameOverScene extends Phaser.Scene {
 
             reviveBtn.on('pointerdown', async () => {
                 reviveBtn.disableInteractive();
-                const success = await PokiSDK.rewardedBreak();
+                const success = hasNoAds || (await PokiSDK.rewardedBreak());
                 if (success) {
                     this.sound.stopAll();
                     this.cameras.main.fadeOut(800, 0, 0, 0);
