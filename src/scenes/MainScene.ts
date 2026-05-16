@@ -22,6 +22,7 @@ import { NightDirector } from '../systems/WaveSystem';
 import { CHARACTERS } from '../constants/CharacterConfig';
 
 import { JuicePipeline } from '../fx/JuicePipeline';
+import { PlasmaStorm } from '../fx/PlasmaStorm';
 import { createCombatSystem } from '../systems/CombatSystem';
 import { SpellSystem } from '../systems/SpellSystem';
 import { ItemSystem } from '../systems/ItemSystem';
@@ -40,6 +41,7 @@ export class MainScene extends Phaser.Scene {
     private combatSystem!: (dt: number) => void;
     private spellSystem!: SpellSystem;
     private itemSystem!: ItemSystem;
+    private plasmaStorm!: PlasmaStorm;
     private selectedCharId: string = 'wizard';
     private currentBGM?: Phaser.Sound.BaseSound;
     private dungeon!: DungeonGenerator;
@@ -107,6 +109,8 @@ export class MainScene extends Phaser.Scene {
         AlchemySlot.slot1[this.playerId] = -1;
         AlchemySlot.slot2[this.playerId] = -1;
         SynergyEffect.synergyId[this.playerId] = -1;
+        this.plasmaStorm = new PlasmaStorm(this);
+        this.plasmaStorm.setPlayerEid(this.playerId);
         SynergyEffect.boostActiveUntil[this.playerId] = 0;
         SynergyEffect.boostCooldownUntil[this.playerId] = 0;
 
@@ -475,6 +479,7 @@ export class MainScene extends Phaser.Scene {
         this.physicsSystem(delta);
         this.combatSystem(delta);
         this.itemSystem.update(delta);
+        this.plasmaStorm.tick();
         this.renderSystem(delta);
         this.handleInteractions();
 
