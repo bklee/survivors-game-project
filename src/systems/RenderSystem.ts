@@ -104,6 +104,10 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
             else if (typeId === 1) charKey = 'wizard';
             else if (typeId === 2) charKey = 'elf';
             else if (typeId === 3) charKey = 'necromancer';
+            else if (typeId === 4)
+                charKey = 'wizard'; // druid: wizard 프레임 재사용
+            else if (typeId === 5)
+                charKey = 'wizard'; // engineer: wizard 프레임 재사용
             else if (typeId === 10) charKey = 'imp';
             else if (typeId === 11) charKey = 'demon';
             else if (typeId === 12) charKey = 'orc';
@@ -423,9 +427,13 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                     if (typeId === 104) {
                         sprite.tint = 0xffff00;
                     } else if (isPlayer) {
-                        // necromancer: 보라색 tint 적용
+                        // 캐릭터별 tint 적용
                         if (typeId === 3) {
-                            sprite.setTint(0x9c27b0);
+                            sprite.setTint(0x9c27b0); // necromancer: 보라색
+                        } else if (typeId === 4) {
+                            sprite.setTint(0x4caf50); // druid: 녹색
+                        } else if (typeId === 5) {
+                            sprite.setTint(0x607d8b); // engineer: 회청색
                         } else {
                             sprite.clearTint();
                         }

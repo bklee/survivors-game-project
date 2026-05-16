@@ -1,6 +1,8 @@
 export interface CharacterData {
     name: string;
     id: string;
+    description?: string;
+    unlockCost?: number;
     baseStats: {
         health: number;
         speed: number;
@@ -44,7 +46,31 @@ export const CHARACTERS: Record<string, CharacterData> = {
     NECROMANCER: {
         name: 'Necromancer',
         id: 'necromancer',
+        description: '어둠의 마법사. 소울 볼트 발사.',
+        unlockCost: 1500,
         baseStats: { health: 80, speed: 110, damage: 1.4, mana: 120 },
+        frames: {
+            idle: { x: 128, y: 132, w: 16, h: 28, count: 4 },
+            run: { x: 192, y: 132, w: 16, h: 28, count: 4 },
+        },
+    },
+    DRUID: {
+        name: 'Druid',
+        id: 'druid',
+        description: '자연의 술사. 가시 덩굴 발사.',
+        unlockCost: 3000,
+        baseStats: { health: 90, speed: 105, damage: 1.2, mana: 100 },
+        frames: {
+            idle: { x: 128, y: 132, w: 16, h: 28, count: 4 },
+            run: { x: 192, y: 132, w: 16, h: 28, count: 4 },
+        },
+    },
+    ENGINEER: {
+        name: 'Engineer',
+        id: 'engineer',
+        description: '기계공. 푸른 마법탄 발사.',
+        unlockCost: 5000,
+        baseStats: { health: 100, speed: 95, damage: 1.0, mana: 80 },
         frames: {
             idle: { x: 128, y: 132, w: 16, h: 28, count: 4 },
             run: { x: 192, y: 132, w: 16, h: 28, count: 4 },

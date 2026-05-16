@@ -15,6 +15,8 @@ import {
 } from '../components';
 import { AlchemySlot, SynergyEffect } from '../components/alchemy';
 import { WeaponEvolution } from '../components/weapon';
+import { Relic } from '../components/relic';
+import { RelicSystem } from '../systems/RelicSystem';
 import { createPhysicsSystem } from '../systems/PhysicsSystem';
 import { createRenderSystem } from '../systems/RenderSystem';
 import { PlayerSystem } from '../systems/PlayerSystem';
@@ -48,7 +50,7 @@ import { SpellSystem } from '../systems/SpellSystem';
 import { ItemSystem } from '../systems/ItemSystem';
 import { NecromancerSystem } from '../systems/NecromancerSystem';
 import { DungeonGenerator, TILE_SIZE, TileType } from '../core/DungeonGenerator';
-import { globalStats } from '../core/PlayerStats';
+import { globalStats, applySkillTreeBonuses } from '../core/PlayerStats';
 import { CharacterData } from '../constants/CharacterConfig';
 
 export class MainScene extends Phaser.Scene {
@@ -83,6 +85,7 @@ export class MainScene extends Phaser.Scene {
     private cyclone!: Cyclone;
     private cascade!: Cascade;
     private necromancerSystem!: NecromancerSystem;
+    private relicSystem!: RelicSystem;
     private selectedCharId: string = 'wizard';
     private currentBGM?: Phaser.Sound.BaseSound;
     private dungeon!: DungeonGenerator;
@@ -91,6 +94,8 @@ export class MainScene extends Phaser.Scene {
     private floorBlitter!: Phaser.GameObjects.Blitter;
     private currentStage: number = 1;
     private isPausedForClear: boolean = false;
+    private enemiesKilled: number = 0;
+    private synergiesActivated: number = 0;
     private charData!: CharacterData;
     private secretRoomData?: {
         doorPixel: { x: number; y: number };
@@ -123,6 +128,10 @@ export class MainScene extends Phaser.Scene {
         globalStats.moveSpeedMult = 1;
         globalStats.cooldownMult = 1;
         globalStats.pickupRadiusMult = 1;
+        globalStats.bonusMaxHp = 0;
+
+        // Apply meta-progression skill tree bonuses on top of base stats
+        applySkillTreeBonuses();
 
         // 3. Ensure UIScene is running
         if (!this.scene.isActive('UIScene')) {
@@ -133,6 +142,8 @@ export class MainScene extends Phaser.Scene {
         this.currentStage = 1;
         globalStats.currentStage = 1;
         this.isPausedForClear = false;
+        this.enemiesKilled = 0;
+        this.synergiesActivated = 0;
 
         this.dungeon = new DungeonGenerator(100, 100);
 
@@ -202,7 +213,9 @@ export class MainScene extends Phaser.Scene {
         if (
             this.selectedCharId === 'wizard' ||
             this.selectedCharId === 'elf' ||
-            this.selectedCharId === 'necromancer'
+            this.selectedCharId === 'necromancer' ||
+            this.selectedCharId === 'druid' ||
+            this.selectedCharId === 'engineer'
         ) {
             addComponent(world, Mana, this.playerId);
             Mana.current[this.playerId] = this.charData.baseStats.mana;
@@ -213,15 +226,20 @@ export class MainScene extends Phaser.Scene {
         if (this.selectedCharId === 'knight') charTypeId = 0;
         else if (this.selectedCharId === 'elf') charTypeId = 2;
         else if (this.selectedCharId === 'necromancer') charTypeId = 3;
+        else if (this.selectedCharId === 'druid') charTypeId = 4;
+        else if (this.selectedCharId === 'engineer') charTypeId = 5;
 
         addComponent(world, WeaponEvolution, this.playerId);
         WeaponEvolution.evolutionId[this.playerId] = -1;
         WeaponEvolution.baseWeaponId[this.playerId] = charTypeId;
 
+        addComponent(world, Relic, this.playerId);
+        Relic.bitmask[this.playerId] = 0;
+
         SpriteInfo.textureIndex[this.playerId] = charTypeId;
         Animation.frameRate[this.playerId] = 10;
-        Health.current[this.playerId] = this.charData.baseStats.health;
-        Health.max[this.playerId] = this.charData.baseStats.health;
+        Health.max[this.playerId] = this.charData.baseStats.health + globalStats.bonusMaxHp;
+        Health.current[this.playerId] = Health.max[this.playerId];
 
         // Player initial position (temp, will be refined after buildMap)
         Position.x[this.playerId] = 0;
@@ -236,6 +254,9 @@ export class MainScene extends Phaser.Scene {
         this.itemSystem = new ItemSystem();
 
         this.spellSystem.selectedCharId = this.selectedCharId;
+
+        this.relicSystem = new RelicSystem(this);
+        this.relicSystem.applyPassives(this.playerId);
 
         this.floorBlitter = this.add.blitter(0, 0, 'floors').setDepth(-3);
 
@@ -298,12 +319,31 @@ export class MainScene extends Phaser.Scene {
         const comboCastHandler = () => {};
         window.addEventListener('combo_cast', comboCastHandler);
 
+        const enemyKilledHandler = () => {
+            this.relicSystem.onEnemyKilled();
+            this.enemiesKilled++;
+        };
+        window.addEventListener('enemy_killed', enemyKilledHandler);
+
+        const synergyActivatedHandler = () => {
+            this.synergiesActivated++;
+        };
+        window.addEventListener('synergy_discovered', synergyActivatedHandler);
+
         const deathHandler = () => {
+            // Phoenix Feather 부활 시도
+            if (this.relicSystem.tryRevive(this.playerId)) {
+                return; // 부활 성공 — 사망 처리 스킵
+            }
             this.time.delayedCall(1000, () => {
                 if (this.scene.isActive('UpgradeScene')) this.scene.stop('UpgradeScene');
                 if (this.scene.isActive('RecipeScene')) this.scene.stop('RecipeScene');
                 this.scene.pause();
-                this.scene.launch('GameOverScene');
+                this.scene.launch('GameOverScene', {
+                    stage: this.currentStage,
+                    enemiesKilled: this.enemiesKilled,
+                    synergiesActivated: this.synergiesActivated,
+                });
             });
         };
         window.addEventListener('player_died', deathHandler);
@@ -426,6 +466,8 @@ export class MainScene extends Phaser.Scene {
         this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
             window.removeEventListener('play_sound', soundHandler);
             window.removeEventListener('combo_cast', comboCastHandler);
+            window.removeEventListener('enemy_killed', enemyKilledHandler);
+            window.removeEventListener('synergy_discovered', synergyActivatedHandler);
             window.removeEventListener('player_died', deathHandler);
             window.removeEventListener('keydown', recipeHandler);
             window.removeEventListener('next_stage', nextStageHandler);
@@ -599,6 +641,7 @@ export class MainScene extends Phaser.Scene {
         this.cyclone.tick();
         this.cascade.tick();
         this.necromancerSystem.tick();
+        this.relicSystem.tick();
         this.renderSystem(delta);
         this.handleInteractions();
 

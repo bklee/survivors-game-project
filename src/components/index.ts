@@ -84,3 +84,6 @@ export { AlchemySlot, SynergyEffect } from './alchemy';
 
 // Weapon evolution component
 export { WeaponEvolution } from './weapon';
+
+// Relic component
+export { Relic } from './relic';
