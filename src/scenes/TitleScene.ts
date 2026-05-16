@@ -32,14 +32,19 @@ export class TitleScene extends Phaser.Scene {
         homeBtn.on('pointerover', () => homeBtn.setTint(0xffff00));
         homeBtn.on('pointerout', () => homeBtn.clearTint());
 
-        // START Button (Same style as GameOver RETRY)
+        // 메뉴 레이아웃 — 720px 화면 안에 START + 보조(가로) + IAP 가 들어가도록 재배치.
+        const startY = height / 2 + 100;
+        const subY = startY + 90; // 가로 묶음 (스킬 트리 + 시너지 도감)
+        const iapY = subY + 70; // 광고 제거 (IAP)
+
+        // START Button (메인 액션)
         const startBtn = this.add
-            .rectangle(width / 2, height / 2 + 150, 240, 70, 0x3d2b1f, 0.8)
+            .rectangle(width / 2, startY, 240, 70, 0x3d2b1f, 0.8)
             .setInteractive({ useHandCursor: true })
             .setStrokeStyle(3, 0xffd700);
 
         const startText = this.add
-            .text(width / 2, height / 2 + 150, 'START', {
+            .text(width / 2, startY, 'START', {
                 fontFamily: '"MedievalSharp", cursive',
                 fontSize: '40px',
                 color: '#ffffff',
@@ -91,16 +96,23 @@ export class TitleScene extends Phaser.Scene {
             startBtn.setScale(1);
         });
 
-        // SKILL TREE Button
+        // 보조 메뉴 — 가로 묶음 (스킬 트리 + 시너지 도감)
+        const subW = 170;
+        const subH = 52;
+        const subGap = 24;
+        const subLeftX = width / 2 - (subW / 2 + subGap / 2);
+        const subRightX = width / 2 + (subW / 2 + subGap / 2);
+
+        // SKILL TREE Button (왼쪽)
         const skillBtn = this.add
-            .rectangle(width / 2, height / 2 + 240, 240, 55, 0x1a2b3d, 0.8)
+            .rectangle(subLeftX, subY, subW, subH, 0x1a2b3d, 0.8)
             .setInteractive({ useHandCursor: true })
             .setStrokeStyle(2, 0x4db8ff);
 
         this.add
-            .text(width / 2, height / 2 + 240, '스킬 트리', {
+            .text(subLeftX, subY, '스킬 트리', {
                 fontFamily: '"MedievalSharp", cursive',
-                fontSize: '28px',
+                fontSize: '22px',
                 color: '#4db8ff',
                 fontStyle: 'bold',
             })
@@ -121,16 +133,16 @@ export class TitleScene extends Phaser.Scene {
             skillBtn.setScale(1);
         });
 
-        // CODEX Button
+        // CODEX Button (오른쪽)
         const codexBtn = this.add
-            .rectangle(width / 2, height / 2 + 310, 240, 55, 0x2d1a3d, 0.8)
+            .rectangle(subRightX, subY, subW, subH, 0x2d1a3d, 0.8)
             .setInteractive({ useHandCursor: true })
             .setStrokeStyle(2, 0xcc88ff);
 
         this.add
-            .text(width / 2, height / 2 + 310, '시너지 도감', {
+            .text(subRightX, subY, '시너지 도감', {
                 fontFamily: '"MedievalSharp", cursive',
-                fontSize: '28px',
+                fontSize: '22px',
                 color: '#cc88ff',
                 fontStyle: 'bold',
             })
@@ -151,17 +163,17 @@ export class TitleScene extends Phaser.Scene {
             codexBtn.setScale(1);
         });
 
-        // No-Ads Pass 버튼
+        // No-Ads Pass 버튼 (보조 메뉴 묶음 아래)
         const hasNoAds = LemonSqueezy.hasProduct('no_ads_pass');
         if (!hasNoAds) {
             ApiClient.trackEvent('iap_funnel_view', { product_id: 'no_ads_pass' });
             const noAdsBtn = this.add
-                .rectangle(width / 2, height / 2 + 385, 240, 50, 0x1e2a3a, 0.8)
+                .rectangle(width / 2, iapY, 280, 44, 0x1e2a3a, 0.85)
                 .setInteractive({ useHandCursor: true })
                 .setStrokeStyle(2, 0xffd700);
 
             this.add
-                .text(width / 2, height / 2 + 385, '광고 제거 ₩5,500', {
+                .text(width / 2, iapY, '광고 제거 ₩5,500', {
                     fontFamily: '"MedievalSharp", cursive',
                     fontSize: '20px',
                     color: '#ffd700',
@@ -173,7 +185,7 @@ export class TitleScene extends Phaser.Scene {
                 noAdsBtn.setScale(1.03);
             });
             noAdsBtn.on('pointerout', () => {
-                noAdsBtn.setFillStyle(0x1e2a3a, 0.8);
+                noAdsBtn.setFillStyle(0x1e2a3a, 0.85);
                 noAdsBtn.setScale(1);
             });
             noAdsBtn.on('pointerdown', () => {
@@ -183,7 +195,7 @@ export class TitleScene extends Phaser.Scene {
             });
         } else {
             this.add
-                .text(width / 2, height / 2 + 385, '✦ No-Ads Pass 활성', {
+                .text(width / 2, iapY, '✦ No-Ads Pass 활성', {
                     fontFamily: '"MedievalSharp", cursive',
                     fontSize: '16px',
                     color: '#888888',
