@@ -1,23 +1,90 @@
 import Phaser from 'phaser';
 import { Element, ELEMENT_INFO } from '../constants/AlchemyConfig';
 import { applySlotChange } from '../systems/AlchemySystem';
+import {
+    EVOLUTIONS,
+    WeaponEvolutionDef,
+    findEligibleEvolutions,
+} from '../constants/EvolutionConfig';
+import { WeaponEvolution } from '../components/weapon';
+import { globalStats } from '../core/PlayerStats';
 
-interface CardData {
+interface ElementPayload {
+    type: 'element';
     element: Element;
+}
+interface StatPayload {
+    type: 'stat';
+    statKey: 'damageMult' | 'moveSpeedMult' | 'cooldownMult' | 'pickupRadiusMult';
+    pct: number;
+}
+interface EvolutionPayload {
+    type: 'evolution';
+    def: WeaponEvolutionDef;
+}
+type CardPayload = ElementPayload | StatPayload | EvolutionPayload;
+
+type CardData = {
     title: string;
     description: string;
-}
+    icon: string;
+    color: number;
+} & CardPayload;
+
+const STAT_OPTIONS: {
+    key: StatPayload['statKey'];
+    pct: number;
+    title: string;
+    desc: string;
+    color: number;
+    icon: string;
+}[] = [
+    {
+        key: 'damageMult',
+        pct: 0.15,
+        title: '데미지 +15%',
+        desc: '모든 공격 데미지 증가',
+        color: 0xff5722,
+        icon: '⚔',
+    },
+    {
+        key: 'moveSpeedMult',
+        pct: 0.1,
+        title: '이동속도 +10%',
+        desc: '이동 속도 증가',
+        color: 0x4caf50,
+        icon: '⚡',
+    },
+    {
+        key: 'cooldownMult',
+        pct: 0.1,
+        title: 'CDR +10%',
+        desc: '쿨다운 감소',
+        color: 0x2196f3,
+        icon: '⏱',
+    },
+    {
+        key: 'pickupRadiusMult',
+        pct: 0.2,
+        title: '획득 범위 +20%',
+        desc: 'XP/아이템 픽업 범위',
+        color: 0xffeb3b,
+        icon: '🧲',
+    },
+];
 
 export class UpgradeScene extends Phaser.Scene {
     private cards: Phaser.GameObjects.Container[] = [];
     private playerEid: number = -1;
+    private playerLevel: number = 1;
 
     constructor() {
         super({ key: 'UpgradeScene' });
     }
 
-    init(data: { playerEid: number }) {
+    init(data: { playerEid: number; playerLevel?: number }) {
         this.playerEid = data.playerEid;
+        this.playerLevel = data.playerLevel ?? globalStats.currentLevel ?? 1;
     }
 
     create() {
@@ -55,13 +122,53 @@ export class UpgradeScene extends Phaser.Scene {
     }
 
     private pickRandomCards(count: number): CardData[] {
+        const pool: CardData[] = [];
+
+        // 1. 원소 카드 (전체 셔플 후 4개 후보)
         const allElements = Object.values(Element) as Element[];
-        const shuffled = [...allElements].sort(() => Math.random() - 0.5);
-        return shuffled.slice(0, count).map((el) => ({
-            element: el,
-            title: ELEMENT_INFO[el].name,
-            description: `${ELEMENT_INFO[el].icon} ${ELEMENT_INFO[el].name} 원소를 슬롯에 추가`,
-        }));
+        const shuffledElements = [...allElements].sort(() => Math.random() - 0.5);
+        for (let i = 0; i < Math.min(4, shuffledElements.length); i++) {
+            const el = shuffledElements[i];
+            pool.push({
+                type: 'element',
+                element: el,
+                title: ELEMENT_INFO[el].name,
+                description: `${ELEMENT_INFO[el].icon} ${ELEMENT_INFO[el].name} 원소를 슬롯에 추가`,
+                icon: ELEMENT_INFO[el].icon,
+                color: ELEMENT_INFO[el].color,
+            });
+        }
+
+        // 2. 스탯 카드 (4개 전부 후보)
+        for (const stat of STAT_OPTIONS) {
+            pool.push({
+                type: 'stat',
+                statKey: stat.key,
+                pct: stat.pct,
+                title: stat.title,
+                description: stat.desc,
+                icon: stat.icon,
+                color: stat.color,
+            });
+        }
+
+        // 3. 진화 카드 (조건 만족 시만)
+        if (this.playerEid >= 0) {
+            const eligibleEvolutions = findEligibleEvolutions(this.playerEid, this.playerLevel);
+            for (const ev of eligibleEvolutions) {
+                pool.push({
+                    type: 'evolution',
+                    def: ev,
+                    title: ev.name,
+                    description: ev.description,
+                    icon: '✦',
+                    color: 0xffd700,
+                });
+            }
+        }
+
+        const shuffledPool = [...pool].sort(() => Math.random() - 0.5);
+        return shuffledPool.slice(0, count);
     }
 
     private createCard(
@@ -74,18 +181,21 @@ export class UpgradeScene extends Phaser.Scene {
         const container = this.add.container(x, y);
         container.setDepth(1);
 
-        const colorNum = ELEMENT_INFO[data.element].color;
-        const bg = this.add.rectangle(0, 0, w, h, colorNum, 0.4);
-        bg.setStrokeStyle(3, 0xffffff, 1);
+        const isEvolution = data.type === 'evolution';
+        const strokeColor = isEvolution ? 0xffd700 : 0xffffff;
+        const strokeWidth = isEvolution ? 4 : 3;
+
+        const bg = this.add.rectangle(0, 0, w, h, data.color, 0.4);
+        bg.setStrokeStyle(strokeWidth, strokeColor, 1);
         container.add(bg);
 
-        const icon = this.add.text(0, -80, ELEMENT_INFO[data.element].icon, { fontSize: '64px' });
+        const icon = this.add.text(0, -80, data.icon, { fontSize: '64px' });
         icon.setOrigin(0.5);
         container.add(icon);
 
         const titleText = this.add.text(0, 0, data.title, {
-            fontSize: '24px',
-            color: '#ffffff',
+            fontSize: '20px',
+            color: isEvolution ? '#ffd700' : '#ffffff',
             fontStyle: 'bold',
         });
         titleText.setOrigin(0.5);
@@ -101,8 +211,8 @@ export class UpgradeScene extends Phaser.Scene {
         container.add(descText);
 
         bg.setInteractive({ useHandCursor: true });
-        bg.on('pointerover', () => bg.setFillStyle(colorNum, 0.7));
-        bg.on('pointerout', () => bg.setFillStyle(colorNum, 0.4));
+        bg.on('pointerover', () => bg.setFillStyle(data.color, 0.7));
+        bg.on('pointerout', () => bg.setFillStyle(data.color, 0.4));
         bg.on('pointerdown', () => this.onCardSelected(data));
 
         return container;
@@ -110,9 +220,27 @@ export class UpgradeScene extends Phaser.Scene {
 
     private onCardSelected(data: CardData) {
         if (this.playerEid >= 0) {
-            applySlotChange(this.playerEid, data.element);
+            this.applyCard(data);
         }
         this.scene.resume('MainScene');
         this.scene.stop();
+    }
+
+    private applyCard(card: CardData) {
+        switch (card.type) {
+            case 'element':
+                applySlotChange(this.playerEid, card.element);
+                break;
+            case 'stat':
+                globalStats[card.statKey] *= 1 + card.pct;
+                break;
+            case 'evolution': {
+                const idx = EVOLUTIONS.findIndex((e) => e.id === card.def.id);
+                if (idx >= 0) {
+                    WeaponEvolution.evolutionId[this.playerEid] = idx;
+                }
+                break;
+            }
+        }
     }
 }

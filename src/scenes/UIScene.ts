@@ -564,13 +564,21 @@ export class UIScene extends Phaser.Scene {
         this.statsText.setText(this.getStatsString());
         if (this.alchemySlotUI && this.triggerButton) {
             // Lazy bind playerId — MainScene.create launches UIScene before
-            // setting this.playerId. Re-bind every frame so new players (restart)
-            // are picked up automatically.
+            // setting this.playerId.
             const mainScene = this.scene.get('MainScene') as { playerId?: number } | undefined;
             if (mainScene?.playerId !== undefined) {
                 this.alchemySlotUI.setPlayerEid(mainScene.playerId);
                 this.triggerButton.setPlayerEid(mainScene.playerId);
             }
+            // 게임 화면(MainScene 활성)일 때만 슬롯/트리거 표시.
+            // TitleScene/CharacterSelectScene/GameOverScene 등에서는 숨김.
+            // UpgradeScene이 뜨면 MainScene이 pause되므로 isActive=false → 자동 숨김.
+            const inGame =
+                this.scene.isActive('MainScene') &&
+                mainScene?.playerId !== undefined &&
+                mainScene.playerId >= 0;
+            this.alchemySlotUI.setVisible(inGame);
+            this.triggerButton.setVisible(inGame);
             this.alchemySlotUI.update();
             this.triggerButton.update();
         }
@@ -752,7 +760,10 @@ export class UIScene extends Phaser.Scene {
                 globalStats.moveSpeedMult *= 1.03;
                 if (!this.scene.isActive('UpgradeScene')) {
                     this.scene.get('MainScene').scene.pause();
-                    this.scene.launch('UpgradeScene', { playerEid: peid });
+                    this.scene.launch('UpgradeScene', {
+                        playerEid: peid,
+                        playerLevel: this.currentLevel,
+                    });
                 }
             }
         }

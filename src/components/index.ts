@@ -81,3 +81,6 @@ export const ActionState = defineComponent({
 
 // Alchemy system components
 export { AlchemySlot, SynergyEffect } from './alchemy';
+
+// Weapon evolution component
+export { WeaponEvolution } from './weapon';
