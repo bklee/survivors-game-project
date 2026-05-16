@@ -226,6 +226,8 @@ export class MainScene extends Phaser.Scene {
 
         const deathHandler = () => {
             this.time.delayedCall(1000, () => {
+                if (this.scene.isActive('UpgradeScene')) this.scene.stop('UpgradeScene');
+                if (this.scene.isActive('RecipeScene')) this.scene.stop('RecipeScene');
                 this.scene.pause();
                 this.scene.launch('GameOverScene');
             });
@@ -354,6 +356,7 @@ export class MainScene extends Phaser.Scene {
             window.removeEventListener('keydown', recipeHandler);
             window.removeEventListener('next_stage', nextStageHandler);
             window.removeEventListener('stage_clear', stageClearInternalHandler);
+            if (this.tempest) this.tempest.destroy();
         });
 
         this.startBGM('main_bgm');
