@@ -4,6 +4,8 @@ import { world } from '../core/World';
 import { Position, Player, Enemy, Boss, Health, Mana } from '../components';
 import { globalStats } from '../core/PlayerStats';
 import { VirtualJoystick } from '../ui/VirtualJoystick';
+import { AlchemySlotUI } from '../ui/AlchemySlotUI';
+import { TriggerButton } from '../ui/TriggerButton';
 
 export class UIScene extends Phaser.Scene {
     private stageLevelText!: Phaser.GameObjects.Text;
@@ -57,6 +59,8 @@ export class UIScene extends Phaser.Scene {
 
     public joystick!: VirtualJoystick;
     private minimapTimer = 0;
+    private alchemySlotUI!: AlchemySlotUI;
+    private triggerButton!: TriggerButton;
 
     private playerQuery = defineQuery([Player, Position]);
     private enemyQuery = defineQuery([Enemy, Position]);
@@ -491,6 +495,15 @@ export class UIScene extends Phaser.Scene {
             showUI();
         }
 
+        this.alchemySlotUI = new AlchemySlotUI(this);
+        this.triggerButton = new TriggerButton(this);
+
+        // MainScene에서 playerId 받아 setPlayerEid 호출
+        if (mainScene?.playerId !== undefined) {
+            this.alchemySlotUI.setPlayerEid(mainScene.playerId);
+            this.triggerButton.setPlayerEid(mainScene.playerId);
+        }
+
         this.updateStageLevelText();
     }
 
@@ -549,6 +562,8 @@ export class UIScene extends Phaser.Scene {
         }
         this.updateTargetArrows();
         this.statsText.setText(this.getStatsString());
+        if (this.alchemySlotUI) this.alchemySlotUI.update();
+        if (this.triggerButton) this.triggerButton.update();
     }
 
     private updateTargetArrows() {
