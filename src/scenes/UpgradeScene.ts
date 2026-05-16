@@ -1,110 +1,118 @@
 import Phaser from 'phaser';
-import { globalStats } from '../core/PlayerStats';
+import { Element, ELEMENT_INFO } from '../constants/AlchemyConfig';
+import { applySlotChange } from '../systems/AlchemySystem';
 
-interface UpgradeOption {
-    id: string;
-    label: string;
-    desc: string;
-    apply: () => void;
+interface CardData {
+    element: Element;
+    title: string;
+    description: string;
 }
 
-const UPGRADE_POOL: UpgradeOption[] = [
-    {
-        id: 'dmg_up',
-        label: 'Alchemy Potency',
-        desc: 'Increases all spell damage by 20%',
-        apply: () => { globalStats.damageMult += 0.20; }
-    },
-    {
-        id: 'spd_up',
-        label: 'Fleet Footwork',
-        desc: 'Increases movement speed by 15%',
-        apply: () => { globalStats.moveSpeedMult += 0.15; }
-    },
-    {
-        id: 'cdr_up',
-        label: "Wizard's Focus",
-        desc: 'Reduces alchemy cooldowns by 15%',
-        apply: () => { globalStats.cooldownMult *= 0.85; }
-    },
-    {
-        id: 'magnet_up',
-        label: 'Aetheric Pull',
-        desc: 'Increases item pickup radius by 40%',
-        apply: () => { globalStats.pickupRadiusMult += 0.40; }
-    }
-];
-
 export class UpgradeScene extends Phaser.Scene {
+    private cards: Phaser.GameObjects.Container[] = [];
+    private playerEid: number = -1;
+
     constructor() {
-        super('UpgradeScene');
+        super({ key: 'UpgradeScene' });
+    }
+
+    init(data: { playerEid: number }) {
+        this.playerEid = data.playerEid;
     }
 
     create() {
-        const { width, height } = this.scale;
+        const bg = this.add.rectangle(
+            this.scale.width / 2,
+            this.scale.height / 2,
+            this.scale.width,
+            this.scale.height,
+            0x000000,
+            0.7,
+        );
+        bg.setDepth(0);
 
-        this.add
-            .rectangle(width / 2, height / 2, width, height, 0x000000, 0.7)
-            .setOrigin(0.5, 0.5);
-
-        this.add
-            .text(width / 2, 120, 'Choose an Upgrade', {
-                fontSize: '42px',
-                color: '#ffffff',
-            })
-            .setOrigin(0.5, 0.5);
-
-        // Pick 3 random distinct upgrades
-        const shuffled = [...UPGRADE_POOL].sort(() => 0.5 - Math.random());
-        const selectedOptions = shuffled.slice(0, 3);
-
-        const cardWidth = 260;
-        const cardHeight = 340;
-        const cardGap = 40;
-        const totalWidth = selectedOptions.length * cardWidth + (selectedOptions.length - 1) * cardGap;
-        const startX = (width - totalWidth) / 2 + cardWidth / 2;
-        const cardY = height / 2 + 20;
-
-        selectedOptions.forEach((option, index) => {
-            const x = startX + index * (cardWidth + cardGap);
-
-            const card = this.add
-                .rectangle(x, cardY, cardWidth, cardHeight, 0x1e1e1e, 1)
-                .setStrokeStyle(3, 0xffffff, 1)
-                .setInteractive({ useHandCursor: true });
-
-            this.add
-                .text(x, cardY - 50, option.label, {
-                    fontSize: '28px',
-                    color: '#ffd700',
-                    align: 'center',
-                    wordWrap: { width: cardWidth - 30 },
-                })
-                .setOrigin(0.5, 0.5);
-
-            this.add
-                .text(x, cardY + 40, option.desc, {
-                    fontSize: '20px',
-                    color: '#ffffff',
-                    align: 'center',
-                    wordWrap: { width: cardWidth - 30 },
-                })
-                .setOrigin(0.5, 0.5);
-
-            card.on('pointerdown', () => {
-                option.apply();
-                console.log('Stats updated:', globalStats);
-                this.scene.resume('MainScene');
-                this.scene.stop('UpgradeScene');
-            });
-            
-            // Hover effects
-            card.on('pointerover', () => {
-                card.setFillStyle(0x3a3a3a, 1);
-            });
-            card.on('pointerout', () => {
-                card.setFillStyle(0x1e1e1e, 1);
-            });
+        const title = this.add.text(this.scale.width / 2, 80, 'LEVEL UP! 카드를 선택하세요', {
+            fontSize: '32px',
+            color: '#ffd700',
+            fontStyle: 'bold',
         });
+        title.setOrigin(0.5);
+        title.setDepth(1);
+
+        const cardData = this.pickRandomCards(3);
+        const cardWidth = 200;
+        const cardHeight = 280;
+        const gap = 40;
+        const totalWidth = cardWidth * 3 + gap * 2;
+        const startX = (this.scale.width - totalWidth) / 2 + cardWidth / 2;
+        const cardY = this.scale.height / 2;
+
+        cardData.forEach((data, i) => {
+            const x = startX + i * (cardWidth + gap);
+            const card = this.createCard(x, cardY, cardWidth, cardHeight, data);
+            this.cards.push(card);
+        });
+    }
+
+    private pickRandomCards(count: number): CardData[] {
+        const allElements = Object.values(Element) as Element[];
+        const shuffled = [...allElements].sort(() => Math.random() - 0.5);
+        return shuffled.slice(0, count).map((el) => ({
+            element: el,
+            title: ELEMENT_INFO[el].name,
+            description: `${ELEMENT_INFO[el].icon} ${ELEMENT_INFO[el].name} 원소를 슬롯에 추가`,
+        }));
+    }
+
+    private createCard(
+        x: number,
+        y: number,
+        w: number,
+        h: number,
+        data: CardData,
+    ): Phaser.GameObjects.Container {
+        const container = this.add.container(x, y);
+        container.setDepth(1);
+
+        const colorNum = ELEMENT_INFO[data.element].color;
+        const bg = this.add.rectangle(0, 0, w, h, colorNum, 0.4);
+        bg.setStrokeStyle(3, 0xffffff, 1);
+        container.add(bg);
+
+        const icon = this.add.text(0, -80, ELEMENT_INFO[data.element].icon, { fontSize: '64px' });
+        icon.setOrigin(0.5);
+        container.add(icon);
+
+        const titleText = this.add.text(0, 0, data.title, {
+            fontSize: '24px',
+            color: '#ffffff',
+            fontStyle: 'bold',
+        });
+        titleText.setOrigin(0.5);
+        container.add(titleText);
+
+        const descText = this.add.text(0, 60, data.description, {
+            fontSize: '14px',
+            color: '#cccccc',
+            wordWrap: { width: w - 20 },
+            align: 'center',
+        });
+        descText.setOrigin(0.5);
+        container.add(descText);
+
+        bg.setInteractive({ useHandCursor: true });
+        bg.on('pointerover', () => bg.setFillStyle(colorNum, 0.7));
+        bg.on('pointerout', () => bg.setFillStyle(colorNum, 0.4));
+        bg.on('pointerdown', () => this.onCardSelected(data));
+
+        return container;
+    }
+
+    private onCardSelected(data: CardData) {
+        if (this.playerEid >= 0) {
+            applySlotChange(this.playerEid, data.element);
+        }
+        this.scene.resume('MainScene');
+        this.scene.stop();
     }
 }

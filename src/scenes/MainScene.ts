@@ -1,7 +1,19 @@
 import Phaser from 'phaser';
 import { defineQuery, addEntity, addComponent, hasComponent, removeEntity } from 'bitecs';
 import { world } from '../core/World';
-import { Position, Velocity, Player, SpriteInfo, Animation, Health, Mana, Interactive, Item, Enemy } from '../components';
+import {
+    Position,
+    Velocity,
+    Player,
+    SpriteInfo,
+    Animation,
+    Health,
+    Mana,
+    Interactive,
+    Item,
+    Enemy,
+} from '../components';
+import { AlchemySlot, SynergyEffect } from '../components/alchemy';
 import { createPhysicsSystem } from '../systems/PhysicsSystem';
 import { createRenderSystem } from '../systems/RenderSystem';
 import { PlayerSystem } from '../systems/PlayerSystem';
@@ -10,6 +22,11 @@ import { NightDirector } from '../systems/WaveSystem';
 import { CHARACTERS } from '../constants/CharacterConfig';
 
 import { JuicePipeline } from '../fx/JuicePipeline';
+import { PlasmaStorm } from '../fx/PlasmaStorm';
+import { VolcanicPlague } from '../fx/VolcanicPlague';
+import { Tempest } from '../fx/Tempest';
+import { Eruption } from '../fx/Eruption';
+import { Cryotoxin } from '../fx/Cryotoxin';
 import { createCombatSystem } from '../systems/CombatSystem';
 import { SpellSystem } from '../systems/SpellSystem';
 import { ItemSystem } from '../systems/ItemSystem';
@@ -28,6 +45,11 @@ export class MainScene extends Phaser.Scene {
     private combatSystem!: (dt: number) => void;
     private spellSystem!: SpellSystem;
     private itemSystem!: ItemSystem;
+    private plasmaStorm!: PlasmaStorm;
+    private volcanicPlague!: VolcanicPlague;
+    private tempest!: Tempest;
+    private eruption!: Eruption;
+    private cryotoxin!: Cryotoxin;
     private selectedCharId: string = 'wizard';
     private currentBGM?: Phaser.Sound.BaseSound;
     private dungeon!: DungeonGenerator;
@@ -37,7 +59,10 @@ export class MainScene extends Phaser.Scene {
     private currentStage: number = 1;
     private isPausedForClear: boolean = false;
     private charData!: CharacterData;
-    private secretRoomData?: { doorPixel: { x: number; y: number }; floorPixels: { x: number; y: number }[] };
+    private secretRoomData?: {
+        doorPixel: { x: number; y: number };
+        floorPixels: { x: number; y: number }[];
+    };
     private wallDecoGroup!: Phaser.GameObjects.Group;
     private debugTexts: Phaser.GameObjects.Text[] = []; // Debug texts for walls
 
@@ -86,6 +111,24 @@ export class MainScene extends Phaser.Scene {
         addComponent(world, SpriteInfo, this.playerId);
         addComponent(world, Animation, this.playerId);
         addComponent(world, Health, this.playerId);
+        addComponent(world, AlchemySlot, this.playerId);
+        addComponent(world, SynergyEffect, this.playerId);
+        AlchemySlot.slot0[this.playerId] = -1;
+        AlchemySlot.slot1[this.playerId] = -1;
+        AlchemySlot.slot2[this.playerId] = -1;
+        SynergyEffect.synergyId[this.playerId] = -1;
+        this.plasmaStorm = new PlasmaStorm(this);
+        this.plasmaStorm.setPlayerEid(this.playerId);
+        this.volcanicPlague = new VolcanicPlague(this);
+        this.volcanicPlague.setPlayerEid(this.playerId);
+        this.tempest = new Tempest(this);
+        this.tempest.setPlayerEid(this.playerId);
+        this.eruption = new Eruption(this);
+        this.eruption.setPlayerEid(this.playerId);
+        this.cryotoxin = new Cryotoxin(this);
+        this.cryotoxin.setPlayerEid(this.playerId);
+        SynergyEffect.boostActiveUntil[this.playerId] = 0;
+        SynergyEffect.boostCooldownUntil[this.playerId] = 0;
 
         const charData = CHARACTERS[this.selectedCharId.toUpperCase()] || CHARACTERS.WIZARD;
         this.charData = charData;
@@ -126,7 +169,7 @@ export class MainScene extends Phaser.Scene {
         this.doorBlitter = this.add.blitter(0, 0, 'dungeon').setDepth(-2);
         this.wallDecoGroup = this.add.group();
         // wallDecoGroup manages North wall specific decorations like wall_holes
-        // wallDecoGroup doesn't have setDepth, but images added to it can have depths. 
+        // wallDecoGroup doesn't have setDepth, but images added to it can have depths.
         // We'll set depths on creation or just leave as group.
 
         this.buildMap(this.currentStage);
@@ -140,19 +183,29 @@ export class MainScene extends Phaser.Scene {
         Position.y[this.playerId] = startPos.y;
 
         setTimeout(() => {
-            window.dispatchEvent(new CustomEvent('hp_updated', {
-                detail: { current: Health.current[this.playerId], max: Health.max[this.playerId] }
-            }));
+            window.dispatchEvent(
+                new CustomEvent('hp_updated', {
+                    detail: {
+                        current: Health.current[this.playerId],
+                        max: Health.max[this.playerId],
+                    },
+                }),
+            );
             if (hasComponent(world, Mana, this.playerId)) {
-                window.dispatchEvent(new CustomEvent('mp_updated', {
-                    detail: { current: Mana.current[this.playerId], max: Mana.max[this.playerId] }
-                }));
+                window.dispatchEvent(
+                    new CustomEvent('mp_updated', {
+                        detail: {
+                            current: Mana.current[this.playerId],
+                            max: Mana.max[this.playerId],
+                        },
+                    }),
+                );
             }
             window.dispatchEvent(new CustomEvent('stage_updated', { detail: this.currentStage }));
             window.dispatchEvent(new CustomEvent('char_selected', { detail: this.selectedCharId }));
         }, 100);
 
-        import('../core/PlayerStats').then(m => {
+        import('../core/PlayerStats').then((m) => {
             m.globalStats.damageMult = charData.baseStats.damage;
             m.globalStats.mana.max = charData.baseStats.mana; // Initialize global mana max
             m.globalStats.mana.current = charData.baseStats.mana; // Initialize global mana current
@@ -168,12 +221,13 @@ export class MainScene extends Phaser.Scene {
         }) as EventListener;
         window.addEventListener('play_sound', soundHandler);
 
-        const comboCastHandler = () => {
-        };
+        const comboCastHandler = () => {};
         window.addEventListener('combo_cast', comboCastHandler);
 
         const deathHandler = () => {
             this.time.delayedCall(1000, () => {
+                if (this.scene.isActive('UpgradeScene')) this.scene.stop('UpgradeScene');
+                if (this.scene.isActive('RecipeScene')) this.scene.stop('RecipeScene');
                 this.scene.pause();
                 this.scene.launch('GameOverScene');
             });
@@ -224,7 +278,13 @@ export class MainScene extends Phaser.Scene {
                 const tid = SpriteInfo.textureIndex[eid];
                 // Props (31-36), Items/Coins (20-21), Potions (50-57), Spells (100+), Enemies (60-89)
                 // Also remove lever(40) and secret door(41) from previous stage
-                if ((tid >= 20 && tid <= 36) || (tid >= 50 && tid <= 57) || tid === 40 || tid === 41 || tid >= 60) {
+                if (
+                    (tid >= 20 && tid <= 36) ||
+                    (tid >= 50 && tid <= 57) ||
+                    tid === 40 ||
+                    tid === 41 ||
+                    tid >= 60
+                ) {
                     removeEntity(world, eid);
                 }
             }
@@ -239,15 +299,25 @@ export class MainScene extends Phaser.Scene {
 
             // Restore HP to 100% on new stage
             Health.current[this.playerId] = Health.max[this.playerId];
-            window.dispatchEvent(new CustomEvent('hp_updated', {
-                detail: { current: Health.current[this.playerId], max: Health.max[this.playerId] }
-            }));
+            window.dispatchEvent(
+                new CustomEvent('hp_updated', {
+                    detail: {
+                        current: Health.current[this.playerId],
+                        max: Health.max[this.playerId],
+                    },
+                }),
+            );
             // Restore MP to 100% on new stage if applicable
             if (hasComponent(world, Mana, this.playerId)) {
                 Mana.current[this.playerId] = Mana.max[this.playerId];
-                window.dispatchEvent(new CustomEvent('mp_updated', {
-                    detail: { current: Mana.current[this.playerId], max: Mana.max[this.playerId] }
-                }));
+                window.dispatchEvent(
+                    new CustomEvent('mp_updated', {
+                        detail: {
+                            current: Mana.current[this.playerId],
+                            max: Mana.max[this.playerId],
+                        },
+                    }),
+                );
             }
 
             // Re-spawn props on new map
@@ -286,6 +356,7 @@ export class MainScene extends Phaser.Scene {
             window.removeEventListener('keydown', recipeHandler);
             window.removeEventListener('next_stage', nextStageHandler);
             window.removeEventListener('stage_clear', stageClearInternalHandler);
+            if (this.tempest) this.tempest.destroy();
         });
 
         this.startBGM('main_bgm');
@@ -321,7 +392,7 @@ export class MainScene extends Phaser.Scene {
         this.wallBlitter.clear();
         this.doorBlitter.clear();
         this.wallDecoGroup.clear(true, true);
-        this.debugTexts.forEach(t => t.destroy());
+        this.debugTexts.forEach((t) => t.destroy());
         this.debugTexts = [];
 
         for (let y = 0; y < mapH; y++) {
@@ -362,11 +433,11 @@ export class MainScene extends Phaser.Scene {
                 // ── Walls ───────────────────────────────────────────────────
                 if (cell === TileType.WALL) {
                     // 북쪽 벽 판정: 타일 바로 아래(y+1)가 바닥(FLOOR), 문(DOOR) 또는 기둥(PILLAR)인 경우
-                    const isNorthWall = y < mapH - 1 && (
-                        this.dungeon.map[y + 1][x] === TileType.FLOOR ||
-                        this.dungeon.map[y + 1][x] === TileType.DOOR ||
-                        this.dungeon.map[y + 1][x] === TileType.PILLAR
-                    );
+                    const isNorthWall =
+                        y < mapH - 1 &&
+                        (this.dungeon.map[y + 1][x] === TileType.FLOOR ||
+                            this.dungeon.map[y + 1][x] === TileType.DOOR ||
+                            this.dungeon.map[y + 1][x] === TileType.PILLAR);
 
                     if (isNorthWall) {
                         // 에셋 매핑 수정으로 wall_n_mid가 심플한 일자벽을 가리키게 됨
@@ -385,17 +456,18 @@ export class MainScene extends Phaser.Scene {
 
                     // ── 남쪽 벽 판정 및 렌더링 (Floor 4-7 사용) ──────────────────
                     // 남쪽 벽: 타일 바로 위(y-1)가 바닥(FLOOR/SECRET_FLOOR), 문(DOOR) 또는 기둥(PILLAR)인 경우
-                    const isSouthWall = y > 0 && (
-                        this.dungeon.map[y - 1][x] === TileType.FLOOR ||
-                        this.dungeon.map[y - 1][x] === TileType.SECRET_FLOOR ||
-                        this.dungeon.map[y - 1][x] === TileType.DOOR ||
-                        this.dungeon.map[y - 1][x] === TileType.PILLAR
-                    );
+                    const isSouthWall =
+                        y > 0 &&
+                        (this.dungeon.map[y - 1][x] === TileType.FLOOR ||
+                            this.dungeon.map[y - 1][x] === TileType.SECRET_FLOOR ||
+                            this.dungeon.map[y - 1][x] === TileType.DOOR ||
+                            this.dungeon.map[y - 1][x] === TileType.PILLAR);
 
                     if (isSouthWall) {
                         // 사용자 요청: floor_4 ~ floor_7 중 랜덤하게 배치하여 남쪽 벽으로 사용
                         const wallFloorIds = [4, 5, 6, 7];
-                        const randomId = wallFloorIds[Math.floor(Math.random() * wallFloorIds.length)];
+                        const randomId =
+                            wallFloorIds[Math.floor(Math.random() * wallFloorIds.length)];
                         this.floorBlitter.create(x * TILE_SIZE, y * TILE_SIZE, `floor_${randomId}`);
                     }
                 }
@@ -426,13 +498,18 @@ export class MainScene extends Phaser.Scene {
         this.physicsSystem(delta);
         this.combatSystem(delta);
         this.itemSystem.update(delta);
+        this.plasmaStorm.tick();
+        this.volcanicPlague.tick();
+        this.tempest.tick();
+        this.eruption.tick();
+        this.cryotoxin.tick();
         this.renderSystem(delta);
-        this.handleInteractions(delta);
+        this.handleInteractions();
 
         this.cameras.main.centerOn(Position.x[this.playerId], Position.y[this.playerId]);
     }
 
-    private handleInteractions(_dt: number) {
+    private handleInteractions() {
         const px = Position.x[this.playerId];
         const py = Position.y[this.playerId];
         const interactives = defineQuery([Position, SpriteInfo])(world);
@@ -446,7 +523,11 @@ export class MainScene extends Phaser.Scene {
             const distSq = dx * dx + dy * dy;
 
             if (typeId === 40) {
-                if (distSq < 40 * 40 && hasComponent(world, Interactive, eid) && Interactive.isActivated[eid] === 0) {
+                if (
+                    distSq < 40 * 40 &&
+                    hasComponent(world, Interactive, eid) &&
+                    Interactive.isActivated[eid] === 0
+                ) {
                     Interactive.isActivated[eid] = 1;
                     const linkId = Interactive.id[eid];
                     window.dispatchEvent(new CustomEvent('play_sound', { detail: 'hit' }));
@@ -455,7 +536,11 @@ export class MainScene extends Phaser.Scene {
                     if (linkId > 0) {
                         for (let j = 0; j < interactives.length; j++) {
                             const targetEid = interactives[j];
-                            if (targetEid !== eid && hasComponent(world, Interactive, targetEid) && Interactive.id[targetEid] === linkId) {
+                            if (
+                                targetEid !== eid &&
+                                hasComponent(world, Interactive, targetEid) &&
+                                Interactive.id[targetEid] === linkId
+                            ) {
                                 Interactive.isActivated[targetEid] = 1;
 
                                 // 비밀 문(ID 41)이 활성화되면 맵의 DOOR 타일을 FLOOR로 변경하여 충돌 해제
@@ -466,7 +551,12 @@ export class MainScene extends Phaser.Scene {
                                         for (let dx = -1; dx <= 1; dx++) {
                                             const yy = dty + dy;
                                             const xx = dtx + dx;
-                                            if (yy >= 0 && yy < this.dungeon.height && xx >= 0 && xx < this.dungeon.width) {
+                                            if (
+                                                yy >= 0 &&
+                                                yy < this.dungeon.height &&
+                                                xx >= 0 &&
+                                                xx < this.dungeon.width
+                                            ) {
                                                 if (this.dungeon.map[yy][xx] === TileType.DOOR) {
                                                     this.dungeon.map[yy][xx] = TileType.FLOOR;
                                                 }
@@ -480,15 +570,20 @@ export class MainScene extends Phaser.Scene {
                 }
             } else if (typeId === 32) {
                 // 32: Spikes (인접 시 데미지, 애니메이션 프레임 기반)
-                const animIdx = Math.floor(Animation.timer[eid] * 4 / 1000) % 4;
+                const animIdx = Math.floor((Animation.timer[eid] * 4) / 1000) % 4;
                 const canDamage = animIdx >= 2;
 
                 if (canDamage) {
                     if (distSq < 20 * 20) {
                         Health.current[this.playerId] -= 0.1;
-                        window.dispatchEvent(new CustomEvent('hp_updated', {
-                            detail: { current: Health.current[this.playerId], max: Health.max[this.playerId] }
-                        }));
+                        window.dispatchEvent(
+                            new CustomEvent('hp_updated', {
+                                detail: {
+                                    current: Health.current[this.playerId],
+                                    max: Health.max[this.playerId],
+                                },
+                            }),
+                        );
                     }
                     for (let j = 0; j < enemies.length; j++) {
                         const en = enemies[j];
@@ -500,7 +595,10 @@ export class MainScene extends Phaser.Scene {
                     }
                 }
             } else if (typeId === 34) {
-                if (distSq < 40 * 40 && (!hasComponent(world, Interactive, eid) || Interactive.isActivated[eid] === 0)) {
+                if (
+                    distSq < 40 * 40 &&
+                    (!hasComponent(world, Interactive, eid) || Interactive.isActivated[eid] === 0)
+                ) {
                     addComponent(world, Interactive, eid);
                     Interactive.isActivated[eid] = 1;
 
@@ -508,9 +606,14 @@ export class MainScene extends Phaser.Scene {
                     this.juicePipeline.vfx.playFireHit(Position.x[eid], Position.y[eid]);
 
                     Health.current[this.playerId] -= 30;
-                    window.dispatchEvent(new CustomEvent('hp_updated', {
-                        detail: { current: Health.current[this.playerId], max: Health.max[this.playerId] }
-                    }));
+                    window.dispatchEvent(
+                        new CustomEvent('hp_updated', {
+                            detail: {
+                                current: Health.current[this.playerId],
+                                max: Health.max[this.playerId],
+                            },
+                        }),
+                    );
                     window.dispatchEvent(new CustomEvent('play_sound', { detail: 'hit' }));
                     removeEntity(world, eid);
                 }
@@ -520,22 +623,35 @@ export class MainScene extends Phaser.Scene {
                     const isBig = typeId >= 54;
                     const baseType = isBig ? typeId - 4 : typeId;
 
-                    if (baseType === 50) { // Green: EXP (~50% of current level requirement)
+                    if (baseType === 50) {
+                        // Green: EXP (~50% of current level requirement)
                         const multiplier = isBig ? 1.5 : 1.0;
                         const randomPercent = (40 + Math.random() * 20) * multiplier;
-                        window.dispatchEvent(new CustomEvent('xp_percent_collected', { detail: randomPercent }));
-                    } else if (baseType === 51) { // Yellow: Refill Health
+                        window.dispatchEvent(
+                            new CustomEvent('xp_percent_collected', { detail: randomPercent }),
+                        );
+                    } else if (baseType === 51) {
+                        // Yellow: Refill Health
                         if (isBig) {
                             Health.current[this.playerId] = Health.max[this.playerId];
                         } else {
                             // 소형: 최대 체력의 1/2만큼 회복 (최대치 초과 불가)
                             const healAmount = Health.max[this.playerId] / 2;
-                            Health.current[this.playerId] = Math.min(Health.max[this.playerId], Health.current[this.playerId] + healAmount);
+                            Health.current[this.playerId] = Math.min(
+                                Health.max[this.playerId],
+                                Health.current[this.playerId] + healAmount,
+                            );
                         }
-                        window.dispatchEvent(new CustomEvent('hp_updated', {
-                            detail: { current: Health.current[this.playerId], max: Health.max[this.playerId] }
-                        }));
-                    } else if (baseType === 52) { // Red: Kill monsters
+                        window.dispatchEvent(
+                            new CustomEvent('hp_updated', {
+                                detail: {
+                                    current: Health.current[this.playerId],
+                                    max: Health.max[this.playerId],
+                                },
+                            }),
+                        );
+                    } else if (baseType === 52) {
+                        // Red: Kill monsters
                         if (isBig) {
                             // 대형: 반경 50px 내 섬멸 및 약간의 화면 흔들림
                             const killRadiusSq = 50 * 50;
@@ -556,28 +672,41 @@ export class MainScene extends Phaser.Scene {
                             this.juicePipeline.screenShake(0.01, 500);
                         }
                         this.juicePipeline.vfx.playFireHit(px, py);
-                    } else if (baseType === 53) { // Blue: Refill MP
+                    } else if (baseType === 53) {
+                        // Blue: Refill MP
                         if (isBig) {
                             globalStats.mana.current = globalStats.mana.max;
                         } else {
                             // 소형: 최대 마나의 1/2만큼 회복 (최대치 초과 불가)
                             const refillAmount = globalStats.mana.max / 2;
-                            globalStats.mana.current = Math.min(globalStats.mana.max, globalStats.mana.current + refillAmount);
+                            globalStats.mana.current = Math.min(
+                                globalStats.mana.max,
+                                globalStats.mana.current + refillAmount,
+                            );
                         }
-                        window.dispatchEvent(new CustomEvent('mp_updated', {
-                            detail: { current: globalStats.mana.current, max: globalStats.mana.max }
-                        }));
+                        window.dispatchEvent(
+                            new CustomEvent('mp_updated', {
+                                detail: {
+                                    current: globalStats.mana.current,
+                                    max: globalStats.mana.max,
+                                },
+                            }),
+                        );
                     }
 
                     window.dispatchEvent(new CustomEvent('play_sound', { detail: 'level_up' }));
                     removeEntity(world, eid);
                 }
-            } else if (typeId === 35) { // Old potion (remove just in case)
+            } else if (typeId === 35) {
+                // Old potion (remove just in case)
                 if (distSq < 20 * 20) {
                     removeEntity(world, eid);
                 }
             } else if (typeId === 36) {
-                if (distSq < 30 * 30 && (!hasComponent(world, Interactive, eid) || Interactive.isActivated[eid] === 0)) {
+                if (
+                    distSq < 30 * 30 &&
+                    (!hasComponent(world, Interactive, eid) || Interactive.isActivated[eid] === 0)
+                ) {
                     addComponent(world, Interactive, eid);
                     Interactive.isActivated[eid] = 1;
 
@@ -635,7 +764,7 @@ export class MainScene extends Phaser.Scene {
         if (this.currentBGM) this.currentBGM.stop();
         if (this.cache.audio.exists(key)) {
             // Volume adjustment: boss music slightly louder, select music slightly softer
-            const vol = key === 'boss_bgm' ? 0.4 : (key === 'select_bgm' ? 0.25 : 0.3);
+            const vol = key === 'boss_bgm' ? 0.4 : key === 'select_bgm' ? 0.25 : 0.3;
             this.currentBGM = this.sound.add(key, { loop: true, volume: vol });
             this.currentBGM.play();
         }
@@ -650,10 +779,10 @@ export class MainScene extends Phaser.Scene {
                 { x: margin, y: margin },
                 { x: this.dungeon.width - margin, y: margin },
                 { x: margin, y: this.dungeon.height - margin },
-                { x: this.dungeon.width - margin, y: this.dungeon.height - margin }
+                { x: this.dungeon.width - margin, y: this.dungeon.height - margin },
             ];
 
-            corners.forEach(pos => {
+            corners.forEach((pos) => {
                 const potId = addEntity(world);
                 addComponent(world, Position, potId);
                 addComponent(world, SpriteInfo, potId);
@@ -757,7 +886,7 @@ export class MainScene extends Phaser.Scene {
         if (floorPixels.length < 10) return;
 
         // 문 근처(64px 이내)에는 상자나 물약을 배치하지 않음 (사용자 요청)
-        const spawnableFloors = floorPixels.filter(fp => {
+        const spawnableFloors = floorPixels.filter((fp) => {
             const dist = Phaser.Math.Distance.Between(fp.x, fp.y, doorPixel.x, doorPixel.y);
             return dist > 64;
         });
