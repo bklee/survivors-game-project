@@ -13,10 +13,20 @@ describe('AlchemyConfig', () => {
     });
 
     it('각 원소에 정보가 있다', () => {
-        for (let i = 0; i < 6; i++) {
-            expect(ELEMENT_INFO[i]).toBeDefined();
-            expect(ELEMENT_INFO[i].name).toBeTruthy();
-            expect(ELEMENT_INFO[i].color).toMatch(/^0x[0-9A-Fa-f]{6}$/);
+        const elements = [
+            Element.FIRE,
+            Element.ICE,
+            Element.LIGHTNING,
+            Element.POISON,
+            Element.EARTH,
+            Element.AIR,
+        ];
+        for (const el of elements) {
+            expect(ELEMENT_INFO[el]).toBeDefined();
+            expect(ELEMENT_INFO[el].name).toBeTruthy();
+            expect(typeof ELEMENT_INFO[el].color).toBe('number');
+            expect(ELEMENT_INFO[el].color).toBeGreaterThanOrEqual(0);
+            expect(ELEMENT_INFO[el].color).toBeLessThanOrEqual(0xffffff);
         }
     });
 
