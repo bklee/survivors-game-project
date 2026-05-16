@@ -30,14 +30,49 @@ describe('AlchemyConfig', () => {
         }
     });
 
-    it('5개 시너지가 정의되어 있다', () => {
-        expect(SYNERGIES).toHaveLength(5);
+    it('5개 초기 시너지 ID가 포함되어 있다', () => {
         const names = SYNERGIES.map((s) => s.id);
         expect(names).toContain('plasma_storm');
         expect(names).toContain('volcanic_plague');
         expect(names).toContain('tempest');
         expect(names).toContain('eruption');
         expect(names).toContain('cryotoxin');
+    });
+
+    it('총 20개 시너지가 정의되어 있다 (모든 C(6,3) 조합)', () => {
+        expect(SYNERGIES).toHaveLength(20);
+    });
+
+    it('모든 시너지가 고유한 elements 조합을 가진다', () => {
+        const keys = SYNERGIES.map((s) => s.elements.join('-'));
+        expect(new Set(keys).size).toBe(20);
+    });
+
+    it('20개 신규 시너지 ID가 모두 정의되어 있다', () => {
+        const ids = SYNERGIES.map((s) => s.id);
+        const expected = [
+            'plasma_storm',
+            'volcanic_plague',
+            'tempest',
+            'eruption',
+            'cryotoxin',
+            'frostbite',
+            'cinder_burst',
+            'thunderstrike',
+            'venom_cloud',
+            'arc_lightning',
+            'rockfall',
+            'sandstorm',
+            'whirlwind',
+            'glacial_spike',
+            'mire',
+            'poison_nova',
+            'static_field',
+            'earthquake',
+            'cyclone',
+            'cascade',
+        ];
+        expected.forEach((id) => expect(ids).toContain(id));
     });
 
     it('findSynergy는 슬롯 조합으로 시너지를 찾는다 (순서 무관)', () => {
