@@ -141,6 +141,41 @@ curl -fsS https://games.blocktalker.co.kr/survivors/api/health
 
 Lemon Squeezy dashboard → Webhooks → URL: `https://games.blocktalker.co.kr/survivors/api/ls-webhook`
 
+## 반복 배포 (repo 루트의 `deploy-stack.exp`)
+
+첫 인프라 셋업 완료 후, 코드 업데이트는 한 번의 명령으로 처리한다.
+
+### 사전 준비 (one-time)
+
+repo 루트에서:
+
+```bash
+cp .env.deploy.example .env.deploy
+$EDITOR .env.deploy   # STACK_REMOTE_DIR, DEPLOY_HOST, DEPLOY_KEY, API_HEALTH_URL 등
+chmod 600 .env.deploy
+```
+
+### 풀스택 배포
+
+```bash
+./deploy-stack.exp
+```
+
+수행 단계:
+
+1. 로컬 `npm run build`
+2. `dist/` → Contabo `$STACK_REMOTE_DIR/dist/` rsync `--delete` (`survivors-static` 컨테이너가 read-only 마운트해서 즉시 픽업, nginx reload 불필요)
+3. SSH: `git fetch + checkout + pull --ff-only`
+4. `docker compose build api && up -d --no-deps api` — postgres 영향 없음
+5. `API_HEALTH_URL` 헬스 체크 — `status:ok` 아니면 exit 1
+
+### 부분 배포
+
+```bash
+./deploy-stack.exp --client-only   # PWA dist 만 (API 재기동 스킵)
+./deploy-stack.exp --server-only   # 백엔드만 (dist rsync 스킵)
+```
+
 ## 모니터링 (Phase 2)
 
 - Sentry 무료 티어 (5K events/월)
