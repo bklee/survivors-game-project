@@ -4,8 +4,10 @@ import { Element, ELEMENT_INFO } from '../constants/AlchemyConfig';
 
 const SLOT_SIZE = 48;
 const SLOT_GAP = 8;
-const MARGIN_X = 20;
-const MARGIN_Y_FROM_BOTTOM = 20;
+// 우측 가장자리에서 슬롯 안쪽 가장자리까지 여백
+const MARGIN_RIGHT = 20;
+// 슬롯 묶음 전체 높이 = 슬롯 3개 + 간격 2개
+const PANEL_HEIGHT = SLOT_SIZE * 3 + SLOT_GAP * 2;
 
 export class AlchemySlotUI {
     private slotRects: Phaser.GameObjects.Rectangle[] = [];
@@ -14,17 +16,19 @@ export class AlchemySlotUI {
     private playerEid: number | null = null;
 
     constructor(scene: Phaser.Scene) {
-        const baseX = MARGIN_X;
-        const baseY = scene.scale.height - MARGIN_Y_FROM_BOTTOM - SLOT_SIZE;
+        // 우측 가장자리에 세로 정렬, 화면 수직 중앙
+        const baseX = scene.scale.width - MARGIN_RIGHT - SLOT_SIZE;
+        const baseY = (scene.scale.height - PANEL_HEIGHT) / 2;
 
         this.container = scene.add.container(baseX, baseY);
         this.container.setDepth(1000);
         this.container.setScrollFactor(0);
 
         for (let i = 0; i < 3; i++) {
+            // 수직 배치: y가 슬롯 인덱스에 따라 증가
             const rect = scene.add.rectangle(
-                i * (SLOT_SIZE + SLOT_GAP) + SLOT_SIZE / 2,
                 SLOT_SIZE / 2,
+                i * (SLOT_SIZE + SLOT_GAP) + SLOT_SIZE / 2,
                 SLOT_SIZE,
                 SLOT_SIZE,
                 0x222222,
@@ -36,8 +40,8 @@ export class AlchemySlotUI {
             this.slotRects.push(rect);
 
             const icon = scene.add.text(
-                i * (SLOT_SIZE + SLOT_GAP) + SLOT_SIZE / 2,
                 SLOT_SIZE / 2,
+                i * (SLOT_SIZE + SLOT_GAP) + SLOT_SIZE / 2,
                 '?',
                 { fontSize: '24px', color: '#888888' },
             );
