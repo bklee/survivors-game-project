@@ -488,8 +488,11 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                         if (isPlayer) {
                             if (charKey === 'knight') weaponTex = 'weapon_knight_sword';
                             else if (charKey === 'wizard') weaponTex = 'weapon_green_magic_staff';
-                            else if (charKey === 'necromancer') weaponTex = 'weapon_cleaver';
-                            else {
+                            else if (charKey === 'necromancer') {
+                                // atlas cleaver-like sprite (양손 도끼 라인 추정)
+                                weaponTex = 'dungeon';
+                                weaponFrame = 'weapon_cleaver_atlas';
+                            } else {
                                 weaponTex = 'dungeon';
                                 weaponFrame = 'weapon_bow';
                             }
