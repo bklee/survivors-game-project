@@ -217,6 +217,8 @@ export class AssetLoader {
         texture.add('weapon_bow', 0, 289, 195, 14, 26);
         texture.add('weapon_bow_2', 0, 305, 195, 14, 26);
         texture.add('weapon_staff', 0, 324, 129, 8, 30);
+        // Cleaver 후보 (atlas의 양손 도끼 라인 영역, y~145-165)
+        texture.add('weapon_cleaver_atlas', 0, 320, 147, 14, 26);
 
         // Props
         texture.add('prop_crate', 0, 288, 408, 16, 24);
