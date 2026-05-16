@@ -1,0 +1,117 @@
+#!/bin/bash
+set -e
+
+# Survivors Game 풀스택 배포 (PWA dist + 백엔드 API + Nginx)
+#
+# 전제 조건 (one-time, README 참조):
+#   - Contabo 서버에 git clone 된 repo 존재 (STACK_REMOTE_DIR)
+#   - infra/.env 작성 완료 (POSTGRES_PASSWORD, LS_WEBHOOK_SECRET, CORS_ORIGIN)
+#   - SSL 인증서 standalone 으로 일회 발급 완료
+#
+# 사용법:
+#   ./deploy-stack.exp                 # 풀 배포 (client + server + nginx reload)
+#   ./deploy-stack.exp --client-only   # PWA dist 만 갱신 (nginx reload 포함)
+#   ./deploy-stack.exp --server-only   # git pull + api 컨테이너 재빌드/재기동
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ENV_FILE="$SCRIPT_DIR/.env.deploy"
+
+if [ ! -f "$ENV_FILE" ]; then
+    echo "Error: $ENV_FILE not found"
+    echo "Copy .env.deploy.example to .env.deploy and fill in values."
+    exit 1
+fi
+
+set -a
+source "$ENV_FILE"
+set +a
+
+# 필수 변수 검증
+: "${DEPLOY_HOST:?Need DEPLOY_HOST in .env.deploy}"
+: "${DEPLOY_KEY:?Need DEPLOY_KEY in .env.deploy}"
+: "${STACK_REMOTE_DIR:?Need STACK_REMOTE_DIR in .env.deploy (e.g. /home/docker/games/survivors)}"
+
+DEPLOY_BRANCH="${DEPLOY_BRANCH:-main}"
+API_HEALTH_URL="${API_HEALTH_URL:-}"
+
+# SSH 키 권한 확인
+if [ ! -f "$DEPLOY_KEY" ]; then
+    echo "Error: SSH key not found: $DEPLOY_KEY"
+    exit 1
+fi
+PERMS=$(stat -f "%Lp" "$DEPLOY_KEY" 2>/dev/null || stat -c "%a" "$DEPLOY_KEY" 2>/dev/null)
+if [ "$PERMS" != "600" ] && [ "$PERMS" != "400" ]; then
+    echo "Error: SSH key $DEPLOY_KEY has unsafe permissions ($PERMS). Run: chmod 600 $DEPLOY_KEY"
+    exit 1
+fi
+
+SSH_OPTS="-i $DEPLOY_KEY -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=$SCRIPT_DIR/.ssh_known_hosts"
+
+MODE="full"
+case "${1:-}" in
+    --client-only) MODE="client" ;;
+    --server-only) MODE="server" ;;
+    "") MODE="full" ;;
+    *)
+        echo "Unknown flag: $1"
+        echo "Usage: $0 [--client-only | --server-only]"
+        exit 2
+        ;;
+esac
+
+echo "===> Mode: $MODE  Branch: $DEPLOY_BRANCH  Target: $DEPLOY_HOST:$STACK_REMOTE_DIR"
+
+# --- 1) 클라이언트 빌드 + dist rsync ---
+if [ "$MODE" = "full" ] || [ "$MODE" = "client" ]; then
+    echo "===> [client] npm run build"
+    cd "$SCRIPT_DIR"
+    npm run build
+
+    echo "===> [client] rsync dist/ -> $STACK_REMOTE_DIR/infra/nginx/dist/"
+    ssh $SSH_OPTS "$DEPLOY_HOST" "mkdir -p $STACK_REMOTE_DIR/infra/nginx/dist"
+    rsync -avz --delete -e "ssh $SSH_OPTS" \
+        "$SCRIPT_DIR/dist/" \
+        "$DEPLOY_HOST:$STACK_REMOTE_DIR/infra/nginx/dist/"
+fi
+
+# --- 2) 서버 코드 fetch + 컨테이너 재빌드/재기동 ---
+if [ "$MODE" = "full" ] || [ "$MODE" = "server" ]; then
+    echo "===> [server] git fetch + checkout $DEPLOY_BRANCH"
+    ssh $SSH_OPTS "$DEPLOY_HOST" "
+        set -e
+        cd '$STACK_REMOTE_DIR'
+        git fetch origin '$DEPLOY_BRANCH'
+        git checkout '$DEPLOY_BRANCH'
+        git pull --ff-only origin '$DEPLOY_BRANCH'
+        cd infra
+        docker-compose build api
+        docker-compose up -d --no-deps api
+    "
+fi
+
+# --- 3) nginx reload (정적 변경 즉시 반영) ---
+if [ "$MODE" = "full" ] || [ "$MODE" = "client" ]; then
+    echo "===> [nginx] reload"
+    ssh $SSH_OPTS "$DEPLOY_HOST" "
+        cd '$STACK_REMOTE_DIR/infra'
+        docker-compose exec -T nginx nginx -s reload || \
+            docker-compose restart nginx
+    "
+fi
+
+# --- 4) Health check ---
+if [ -n "$API_HEALTH_URL" ]; then
+    echo "===> [verify] GET $API_HEALTH_URL"
+    sleep 3
+    if curl -fsS --max-time 10 "$API_HEALTH_URL" | grep -q '"status":"ok"'; then
+        echo "===> Health check OK"
+    else
+        echo "WARNING: Health check did not return status:ok — inspect 'docker logs survivors-api'"
+        exit 1
+    fi
+fi
+
+echo "===> Deployment finished ($MODE)"
+if [ -n "$LIVE_URL" ]; then
+    echo "===> Live URL: $LIVE_URL"
+fi
