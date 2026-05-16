@@ -3,6 +3,7 @@ import { pool } from './db/pool.js';
 import leaderboardRouter from './routes/leaderboard.js';
 import eventsRouter from './routes/events.js';
 import webhookRouter from './routes/webhook.js';
+import playerRouter from './routes/player.js';
 
 const app = express();
 
@@ -40,6 +41,7 @@ app.get('/api/health', async (_req, res) => {
 app.use('/api/leaderboard', leaderboardRouter);
 app.use('/api/events', eventsRouter);
 app.use('/api/ls-webhook', webhookRouter);
+app.use('/api/player', playerRouter);
 
 // 404
 app.use((_req, res) => res.status(404).json({ error: 'not found' }));
