@@ -62,7 +62,7 @@ export const Item = defineComponent({
 // Interactive (Levers, Doors)
 export const Interactive = defineComponent({
     isActivated: Types.ui8, // 0: off, 1: on
-    id: Types.ui16,         // link lever with door
+    id: Types.ui16, // link lever with door
 });
 
 // Lifespan for projectiles and temporary entities
@@ -71,10 +71,13 @@ export const Lifespan = defineComponent({
 });
 
 export const Rotation = defineComponent({
-    angle: Types.f32
+    angle: Types.f32,
 });
 
 export const ActionState = defineComponent({
     attackTimer: Types.f32,
-    attackDuration: Types.f32
+    attackDuration: Types.f32,
 });
+
+// Alchemy system components
+export { AlchemySlot, SynergyEffect } from './alchemy';
