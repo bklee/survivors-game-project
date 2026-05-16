@@ -1,8 +1,19 @@
 import Phaser from 'phaser';
+import { MetaProgress } from '../core/MetaProgress';
 
 export class GameOverScene extends Phaser.Scene {
+    private stage: number = 1;
+    private enemiesKilled: number = 0;
+    private synergiesActivated: number = 0;
+
     constructor() {
         super('GameOverScene');
+    }
+
+    init(data: { stage?: number; enemiesKilled?: number; synergiesActivated?: number } = {}) {
+        this.stage = data.stage ?? 1;
+        this.enemiesKilled = data.enemiesKilled ?? 0;
+        this.synergiesActivated = data.synergiesActivated ?? 0;
     }
 
     create() {
@@ -17,23 +28,47 @@ export class GameOverScene extends Phaser.Scene {
         }
 
         // 1. Background Image (game_over.png)
-        this.add.image(width / 2, height / 2, 'game_over')
-            .setDisplaySize(width, height);
+        this.add.image(width / 2, height / 2, 'game_over').setDisplaySize(width, height);
 
         // 2. Overlay
         this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.2);
 
-        // 3. Retry Button
-        const retryBtn = this.add.rectangle(width / 2, height / 2 + 150, 240, 70, 0x3d2b1f, 0.8)
+        // 3. 정수 정산
+        const baseEssence =
+            this.stage * 10 + this.enemiesKilled * 0.5 + this.synergiesActivated * 5;
+        const discoveryLevel = MetaProgress.load().skillTree.discovery;
+        const discoveryBonus = 1 + discoveryLevel * 0.1;
+        const finalEssence = Math.floor(baseEssence * discoveryBonus);
+
+        MetaProgress.addEssence(finalEssence);
+        const totalEssence = MetaProgress.load().essence;
+
+        // 4. 정수 획득 표시
+        this.add
+            .text(width / 2, height / 2 - 80, `+ ${finalEssence} 정수\n(총: ${totalEssence})`, {
+                fontFamily: '"MedievalSharp", cursive',
+                fontSize: '32px',
+                color: '#ffd700',
+                align: 'center',
+                stroke: '#000000',
+                strokeThickness: 4,
+            })
+            .setOrigin(0.5);
+
+        // 5. Retry Button
+        const retryBtn = this.add
+            .rectangle(width / 2, height / 2 + 150, 240, 70, 0x3d2b1f, 0.8)
             .setInteractive({ useHandCursor: true })
             .setStrokeStyle(3, 0xffd700);
 
-        this.add.text(width / 2, height / 2 + 150, 'RETRY', {
-            fontFamily: '"MedievalSharp", cursive',
-            fontSize: '40px',
-            color: '#ffffff',
-            fontStyle: 'bold'
-        }).setOrigin(0.5);
+        this.add
+            .text(width / 2, height / 2 + 150, 'RETRY', {
+                fontFamily: '"MedievalSharp", cursive',
+                fontSize: '40px',
+                color: '#ffffff',
+                fontStyle: 'bold',
+            })
+            .setOrigin(0.5);
 
         retryBtn.on('pointerdown', () => {
             // Stop all sounds including Game Over BGM
@@ -42,7 +77,7 @@ export class GameOverScene extends Phaser.Scene {
             // Fade out and transition
             this.cameras.main.fadeOut(800, 0, 0, 0);
             this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => {
-                // To perfectly clear the previous game state (MainScene, UIScene), 
+                // To perfectly clear the previous game state (MainScene, UIScene),
                 // we stop them explicitly before starting the character select.
                 this.scene.stop('MainScene');
                 this.scene.stop('UIScene');

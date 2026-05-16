@@ -94,6 +94,8 @@ export class MainScene extends Phaser.Scene {
     private floorBlitter!: Phaser.GameObjects.Blitter;
     private currentStage: number = 1;
     private isPausedForClear: boolean = false;
+    private enemiesKilled: number = 0;
+    private synergiesActivated: number = 0;
     private charData!: CharacterData;
     private secretRoomData?: {
         doorPixel: { x: number; y: number };
@@ -140,6 +142,8 @@ export class MainScene extends Phaser.Scene {
         this.currentStage = 1;
         globalStats.currentStage = 1;
         this.isPausedForClear = false;
+        this.enemiesKilled = 0;
+        this.synergiesActivated = 0;
 
         this.dungeon = new DungeonGenerator(100, 100);
 
@@ -315,8 +319,16 @@ export class MainScene extends Phaser.Scene {
         const comboCastHandler = () => {};
         window.addEventListener('combo_cast', comboCastHandler);
 
-        const enemyKilledHandler = () => this.relicSystem.onEnemyKilled();
+        const enemyKilledHandler = () => {
+            this.relicSystem.onEnemyKilled();
+            this.enemiesKilled++;
+        };
         window.addEventListener('enemy_killed', enemyKilledHandler);
+
+        const synergyActivatedHandler = () => {
+            this.synergiesActivated++;
+        };
+        window.addEventListener('synergy_discovered', synergyActivatedHandler);
 
         const deathHandler = () => {
             // Phoenix Feather 부활 시도
@@ -327,7 +339,11 @@ export class MainScene extends Phaser.Scene {
                 if (this.scene.isActive('UpgradeScene')) this.scene.stop('UpgradeScene');
                 if (this.scene.isActive('RecipeScene')) this.scene.stop('RecipeScene');
                 this.scene.pause();
-                this.scene.launch('GameOverScene');
+                this.scene.launch('GameOverScene', {
+                    stage: this.currentStage,
+                    enemiesKilled: this.enemiesKilled,
+                    synergiesActivated: this.synergiesActivated,
+                });
             });
         };
         window.addEventListener('player_died', deathHandler);
@@ -451,6 +467,7 @@ export class MainScene extends Phaser.Scene {
             window.removeEventListener('play_sound', soundHandler);
             window.removeEventListener('combo_cast', comboCastHandler);
             window.removeEventListener('enemy_killed', enemyKilledHandler);
+            window.removeEventListener('synergy_discovered', synergyActivatedHandler);
             window.removeEventListener('player_died', deathHandler);
             window.removeEventListener('keydown', recipeHandler);
             window.removeEventListener('next_stage', nextStageHandler);
