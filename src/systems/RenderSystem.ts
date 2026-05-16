@@ -533,13 +533,15 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                     wSprite.setScale(wScale);
 
                     const wx =
-                        charKey === 'wizard' || charKey === 'necromancer'
+                        charKey === 'wizard'
                             ? 4
-                            : charKey === 'elf'
-                              ? 5
-                              : charKey === 'ogre'
-                                ? 12
-                                : 5;
+                            : charKey === 'necromancer'
+                              ? 10 // 가시 곤봉은 캐릭터 우측에 배치
+                              : charKey === 'elf'
+                                ? 5
+                                : charKey === 'ogre'
+                                  ? 12
+                                  : 5;
                     // wy: Negative moves it UP. Ogre hand is roughly at shoulders, so moving it higher (-10)
                     const wy =
                         charKey === 'wizard' || charKey === 'elf' || charKey === 'necromancer'
