@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { LemonSqueezy } from '../integrations/LemonSqueezy';
 
 export class TitleScene extends Phaser.Scene {
     constructor() {
@@ -148,5 +149,42 @@ export class TitleScene extends Phaser.Scene {
             codexBtn.setFillStyle(0x2d1a3d, 0.8);
             codexBtn.setScale(1);
         });
+
+        // No-Ads Pass 버튼
+        const hasNoAds = LemonSqueezy.hasProduct('no_ads_pass');
+        if (!hasNoAds) {
+            const noAdsBtn = this.add
+                .rectangle(width / 2, height / 2 + 385, 240, 50, 0x1e2a3a, 0.8)
+                .setInteractive({ useHandCursor: true })
+                .setStrokeStyle(2, 0xffd700);
+
+            this.add
+                .text(width / 2, height / 2 + 385, '광고 제거 ₩5,500', {
+                    fontFamily: '"MedievalSharp", cursive',
+                    fontSize: '20px',
+                    color: '#ffd700',
+                })
+                .setOrigin(0.5);
+
+            noAdsBtn.on('pointerover', () => {
+                noAdsBtn.setFillStyle(0x2e3a4a, 1);
+                noAdsBtn.setScale(1.03);
+            });
+            noAdsBtn.on('pointerout', () => {
+                noAdsBtn.setFillStyle(0x1e2a3a, 0.8);
+                noAdsBtn.setScale(1);
+            });
+            noAdsBtn.on('pointerdown', () => {
+                LemonSqueezy.checkout('no_ads_pass');
+            });
+        } else {
+            this.add
+                .text(width / 2, height / 2 + 385, '✦ No-Ads Pass 활성', {
+                    fontFamily: '"MedievalSharp", cursive',
+                    fontSize: '16px',
+                    color: '#888888',
+                })
+                .setOrigin(0.5);
+        }
     }
 }

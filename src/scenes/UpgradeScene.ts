@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { PokiSDK } from '../integrations/PokiSDK';
+import { LemonSqueezy } from '../integrations/LemonSqueezy';
 import { Element, ELEMENT_INFO } from '../constants/AlchemyConfig';
 import { applySlotChange } from '../systems/AlchemySystem';
 import {
@@ -128,12 +129,14 @@ export class UpgradeScene extends Phaser.Scene {
             this.cards.push(card);
         });
 
-        // 광고 보고 카드 1장 더 버튼 (1회 한정)
+        // 카드 1장 더 버튼 (1회 한정) — No-Ads Pass 보유 시 광고 없이 즉시 추가
+        const hasNoAds = LemonSqueezy.hasProduct('no_ads_pass');
+        const extraBtnLabel = hasNoAds ? '✦ 카드 1장 더' : '광고 보고 카드 1장 더';
         let extraCardUsed = false;
         const extraCardBtn = this.add
-            .text(this.scale.width / 2, this.scale.height - 50, '광고 보고 카드 1장 더', {
+            .text(this.scale.width / 2, this.scale.height - 50, extraBtnLabel, {
                 fontSize: '18px',
-                color: '#aaaaaa',
+                color: hasNoAds ? '#ffd700' : '#aaaaaa',
                 backgroundColor: '#222222',
                 padding: { x: 12, y: 6 },
             })
@@ -145,7 +148,7 @@ export class UpgradeScene extends Phaser.Scene {
             if (extraCardUsed) return;
             extraCardUsed = true;
             extraCardBtn.disableInteractive().setAlpha(0.5);
-            const success = await PokiSDK.rewardedBreak();
+            const success = hasNoAds || (await PokiSDK.rewardedBreak());
             if (success) {
                 const extraCards = this.pickRandomCards(1);
                 if (extraCards.length > 0) {
