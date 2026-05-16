@@ -14,6 +14,7 @@ import {
     Enemy,
 } from '../components';
 import { AlchemySlot, SynergyEffect } from '../components/alchemy';
+import { WeaponEvolution } from '../components/weapon';
 import { createPhysicsSystem } from '../systems/PhysicsSystem';
 import { createRenderSystem } from '../systems/RenderSystem';
 import { PlayerSystem } from '../systems/PlayerSystem';
@@ -27,9 +28,25 @@ import { VolcanicPlague } from '../fx/VolcanicPlague';
 import { Tempest } from '../fx/Tempest';
 import { Eruption } from '../fx/Eruption';
 import { Cryotoxin } from '../fx/Cryotoxin';
+import { Frostbite } from '../fx/Frostbite';
+import { CinderBurst } from '../fx/CinderBurst';
+import { BlizzardStrike } from '../fx/BlizzardStrike';
+import { MagmaField } from '../fx/MagmaField';
+import { ArcLightning } from '../fx/ArcLightning';
+import { PlagueWind } from '../fx/PlagueWind';
+import { BlightStorm } from '../fx/BlightStorm';
+import { Whirlwind } from '../fx/Whirlwind';
+import { GlacialSpike } from '../fx/GlacialSpike';
+import { Mire } from '../fx/Mire';
+import { GlacialNova } from '../fx/GlacialNova';
+import { StaticField } from '../fx/StaticField';
+import { ToxicTempest } from '../fx/ToxicTempest';
+import { Cyclone } from '../fx/Cyclone';
+import { Cascade } from '../fx/Cascade';
 import { createCombatSystem } from '../systems/CombatSystem';
 import { SpellSystem } from '../systems/SpellSystem';
 import { ItemSystem } from '../systems/ItemSystem';
+import { NecromancerSystem } from '../systems/NecromancerSystem';
 import { DungeonGenerator, TILE_SIZE, TileType } from '../core/DungeonGenerator';
 import { globalStats } from '../core/PlayerStats';
 import { CharacterData } from '../constants/CharacterConfig';
@@ -50,6 +67,22 @@ export class MainScene extends Phaser.Scene {
     private tempest!: Tempest;
     private eruption!: Eruption;
     private cryotoxin!: Cryotoxin;
+    private frostbite!: Frostbite;
+    private cinderBurst!: CinderBurst;
+    private blizzardStrike!: BlizzardStrike;
+    private magmaField!: MagmaField;
+    private arcLightning!: ArcLightning;
+    private plagueWind!: PlagueWind;
+    private blightStorm!: BlightStorm;
+    private whirlwind!: Whirlwind;
+    private glacialSpike!: GlacialSpike;
+    private mire!: Mire;
+    private glacialNova!: GlacialNova;
+    private staticField!: StaticField;
+    private toxicTempest!: ToxicTempest;
+    private cyclone!: Cyclone;
+    private cascade!: Cascade;
+    private necromancerSystem!: NecromancerSystem;
     private selectedCharId: string = 'wizard';
     private currentBGM?: Phaser.Sound.BaseSound;
     private dungeon!: DungeonGenerator;
@@ -127,6 +160,38 @@ export class MainScene extends Phaser.Scene {
         this.eruption.setPlayerEid(this.playerId);
         this.cryotoxin = new Cryotoxin(this);
         this.cryotoxin.setPlayerEid(this.playerId);
+        this.frostbite = new Frostbite(this);
+        this.frostbite.setPlayerEid(this.playerId);
+        this.cinderBurst = new CinderBurst(this);
+        this.cinderBurst.setPlayerEid(this.playerId);
+        this.blizzardStrike = new BlizzardStrike(this);
+        this.blizzardStrike.setPlayerEid(this.playerId);
+        this.magmaField = new MagmaField(this);
+        this.magmaField.setPlayerEid(this.playerId);
+        this.arcLightning = new ArcLightning(this);
+        this.arcLightning.setPlayerEid(this.playerId);
+        this.plagueWind = new PlagueWind(this);
+        this.plagueWind.setPlayerEid(this.playerId);
+        this.blightStorm = new BlightStorm(this);
+        this.blightStorm.setPlayerEid(this.playerId);
+        this.whirlwind = new Whirlwind(this);
+        this.whirlwind.setPlayerEid(this.playerId);
+        this.glacialSpike = new GlacialSpike(this);
+        this.glacialSpike.setPlayerEid(this.playerId);
+        this.mire = new Mire(this);
+        this.mire.setPlayerEid(this.playerId);
+        this.glacialNova = new GlacialNova(this);
+        this.glacialNova.setPlayerEid(this.playerId);
+        this.staticField = new StaticField(this);
+        this.staticField.setPlayerEid(this.playerId);
+        this.toxicTempest = new ToxicTempest(this);
+        this.toxicTempest.setPlayerEid(this.playerId);
+        this.cyclone = new Cyclone(this);
+        this.cyclone.setPlayerEid(this.playerId);
+        this.cascade = new Cascade(this);
+        this.cascade.setPlayerEid(this.playerId);
+        this.necromancerSystem = new NecromancerSystem(this, this.selectedCharId === 'necromancer');
+        this.necromancerSystem.setPlayerEid(this.playerId);
         SynergyEffect.boostActiveUntil[this.playerId] = 0;
         SynergyEffect.boostCooldownUntil[this.playerId] = 0;
 
@@ -134,7 +199,11 @@ export class MainScene extends Phaser.Scene {
         this.charData = charData;
 
         // Add Mana component if character uses mana
-        if (this.selectedCharId === 'wizard' || this.selectedCharId === 'elf') {
+        if (
+            this.selectedCharId === 'wizard' ||
+            this.selectedCharId === 'elf' ||
+            this.selectedCharId === 'necromancer'
+        ) {
             addComponent(world, Mana, this.playerId);
             Mana.current[this.playerId] = this.charData.baseStats.mana;
             Mana.max[this.playerId] = this.charData.baseStats.mana;
@@ -143,6 +212,11 @@ export class MainScene extends Phaser.Scene {
         let charTypeId = 1;
         if (this.selectedCharId === 'knight') charTypeId = 0;
         else if (this.selectedCharId === 'elf') charTypeId = 2;
+        else if (this.selectedCharId === 'necromancer') charTypeId = 3;
+
+        addComponent(world, WeaponEvolution, this.playerId);
+        WeaponEvolution.evolutionId[this.playerId] = -1;
+        WeaponEvolution.baseWeaponId[this.playerId] = charTypeId;
 
         SpriteInfo.textureIndex[this.playerId] = charTypeId;
         Animation.frameRate[this.playerId] = 10;
@@ -357,6 +431,12 @@ export class MainScene extends Phaser.Scene {
             window.removeEventListener('next_stage', nextStageHandler);
             window.removeEventListener('stage_clear', stageClearInternalHandler);
             if (this.tempest) this.tempest.destroy();
+            if (this.magmaField) this.magmaField.destroy();
+            if (this.blightStorm) this.blightStorm.destroy();
+            if (this.whirlwind) this.whirlwind.destroy();
+            if (this.staticField) this.staticField.destroy();
+            if (this.cyclone) this.cyclone.destroy();
+            if (this.necromancerSystem) this.necromancerSystem.destroy();
         });
 
         this.startBGM('main_bgm');
@@ -503,6 +583,22 @@ export class MainScene extends Phaser.Scene {
         this.tempest.tick();
         this.eruption.tick();
         this.cryotoxin.tick();
+        this.frostbite.tick();
+        this.cinderBurst.tick();
+        this.blizzardStrike.tick();
+        this.magmaField.tick();
+        this.arcLightning.tick();
+        this.plagueWind.tick();
+        this.blightStorm.tick();
+        this.whirlwind.tick();
+        this.glacialSpike.tick();
+        this.mire.tick();
+        this.glacialNova.tick();
+        this.staticField.tick();
+        this.toxicTempest.tick();
+        this.cyclone.tick();
+        this.cascade.tick();
+        this.necromancerSystem.tick();
         this.renderSystem(delta);
         this.handleInteractions();
 

@@ -11,13 +11,14 @@ export class CharacterSelectScene extends Phaser.Scene {
         this.cameras.main.fadeIn(1000, 0, 0, 0);
 
         // Background Image
-        this.add.image(width / 2, height / 2, 'loading_bg')
+        this.add
+            .image(width / 2, height / 2, 'loading_bg')
             .setDisplaySize(width, height)
             .setAlpha(0.6);
 
         // Ensure selection BGM is playing (especially after retry)
         // Check if ANY instance of select_bgm is currently playing
-        const isBgmPlaying = this.sound.getAllPlaying().some(s => s.key === 'select_bgm');
+        const isBgmPlaying = this.sound.getAllPlaying().some((s) => s.key === 'select_bgm');
 
         if (!isBgmPlaying && this.cache.audio.exists('select_bgm')) {
             // Force resume audio context if suspended (common in browsers)
@@ -28,59 +29,69 @@ export class CharacterSelectScene extends Phaser.Scene {
             this.sound.play('select_bgm', { loop: true, volume: 0.4 });
         }
 
-
-
-
         // Title
-        this.add.text(width / 2, 100, 'CHOOSE YOUR HERO!', {
-            fontFamily: '"MedievalSharp", cursive',
-            fontSize: '64px',
-            color: '#ffd700',
-            fontStyle: 'bold',
-            stroke: '#000000',
-            strokeThickness: 8,
-            shadow: { offsetX: 2, offsetY: 2, color: '#333', blur: 10, fill: true }
-        }).setOrigin(0.5).setDepth(100);
+        this.add
+            .text(width / 2, 100, 'CHOOSE YOUR HERO!', {
+                fontFamily: '"MedievalSharp", cursive',
+                fontSize: '64px',
+                color: '#ffd700',
+                fontStyle: 'bold',
+                stroke: '#000000',
+                strokeThickness: 8,
+                shadow: { offsetX: 2, offsetY: 2, color: '#333', blur: 10, fill: true },
+            })
+            .setOrigin(0.5)
+            .setDepth(100);
 
         const charIds = Object.keys(CHARACTERS);
-        const cardWidth = 300;
-        const totalWidth = charIds.length * cardWidth + (charIds.length - 1) * 50;
+        // 4명 캐릭터에 맞춘 가로 레이아웃 — 화면 폭 1280에 4 카드가 여유 있게 들어가도록
+        const cardWidth = 240;
+        const cardHeight = 360;
+        const gap = 30;
+        const totalWidth = charIds.length * cardWidth + (charIds.length - 1) * gap;
         const startX = (width - totalWidth) / 2 + cardWidth / 2;
 
         charIds.forEach((id, index) => {
             const char = CHARACTERS[id];
-            const x = startX + index * (cardWidth + 50);
+            const x = startX + index * (cardWidth + gap);
             const y = height / 2;
 
-            const card = this.add.rectangle(x, y, cardWidth, 400, 0x1e1e1e, 1)
+            const card = this.add
+                .rectangle(x, y, cardWidth, cardHeight, 0x1e1e1e, 1)
                 .setStrokeStyle(3, 0x444444)
                 .setInteractive({ useHandCursor: true });
 
             // Display Character Sprite
-            const sprite = this.add.sprite(x, y - 50, 'dungeon', `${char.id}_idle_0`)
-                .setScale(4);
+            const idleFrame = char.id === 'necromancer' ? 'necromancer_f0' : `${char.id}_idle_0`;
+            const sprite = this.add.sprite(x, y - 40, 'dungeon', idleFrame).setScale(3.5);
+            if (char.id === 'necromancer') sprite.setTint(0x9c27b0);
 
             this.tweens.add({
                 targets: sprite,
-                y: y - 60,
+                y: y - 50,
                 duration: 1000,
                 yoyo: true,
                 repeat: -1,
-                ease: 'Sine.easeInOut'
+                ease: 'Sine.easeInOut',
             });
 
-            this.add.text(x, y - 150, char.name, {
-                fontSize: '32px',
-                color: '#ffd700',
-                fontStyle: 'bold'
-            }).setOrigin(0.5);
+            this.add
+                .text(x, y - 130, char.name, {
+                    fontSize: '26px',
+                    color: '#ffd700',
+                    fontStyle: 'bold',
+                })
+                .setOrigin(0.5);
 
             const statsText = `HP: ${char.baseStats.health}\nSPD: ${char.baseStats.speed}\nDMG: x${char.baseStats.damage}`;
-            this.add.text(x, y + 100, statsText, {
-                fontSize: '24px',
-                color: '#aaaaaa',
-                align: 'center'
-            }).setOrigin(0.5);
+            this.add
+                .text(x, y + 90, statsText, {
+                    fontSize: '20px',
+                    color: '#aaaaaa',
+                    align: 'center',
+                    lineSpacing: 4,
+                })
+                .setOrigin(0.5);
 
             card.on('pointerdown', () => {
                 this.sound.stopAll(); // Stop selection BGM
@@ -93,7 +104,8 @@ export class CharacterSelectScene extends Phaser.Scene {
             });
             card.on('pointerout', () => {
                 card.setStrokeStyle(3, 0x444444);
-                sprite.clearTint();
+                if (char.id === 'necromancer') sprite.setTint(0x9c27b0);
+                else sprite.clearTint();
             });
         });
     }

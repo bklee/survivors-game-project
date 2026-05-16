@@ -40,7 +40,8 @@ export class SpellSystem {
     }
 
     private updateFacingFromKeys() {
-        let ix = 0, iy = 0;
+        let ix = 0,
+            iy = 0;
         if (this.keys['KeyW'] || this.keys['ArrowUp']) iy -= 1;
         if (this.keys['KeyS'] || this.keys['ArrowDown']) iy += 1;
         if (this.keys['KeyA'] || this.keys['ArrowLeft']) ix -= 1;
@@ -72,7 +73,7 @@ export class SpellSystem {
         const px = Position.x[playerEid];
         const py = Position.y[playerEid];
 
-        const animDuration = (this.selectedCharId === 'knight') ? 250 : 400;
+        const animDuration = this.selectedCharId === 'knight' ? 250 : 400;
         this.spellCooldowns.set(spellId, 500 * globalStats.cooldownMult);
 
         window.dispatchEvent(new CustomEvent('combo_cast', { detail: { duration: animDuration } }));
@@ -99,6 +100,13 @@ export class SpellSystem {
                     }
                 }
             });
+        } else if (this.selectedCharId === 'necromancer') {
+            window.dispatchEvent(new CustomEvent('play_sound', { detail: 'fire_cast' }));
+            for (let i = 0; i <= extraProjectiles; i++) {
+                const angle = this.calculateAngleOffset(i);
+                const dir = this.rotateVector(this.lastFacingX, this.lastFacingY, angle);
+                this.spawnSoulBoltAttack(px, py, dir.x, dir.y, i === 0);
+            }
         } else {
             window.dispatchEvent(new CustomEvent('play_sound', { detail: 'fire_cast' }));
             for (let i = 0; i <= extraProjectiles; i++) {
@@ -115,18 +123,22 @@ export class SpellSystem {
         return 15 * Math.ceil(index / 2) * (index % 2 === 1 ? 1 : -1);
     }
 
-    private rotateVector(x: number, y: number, angleDeg: number): { x: number, y: number } {
+    private rotateVector(x: number, y: number, angleDeg: number): { x: number; y: number } {
         const rad = angleDeg * (Math.PI / 180);
         const cos = Math.cos(rad);
         const sin = Math.sin(rad);
         return {
             x: x * cos - y * sin,
-            y: x * sin + y * cos
+            y: x * sin + y * cos,
         };
     }
 
     private spawnKnightAttack(x: number, y: number, dx: number, dy: number) {
-        const fxEid = this.createBaseSpell(x + dx * 35, y + dy * 35, Math.random() > 0.5 ? 109 : 110);
+        const fxEid = this.createBaseSpell(
+            x + dx * 35,
+            y + dy * 35,
+            Math.random() > 0.5 ? 109 : 110,
+        );
         Spell.damage[fxEid] = 60 * globalStats.damageMult;
         Spell.radius[fxEid] = 60;
         Spell.duration[fxEid] = 250;
@@ -155,7 +167,7 @@ export class SpellSystem {
 
         for (let i = 0; i < explosionCount; i++) {
             this.scene.time.delayedCall(i * delay, () => {
-                const castDist = firstDist + (i * spacing);
+                const castDist = firstDist + i * spacing;
                 const eid = this.createBaseSpell(x + dx * castDist, y + dy * castDist, 100);
                 Spell.damage[eid] = 45 * globalStats.damageMult;
                 Spell.radius[eid] = 45;
@@ -168,6 +180,80 @@ export class SpellSystem {
                     window.dispatchEvent(new CustomEvent('play_sound', { detail: 'fire_cast' }));
                 }
             });
+        }
+    }
+
+    private spawnSoulBoltAttack(x: number, y: number, dx: number, dy: number, playSound: boolean) {
+        const startX = x + dx * 20;
+        const startY = y + dy * 20;
+        const speed = 420;
+        const lifetimeMs = 700;
+
+        // createBaseSpell 사용: SpriteInfo 부착(typeId=99) → PhysicsSystem 벽 충돌 적용,
+        // RenderSystem은 typeId=99를 skip하므로 기본 sprite는 표시 안 됨
+        const eid = this.createBaseSpell(startX, startY, 99);
+        Spell.damage[eid] = 55 * globalStats.damageMult;
+        Spell.radius[eid] = 12;
+        Spell.duration[eid] = lifetimeMs;
+        Spell.pierce[eid] = 2;
+        Velocity.x[eid] = dx * speed;
+        Velocity.y[eid] = dy * speed;
+        Rotation.angle[eid] = Math.atan2(dy, dx);
+
+        // 시각: 작은 보라 막대 (완드형) + 꼬리 원 — ECS Position 추적
+        const wand = this.scene.add.rectangle(startX, startY, 18, 4, 0x9c27b0, 1);
+        wand.setStrokeStyle(1, 0xe1bee7, 0.8);
+        wand.setRotation(Math.atan2(dy, dx));
+        wand.setDepth(20);
+        const trail = this.scene.add.circle(startX, startY, 5, 0xce93d8, 0.6);
+        trail.setDepth(19);
+
+        let prevX = startX;
+        let prevY = startY;
+        let stalledFrames = 0;
+
+        const cleanup = () => {
+            wand.destroy();
+            trail.destroy();
+            this.scene.events.off('update', onUpdate);
+        };
+
+        const onUpdate = () => {
+            // 엔티티가 아직 살아있는지 확인 (duration > 0, Spell 컴포넌트 존재 여부)
+            if (Spell.duration[eid] <= 0) {
+                cleanup();
+                return;
+            }
+            const cx = Position.x[eid];
+            const cy = Position.y[eid];
+
+            // 벽에 막혀 위치가 변하지 않으면 2프레임 후 즉시 제거
+            if (Math.abs(cx - prevX) < 0.1 && Math.abs(cy - prevY) < 0.1) {
+                stalledFrames++;
+                if (stalledFrames >= 2) {
+                    Spell.duration[eid] = 0;
+                    cleanup();
+                    return;
+                }
+            } else {
+                stalledFrames = 0;
+            }
+
+            prevX = cx;
+            prevY = cy;
+            wand.x = cx;
+            wand.y = cy;
+            trail.x = cx;
+            trail.y = cy;
+        };
+
+        this.scene.events.on('update', onUpdate);
+
+        // 안전망: lifetime 이후 정리
+        this.scene.time.delayedCall(lifetimeMs + 100, cleanup);
+
+        if (playSound) {
+            window.dispatchEvent(new CustomEvent('play_sound', { detail: 'fire_cast' }));
         }
     }
 

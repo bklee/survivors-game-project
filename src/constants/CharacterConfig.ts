@@ -21,7 +21,7 @@ export const CHARACTERS: Record<string, CharacterData> = {
         frames: {
             idle: { x: 128, y: 68, w: 16, h: 28, count: 4 },
             run: { x: 192, y: 68, w: 16, h: 28, count: 4 },
-        }
+        },
     },
     WIZARD: {
         name: 'Wizard',
@@ -30,7 +30,7 @@ export const CHARACTERS: Record<string, CharacterData> = {
         frames: {
             idle: { x: 128, y: 132, w: 16, h: 28, count: 4 },
             run: { x: 192, y: 132, w: 16, h: 28, count: 4 },
-        }
+        },
     },
     ELF: {
         name: 'Elf',
@@ -39,8 +39,17 @@ export const CHARACTERS: Record<string, CharacterData> = {
         frames: {
             idle: { x: 128, y: 4, w: 16, h: 28, count: 4 },
             run: { x: 192, y: 4, w: 16, h: 28, count: 4 },
-        }
-    }
+        },
+    },
+    NECROMANCER: {
+        name: 'Necromancer',
+        id: 'necromancer',
+        baseStats: { health: 80, speed: 110, damage: 1.4, mana: 120 },
+        frames: {
+            idle: { x: 128, y: 132, w: 16, h: 28, count: 4 },
+            run: { x: 192, y: 132, w: 16, h: 28, count: 4 },
+        },
+    },
 };
 
 export const BACKGROUND_FLOOR = { x: 16, y: 64, w: 16, h: 16 };

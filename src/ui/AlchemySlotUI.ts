@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
-import { AlchemySlot } from '../components/alchemy';
-import { Element, ELEMENT_INFO } from '../constants/AlchemyConfig';
+import { AlchemySlot, SynergyEffect } from '../components/alchemy';
+import { Element, ELEMENT_INFO, SYNERGIES } from '../constants/AlchemyConfig';
 
 const SLOT_SIZE = 48;
 const SLOT_GAP = 8;
@@ -13,6 +13,8 @@ export class AlchemySlotUI {
     private slotRects: Phaser.GameObjects.Rectangle[] = [];
     private slotIcons: Phaser.GameObjects.Text[] = [];
     private container: Phaser.GameObjects.Container;
+    private synergyNameText!: Phaser.GameObjects.Text;
+    private synergyDescText!: Phaser.GameObjects.Text;
     private playerEid: number | null = null;
 
     constructor(scene: Phaser.Scene) {
@@ -50,10 +52,43 @@ export class AlchemySlotUI {
             this.container.add(icon);
             this.slotIcons.push(icon);
         }
+
+        // 슬롯 패널 왼쪽에 시너지 이름 + 설명 박스 (활성 시너지 안내)
+        // origin (1, 0.5) = 우측 정렬, 슬롯 왼쪽에서 좌측으로 텍스트 펼침
+        this.synergyNameText = scene.add
+            .text(-12, SLOT_SIZE * 0.5, '', {
+                fontFamily: '"MedievalSharp", cursive',
+                fontSize: '20px',
+                fontStyle: 'bold',
+                color: '#ffd700',
+                align: 'right',
+                stroke: '#000000',
+                strokeThickness: 4,
+            })
+            .setOrigin(1, 0.5);
+        this.synergyNameText.setScrollFactor(0);
+        this.container.add(this.synergyNameText);
+
+        this.synergyDescText = scene.add
+            .text(-12, SLOT_SIZE * 1.4, '', {
+                fontSize: '12px',
+                color: '#cccccc',
+                align: 'right',
+                wordWrap: { width: 240 },
+                stroke: '#000000',
+                strokeThickness: 3,
+            })
+            .setOrigin(1, 0);
+        this.synergyDescText.setScrollFactor(0);
+        this.container.add(this.synergyDescText);
     }
 
     setPlayerEid(eid: number): void {
         this.playerEid = eid;
+    }
+
+    setVisible(visible: boolean): void {
+        this.container.setVisible(visible);
     }
 
     update(): void {
@@ -75,6 +110,17 @@ export class AlchemySlotUI {
                 this.slotIcons[i].setColor('#ffffff');
                 this.slotRects[i].setFillStyle(info.color, 0.5);
             }
+        }
+
+        // 활성 시너지 이름·설명 표시 (3슬롯 채워지고 정의된 조합일 때)
+        const synergyId = SynergyEffect.synergyId[this.playerEid];
+        if (synergyId >= 0 && synergyId < SYNERGIES.length) {
+            const synergy = SYNERGIES[synergyId];
+            this.synergyNameText.setText(`✦ ${synergy.name}`);
+            this.synergyDescText.setText(synergy.description);
+        } else {
+            this.synergyNameText.setText('');
+            this.synergyDescText.setText('');
         }
     }
 

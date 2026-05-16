@@ -17,12 +17,19 @@ export class AssetLoader {
         this.scene.load.image('walls', './assets/atlas_walls_high-16x32.png');
         this.scene.load.image('floors', './assets/atlas_floor-16x16.png');
         this.scene.load.image('weapon_knight_sword', './assets/frames/weapon_knight_sword.png');
-        this.scene.load.image('weapon_green_magic_staff', './assets/frames/weapon_green_magic_staff.png');
+        this.scene.load.image(
+            'weapon_green_magic_staff',
+            './assets/frames/weapon_green_magic_staff.png',
+        );
         this.scene.load.image('main_bg', './assets/main.png');
         this.scene.load.image('loading_bg', './assets/loading.jpg');
         this.scene.load.image('hp_icon', './assets/frames/ui_heart_full.png');
         this.scene.load.image('game_over', './assets/game_over.png');
-        this.scene.load.image('weapon_baton_with_spikes', './assets/frames/weapon_baton_with_spikes.png');
+        this.scene.load.image(
+            'weapon_baton_with_spikes',
+            './assets/frames/weapon_baton_with_spikes.png',
+        );
+        this.scene.load.image('weapon_cleaver', './assets/frames/weapon_cleaver.png');
         this.scene.load.image('hole', './assets/frames/hole.png');
         this.scene.load.image('wall_hole_1', './assets/frames/wall_hole_1.png');
         this.scene.load.image('wall_hole_2', './assets/frames/wall_hole_2.png');
@@ -37,10 +44,16 @@ export class AssetLoader {
 
     loadAudio() {
         this.scene.load.audio('select_bgm', 'assets/audio/hero_reprise.mp3', { stream: true });
-        this.scene.load.audio('main_bgm', 'assets/audio/fight_for_better_future.mp3', { stream: true });
+        this.scene.load.audio('main_bgm', 'assets/audio/fight_for_better_future.mp3', {
+            stream: true,
+        });
         this.scene.load.audio('bgm_metal', 'assets/audio/once_more_metal.mp3', { stream: true });
-        this.scene.load.audio('bgm_unchained', 'assets/audio/unchained_destiny_loop.mp3', { stream: true });
-        this.scene.load.audio('boss_bgm', 'assets/audio/boss_battle_8_retro_01_opening.mp3', { stream: true });
+        this.scene.load.audio('bgm_unchained', 'assets/audio/unchained_destiny_loop.mp3', {
+            stream: true,
+        });
+        this.scene.load.audio('boss_bgm', 'assets/audio/boss_battle_8_retro_01_opening.mp3', {
+            stream: true,
+        });
 
         this.scene.load.audio('fire_cast', 'assets/audio/fire_cast.mp3');
         this.scene.load.audio('ice_cast', 'assets/audio/ice_cast.mp3');
@@ -61,101 +74,114 @@ export class AssetLoader {
         if (!texture) return;
 
         // Add background floor frame
-        texture.add('floor', 0, BACKGROUND_FLOOR.x, BACKGROUND_FLOOR.y, BACKGROUND_FLOOR.w, BACKGROUND_FLOOR.h);
+        texture.add(
+            'floor',
+            0,
+            BACKGROUND_FLOOR.x,
+            BACKGROUND_FLOOR.y,
+            BACKGROUND_FLOOR.w,
+            BACKGROUND_FLOOR.h,
+        );
 
         // Add character frames
-        Object.values(CHARACTERS).forEach(char => {
+        Object.values(CHARACTERS).forEach((char) => {
             // Idle frames
             for (let i = 0; i < char.frames.idle.count; i++) {
-                texture.add(`${char.id}_idle_${i}`, 0,
-                    char.frames.idle.x + (i * 16),
+                texture.add(
+                    `${char.id}_idle_${i}`,
+                    0,
+                    char.frames.idle.x + i * 16,
                     char.frames.idle.y,
                     char.frames.idle.w,
-                    char.frames.idle.h);
+                    char.frames.idle.h,
+                );
             }
             // Run frames
             for (let i = 0; i < char.frames.run.count; i++) {
-                texture.add(`${char.id}_run_${i}`, 0,
-                    char.frames.run.x + (i * 16),
+                texture.add(
+                    `${char.id}_run_${i}`,
+                    0,
+                    char.frames.run.x + i * 16,
                     char.frames.run.y,
                     char.frames.run.w,
-                    char.frames.run.h);
+                    char.frames.run.h,
+                );
             }
         });
 
         // Add some enemy frames (Demon)
         // Big Demon frames (32x36)
         for (let i = 0; i < 4; i++) {
-            texture.add(`demon_idle_${i}`, 0, 16 + (i * 32), 428, 32, 36);
-            texture.add(`demon_run_${i}`, 0, 144 + (i * 32), 428, 32, 36);
+            texture.add(`demon_idle_${i}`, 0, 16 + i * 32, 428, 32, 36);
+            texture.add(`demon_run_${i}`, 0, 144 + i * 32, 428, 32, 36);
         }
 
         // Orc (16x23)
         for (let i = 0; i < 4; i++) {
-            texture.add(`orc_idle_${i}`, 0, 368 + (i * 16), 177, 16, 23);
-            texture.add(`orc_run_${i}`, 0, 432 + (i * 16), 177, 16, 23);
+            texture.add(`orc_idle_${i}`, 0, 368 + i * 16, 177, 16, 23);
+            texture.add(`orc_run_${i}`, 0, 432 + i * 16, 177, 16, 23);
         }
 
         // Skeleton (16x16)
         for (let i = 0; i < 4; i++) {
-            texture.add(`skeleton_idle_${i}`, 0, 368 + (i * 16), 88, 16, 16);
-            texture.add(`skeleton_run_${i}`, 0, 432 + (i * 16), 88, 16, 16);
+            texture.add(`skeleton_idle_${i}`, 0, 368 + i * 16, 88, 16, 16);
+            texture.add(`skeleton_run_${i}`, 0, 432 + i * 16, 88, 16, 16);
         }
 
         // Add default enemy (imp or similar)
         for (let i = 0; i < 4; i++) {
-            texture.add(`imp_idle_f${i}`, 0, 368 + (i * 16), 64, 16, 16);
-            texture.add(`imp_run_f${i}`, 0, 432 + (i * 16), 64, 16, 16);
+            texture.add(`imp_idle_f${i}`, 0, 368 + i * 16, 64, 16, 16);
+            texture.add(`imp_run_f${i}`, 0, 432 + i * 16, 64, 16, 16);
         }
 
         // --- NEW COMPREHENSIVE FRAMES FROM TILESET ---
         // Big Bosses (32x36)
         for (let i = 0; i < 4; i++) {
-            texture.add(`big_demon_idle_f${i}`, 0, 16 + (i * 32), 428, 32, 36);
-            texture.add(`big_demon_run_f${i}`, 0, 144 + (i * 32), 428, 32, 36);
-            texture.add(`big_zombie_idle_f${i}`, 0, 16 + (i * 32), 332, 32, 36);
-            texture.add(`big_zombie_run_f${i}`, 0, 144 + (i * 32), 332, 32, 36);
-            texture.add(`ogre_idle_f${i}`, 0, 16 + (i * 32), 380, 32, 36);
-            texture.add(`ogre_run_f${i}`, 0, 144 + (i * 32), 380, 32, 36);
+            texture.add(`big_demon_idle_f${i}`, 0, 16 + i * 32, 428, 32, 36);
+            texture.add(`big_demon_run_f${i}`, 0, 144 + i * 32, 428, 32, 36);
+            texture.add(`big_zombie_idle_f${i}`, 0, 16 + i * 32, 332, 32, 36);
+            texture.add(`big_zombie_run_f${i}`, 0, 144 + i * 32, 332, 32, 36);
+            texture.add(`ogre_idle_f${i}`, 0, 16 + i * 32, 380, 32, 36);
+            texture.add(`ogre_run_f${i}`, 0, 144 + i * 32, 380, 32, 36);
         }
 
         // Monsters (16x23 / 16x16)
         for (let i = 0; i < 4; i++) {
             // Orcs
-            texture.add(`orc_shaman_idle_f${i}`, 0, 368 + (i * 16), 201, 16, 23);
-            texture.add(`orc_shaman_run_f${i}`, 0, 432 + (i * 16), 201, 16, 23);
-            texture.add(`orc_warrior_idle_f${i}`, 0, 368 + (i * 16), 177, 16, 23);
-            texture.add(`orc_warrior_run_f${i}`, 0, 432 + (i * 16), 177, 16, 23);
-            texture.add(`goblin_idle_f${i}`, 0, 368 + (i * 16), 40, 16, 16);
-            texture.add(`goblin_run_f${i}`, 0, 432 + (i * 16), 40, 16, 16);
-            texture.add(`masked_orc_idle_f${i}`, 0, 368 + (i * 16), 153, 16, 23);
-            texture.add(`masked_orc_run_f${i}`, 0, 432 + (i * 16), 153, 16, 23);
+            texture.add(`orc_shaman_idle_f${i}`, 0, 368 + i * 16, 201, 16, 23);
+            texture.add(`orc_shaman_run_f${i}`, 0, 432 + i * 16, 201, 16, 23);
+            texture.add(`orc_warrior_idle_f${i}`, 0, 368 + i * 16, 177, 16, 23);
+            texture.add(`orc_warrior_run_f${i}`, 0, 432 + i * 16, 177, 16, 23);
+            texture.add(`goblin_idle_f${i}`, 0, 368 + i * 16, 40, 16, 16);
+            texture.add(`goblin_run_f${i}`, 0, 432 + i * 16, 40, 16, 16);
+            texture.add(`masked_orc_idle_f${i}`, 0, 368 + i * 16, 153, 16, 23);
+            texture.add(`masked_orc_run_f${i}`, 0, 432 + i * 16, 153, 16, 23);
             // Undeads
-            texture.add(`skelet_idle_f${i}`, 0, 368 + (i * 16), 88, 16, 16);
-            texture.add(`skelet_run_f${i}`, 0, 432 + (i * 16), 88, 16, 16);
-            texture.add(`tiny_zombie_idle_f${i}`, 0, 368 + (i * 16), 16, 16, 16);
-            texture.add(`tiny_zombie_run_f${i}`, 0, 432 + (i * 16), 16, 16, 16);
-            texture.add(`zombie_f${i}`, 0, 368 + (i * 16), 136, 16, 16);
-            texture.add(`ice_zombie_f${i}`, 0, 432 + (i * 16), 136, 16, 16);
-            texture.add(`doc_idle_f${i}`, 0, 368 + (i * 16), 345, 16, 23);
-            texture.add(`doc_run_f${i}`, 0, 432 + (i * 16), 345, 16, 23);
-            texture.add(`necromancer_f${i}`, 0, 368 + (i * 16), 225, 16, 23);
+            texture.add(`skelet_idle_f${i}`, 0, 368 + i * 16, 88, 16, 16);
+            texture.add(`skelet_run_f${i}`, 0, 432 + i * 16, 88, 16, 16);
+            texture.add(`tiny_zombie_idle_f${i}`, 0, 368 + i * 16, 16, 16, 16);
+            texture.add(`tiny_zombie_run_f${i}`, 0, 432 + i * 16, 16, 16, 16);
+            texture.add(`zombie_f${i}`, 0, 368 + i * 16, 136, 16, 16);
+            texture.add(`ice_zombie_f${i}`, 0, 432 + i * 16, 136, 16, 16);
+            texture.add(`doc_idle_f${i}`, 0, 368 + i * 16, 345, 16, 23);
+            texture.add(`doc_run_f${i}`, 0, 432 + i * 16, 345, 16, 23);
+            texture.add(`necromancer_f${i}`, 0, 368 + i * 16, 225, 16, 23);
             // Demons
-            texture.add(`chort_idle_f${i}`, 0, 368 + (i * 16), 273, 16, 23);
-            texture.add(`chort_run_f${i}`, 0, 432 + (i * 16), 273, 16, 23);
-            texture.add(`wogol_idle_f${i}`, 0, 368 + (i * 16), 249, 16, 23);
-            texture.add(`wogol_run_f${i}`, 0, 432 + (i * 16), 249, 16, 23);
+            texture.add(`chort_idle_f${i}`, 0, 368 + i * 16, 273, 16, 23);
+            texture.add(`chort_run_f${i}`, 0, 432 + i * 16, 273, 16, 23);
+            texture.add(`wogol_idle_f${i}`, 0, 368 + i * 16, 249, 16, 23);
+            texture.add(`wogol_run_f${i}`, 0, 432 + i * 16, 249, 16, 23);
         }
 
         // Chests (16x16)
         for (let i = 0; i < 3; i++) {
-            texture.add(`chest_full_open_f${i}`, 0, 304 + (i * 16), 416, 16, 16);
-            texture.add(`chest_empty_open_f${i}`, 0, 304 + (i * 16), 400, 16, 16);
+            texture.add(`chest_full_open_f${i}`, 0, 304 + i * 16, 416, 16, 16);
+            texture.add(`chest_empty_open_f${i}`, 0, 304 + i * 16, 400, 16, 16);
         }
 
         // Coins (6x7)
         for (let i = 0; i < 4; i++) {
-            texture.add(`coin_f${i}`, 0, 289 + (i * 8), 385, 6, 7);
+            texture.add(`coin_f${i}`, 0, 289 + i * 8, 385, 6, 7);
         }
 
         // Slashes (placeholder coordinates if needed, or keeping current)
@@ -191,6 +217,8 @@ export class AssetLoader {
         texture.add('weapon_bow', 0, 289, 195, 14, 26);
         texture.add('weapon_bow_2', 0, 305, 195, 14, 26);
         texture.add('weapon_staff', 0, 324, 129, 8, 30);
+        // Necromancer Cleaver (사용자 측정 좌표 318, 128)
+        texture.add('weapon_cleaver_atlas', 0, 318, 128, 12, 30);
 
         // Props
         texture.add('prop_crate', 0, 288, 408, 16, 24);
@@ -199,13 +227,13 @@ export class AssetLoader {
         texture.add('prop_chest', 0, 304, 416, 16, 16);
 
         for (let i = 0; i < 4; i++) {
-            texture.add(`prop_spikes_${i}`, 0, 16 + (i * 16), 192, 16, 16);
+            texture.add(`prop_spikes_${i}`, 0, 16 + i * 16, 192, 16, 16);
         }
 
-        texture.add('lever_off', 0, 80, 208, 16, 16);   // tile_list: lever_left  (이전 좌표 256,448 → 빨간 몬스터 스프라이트 구역 버그 수정)
-        texture.add('lever_on', 0, 96, 208, 16, 16);   // tile_list: lever_right
-        texture.add('door_closed', 0, 32, 240, 32, 32);   // tile_list: doors_leaf_closed  (이전 좌표 160,144 → wizzard 스프라이트와 겹쳐있던 버그 수정)
-        texture.add('door_open', 0, 80, 240, 32, 32);     // tile_list: doors_leaf_open
+        texture.add('lever_off', 0, 80, 208, 16, 16); // tile_list: lever_left  (이전 좌표 256,448 → 빨간 몬스터 스프라이트 구역 버그 수정)
+        texture.add('lever_on', 0, 96, 208, 16, 16); // tile_list: lever_right
+        texture.add('door_closed', 0, 32, 240, 32, 32); // tile_list: doors_leaf_closed  (이전 좌표 160,144 → wizzard 스프라이트와 겹쳐있던 버그 수정)
+        texture.add('door_open', 0, 80, 240, 32, 32); // tile_list: doors_leaf_open
         texture.add('doors_frame_left', 0, 16, 240, 16, 32);
         texture.add('doors_frame_right', 0, 64, 240, 16, 32);
         texture.add('doors_frame_top', 0, 32, 224, 32, 16);
@@ -214,7 +242,7 @@ export class AssetLoader {
         const wallTex = this.scene.textures.get('walls');
         if (wallTex) {
             // --- North Walls (Row 0 -> Row 3의 심플한 일자벽으로 매핑 변경) ---
-            wallTex.add('wall_n_mid', 0, 32, 96, 16, 32); 
+            wallTex.add('wall_n_mid', 0, 32, 96, 16, 32);
             wallTex.add('wall_n_corner_l', 0, 16, 0, 16, 32);
             wallTex.add('wall_n_corner_r', 0, 48, 0, 16, 32);
             wallTex.add('wall_n_end_l', 0, 80, 0, 16, 32);
@@ -251,12 +279,12 @@ export class AssetLoader {
             // --- Fountains ---
             for (let i = 0; i < 3; i++) {
                 // Blue Fountain: Tip (Top) is at 96, Body (Mid) is at 64
-                wallTex.add(`wall_fountain_top_blue_f${i}`, 0, 192 + (i * 16), 96, 16, 32);
-                wallTex.add(`wall_fountain_mid_blue_f${i}`, 0, 192 + (i * 16), 64, 16, 32);
-                
+                wallTex.add(`wall_fountain_top_blue_f${i}`, 0, 192 + i * 16, 96, 16, 32);
+                wallTex.add(`wall_fountain_mid_blue_f${i}`, 0, 192 + i * 16, 64, 16, 32);
+
                 // Red Fountain: Tip (Top) is at 0, Body (Mid) is at 32
-                wallTex.add(`wall_fountain_top_red_f${i}`, 0, 192 + (i * 16), 0, 16, 32);
-                wallTex.add(`wall_fountain_mid_red_f${i}`, 0, 192 + (i * 16), 32, 16, 32);
+                wallTex.add(`wall_fountain_top_red_f${i}`, 0, 192 + i * 16, 0, 16, 32);
+                wallTex.add(`wall_fountain_mid_red_f${i}`, 0, 192 + i * 16, 32, 16, 32);
             }
         }
 
@@ -271,5 +299,4 @@ export class AssetLoader {
             }
         }
     }
-
 }
