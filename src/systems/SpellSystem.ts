@@ -107,6 +107,20 @@ export class SpellSystem {
                 const dir = this.rotateVector(this.lastFacingX, this.lastFacingY, angle);
                 this.spawnSoulBoltAttack(px, py, dir.x, dir.y, i === 0);
             }
+        } else if (this.selectedCharId === 'druid') {
+            window.dispatchEvent(new CustomEvent('play_sound', { detail: 'fire_cast' }));
+            for (let i = 0; i <= extraProjectiles; i++) {
+                const angle = this.calculateAngleOffset(i);
+                const dir = this.rotateVector(this.lastFacingX, this.lastFacingY, angle);
+                this.spawnDruidAttack(px, py, dir.x, dir.y, i === 0);
+            }
+        } else if (this.selectedCharId === 'engineer') {
+            window.dispatchEvent(new CustomEvent('play_sound', { detail: 'fire_cast' }));
+            for (let i = 0; i <= extraProjectiles; i++) {
+                const angle = this.calculateAngleOffset(i);
+                const dir = this.rotateVector(this.lastFacingX, this.lastFacingY, angle);
+                this.spawnEngineerAttack(px, py, dir.x, dir.y, i === 0);
+            }
         } else {
             window.dispatchEvent(new CustomEvent('play_sound', { detail: 'fire_cast' }));
             for (let i = 0; i <= extraProjectiles; i++) {
@@ -250,6 +264,78 @@ export class SpellSystem {
         this.scene.events.on('update', onUpdate);
 
         // 안전망: lifetime 이후 정리
+        this.scene.time.delayedCall(lifetimeMs + 100, cleanup);
+
+        if (playSound) {
+            window.dispatchEvent(new CustomEvent('play_sound', { detail: 'fire_cast' }));
+        }
+    }
+
+    private spawnDruidAttack(x: number, y: number, dx: number, dy: number, playSound: boolean) {
+        // 녹색 마법탄 — wizard 변종, 더 빠르고 덩굴 느낌
+        const speed = 380;
+        const lifetimeMs = 600;
+        const eid = this.createBaseSpell(x + dx * 20, y + dy * 20, 99);
+        Spell.damage[eid] = 40 * globalStats.damageMult;
+        Spell.radius[eid] = 14;
+        Spell.duration[eid] = lifetimeMs;
+        Spell.pierce[eid] = 3;
+        Velocity.x[eid] = dx * speed;
+        Velocity.y[eid] = dy * speed;
+        Rotation.angle[eid] = Math.atan2(dy, dx);
+
+        const bolt = this.scene.add.circle(x + dx * 20, y + dy * 20, 7, 0x4caf50, 0.9);
+        bolt.setDepth(20);
+
+        const cleanup = () => {
+            bolt.destroy();
+            this.scene.events.off('update', onUpdate);
+        };
+        const onUpdate = () => {
+            if (Spell.duration[eid] <= 0) {
+                cleanup();
+                return;
+            }
+            bolt.setPosition(Position.x[eid], Position.y[eid]);
+        };
+        this.scene.events.on('update', onUpdate);
+        this.scene.time.delayedCall(lifetimeMs + 100, cleanup);
+
+        if (playSound) {
+            window.dispatchEvent(new CustomEvent('play_sound', { detail: 'fire_cast' }));
+        }
+    }
+
+    private spawnEngineerAttack(x: number, y: number, dx: number, dy: number, playSound: boolean) {
+        // 회청색 빠른 마법탄 — 관통력 낮지만 빠름
+        const speed = 500;
+        const lifetimeMs = 500;
+        const eid = this.createBaseSpell(x + dx * 20, y + dy * 20, 99);
+        Spell.damage[eid] = 35 * globalStats.damageMult;
+        Spell.radius[eid] = 10;
+        Spell.duration[eid] = lifetimeMs;
+        Spell.pierce[eid] = 1;
+        Velocity.x[eid] = dx * speed;
+        Velocity.y[eid] = dy * speed;
+        Rotation.angle[eid] = Math.atan2(dy, dx);
+
+        const bolt = this.scene.add.rectangle(x + dx * 20, y + dy * 20, 16, 4, 0x607d8b, 1);
+        bolt.setStrokeStyle(1, 0x90a4ae, 0.9);
+        bolt.setRotation(Math.atan2(dy, dx));
+        bolt.setDepth(20);
+
+        const cleanup = () => {
+            bolt.destroy();
+            this.scene.events.off('update', onUpdate);
+        };
+        const onUpdate = () => {
+            if (Spell.duration[eid] <= 0) {
+                cleanup();
+                return;
+            }
+            bolt.setPosition(Position.x[eid], Position.y[eid]);
+        };
+        this.scene.events.on('update', onUpdate);
         this.scene.time.delayedCall(lifetimeMs + 100, cleanup);
 
         if (playSound) {

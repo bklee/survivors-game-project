@@ -209,7 +209,9 @@ export class MainScene extends Phaser.Scene {
         if (
             this.selectedCharId === 'wizard' ||
             this.selectedCharId === 'elf' ||
-            this.selectedCharId === 'necromancer'
+            this.selectedCharId === 'necromancer' ||
+            this.selectedCharId === 'druid' ||
+            this.selectedCharId === 'engineer'
         ) {
             addComponent(world, Mana, this.playerId);
             Mana.current[this.playerId] = this.charData.baseStats.mana;
@@ -220,6 +222,8 @@ export class MainScene extends Phaser.Scene {
         if (this.selectedCharId === 'knight') charTypeId = 0;
         else if (this.selectedCharId === 'elf') charTypeId = 2;
         else if (this.selectedCharId === 'necromancer') charTypeId = 3;
+        else if (this.selectedCharId === 'druid') charTypeId = 4;
+        else if (this.selectedCharId === 'engineer') charTypeId = 5;
 
         addComponent(world, WeaponEvolution, this.playerId);
         WeaponEvolution.evolutionId[this.playerId] = -1;
