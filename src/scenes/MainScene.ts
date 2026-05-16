@@ -48,7 +48,7 @@ import { SpellSystem } from '../systems/SpellSystem';
 import { ItemSystem } from '../systems/ItemSystem';
 import { NecromancerSystem } from '../systems/NecromancerSystem';
 import { DungeonGenerator, TILE_SIZE, TileType } from '../core/DungeonGenerator';
-import { globalStats } from '../core/PlayerStats';
+import { globalStats, applySkillTreeBonuses } from '../core/PlayerStats';
 import { CharacterData } from '../constants/CharacterConfig';
 
 export class MainScene extends Phaser.Scene {
@@ -123,6 +123,10 @@ export class MainScene extends Phaser.Scene {
         globalStats.moveSpeedMult = 1;
         globalStats.cooldownMult = 1;
         globalStats.pickupRadiusMult = 1;
+        globalStats.bonusMaxHp = 0;
+
+        // Apply meta-progression skill tree bonuses on top of base stats
+        applySkillTreeBonuses();
 
         // 3. Ensure UIScene is running
         if (!this.scene.isActive('UIScene')) {
@@ -220,8 +224,8 @@ export class MainScene extends Phaser.Scene {
 
         SpriteInfo.textureIndex[this.playerId] = charTypeId;
         Animation.frameRate[this.playerId] = 10;
-        Health.current[this.playerId] = this.charData.baseStats.health;
-        Health.max[this.playerId] = this.charData.baseStats.health;
+        Health.max[this.playerId] = this.charData.baseStats.health + globalStats.bonusMaxHp;
+        Health.current[this.playerId] = Health.max[this.playerId];
 
         // Player initial position (temp, will be refined after buildMap)
         Position.x[this.playerId] = 0;
