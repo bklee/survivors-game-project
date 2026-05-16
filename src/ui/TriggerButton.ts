@@ -16,8 +16,12 @@ export class TriggerButton {
 
     constructor(scene: Phaser.Scene) {
         this.scene = scene;
-        const x = scene.scale.width - 80;
-        const y = scene.scale.height - 80;
+        // 우측 가운데 — AlchemySlotUI 슬롯 패널(가운데 정렬, 높이=160px) 바로 아래
+        // 슬롯 묶음 끝: (height-160)/2 + 160 = (height+160)/2
+        // gap 48px 후 트리거 버튼 중심
+        const slotPanelBottom = (scene.scale.height + 48 * 3 + 8 * 2) / 2;
+        const x = scene.scale.width - 20 - TRIGGER_BUTTON_RADIUS_PX - 4;
+        const y = slotPanelBottom + 24 + TRIGGER_BUTTON_RADIUS_PX;
 
         this.container = scene.add.container(x, y);
         this.container.setDepth(1000);
