@@ -49,9 +49,9 @@ export class LemonSqueezy {
         const product = params.get('product');
         if (!product || !PRODUCTS[product]) return;
 
-        // Phase 1: LocalStorage에 임시 저장
-        // Phase 2: 서버 API로 webhook 기반 검증
+        // 클라이언트 1차 마킹 (서버 webhook 이 진실의 원천 — 다음 refreshFromServer 에서 확정)
         this.setOwned(product, true);
+        ApiClient.trackEvent('iap_funnel_complete', { product_id: product });
         alert(`결제 완료! ${PRODUCTS[product].name}가 적용됩니다.`);
         // URL 정리 (history)
         window.history.replaceState({}, '', window.location.pathname);

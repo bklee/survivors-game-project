@@ -330,8 +330,13 @@ export class MainScene extends Phaser.Scene {
         };
         window.addEventListener('enemy_killed', enemyKilledHandler);
 
-        const synergyActivatedHandler = () => {
+        const synergyActivatedHandler = (e: Event) => {
             this.synergiesActivated++;
+            const detail = (e as CustomEvent).detail;
+            ApiClient.trackEvent('synergy_discover', {
+                synergy: typeof detail === 'object' ? detail : { value: detail },
+                stage: this.currentStage,
+            });
         };
         window.addEventListener('synergy_discovered', synergyActivatedHandler);
 

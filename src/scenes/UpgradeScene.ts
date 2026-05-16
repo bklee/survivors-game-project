@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { PokiSDK } from '../integrations/PokiSDK';
 import { LemonSqueezy } from '../integrations/LemonSqueezy';
+import { ApiClient } from '../integrations/ApiClient';
 import { Element, ELEMENT_INFO } from '../constants/AlchemyConfig';
 import { applySlotChange } from '../systems/AlchemySystem';
 import {
@@ -148,7 +149,15 @@ export class UpgradeScene extends Phaser.Scene {
             if (extraCardUsed) return;
             extraCardUsed = true;
             extraCardBtn.disableInteractive().setAlpha(0.5);
-            const success = hasNoAds || (await PokiSDK.rewardedBreak());
+            let success: boolean;
+            if (hasNoAds) {
+                success = true;
+            } else {
+                success = await PokiSDK.rewardedBreak();
+                ApiClient.trackEvent(success ? 'ad_view' : 'ad_skip', {
+                    placement: 'extra_card',
+                });
+            }
             if (success) {
                 const extraCards = this.pickRandomCards(1);
                 if (extraCards.length > 0) {
@@ -284,6 +293,10 @@ export class UpgradeScene extends Phaser.Scene {
     }
 
     private onCardSelected(data: CardData) {
+        ApiClient.trackEvent('card_select', {
+            type: data.type,
+            title: data.title,
+        });
         if (this.playerEid >= 0) {
             this.applyCard(data);
         }
