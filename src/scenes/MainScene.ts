@@ -14,6 +14,7 @@ import {
     Enemy,
 } from '../components';
 import { AlchemySlot, SynergyEffect } from '../components/alchemy';
+import { WeaponEvolution } from '../components/weapon';
 import { createPhysicsSystem } from '../systems/PhysicsSystem';
 import { createRenderSystem } from '../systems/RenderSystem';
 import { PlayerSystem } from '../systems/PlayerSystem';
@@ -203,6 +204,10 @@ export class MainScene extends Phaser.Scene {
         let charTypeId = 1;
         if (this.selectedCharId === 'knight') charTypeId = 0;
         else if (this.selectedCharId === 'elf') charTypeId = 2;
+
+        addComponent(world, WeaponEvolution, this.playerId);
+        WeaponEvolution.evolutionId[this.playerId] = -1;
+        WeaponEvolution.baseWeaponId[this.playerId] = charTypeId;
 
         SpriteInfo.textureIndex[this.playerId] = charTypeId;
         Animation.frameRate[this.playerId] = 10;
