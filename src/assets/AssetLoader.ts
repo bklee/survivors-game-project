@@ -29,6 +29,7 @@ export class AssetLoader {
             'weapon_baton_with_spikes',
             './assets/frames/weapon_baton_with_spikes.png',
         );
+        this.scene.load.image('weapon_cleaver', './assets/frames/weapon_cleaver.png');
         this.scene.load.image('hole', './assets/frames/hole.png');
         this.scene.load.image('wall_hole_1', './assets/frames/wall_hole_1.png');
         this.scene.load.image('wall_hole_2', './assets/frames/wall_hole_2.png');
@@ -216,9 +217,6 @@ export class AssetLoader {
         texture.add('weapon_bow', 0, 289, 195, 14, 26);
         texture.add('weapon_bow_2', 0, 305, 195, 14, 26);
         texture.add('weapon_staff', 0, 324, 129, 8, 30);
-        // atlas 내 가시 곤봉 변종 (Necromancer용) — weapon column 가장 위쪽 (그라인 최상단)
-        // weapon_staff(324, 129)와 같은 column에서 y=98(sword 라인) 위치 시도
-        texture.add('weapon_baton_atlas', 0, 322, 97, 14, 32);
 
         // Props
         texture.add('prop_crate', 0, 288, 408, 16, 24);
