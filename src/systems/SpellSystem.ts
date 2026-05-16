@@ -189,14 +189,9 @@ export class SpellSystem {
         const speed = 420;
         const lifetimeMs = 700;
 
-        // Spell 엔티티: SpriteInfo 없이 생성 → RenderSystem 제외, CombatSystem(충돌)만 처리
-        const eid = addEntity(world);
-        addComponent(world, Position, eid);
-        addComponent(world, Velocity, eid);
-        addComponent(world, Spell, eid);
-        addComponent(world, Rotation, eid);
-        Position.x[eid] = startX;
-        Position.y[eid] = startY;
+        // createBaseSpell 사용: SpriteInfo 부착(typeId=99) → PhysicsSystem 벽 충돌 적용,
+        // RenderSystem은 typeId=99를 skip하므로 기본 sprite는 표시 안 됨
+        const eid = this.createBaseSpell(startX, startY, 99);
         Spell.damage[eid] = 55 * globalStats.damageMult;
         Spell.radius[eid] = 12;
         Spell.duration[eid] = lifetimeMs;
@@ -205,7 +200,7 @@ export class SpellSystem {
         Velocity.y[eid] = dy * speed;
         Rotation.angle[eid] = Math.atan2(dy, dx);
 
-        // 시각: 작은 보라 막대 (완드형) + 꼬리 원
+        // 시각: 작은 보라 막대 (완드형) + 꼬리 원 — ECS Position 추적
         const wand = this.scene.add.rectangle(startX, startY, 18, 4, 0x9c27b0, 1);
         wand.setStrokeStyle(1, 0xe1bee7, 0.8);
         wand.setRotation(Math.atan2(dy, dx));
@@ -213,20 +208,49 @@ export class SpellSystem {
         const trail = this.scene.add.circle(startX, startY, 5, 0xce93d8, 0.6);
         trail.setDepth(19);
 
-        const endX = startX + dx * speed * (lifetimeMs / 1000);
-        const endY = startY + dy * speed * (lifetimeMs / 1000);
-        this.scene.tweens.add({
-            targets: [wand, trail],
-            x: endX,
-            y: endY,
-            alpha: 0,
-            duration: lifetimeMs,
-            ease: 'Linear',
-            onComplete: () => {
-                wand.destroy();
-                trail.destroy();
-            },
-        });
+        let prevX = startX;
+        let prevY = startY;
+        let stalledFrames = 0;
+
+        const cleanup = () => {
+            wand.destroy();
+            trail.destroy();
+            this.scene.events.off('update', onUpdate);
+        };
+
+        const onUpdate = () => {
+            // 엔티티가 아직 살아있는지 확인 (duration > 0, Spell 컴포넌트 존재 여부)
+            if (Spell.duration[eid] <= 0) {
+                cleanup();
+                return;
+            }
+            const cx = Position.x[eid];
+            const cy = Position.y[eid];
+
+            // 벽에 막혀 위치가 변하지 않으면 2프레임 후 즉시 제거
+            if (Math.abs(cx - prevX) < 0.1 && Math.abs(cy - prevY) < 0.1) {
+                stalledFrames++;
+                if (stalledFrames >= 2) {
+                    Spell.duration[eid] = 0;
+                    cleanup();
+                    return;
+                }
+            } else {
+                stalledFrames = 0;
+            }
+
+            prevX = cx;
+            prevY = cy;
+            wand.x = cx;
+            wand.y = cy;
+            trail.x = cx;
+            trail.y = cy;
+        };
+
+        this.scene.events.on('update', onUpdate);
+
+        // 안전망: lifetime 이후 정리
+        this.scene.time.delayedCall(lifetimeMs + 100, cleanup);
 
         if (playSound) {
             window.dispatchEvent(new CustomEvent('play_sound', { detail: 'fire_cast' }));

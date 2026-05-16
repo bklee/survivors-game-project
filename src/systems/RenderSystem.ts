@@ -90,6 +90,10 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
             }
 
             const typeId = SpriteInfo.textureIndex[eid];
+
+            // typeId=99: soul_bolt — 시각은 SpellSystem이 직접 관리, RenderSystem skip
+            if (typeId === 99) continue;
+
             let bob = bobs[eid];
             let frameName: string | number = '';
 
@@ -483,7 +487,8 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
 
                         if (isPlayer) {
                             if (charKey === 'knight') weaponTex = 'weapon_knight_sword';
-                            else if (charKey === 'wizard') weaponTex = 'weapon_green_magic_staff';
+                            else if (charKey === 'wizard' || charKey === 'necromancer')
+                                weaponTex = 'weapon_green_magic_staff';
                             else {
                                 weaponTex = 'dungeon';
                                 weaponFrame = 'weapon_bow';
@@ -504,7 +509,9 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                             0.5,
                             charKey === 'ogre'
                                 ? 1.0
-                                : charKey === 'wizard' || charKey === 'elf'
+                                : charKey === 'wizard' ||
+                                    charKey === 'elf' ||
+                                    charKey === 'necromancer'
                                   ? 1.0
                                   : 0.8,
                         );
@@ -524,7 +531,7 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                     wSprite.setScale(wScale);
 
                     const wx =
-                        charKey === 'wizard'
+                        charKey === 'wizard' || charKey === 'necromancer'
                             ? 4
                             : charKey === 'elf'
                               ? 5
@@ -533,7 +540,7 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                                 : 5;
                     // wy: Negative moves it UP. Ogre hand is roughly at shoulders, so moving it higher (-10)
                     const wy =
-                        charKey === 'wizard' || charKey === 'elf'
+                        charKey === 'wizard' || charKey === 'elf' || charKey === 'necromancer'
                             ? 4
                             : charKey === 'ogre'
                               ? -10
@@ -563,7 +570,7 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
 
                         if (charKey === 'knight' || charKey === 'ogre') {
                             swingRot = Math.sin(progress * Math.PI) * (Math.PI * 0.8);
-                        } else if (charKey === 'wizard') {
+                        } else if (charKey === 'wizard' || charKey === 'necromancer') {
                             swingRot = Math.sin(progress * Math.PI) * (Math.PI / 15);
                         } else if (charKey === 'elf') {
                             // 활만 움직이도록 (회전 없이 프레임 애니메이션만 적용)
