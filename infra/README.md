@@ -95,8 +95,43 @@ curl https://games.blocktalker.co.kr/api/health
 
 ### 5) 자동 갱신
 
-`certbot` 컨테이너가 12시간마다 `certbot renew --webroot` 실행 — 만료 30일 이내일 때만 갱신. 갱신 후 nginx 는 SIGHUP 또는 컨테이너 재시작 필요 (cronjob 또는 hook 추가 가능).
+`certbot` 컨테이너가 12시간마다 `certbot renew --webroot` 실행 — 만료 30일 이내일 때만 갱신. `nginx` 컨테이너는 6시간마다 `nginx -s reload` 자동 실행하여 갱신된 cert 를 픽업한다.
+
+## 반복 배포 (변경사항 push)
+
+첫 인프라 배포 완료 후, 코드 업데이트는 로컬에서 `deploy-stack.exp` 한 번으로 처리한다.
+
+### 사전 준비 (one-time)
+
+```bash
+cp .env.deploy.example .env.deploy
+$EDITOR .env.deploy   # STACK_REMOTE_DIR, DEPLOY_HOST, DEPLOY_KEY 등 채우기
+chmod 600 .env.deploy
+```
+
+### 일반 풀스택 배포
+
+```bash
+./deploy-stack.exp
+```
+
+다음을 수행:
+
+1. 로컬 `npm run build`
+2. `dist/` → Contabo `<STACK_REMOTE_DIR>/infra/nginx/dist/` rsync (--delete)
+3. SSH 접속 후 `git fetch + checkout + pull --ff-only`
+4. `docker-compose build api && up -d --no-deps api` (API 재기동 ~5초)
+5. nginx reload (정적 새 dist 즉시 반영)
+6. `API_HEALTH_URL` 으로 health check — `status:ok` 가 아니면 exit 1
+
+### 부분 배포
+
+```bash
+./deploy-stack.exp --client-only   # PWA 정적 변경만 (API 재기동 스킵)
+./deploy-stack.exp --server-only   # 백엔드 변경만 (dist rsync 스킵)
+```
 
 ## 모니터링 (Phase 2)
+
 - Sentry 무료 티어 (5K events/월)
-- 단기: `docker logs survivors-postgres` / `docker logs survivors-api` / `docker logs survivors-nginx` 확인
+- 단기: `docker logs survivors-postgres` / `docker logs survivors-api` / `docker logs survivors-nginx`
