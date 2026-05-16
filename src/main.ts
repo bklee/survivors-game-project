@@ -8,6 +8,8 @@ import { GameOverScene } from './scenes/GameOverScene';
 import { TitleScene } from './scenes/TitleScene';
 import { CharacterSelectScene } from './scenes/CharacterSelectScene';
 import { RecipeScene } from './scenes/RecipeScene';
+import { SkillTreeScene } from './scenes/SkillTreeScene';
+import { CodexScene } from './scenes/CodexScene';
 
 const config: Phaser.Types.Core.GameConfig = {
     type: Phaser.AUTO,
@@ -25,7 +27,18 @@ const config: Phaser.Types.Core.GameConfig = {
             debug: false,
         },
     },
-    scene: [BootScene, TitleScene, CharacterSelectScene, MainScene, UIScene, UpgradeScene, GameOverScene, RecipeScene],
+    scene: [
+        BootScene,
+        TitleScene,
+        CharacterSelectScene,
+        MainScene,
+        UIScene,
+        UpgradeScene,
+        GameOverScene,
+        RecipeScene,
+        SkillTreeScene,
+        CodexScene,
+    ],
     pixelArt: true,
     backgroundColor: '#111111',
 };
