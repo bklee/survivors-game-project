@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { defineQuery, addEntity, addComponent, hasComponent, removeEntity } from 'bitecs';
 import { PokiSDK } from '../integrations/PokiSDK';
+import { ApiClient } from '../integrations/ApiClient';
 import { world } from '../core/World';
 import {
     Position,
@@ -97,6 +98,7 @@ export class MainScene extends Phaser.Scene {
     private isPausedForClear: boolean = false;
     private enemiesKilled: number = 0;
     private synergiesActivated: number = 0;
+    private sessionStartMs: number = 0;
     private charData!: CharacterData;
     private secretRoomData?: {
         doorPixel: { x: number; y: number };
@@ -145,6 +147,8 @@ export class MainScene extends Phaser.Scene {
         this.isPausedForClear = false;
         this.enemiesKilled = 0;
         this.synergiesActivated = 0;
+        this.sessionStartMs = Date.now();
+        ApiClient.trackEvent('session_start', { character_id: this.selectedCharId });
 
         this.dungeon = new DungeonGenerator(100, 100);
 
@@ -326,8 +330,13 @@ export class MainScene extends Phaser.Scene {
         };
         window.addEventListener('enemy_killed', enemyKilledHandler);
 
-        const synergyActivatedHandler = () => {
+        const synergyActivatedHandler = (e: Event) => {
             this.synergiesActivated++;
+            const detail = (e as CustomEvent).detail;
+            ApiClient.trackEvent('synergy_discover', {
+                synergy: typeof detail === 'object' ? detail : { value: detail },
+                stage: this.currentStage,
+            });
         };
         window.addEventListener('synergy_discovered', synergyActivatedHandler);
 
@@ -336,6 +345,26 @@ export class MainScene extends Phaser.Scene {
             if (this.relicSystem.tryRevive(this.playerId)) {
                 return; // 부활 성공 — 사망 처리 스킵
             }
+
+            // 세션 종료 분석 + leaderboard 제출 (best-effort)
+            const durationSec = Math.max(0, Math.floor((Date.now() - this.sessionStartMs) / 1000));
+            const score = this.enemiesKilled * 10 + this.currentStage * 100;
+            ApiClient.trackEvent('session_end', {
+                character_id: this.selectedCharId,
+                stage_reached: this.currentStage,
+                enemies_killed: this.enemiesKilled,
+                synergies_activated: this.synergiesActivated,
+                duration_seconds: durationSec,
+                outcome: 'death',
+            });
+            void ApiClient.flush();
+            void ApiClient.submitLeaderboard({
+                score,
+                character_id: this.selectedCharId,
+                stage_reached: this.currentStage,
+                duration_seconds: durationSec,
+            });
+
             this.time.delayedCall(1000, () => {
                 if (this.scene.isActive('UpgradeScene')) this.scene.stop('UpgradeScene');
                 if (this.scene.isActive('RecipeScene')) this.scene.stop('RecipeScene');

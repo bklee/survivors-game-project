@@ -2,6 +2,7 @@ import './errorLogger';
 import Phaser from 'phaser';
 import { PokiSDK } from './integrations/PokiSDK';
 import { LemonSqueezy } from './integrations/LemonSqueezy';
+import { ApiClient } from './integrations/ApiClient';
 import { BootScene } from './scenes/BootScene';
 import { MainScene } from './scenes/MainScene';
 import { UpgradeScene } from './scenes/UpgradeScene';
@@ -46,6 +47,11 @@ const config: Phaser.Types.Core.GameConfig = {
 };
 
 LemonSqueezy.handleSuccessRedirect();
+
+// PWA 설치 완료 트래킹
+window.addEventListener('appinstalled', () => {
+    ApiClient.trackEvent('pwa_install');
+});
 
 PokiSDK.init().then(() => {
     new Phaser.Game(config);

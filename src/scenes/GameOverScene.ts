@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { MetaProgress } from '../core/MetaProgress';
 import { PokiSDK } from '../integrations/PokiSDK';
 import { LemonSqueezy } from '../integrations/LemonSqueezy';
+import { ApiClient } from '../integrations/ApiClient';
 
 export class GameOverScene extends Phaser.Scene {
     private stage: number = 1;
@@ -118,7 +119,16 @@ export class GameOverScene extends Phaser.Scene {
 
             reviveBtn.on('pointerdown', async () => {
                 reviveBtn.disableInteractive();
-                const success = hasNoAds || (await PokiSDK.rewardedBreak());
+                let success: boolean;
+                if (hasNoAds) {
+                    success = true;
+                } else {
+                    success = await PokiSDK.rewardedBreak();
+                    ApiClient.trackEvent(success ? 'ad_view' : 'ad_skip', {
+                        placement: 'revive',
+                        stage: this.stage,
+                    });
+                }
                 if (success) {
                     this.sound.stopAll();
                     this.cameras.main.fadeOut(800, 0, 0, 0);

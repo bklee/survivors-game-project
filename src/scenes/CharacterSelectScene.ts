@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { CHARACTERS } from '../constants/CharacterConfig';
 import { MetaProgress } from '../core/MetaProgress';
+import { ApiClient } from '../integrations/ApiClient';
 
 export class CharacterSelectScene extends Phaser.Scene {
     constructor() {
@@ -168,6 +169,7 @@ export class CharacterSelectScene extends Phaser.Scene {
             // 포인터 이벤트
             card.on('pointerdown', () => {
                 if (isUnlocked) {
+                    ApiClient.trackEvent('character_select', { character_id: char.id });
                     this.sound.stopAll();
                     this.scene.start('MainScene', { characterId: id });
                 } else if (
