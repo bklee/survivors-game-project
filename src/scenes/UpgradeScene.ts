@@ -55,9 +55,7 @@ export class UpgradeScene extends Phaser.Scene {
     }
 
     private pickRandomCards(count: number): CardData[] {
-        const allElements = Object.values(Element).filter(
-            (v) => typeof v === 'number',
-        ) as Element[];
+        const allElements = Object.values(Element) as Element[];
         const shuffled = [...allElements].sort(() => Math.random() - 0.5);
         return shuffled.slice(0, count).map((el) => ({
             element: el,
