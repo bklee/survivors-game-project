@@ -488,10 +488,11 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                         if (isPlayer) {
                             if (charKey === 'knight') weaponTex = 'weapon_knight_sword';
                             else if (charKey === 'wizard') weaponTex = 'weapon_green_magic_staff';
-                            else if (charKey === 'necromancer')
-                                // Necromancy 톤에 어울리는 가시 박힌 곤봉
-                                weaponTex = 'weapon_baton_with_spikes';
-                            else {
+                            else if (charKey === 'necromancer') {
+                                // atlas 내 가시 곤봉 변종 사용
+                                weaponTex = 'dungeon';
+                                weaponFrame = 'weapon_baton_atlas';
+                            } else {
                                 weaponTex = 'dungeon';
                                 weaponFrame = 'weapon_bow';
                             }
