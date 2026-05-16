@@ -33,10 +33,10 @@ export class LemonSqueezy {
         // LS custom data 전달 — webhook에서 device_id 매칭용
         url.searchParams.set('checkout[custom][device_id]', deviceId);
         url.searchParams.set('checkout[custom][product_id]', productId);
-        // 결제 완료 후 돌아올 URL
+        // 결제 완료 후 돌아올 URL — BASE_URL 반영 (/survivors/ 등 서브 path 대응)
         url.searchParams.set(
             'checkout[success_url]',
-            `${window.location.origin}/?ls_success=1&product=${productId}`,
+            `${window.location.origin}${import.meta.env.BASE_URL}?ls_success=1&product=${productId}`,
         );
         window.location.href = url.toString();
     }
