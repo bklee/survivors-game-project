@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { MetaProgress } from '../core/MetaProgress';
+import { PokiSDK } from '../integrations/PokiSDK';
 
 export class GameOverScene extends Phaser.Scene {
     private stage: number = 1;
@@ -10,7 +11,10 @@ export class GameOverScene extends Phaser.Scene {
         super('GameOverScene');
     }
 
+    private reviveUsed: boolean = false;
+
     init(data: { stage?: number; enemiesKilled?: number; synergiesActivated?: number } = {}) {
+        this.reviveUsed = false;
         this.stage = data.stage ?? 1;
         this.enemiesKilled = data.enemiesKilled ?? 0;
         this.synergiesActivated = data.synergiesActivated ?? 0;
@@ -94,5 +98,35 @@ export class GameOverScene extends Phaser.Scene {
             retryBtn.setFillStyle(0x3d2b1f, 0.8);
             retryBtn.setScale(1);
         });
+
+        // 6. 광고 보고 부활 버튼 (게임당 1회)
+        if (!this.reviveUsed) {
+            const reviveBtn = this.add
+                .text(width / 2, height / 2 + 60, '광고 보고 부활', {
+                    fontFamily: '"MedievalSharp", cursive',
+                    fontSize: '24px',
+                    color: '#ffd700',
+                    backgroundColor: '#333333',
+                    padding: { x: 16, y: 8 },
+                })
+                .setOrigin(0.5)
+                .setInteractive({ useHandCursor: true });
+
+            reviveBtn.on('pointerdown', async () => {
+                reviveBtn.disableInteractive();
+                const success = await PokiSDK.rewardedBreak();
+                if (success) {
+                    this.sound.stopAll();
+                    this.cameras.main.fadeOut(800, 0, 0, 0);
+                    this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => {
+                        this.scene.stop('GameOverScene');
+                        this.scene.resume('MainScene', { revive: true });
+                    });
+                } else {
+                    reviveBtn.setText('광고 시청 실패');
+                    reviveBtn.setColor('#888888');
+                }
+            });
+        }
     }
 }

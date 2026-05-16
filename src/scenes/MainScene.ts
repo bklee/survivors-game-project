@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { defineQuery, addEntity, addComponent, hasComponent, removeEntity } from 'bitecs';
+import { PokiSDK } from '../integrations/PokiSDK';
 import { world } from '../core/World';
 import {
     Position,
@@ -464,6 +465,8 @@ export class MainScene extends Phaser.Scene {
         window.addEventListener('stage_clear', stageClearInternalHandler);
 
         this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+            // Poki: 게임플레이 종료 — 광고 표시 허용
+            PokiSDK.gameplayStop();
             window.removeEventListener('play_sound', soundHandler);
             window.removeEventListener('combo_cast', comboCastHandler);
             window.removeEventListener('enemy_killed', enemyKilledHandler);
@@ -486,6 +489,9 @@ export class MainScene extends Phaser.Scene {
 
         this.spawnDungeonProps();
         window.dispatchEvent(new CustomEvent('game_started'));
+
+        // Poki: 게임플레이 시작 — 광고 차단 시점
+        PokiSDK.gameplayStart();
     }
 
     private buildMap(stage: number) {
