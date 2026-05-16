@@ -56,6 +56,10 @@ export class AlchemySlotUI {
         this.playerEid = eid;
     }
 
+    setVisible(visible: boolean): void {
+        this.container.setVisible(visible);
+    }
+
     update(): void {
         if (this.playerEid === null) return;
         const slots = [
