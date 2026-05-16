@@ -562,8 +562,18 @@ export class UIScene extends Phaser.Scene {
         }
         this.updateTargetArrows();
         this.statsText.setText(this.getStatsString());
-        if (this.alchemySlotUI) this.alchemySlotUI.update();
-        if (this.triggerButton) this.triggerButton.update();
+        if (this.alchemySlotUI && this.triggerButton) {
+            // Lazy bind playerId — MainScene.create launches UIScene before
+            // setting this.playerId. Re-bind every frame so new players (restart)
+            // are picked up automatically.
+            const mainScene = this.scene.get('MainScene') as { playerId?: number } | undefined;
+            if (mainScene?.playerId !== undefined) {
+                this.alchemySlotUI.setPlayerEid(mainScene.playerId);
+                this.triggerButton.setPlayerEid(mainScene.playerId);
+            }
+            this.alchemySlotUI.update();
+            this.triggerButton.update();
+        }
     }
 
     private updateTargetArrows() {
