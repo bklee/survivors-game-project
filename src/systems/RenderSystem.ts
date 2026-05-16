@@ -99,8 +99,7 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
             if (typeId === 0) charKey = 'knight';
             else if (typeId === 1) charKey = 'wizard';
             else if (typeId === 2) charKey = 'elf';
-            else if (typeId === 3)
-                charKey = 'wizard'; // necromancer는 wizard 스프라이트 재사용
+            else if (typeId === 3) charKey = 'necromancer';
             else if (typeId === 10) charKey = 'imp';
             else if (typeId === 11) charKey = 'demon';
             else if (typeId === 12) charKey = 'orc';
@@ -287,6 +286,12 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                         frameName = `${config.name}_f${fIdx}`;
                     }
                 }
+            } else if (typeId === 3) {
+                // Necromancer: necromancer_f0~3 프레임 사용 (idle/run 구분 없음)
+                const rate = Animation.frameRate[eid] || 8;
+                Animation.timer[eid] += dt;
+                const fIdx = Math.floor(Animation.timer[eid] / (1000 / rate)) % 4;
+                frameName = `necromancer_f${fIdx}`;
             } else {
                 const rate = Animation.frameRate[eid] || 8;
                 Animation.timer[eid] += dt;
@@ -650,7 +655,6 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                         else if (Velocity.x[eid] > 0) bob.flipX = false;
                     }
                     if (blitter.texture.has(frameName.toString())) {
-                         
                         try {
                             bob.setFrame(frameName);
                         } catch {
