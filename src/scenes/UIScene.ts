@@ -470,6 +470,10 @@ export class UIScene extends Phaser.Scene {
         window.addEventListener('map_generated', mapGeneratedHandler);
         window.addEventListener('mp_updated', this.handleMp as EventListener);
         window.addEventListener('char_selected', charSelectedHandler);
+        window.addEventListener(
+            'synergy_discovered',
+            this.handleSynergyDiscovered as EventListener,
+        );
 
         this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
             window.removeEventListener('game_started', gameStartedHandler);
@@ -488,6 +492,10 @@ export class UIScene extends Phaser.Scene {
             window.removeEventListener('map_generated', mapGeneratedHandler);
             window.removeEventListener('mp_updated', this.handleMp as EventListener);
             window.removeEventListener('char_selected', charSelectedHandler);
+            window.removeEventListener(
+                'synergy_discovered',
+                this.handleSynergyDiscovered as EventListener,
+            );
         });
 
         const mainScene = this.scene.get('MainScene') as any;
@@ -852,6 +860,30 @@ export class UIScene extends Phaser.Scene {
                 this.input.once('pointerdown', proceed);
                 this.input.keyboard?.once('keydown', proceed);
             },
+        });
+    };
+
+    private handleSynergyDiscovered = (e: CustomEvent<{ name: string }>) => {
+        const synergy = e.detail;
+        const toast = this.add
+            .text(this.scale.width / 2, 200, `✦ 새 시너지 발견: ${synergy.name}!\n+50 정수`, {
+                fontFamily: '"MedievalSharp", cursive',
+                fontSize: '32px',
+                color: '#ffd700',
+                align: 'center',
+                stroke: '#000000',
+                strokeThickness: 6,
+            })
+            .setOrigin(0.5)
+            .setDepth(2000);
+
+        this.tweens.add({
+            targets: toast,
+            y: 150,
+            alpha: 0,
+            duration: 3000,
+            ease: 'Quad.easeIn',
+            onComplete: () => toast.destroy(),
         });
     };
 

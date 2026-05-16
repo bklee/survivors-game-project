@@ -1,5 +1,6 @@
 import { AlchemySlot, SynergyEffect } from '../components/alchemy';
 import { Element, SynergyDef, SYNERGIES, findSynergy } from '../constants/AlchemyConfig';
+import { MetaProgress } from '../core/MetaProgress';
 
 /**
  * 주어진 엔티티의 3슬롯 상태를 보고 일치하는 시너지를 반환.
@@ -30,4 +31,9 @@ export function applySlotChange(eid: number, element: Element): void {
     }
     const synergy = detectSynergy(eid);
     SynergyEffect.synergyId[eid] = synergy ? SYNERGIES.findIndex((s) => s.id === synergy.id) : -1;
+
+    if (synergy && !MetaProgress.load().discoveredSynergies.includes(synergy.id)) {
+        MetaProgress.discoverSynergy(synergy.id);
+        window.dispatchEvent(new CustomEvent('synergy_discovered', { detail: synergy }));
+    }
 }

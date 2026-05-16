@@ -118,5 +118,35 @@ export class TitleScene extends Phaser.Scene {
             skillBtn.setFillStyle(0x1a2b3d, 0.8);
             skillBtn.setScale(1);
         });
+
+        // CODEX Button
+        const codexBtn = this.add
+            .rectangle(width / 2, height / 2 + 310, 240, 55, 0x2d1a3d, 0.8)
+            .setInteractive({ useHandCursor: true })
+            .setStrokeStyle(2, 0xcc88ff);
+
+        this.add
+            .text(width / 2, height / 2 + 310, '시너지 도감', {
+                fontFamily: '"MedievalSharp", cursive',
+                fontSize: '28px',
+                color: '#cc88ff',
+                fontStyle: 'bold',
+            })
+            .setOrigin(0.5);
+
+        codexBtn.on('pointerdown', () => {
+            this.cameras.main.fadeOut(300, 0, 0, 0);
+            this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => {
+                this.scene.start('CodexScene');
+            });
+        });
+        codexBtn.on('pointerover', () => {
+            codexBtn.setFillStyle(0x3d2552, 1);
+            codexBtn.setScale(1.04);
+        });
+        codexBtn.on('pointerout', () => {
+            codexBtn.setFillStyle(0x2d1a3d, 0.8);
+            codexBtn.setScale(1);
+        });
     }
 }
