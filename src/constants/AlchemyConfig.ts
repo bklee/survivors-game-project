@@ -11,17 +11,17 @@ export type Element = (typeof Element)[keyof typeof Element];
 
 export interface ElementInfo {
     name: string;
-    color: string; // hex like '0xFF4500'
+    color: number; // Phaser graphics number e.g. 0xFF4500
     icon: string; // emoji or key
 }
 
-export const ELEMENT_INFO: Record<number, ElementInfo> = {
-    [Element.FIRE]: { name: 'FIRE', color: '0xFF4500', icon: '🔥' },
-    [Element.ICE]: { name: 'ICE', color: '0x4FC3F7', icon: '❄️' },
-    [Element.LIGHTNING]: { name: 'LIGHTNING', color: '0xFFEE58', icon: '⚡' },
-    [Element.POISON]: { name: 'POISON', color: '0x9CCC65', icon: '☠️' },
-    [Element.EARTH]: { name: 'EARTH', color: '0x8D6E63', icon: '🪨' },
-    [Element.AIR]: { name: 'AIR', color: '0xCFD8DC', icon: '💨' },
+export const ELEMENT_INFO: Record<Element, ElementInfo> = {
+    [Element.FIRE]: { name: 'FIRE', color: 0xff4500, icon: '🔥' },
+    [Element.ICE]: { name: 'ICE', color: 0x4fc3f7, icon: '❄️' },
+    [Element.LIGHTNING]: { name: 'LIGHTNING', color: 0xffee58, icon: '⚡' },
+    [Element.POISON]: { name: 'POISON', color: 0x9ccc65, icon: '☠️' },
+    [Element.EARTH]: { name: 'EARTH', color: 0x8d6e63, icon: '🪨' },
+    [Element.AIR]: { name: 'AIR', color: 0xcfd8dc, icon: '💨' },
 };
 
 export interface SynergyDef {
