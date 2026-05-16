@@ -8,6 +8,9 @@ import {
 } from '../constants/EvolutionConfig';
 import { WeaponEvolution } from '../components/weapon';
 import { globalStats } from '../core/PlayerStats';
+import { RELICS, RelicDef, hasRelic, setRelic, countRelics } from '../constants/RelicConfig';
+import { Relic } from '../components/relic';
+import { MetaProgress } from '../core/MetaProgress';
 
 interface ElementPayload {
     type: 'element';
@@ -22,7 +25,11 @@ interface EvolutionPayload {
     type: 'evolution';
     def: WeaponEvolutionDef;
 }
-type CardPayload = ElementPayload | StatPayload | EvolutionPayload;
+interface RelicPayload {
+    type: 'relic';
+    relicDef: RelicDef;
+}
+type CardPayload = ElementPayload | StatPayload | EvolutionPayload | RelicPayload;
 
 type CardData = {
     title: string;
@@ -167,6 +174,27 @@ export class UpgradeScene extends Phaser.Scene {
             }
         }
 
+        // 4. 유물 카드 — 미보유 + relicSlots 한도 체크
+        if (this.playerEid >= 0) {
+            const playerMask = Relic.bitmask[this.playerEid];
+            const ownedCount = countRelics(playerMask);
+            const maxSlots = MetaProgress.load().relicSlots;
+            if (ownedCount < maxSlots) {
+                const available = RELICS.filter((r) => !hasRelic(playerMask, r.bit));
+                const shuffledRelics = [...available].sort(() => Math.random() - 0.5);
+                for (const relic of shuffledRelics.slice(0, 4)) {
+                    pool.push({
+                        type: 'relic',
+                        relicDef: relic,
+                        title: relic.name,
+                        description: relic.description,
+                        icon: '✦',
+                        color: 0xff6b00,
+                    });
+                }
+            }
+        }
+
         const shuffledPool = [...pool].sort(() => Math.random() - 0.5);
         return shuffledPool.slice(0, count);
     }
@@ -182,8 +210,9 @@ export class UpgradeScene extends Phaser.Scene {
         container.setDepth(1);
 
         const isEvolution = data.type === 'evolution';
-        const strokeColor = isEvolution ? 0xffd700 : 0xffffff;
-        const strokeWidth = isEvolution ? 4 : 3;
+        const isRelic = data.type === 'relic';
+        const strokeColor = isEvolution ? 0xffd700 : isRelic ? 0xff6b00 : 0xffffff;
+        const strokeWidth = isEvolution || isRelic ? 4 : 3;
 
         const bg = this.add.rectangle(0, 0, w, h, data.color, 0.4);
         bg.setStrokeStyle(strokeWidth, strokeColor, 1);
@@ -195,7 +224,7 @@ export class UpgradeScene extends Phaser.Scene {
 
         const titleText = this.add.text(0, 0, data.title, {
             fontSize: '20px',
-            color: isEvolution ? '#ffd700' : '#ffffff',
+            color: isEvolution ? '#ffd700' : isRelic ? '#ff6b00' : '#ffffff',
             fontStyle: 'bold',
         });
         titleText.setOrigin(0.5);
@@ -239,6 +268,11 @@ export class UpgradeScene extends Phaser.Scene {
                 if (idx >= 0) {
                     WeaponEvolution.evolutionId[this.playerEid] = idx;
                 }
+                break;
+            }
+            case 'relic': {
+                const mask = Relic.bitmask[this.playerEid];
+                Relic.bitmask[this.playerEid] = setRelic(mask, card.relicDef.bit);
                 break;
             }
         }

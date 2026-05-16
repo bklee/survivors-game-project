@@ -15,6 +15,8 @@ import {
 } from '../components';
 import { AlchemySlot, SynergyEffect } from '../components/alchemy';
 import { WeaponEvolution } from '../components/weapon';
+import { Relic } from '../components/relic';
+import { RelicSystem } from '../systems/RelicSystem';
 import { createPhysicsSystem } from '../systems/PhysicsSystem';
 import { createRenderSystem } from '../systems/RenderSystem';
 import { PlayerSystem } from '../systems/PlayerSystem';
@@ -83,6 +85,7 @@ export class MainScene extends Phaser.Scene {
     private cyclone!: Cyclone;
     private cascade!: Cascade;
     private necromancerSystem!: NecromancerSystem;
+    private relicSystem!: RelicSystem;
     private selectedCharId: string = 'wizard';
     private currentBGM?: Phaser.Sound.BaseSound;
     private dungeon!: DungeonGenerator;
@@ -222,6 +225,9 @@ export class MainScene extends Phaser.Scene {
         WeaponEvolution.evolutionId[this.playerId] = -1;
         WeaponEvolution.baseWeaponId[this.playerId] = charTypeId;
 
+        addComponent(world, Relic, this.playerId);
+        Relic.bitmask[this.playerId] = 0;
+
         SpriteInfo.textureIndex[this.playerId] = charTypeId;
         Animation.frameRate[this.playerId] = 10;
         Health.max[this.playerId] = this.charData.baseStats.health + globalStats.bonusMaxHp;
@@ -240,6 +246,9 @@ export class MainScene extends Phaser.Scene {
         this.itemSystem = new ItemSystem();
 
         this.spellSystem.selectedCharId = this.selectedCharId;
+
+        this.relicSystem = new RelicSystem(this);
+        this.relicSystem.applyPassives(this.playerId);
 
         this.floorBlitter = this.add.blitter(0, 0, 'floors').setDepth(-3);
 
@@ -302,7 +311,14 @@ export class MainScene extends Phaser.Scene {
         const comboCastHandler = () => {};
         window.addEventListener('combo_cast', comboCastHandler);
 
+        const enemyKilledHandler = () => this.relicSystem.onEnemyKilled();
+        window.addEventListener('enemy_killed', enemyKilledHandler);
+
         const deathHandler = () => {
+            // Phoenix Feather 부활 시도
+            if (this.relicSystem.tryRevive(this.playerId)) {
+                return; // 부활 성공 — 사망 처리 스킵
+            }
             this.time.delayedCall(1000, () => {
                 if (this.scene.isActive('UpgradeScene')) this.scene.stop('UpgradeScene');
                 if (this.scene.isActive('RecipeScene')) this.scene.stop('RecipeScene');
@@ -430,6 +446,7 @@ export class MainScene extends Phaser.Scene {
         this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
             window.removeEventListener('play_sound', soundHandler);
             window.removeEventListener('combo_cast', comboCastHandler);
+            window.removeEventListener('enemy_killed', enemyKilledHandler);
             window.removeEventListener('player_died', deathHandler);
             window.removeEventListener('keydown', recipeHandler);
             window.removeEventListener('next_stage', nextStageHandler);
@@ -603,6 +620,7 @@ export class MainScene extends Phaser.Scene {
         this.cyclone.tick();
         this.cascade.tick();
         this.necromancerSystem.tick();
+        this.relicSystem.tick();
         this.renderSystem(delta);
         this.handleInteractions();
 

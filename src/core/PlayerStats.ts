@@ -7,6 +7,8 @@ export const globalStats = {
     mana: { current: 100, max: 100 },
     currentStage: 1,
     currentLevel: 1,
+    coinMult: 1,
+    manaRegenMult: 1,
 };
 
 import { MetaProgress } from './MetaProgress';
