@@ -1,4 +1,5 @@
 import { Identity } from '../core/Identity';
+import { ApiClient } from './ApiClient';
 
 export interface PaymentProduct {
     id: string;
@@ -48,17 +49,33 @@ export class LemonSqueezy {
         const product = params.get('product');
         if (!product || !PRODUCTS[product]) return;
 
-        // Phase 1: LocalStorage에 임시 저장
-        // Phase 2: 서버 API로 webhook 기반 검증
+        // 클라이언트 1차 마킹 (서버 webhook 이 진실의 원천 — 다음 refreshFromServer 에서 확정)
         this.setOwned(product, true);
+        ApiClient.trackEvent('iap_funnel_complete', { product_id: product });
         alert(`결제 완료! ${PRODUCTS[product].name}가 적용됩니다.`);
         // URL 정리 (history)
         window.history.replaceState({}, '', window.location.pathname);
     }
 
-    /** 제품 보유 여부 (Phase 1 — LocalStorage) */
+    /** 제품 보유 여부 (LocalStorage 캐시 — 오프라인/실패 대비 빠른 경로) */
     static hasProduct(productId: string): boolean {
         return localStorage.getItem(OWNED_KEY_PREFIX + productId) === 'true';
+    }
+
+    /**
+     * 서버에서 IAP 보유 상태를 동기화하여 LocalStorage 캐시를 갱신한다.
+     * 게임 시작 시 1회 호출. 네트워크 실패 시 기존 캐시 유지.
+     * No-Ads Pass 외 제품은 현재 LocalStorage 폴백만 사용.
+     */
+    static async refreshFromServer(): Promise<void> {
+        try {
+            const player = await ApiClient.getPlayer();
+            if (player.exists) {
+                this.setOwned('no_ads_pass', !!player.no_ads_pass);
+            }
+        } catch (err) {
+            console.warn('[LS] refreshFromServer failed:', err);
+        }
     }
 
     /** 보유 상태 설정 (테스트 + success redirect 용) */

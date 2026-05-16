@@ -54,11 +54,49 @@ PostgreSQL은 `127.0.0.1:5432`로만 노출됨. 외부 접속 차단.
 **게임 백엔드 API**는 같은 Docker network 또는 같은 호스트에서 `localhost:5432`로 접속.
 별도 컨테이너 (Phase 2에서 추가)에서 access.
 
-## Phase 2 후속 작업
-- Node.js/Express 백엔드 API 컨테이너 추가 (`/api/leaderboard`, `/api/events`, `/api/ls-webhook` 등)
-- Nginx reverse proxy + SSL (Let's Encrypt) — `games.blocktalker.co.kr/api/*` 라우팅
-- Lemon Squeezy webhook signature 검증
+## Phase 2: API + Nginx + SSL 추가
+
+### 1) 게임 dist 배치
+
+PWA 빌드를 nginx 컨테이너가 서빙할 위치에 둔다:
+
+```bash
+# 호스트 (로컬 빌드 후 rsync) 또는 서버에서 직접
+mkdir -p infra/nginx/dist
+# 게임 빌드 결과 (dist/) 를 nginx/dist 로 복사
+cp -r ../dist/* infra/nginx/dist/
+```
+
+### 2) SSL 인증서 최초 발급 (one-time)
+
+Nginx HTTPS 설정이 cert 파일을 참조하므로 첫 기동 전에 cert 가 존재해야 한다. standalone 모드로 발급:
+
+```bash
+# 포트 80 비어있는 상태에서 실행
+docker-compose run --rm --service-ports certbot certonly --standalone \
+    -d games.blocktalker.co.kr \
+    --email <YOUR_EMAIL> --agree-tos --no-eff-email
+# 성공 시 ./certbot/conf/live/games.blocktalker.co.kr/ 에 fullchain.pem, privkey.pem 생성
+```
+
+### 3) 전체 스택 기동
+
+```bash
+docker-compose up -d
+docker-compose ps   # postgres, postgres_backup, api, nginx, certbot 모두 (healthy)
+```
+
+### 4) Health check
+
+```bash
+curl https://games.blocktalker.co.kr/api/health
+# {"status":"ok","db":"connected","time":"..."}
+```
+
+### 5) 자동 갱신
+
+`certbot` 컨테이너가 12시간마다 `certbot renew --webroot` 실행 — 만료 30일 이내일 때만 갱신. 갱신 후 nginx 는 SIGHUP 또는 컨테이너 재시작 필요 (cronjob 또는 hook 추가 가능).
 
 ## 모니터링 (Phase 2)
 - Sentry 무료 티어 (5K events/월)
-- 단기: `docker logs survivors-postgres` 확인
+- 단기: `docker logs survivors-postgres` / `docker logs survivors-api` / `docker logs survivors-nginx` 확인

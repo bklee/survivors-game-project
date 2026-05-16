@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { LemonSqueezy } from '../integrations/LemonSqueezy';
+import { ApiClient } from '../integrations/ApiClient';
 
 export class TitleScene extends Phaser.Scene {
     constructor() {
@@ -153,6 +154,7 @@ export class TitleScene extends Phaser.Scene {
         // No-Ads Pass 버튼
         const hasNoAds = LemonSqueezy.hasProduct('no_ads_pass');
         if (!hasNoAds) {
+            ApiClient.trackEvent('iap_funnel_view', { product_id: 'no_ads_pass' });
             const noAdsBtn = this.add
                 .rectangle(width / 2, height / 2 + 385, 240, 50, 0x1e2a3a, 0.8)
                 .setInteractive({ useHandCursor: true })
@@ -175,6 +177,8 @@ export class TitleScene extends Phaser.Scene {
                 noAdsBtn.setScale(1);
             });
             noAdsBtn.on('pointerdown', () => {
+                ApiClient.trackEvent('iap_funnel_click', { product_id: 'no_ads_pass' });
+                void ApiClient.flush(); // 결제 페이지로 이동 전에 강제 flush
                 LemonSqueezy.checkout('no_ads_pass');
             });
         } else {
