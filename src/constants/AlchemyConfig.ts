@@ -67,6 +67,96 @@ export const SYNERGIES: SynergyDef[] = [
         elements: sortTuple(Element.POISON, Element.ICE, Element.LIGHTNING),
         description: '적 처치 시 50% 얼음 폭발 (반경 80)',
     },
+    {
+        id: 'frostbite',
+        name: 'Frostbite',
+        elements: sortTuple(Element.FIRE, Element.ICE, Element.POISON),
+        description: '5초마다 가장 가까운 적 빙결 1.5초 + 중독',
+    },
+    {
+        id: 'cinder_burst',
+        name: 'Cinder Burst',
+        elements: sortTuple(Element.FIRE, Element.ICE, Element.EARTH),
+        description: '적 처치 시 25% 확률 잔해 폭발 (반경 60, 100dmg)',
+    },
+    {
+        id: 'thunderstrike',
+        name: 'Thunderstrike',
+        elements: sortTuple(Element.FIRE, Element.ICE, Element.AIR),
+        description: '플레이어 위 3초마다 낙뢰 (반경 80, 180dmg)',
+    },
+    {
+        id: 'venom_cloud',
+        name: 'Venom Cloud',
+        elements: sortTuple(Element.FIRE, Element.LIGHTNING, Element.EARTH),
+        description: '플레이어 주변 반경 120 독 안개 (틱당 max HP 2%)',
+    },
+    {
+        id: 'arc_lightning',
+        name: 'Arc Lightning',
+        elements: sortTuple(Element.FIRE, Element.LIGHTNING, Element.AIR),
+        description: '공격 시 25% 확률 인근 적 2명 체인 (50dmg)',
+    },
+    {
+        id: 'rockfall',
+        name: 'Rockfall',
+        elements: sortTuple(Element.FIRE, Element.POISON, Element.AIR),
+        description: '8초마다 화면 무작위 4곳 돌덩이 (반경 70, 200dmg)',
+    },
+    {
+        id: 'sandstorm',
+        name: 'Sandstorm',
+        elements: sortTuple(Element.FIRE, Element.LIGHTNING, Element.POISON),
+        description: '플레이어 주변 회오리 (반경 180) 적 둔화 40% + 시야 차단',
+    },
+    {
+        id: 'whirlwind',
+        name: 'Whirlwind',
+        elements: sortTuple(Element.ICE, Element.LIGHTNING, Element.EARTH),
+        description: '플레이어 주변 회오리 반경 200, 60프레임마다 80dmg + 넉백',
+    },
+    {
+        id: 'glacial_spike',
+        name: 'Glacial Spike',
+        elements: sortTuple(Element.ICE, Element.POISON, Element.EARTH),
+        description: '15프레임마다 가장 강한 적에게 얼음 가시 (250dmg + 1초 둔화)',
+    },
+    {
+        id: 'mire',
+        name: 'Mire',
+        elements: sortTuple(Element.ICE, Element.POISON, Element.AIR),
+        description: '8초마다 화면 무작위 위치 늪 (반경 80, 3초 지속, 둔화+중독)',
+    },
+    {
+        id: 'poison_nova',
+        name: 'Poison Nova',
+        elements: sortTuple(Element.ICE, Element.EARTH, Element.AIR),
+        description: '10초마다 플레이어 중심 독 폭발 (반경 200, 100dmg)',
+    },
+    {
+        id: 'static_field',
+        name: 'Static Field',
+        elements: sortTuple(Element.LIGHTNING, Element.POISON, Element.EARTH),
+        description: '플레이어 주변 반경 180 전기장 (틱당 25dmg + 5% 마비)',
+    },
+    {
+        id: 'earthquake',
+        name: 'Earthquake',
+        elements: sortTuple(Element.LIGHTNING, Element.POISON, Element.AIR),
+        description: '12초마다 전체 지진 (모든 적 1초 스턴 + 50dmg)',
+    },
+    {
+        id: 'cyclone',
+        name: 'Cyclone',
+        elements: sortTuple(Element.LIGHTNING, Element.EARTH, Element.AIR),
+        description: '플레이어 따라다니는 사이클론 (반경 150, 적 끌어당김 + 100dmg/sec)',
+    },
+    {
+        id: 'cascade',
+        name: 'Cascade',
+        elements: sortTuple(Element.POISON, Element.EARTH, Element.AIR),
+        description: '적 처치 시 인근 적 1명에게 30% 데미지 폭발',
+    },
 ];
 
 export function findSynergy(slots: [Element, Element, Element]): SynergyDef | null {
