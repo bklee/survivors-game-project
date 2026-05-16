@@ -23,6 +23,10 @@ import { CHARACTERS } from '../constants/CharacterConfig';
 
 import { JuicePipeline } from '../fx/JuicePipeline';
 import { PlasmaStorm } from '../fx/PlasmaStorm';
+import { VolcanicPlague } from '../fx/VolcanicPlague';
+import { Tempest } from '../fx/Tempest';
+import { Eruption } from '../fx/Eruption';
+import { Cryotoxin } from '../fx/Cryotoxin';
 import { createCombatSystem } from '../systems/CombatSystem';
 import { SpellSystem } from '../systems/SpellSystem';
 import { ItemSystem } from '../systems/ItemSystem';
@@ -42,6 +46,10 @@ export class MainScene extends Phaser.Scene {
     private spellSystem!: SpellSystem;
     private itemSystem!: ItemSystem;
     private plasmaStorm!: PlasmaStorm;
+    private volcanicPlague!: VolcanicPlague;
+    private tempest!: Tempest;
+    private eruption!: Eruption;
+    private cryotoxin!: Cryotoxin;
     private selectedCharId: string = 'wizard';
     private currentBGM?: Phaser.Sound.BaseSound;
     private dungeon!: DungeonGenerator;
@@ -111,6 +119,14 @@ export class MainScene extends Phaser.Scene {
         SynergyEffect.synergyId[this.playerId] = -1;
         this.plasmaStorm = new PlasmaStorm(this);
         this.plasmaStorm.setPlayerEid(this.playerId);
+        this.volcanicPlague = new VolcanicPlague(this);
+        this.volcanicPlague.setPlayerEid(this.playerId);
+        this.tempest = new Tempest(this);
+        this.tempest.setPlayerEid(this.playerId);
+        this.eruption = new Eruption(this);
+        this.eruption.setPlayerEid(this.playerId);
+        this.cryotoxin = new Cryotoxin(this);
+        this.cryotoxin.setPlayerEid(this.playerId);
         SynergyEffect.boostActiveUntil[this.playerId] = 0;
         SynergyEffect.boostCooldownUntil[this.playerId] = 0;
 
@@ -480,6 +496,10 @@ export class MainScene extends Phaser.Scene {
         this.combatSystem(delta);
         this.itemSystem.update(delta);
         this.plasmaStorm.tick();
+        this.volcanicPlague.tick();
+        this.tempest.tick();
+        this.eruption.tick();
+        this.cryotoxin.tick();
         this.renderSystem(delta);
         this.handleInteractions();
 
