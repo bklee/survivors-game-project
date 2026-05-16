@@ -54,6 +54,10 @@ export class TriggerButton {
         this.playerEid = eid;
     }
 
+    setVisible(visible: boolean): void {
+        this.container.setVisible(visible);
+    }
+
     private canActivate(now: number): boolean {
         if (this.playerEid === null) return false;
         if (SynergyEffect.synergyId[this.playerEid] < 0) return false;
