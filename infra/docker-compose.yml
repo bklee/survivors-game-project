@@ -84,6 +84,8 @@ services:
       - ./nginx/dist:/usr/share/nginx/html:ro
       - ./certbot/conf:/etc/letsencrypt:ro
       - ./certbot/www:/var/www/certbot:ro
+    # 6시간마다 nginx reload — certbot 갱신된 cert 픽업 (--deploy-hook 보완)
+    command: ["/bin/sh", "-c", "while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g 'daemon off;'"]
 
   certbot:
     image: certbot/certbot
