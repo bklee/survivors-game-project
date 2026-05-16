@@ -94,14 +94,37 @@ docker-compose ps   # postgres, postgres_backup, api 모두 (healthy)
 
 ### 4) NPM Proxy Host 설정 (Web UI, one-time)
 
-`https://nginx.blocktalker.co.kr/nginx/proxy` 접속 후 `games.blocktalker.co.kr` proxy host 편집:
+`https://nginx.blocktalker.co.kr/nginx/proxy` 접속 → `games.blocktalker.co.kr` proxy host 편집 → **Advanced** 탭에 아래 블록 붙여넣기:
 
-- **Custom locations** 탭 → Add location
-  - Location: `/survivors/api`
-  - Scheme: `http`
-  - Forward Hostname/IP: `survivors-api`
-  - Forward Port: `3001`
-- SSL 탭: 이미 도메인 cert 가 있으므로 추가 작업 없음
+```nginx
+location /survivors/api/ {
+    proxy_pass http://survivors-api:3001/api/;
+    proxy_http_version 1.1;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_set_header X-Signature $http_x_signature;
+}
+
+location = /survivors/api {
+    return 301 /survivors/api/;
+}
+
+location /survivors/ {
+    proxy_pass http://survivors-static:80/;
+    proxy_http_version 1.1;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+}
+```
+
+핵심 포인트:
+- `/survivors/api/` 가 `/survivors/` 보다 더 길어 nginx 가 더 구체적인 매치 우선 적용 → API 요청은 api 컨테이너로
+- `proxy_pass` URL 의 끝 슬래시가 location prefix (`/survivors`) 를 떼어내고 upstream 의 path 로 갈아 끼움
+- 정적 PWA 는 별도 `survivors-static` 컨테이너 (built `dist/` 만 마운트, 소스 노출 차단)
 
 ### 5) Health check
 

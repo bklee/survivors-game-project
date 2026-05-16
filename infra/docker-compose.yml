@@ -77,6 +77,18 @@ services:
       - default
       - proxy
 
+  static:
+    image: nginx:alpine
+    container_name: survivors-static
+    restart: unless-stopped
+    volumes:
+      # 빌드된 PWA dist 만 서빙 — 소스 코드 (src/, backend/) 노출 차단
+      - ../dist:/usr/share/nginx/html:ro
+    expose:
+      - "80"
+    networks:
+      - proxy
+
 volumes:
   postgres_data:
 
