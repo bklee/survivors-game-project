@@ -1,5 +1,7 @@
 import './errorLogger';
 import Phaser from 'phaser';
+import { PokiSDK } from './integrations/PokiSDK';
+import { LemonSqueezy } from './integrations/LemonSqueezy';
 import { BootScene } from './scenes/BootScene';
 import { MainScene } from './scenes/MainScene';
 import { UpgradeScene } from './scenes/UpgradeScene';
@@ -43,4 +45,9 @@ const config: Phaser.Types.Core.GameConfig = {
     backgroundColor: '#111111',
 };
 
-new Phaser.Game(config);
+LemonSqueezy.handleSuccessRedirect();
+
+PokiSDK.init().then(() => {
+    new Phaser.Game(config);
+    setTimeout(() => PokiSDK.gameLoadingFinished(), 1000);
+});
