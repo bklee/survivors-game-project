@@ -2,3 +2,35 @@ node_modules/
 dist/
 .DS_Store
 *.log
+
+# Secrets / Credentials (NEVER COMMIT)
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+*.p12
+*.pfx
+*_key
+*_key.pub
+.deploy_key
+.deploy_key.pub
+.ssh/
+id_rsa*
+id_ed25519*
+credentials*
+secrets*
+.npmrc
+config.local.*
+*.secret
+*-secret
+*-secret.*
+
+# Deployment / Auth scripts with potential secrets
+setup_key.exp
+deploy.exp.local
+
+# Editor / OS
+.vscode/
+.idea/
+Thumbs.db
