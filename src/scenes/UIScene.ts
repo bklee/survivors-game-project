@@ -725,8 +725,10 @@ export class UIScene extends Phaser.Scene {
                 }
                 globalStats.damageMult *= 1.05;
                 globalStats.moveSpeedMult *= 1.03;
-                this.scene.get('MainScene').scene.pause();
-                this.scene.launch('UpgradeScene', { playerEid: peid });
+                if (!this.scene.isActive('UpgradeScene')) {
+                    this.scene.get('MainScene').scene.pause();
+                    this.scene.launch('UpgradeScene', { playerEid: peid });
+                }
             }
         }
         this.updateStageLevelText();
