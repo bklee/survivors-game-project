@@ -184,26 +184,52 @@ export class SpellSystem {
     }
 
     private spawnSoulBoltAttack(x: number, y: number, dx: number, dy: number, playSound: boolean) {
-        const explosionCount = 3;
-        const spacing = 25;
-        const firstDist = 20;
-        const delay = 100; // 약간 더 느린 발사 리듬
+        const startX = x + dx * 20;
+        const startY = y + dy * 20;
+        const speed = 420;
+        const lifetimeMs = 700;
 
-        for (let i = 0; i < explosionCount; i++) {
-            this.scene.time.delayedCall(i * delay, () => {
-                const castDist = firstDist + i * spacing;
-                const eid = this.createBaseSpell(x + dx * castDist, y + dy * castDist, 100);
-                Spell.damage[eid] = 55 * globalStats.damageMult; // wizard(45)보다 높음
-                Spell.radius[eid] = 45;
-                Spell.duration[eid] = 450;
-                Spell.pierce[eid] = 255;
-                Velocity.x[eid] = 0;
-                Velocity.y[eid] = 0;
+        // Spell 엔티티: SpriteInfo 없이 생성 → RenderSystem 제외, CombatSystem(충돌)만 처리
+        const eid = addEntity(world);
+        addComponent(world, Position, eid);
+        addComponent(world, Velocity, eid);
+        addComponent(world, Spell, eid);
+        addComponent(world, Rotation, eid);
+        Position.x[eid] = startX;
+        Position.y[eid] = startY;
+        Spell.damage[eid] = 55 * globalStats.damageMult;
+        Spell.radius[eid] = 12;
+        Spell.duration[eid] = lifetimeMs;
+        Spell.pierce[eid] = 2;
+        Velocity.x[eid] = dx * speed;
+        Velocity.y[eid] = dy * speed;
+        Rotation.angle[eid] = Math.atan2(dy, dx);
 
-                if (playSound) {
-                    window.dispatchEvent(new CustomEvent('play_sound', { detail: 'fire_cast' }));
-                }
-            });
+        // 시각: 작은 보라 막대 (완드형) + 꼬리 원
+        const wand = this.scene.add.rectangle(startX, startY, 18, 4, 0x9c27b0, 1);
+        wand.setStrokeStyle(1, 0xe1bee7, 0.8);
+        wand.setRotation(Math.atan2(dy, dx));
+        wand.setDepth(20);
+        const trail = this.scene.add.circle(startX, startY, 5, 0xce93d8, 0.6);
+        trail.setDepth(19);
+
+        const endX = startX + dx * speed * (lifetimeMs / 1000);
+        const endY = startY + dy * speed * (lifetimeMs / 1000);
+        this.scene.tweens.add({
+            targets: [wand, trail],
+            x: endX,
+            y: endY,
+            alpha: 0,
+            duration: lifetimeMs,
+            ease: 'Linear',
+            onComplete: () => {
+                wand.destroy();
+                trail.destroy();
+            },
+        });
+
+        if (playSound) {
+            window.dispatchEvent(new CustomEvent('play_sound', { detail: 'fire_cast' }));
         }
     }
 
