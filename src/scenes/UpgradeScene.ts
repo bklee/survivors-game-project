@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { PokiSDK } from '../integrations/PokiSDK';
 import { Element, ELEMENT_INFO } from '../constants/AlchemyConfig';
 import { applySlotChange } from '../systems/AlchemySystem';
 import {
@@ -125,6 +126,38 @@ export class UpgradeScene extends Phaser.Scene {
             const x = startX + i * (cardWidth + gap);
             const card = this.createCard(x, cardY, cardWidth, cardHeight, data);
             this.cards.push(card);
+        });
+
+        // 광고 보고 카드 1장 더 버튼 (1회 한정)
+        let extraCardUsed = false;
+        const extraCardBtn = this.add
+            .text(this.scale.width / 2, this.scale.height - 50, '광고 보고 카드 1장 더', {
+                fontSize: '18px',
+                color: '#aaaaaa',
+                backgroundColor: '#222222',
+                padding: { x: 12, y: 6 },
+            })
+            .setOrigin(0.5)
+            .setDepth(1)
+            .setInteractive({ useHandCursor: true });
+
+        extraCardBtn.on('pointerdown', async () => {
+            if (extraCardUsed) return;
+            extraCardUsed = true;
+            extraCardBtn.disableInteractive().setAlpha(0.5);
+            const success = await PokiSDK.rewardedBreak();
+            if (success) {
+                const extraCards = this.pickRandomCards(1);
+                if (extraCards.length > 0) {
+                    const extraCard = extraCards[0];
+                    const extraX = startX + 3 * (cardWidth + gap);
+                    const card = this.createCard(extraX, cardY, cardWidth, cardHeight, extraCard);
+                    this.cards.push(card);
+                    extraCardBtn.setText(`+ ${extraCard.title}`).setColor('#ffd700');
+                }
+            } else {
+                extraCardBtn.setText('광고 시청 실패').setColor('#888888');
+            }
         });
     }
 
