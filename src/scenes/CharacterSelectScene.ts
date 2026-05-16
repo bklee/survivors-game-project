@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { CHARACTERS } from '../constants/CharacterConfig';
+import { MetaProgress } from '../core/MetaProgress';
 
 export class CharacterSelectScene extends Phaser.Scene {
     constructor() {
@@ -17,11 +18,9 @@ export class CharacterSelectScene extends Phaser.Scene {
             .setAlpha(0.6);
 
         // Ensure selection BGM is playing (especially after retry)
-        // Check if ANY instance of select_bgm is currently playing
         const isBgmPlaying = this.sound.getAllPlaying().some((s) => s.key === 'select_bgm');
 
         if (!isBgmPlaying && this.cache.audio.exists('select_bgm')) {
-            // Force resume audio context if suspended (common in browsers)
             const soundManager = this.sound as any;
             if (soundManager.context?.state === 'suspended') {
                 soundManager.context.resume();
@@ -31,9 +30,9 @@ export class CharacterSelectScene extends Phaser.Scene {
 
         // Title
         this.add
-            .text(width / 2, 100, 'CHOOSE YOUR HERO!', {
+            .text(width / 2, 70, 'CHOOSE YOUR HERO!', {
                 fontFamily: '"MedievalSharp", cursive',
-                fontSize: '64px',
+                fontSize: '56px',
                 color: '#ffd700',
                 fontStyle: 'bold',
                 stroke: '#000000',
@@ -43,69 +42,159 @@ export class CharacterSelectScene extends Phaser.Scene {
             .setOrigin(0.5)
             .setDepth(100);
 
+        const meta = MetaProgress.load();
+        const unlockedList = meta.unlockedCharacters;
+        const myEssence = meta.essence;
+
+        // 정수 표시
+        this.add
+            .text(width / 2, 120, `보유 정수: ${myEssence}`, {
+                fontSize: '22px',
+                color: '#aaddff',
+                fontStyle: 'bold',
+            })
+            .setOrigin(0.5)
+            .setDepth(100);
+
         const charIds = Object.keys(CHARACTERS);
-        // 4명 캐릭터에 맞춘 가로 레이아웃 — 화면 폭 1280에 4 카드가 여유 있게 들어가도록
-        const cardWidth = 240;
-        const cardHeight = 360;
-        const gap = 30;
-        const totalWidth = charIds.length * cardWidth + (charIds.length - 1) * gap;
+
+        // 2-row × 3-col 레이아웃
+        const cardWidth = 220;
+        const cardHeight = 310;
+        const cols = 3;
+        const gapX = 28;
+        const gapY = 24;
+        const totalWidth = cols * cardWidth + (cols - 1) * gapX;
         const startX = (width - totalWidth) / 2 + cardWidth / 2;
+        const startY = 160 + cardHeight / 2;
 
         charIds.forEach((id, index) => {
             const char = CHARACTERS[id];
-            const x = startX + index * (cardWidth + gap);
-            const y = height / 2;
+            const col = index % cols;
+            const row = Math.floor(index / cols);
+            const x = startX + col * (cardWidth + gapX);
+            const y = startY + row * (cardHeight + gapY);
+
+            const isUnlocked = unlockedList.includes(char.id);
+            const canAfford =
+                !isUnlocked && char.unlockCost !== undefined && myEssence >= char.unlockCost;
+
+            const cardColor = isUnlocked ? 0x1e1e1e : 0x0d0d0d;
+            const strokeColor = isUnlocked ? 0x444444 : 0x222222;
 
             const card = this.add
-                .rectangle(x, y, cardWidth, cardHeight, 0x1e1e1e, 1)
-                .setStrokeStyle(3, 0x444444)
-                .setInteractive({ useHandCursor: true });
+                .rectangle(x, y, cardWidth, cardHeight, cardColor, 1)
+                .setStrokeStyle(3, strokeColor)
+                .setInteractive({ useHandCursor: true })
+                .setDepth(1);
 
-            // Display Character Sprite
+            // 캐릭터 스프라이트
             const idleFrame = char.id === 'necromancer' ? 'necromancer_f0' : `${char.id}_idle_0`;
-            const sprite = this.add.sprite(x, y - 40, 'dungeon', idleFrame).setScale(3.5);
+            const sprite = this.add
+                .sprite(x, y - 50, 'dungeon', idleFrame)
+                .setScale(3.0)
+                .setDepth(2);
+
+            // tint 설정
             if (char.id === 'necromancer') sprite.setTint(0x9c27b0);
+            else if (char.id === 'druid') sprite.setTint(0x4caf50);
+            else if (char.id === 'engineer') sprite.setTint(0x607d8b);
 
-            this.tweens.add({
-                targets: sprite,
-                y: y - 50,
-                duration: 1000,
-                yoyo: true,
-                repeat: -1,
-                ease: 'Sine.easeInOut',
-            });
+            if (!isUnlocked) sprite.setAlpha(0.35);
 
+            // 떠다니는 애니메이션 (해금된 캐릭터만)
+            if (isUnlocked) {
+                this.tweens.add({
+                    targets: sprite,
+                    y: y - 60,
+                    duration: 1000,
+                    yoyo: true,
+                    repeat: -1,
+                    ease: 'Sine.easeInOut',
+                });
+            }
+
+            // 이름
             this.add
-                .text(x, y - 130, char.name, {
-                    fontSize: '26px',
-                    color: '#ffd700',
+                .text(x, y - 120, char.name, {
+                    fontSize: '22px',
+                    color: isUnlocked ? '#ffd700' : '#555555',
                     fontStyle: 'bold',
                 })
-                .setOrigin(0.5);
+                .setOrigin(0.5)
+                .setDepth(2);
 
-            const statsText = `HP: ${char.baseStats.health}\nSPD: ${char.baseStats.speed}\nDMG: x${char.baseStats.damage}`;
-            this.add
-                .text(x, y + 90, statsText, {
-                    fontSize: '20px',
-                    color: '#aaaaaa',
-                    align: 'center',
-                    lineSpacing: 4,
-                })
-                .setOrigin(0.5);
+            if (isUnlocked) {
+                // 스탯 표시
+                const statsText = `HP: ${char.baseStats.health}  SPD: ${char.baseStats.speed}\nDMG: ×${char.baseStats.damage}`;
+                this.add
+                    .text(x, y + 80, statsText, {
+                        fontSize: '17px',
+                        color: '#aaaaaa',
+                        align: 'center',
+                        lineSpacing: 4,
+                    })
+                    .setOrigin(0.5)
+                    .setDepth(2);
+            } else {
+                // 자물쇠 + 비용
+                this.add
+                    .text(x, y + 55, `🔒 ${char.unlockCost ?? '?'} 정수`, {
+                        fontSize: '19px',
+                        color: '#888888',
+                    })
+                    .setOrigin(0.5)
+                    .setDepth(2);
 
+                if (canAfford) {
+                    this.add
+                        .text(x, y + 90, '[클릭하여 해금]', {
+                            fontSize: '15px',
+                            color: '#ffd700',
+                        })
+                        .setOrigin(0.5)
+                        .setDepth(2);
+                } else {
+                    this.add
+                        .text(x, y + 90, '정수 부족', {
+                            fontSize: '15px',
+                            color: '#554444',
+                        })
+                        .setOrigin(0.5)
+                        .setDepth(2);
+                }
+            }
+
+            // 포인터 이벤트
             card.on('pointerdown', () => {
-                this.sound.stopAll(); // Stop selection BGM
-                this.scene.start('MainScene', { characterId: id });
+                if (isUnlocked) {
+                    this.sound.stopAll();
+                    this.scene.start('MainScene', { characterId: id });
+                } else if (
+                    char.unlockCost !== undefined &&
+                    MetaProgress.unlockCharacter(char.id, char.unlockCost)
+                ) {
+                    this.scene.restart();
+                }
             });
 
             card.on('pointerover', () => {
-                card.setStrokeStyle(4, 0x00ffff);
-                sprite.setTint(0x00ffff);
+                if (isUnlocked) {
+                    card.setStrokeStyle(4, 0x00ffff);
+                    sprite.setTint(0x00ffff);
+                } else if (canAfford) {
+                    card.setStrokeStyle(4, 0xffd700);
+                }
             });
+
             card.on('pointerout', () => {
-                card.setStrokeStyle(3, 0x444444);
-                if (char.id === 'necromancer') sprite.setTint(0x9c27b0);
-                else sprite.clearTint();
+                card.setStrokeStyle(3, strokeColor);
+                if (isUnlocked) {
+                    if (char.id === 'necromancer') sprite.setTint(0x9c27b0);
+                    else if (char.id === 'druid') sprite.setTint(0x4caf50);
+                    else if (char.id === 'engineer') sprite.setTint(0x607d8b);
+                    else sprite.clearTint();
+                }
             });
         });
     }
