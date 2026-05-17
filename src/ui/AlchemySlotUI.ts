@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { AlchemySlot, SynergyEffect } from '../components/alchemy';
 import { Element, ELEMENT_INFO, SYNERGIES } from '../constants/AlchemyConfig';
+import { tr } from '../i18n/I18n';
 
 const SLOT_SIZE = 48;
 const SLOT_GAP = 8;
@@ -117,7 +118,7 @@ export class AlchemySlotUI {
         if (synergyId >= 0 && synergyId < SYNERGIES.length) {
             const synergy = SYNERGIES[synergyId];
             this.synergyNameText.setText(`✦ ${synergy.name}`);
-            this.synergyDescText.setText(synergy.description);
+            this.synergyDescText.setText(tr(synergy.description));
         } else {
             this.synergyNameText.setText('');
             this.synergyDescText.setText('');
