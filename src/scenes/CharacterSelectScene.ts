@@ -101,6 +101,7 @@ export class CharacterSelectScene extends Phaser.Scene {
             if (char.id === 'necromancer') sprite.setTint(0x9c27b0);
             else if (char.id === 'druid') sprite.setTint(0x4caf50);
             else if (char.id === 'engineer') sprite.setTint(0x607d8b);
+            else if (char.id === 'dwarf') sprite.setTint(0x8d6e63);
 
             if (!isUnlocked) sprite.setAlpha(0.35);
 
@@ -201,6 +202,7 @@ export class CharacterSelectScene extends Phaser.Scene {
                     if (char.id === 'necromancer') sprite.setTint(0x9c27b0);
                     else if (char.id === 'druid') sprite.setTint(0x4caf50);
                     else if (char.id === 'engineer') sprite.setTint(0x607d8b);
+                    else if (char.id === 'dwarf') sprite.setTint(0x8d6e63);
                     else sprite.clearTint();
                 }
             });

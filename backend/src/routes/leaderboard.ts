@@ -4,7 +4,15 @@ import { pool } from '../db/pool.js';
 
 const router = Router();
 
-const CHARACTER_IDS = ['knight', 'wizard', 'elf', 'necromancer', 'druid', 'engineer'] as const;
+const CHARACTER_IDS = [
+    'knight',
+    'wizard',
+    'elf',
+    'necromancer',
+    'druid',
+    'engineer',
+    'dwarf',
+] as const;
 
 const SubmitSchema = z.object({
     device_id: z.string().min(8).max(64),
