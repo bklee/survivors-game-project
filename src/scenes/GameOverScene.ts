@@ -1,7 +1,6 @@
 import Phaser from 'phaser';
 import { MetaProgress } from '../core/MetaProgress';
 import { PokiSDK } from '../integrations/PokiSDK';
-import { LemonSqueezy } from '../integrations/LemonSqueezy';
 import { ApiClient } from '../integrations/ApiClient';
 
 export class GameOverScene extends Phaser.Scene {
@@ -101,13 +100,10 @@ export class GameOverScene extends Phaser.Scene {
             retryBtn.setScale(1);
         });
 
-        // 6. 부활 버튼 (게임당 1회) — No-Ads Pass 보유 시 광고 없이 즉시 부활
+        // 6. 부활 버튼 (게임당 1회) — 광고 보면 부활
         if (!this.reviveUsed) {
-            const hasNoAds = LemonSqueezy.hasProduct('no_ads_pass');
-            const reviveLabel = hasNoAds ? '✦ 부활' : '광고 보고 부활';
-
             const reviveBtn = this.add
-                .text(width / 2, height / 2 + 60, reviveLabel, {
+                .text(width / 2, height / 2 + 60, '광고 보고 부활', {
                     fontFamily: '"MedievalSharp", cursive',
                     fontSize: '24px',
                     color: '#ffd700',
@@ -119,16 +115,11 @@ export class GameOverScene extends Phaser.Scene {
 
             reviveBtn.on('pointerdown', async () => {
                 reviveBtn.disableInteractive();
-                let success: boolean;
-                if (hasNoAds) {
-                    success = true;
-                } else {
-                    success = await PokiSDK.rewardedBreak();
-                    ApiClient.trackEvent(success ? 'ad_view' : 'ad_skip', {
-                        placement: 'revive',
-                        stage: this.stage,
-                    });
-                }
+                const success = await PokiSDK.rewardedBreak();
+                ApiClient.trackEvent(success ? 'ad_view' : 'ad_skip', {
+                    placement: 'revive',
+                    stage: this.stage,
+                });
                 if (success) {
                     this.sound.stopAll();
                     this.cameras.main.fadeOut(800, 0, 0, 0);

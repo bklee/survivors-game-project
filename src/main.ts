@@ -1,7 +1,6 @@
 import './errorLogger';
 import Phaser from 'phaser';
 import { PokiSDK } from './integrations/PokiSDK';
-import { LemonSqueezy } from './integrations/LemonSqueezy';
 import { ApiClient } from './integrations/ApiClient';
 import { BootScene } from './scenes/BootScene';
 import { MainScene } from './scenes/MainScene';
@@ -45,8 +44,6 @@ const config: Phaser.Types.Core.GameConfig = {
     pixelArt: true,
     backgroundColor: '#111111',
 };
-
-LemonSqueezy.handleSuccessRedirect();
 
 // PWA 설치 완료 트래킹
 window.addEventListener('appinstalled', () => {

@@ -414,6 +414,18 @@ export class MainScene extends Phaser.Scene {
             globalStats.currentStage = this.currentStage;
             this.isPausedForClear = false;
 
+            // 5 스테이지마다 interstitial 광고 (수익 채널 — 게임 흐름 자연스러운 break)
+            if (this.currentStage > 1 && this.currentStage % 5 === 0) {
+                PokiSDK.gameplayStop();
+                void PokiSDK.commercialBreak().then(() => {
+                    ApiClient.trackEvent('ad_view', {
+                        placement: 'stage_interstitial',
+                        stage: this.currentStage,
+                    });
+                    PokiSDK.gameplayStart();
+                });
+            }
+
             // Remove old props, items, and spells from previous stage
             const allEntities = defineQuery([Position, SpriteInfo])(world);
             for (let i = 0; i < allEntities.length; i++) {

@@ -1,6 +1,4 @@
 import Phaser from 'phaser';
-import { LemonSqueezy } from '../integrations/LemonSqueezy';
-import { ApiClient } from '../integrations/ApiClient';
 
 export class TitleScene extends Phaser.Scene {
     constructor() {
@@ -32,10 +30,9 @@ export class TitleScene extends Phaser.Scene {
         homeBtn.on('pointerover', () => homeBtn.setTint(0xffff00));
         homeBtn.on('pointerout', () => homeBtn.clearTint());
 
-        // 메뉴 레이아웃 — 720px 화면 안에 START + 보조(가로) + IAP 가 들어가도록 재배치.
+        // 메뉴 레이아웃 — START + 보조 메뉴 (스킬 트리 + 시너지 도감 가로 묶음)
         const startY = height / 2 + 100;
-        const subY = startY + 90; // 가로 묶음 (스킬 트리 + 시너지 도감)
-        const iapY = subY + 70; // 광고 제거 (IAP)
+        const subY = startY + 90;
 
         // START Button (메인 액션)
         const startBtn = this.add
@@ -162,45 +159,5 @@ export class TitleScene extends Phaser.Scene {
             codexBtn.setFillStyle(0x2d1a3d, 0.8);
             codexBtn.setScale(1);
         });
-
-        // No-Ads Pass 버튼 (보조 메뉴 묶음 아래)
-        const hasNoAds = LemonSqueezy.hasProduct('no_ads_pass');
-        if (!hasNoAds) {
-            ApiClient.trackEvent('iap_funnel_view', { product_id: 'no_ads_pass' });
-            const noAdsBtn = this.add
-                .rectangle(width / 2, iapY, 280, 44, 0x1e2a3a, 0.85)
-                .setInteractive({ useHandCursor: true })
-                .setStrokeStyle(2, 0xffd700);
-
-            this.add
-                .text(width / 2, iapY, '광고 제거 ₩2,000', {
-                    fontFamily: '"MedievalSharp", cursive',
-                    fontSize: '20px',
-                    color: '#ffd700',
-                })
-                .setOrigin(0.5);
-
-            noAdsBtn.on('pointerover', () => {
-                noAdsBtn.setFillStyle(0x2e3a4a, 1);
-                noAdsBtn.setScale(1.03);
-            });
-            noAdsBtn.on('pointerout', () => {
-                noAdsBtn.setFillStyle(0x1e2a3a, 0.85);
-                noAdsBtn.setScale(1);
-            });
-            noAdsBtn.on('pointerdown', () => {
-                ApiClient.trackEvent('iap_funnel_click', { product_id: 'no_ads_pass' });
-                void ApiClient.flush(); // 결제 페이지로 이동 전에 강제 flush
-                LemonSqueezy.checkout('no_ads_pass');
-            });
-        } else {
-            this.add
-                .text(width / 2, iapY, '✦ No-Ads Pass 활성', {
-                    fontFamily: '"MedievalSharp", cursive',
-                    fontSize: '16px',
-                    color: '#888888',
-                })
-                .setOrigin(0.5);
-        }
     }
 }
