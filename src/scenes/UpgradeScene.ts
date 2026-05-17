@@ -82,6 +82,14 @@ const STAT_OPTIONS: {
         color: 0xffeb3b,
         icon: '🧲',
     },
+    {
+        key: 'damageMult',
+        pct: 0.25,
+        titleKey: 'upgrade_stat_bigdmg_title',
+        descKey: 'upgrade_stat_bigdmg_desc',
+        color: 0xb71c1c,
+        icon: '🔥',
+    },
 ];
 
 export class UpgradeScene extends Phaser.Scene {
@@ -253,6 +261,27 @@ export class UpgradeScene extends Phaser.Scene {
         const strokeColor = isEvolution ? 0xffd700 : isRelic ? 0xff6b00 : 0xffffff;
         const strokeWidth = isEvolution || isRelic ? 4 : 3;
 
+        // Rarity 글로우 — evolution(금) / relic(주황) 카드에 펄스 애니메이션
+        if (isEvolution || isRelic) {
+            const glow = this.add.rectangle(
+                0,
+                0,
+                w + 12,
+                h + 12,
+                isEvolution ? 0xffd700 : 0xff6b00,
+                0.25,
+            );
+            container.add(glow);
+            this.tweens.add({
+                targets: glow,
+                alpha: 0.5,
+                duration: 800,
+                yoyo: true,
+                repeat: -1,
+                ease: 'Sine.easeInOut',
+            });
+        }
+
         const bg = this.add.rectangle(0, 0, w, h, data.color, 0.4);
         bg.setStrokeStyle(strokeWidth, strokeColor, 1);
         container.add(bg);
@@ -279,8 +308,24 @@ export class UpgradeScene extends Phaser.Scene {
         container.add(descText);
 
         bg.setInteractive({ useHandCursor: true });
-        bg.on('pointerover', () => bg.setFillStyle(data.color, 0.7));
-        bg.on('pointerout', () => bg.setFillStyle(data.color, 0.4));
+        bg.on('pointerover', () => {
+            bg.setFillStyle(data.color, 0.7);
+            this.tweens.add({
+                targets: container,
+                scale: 1.06,
+                duration: 150,
+                ease: 'Back.easeOut',
+            });
+        });
+        bg.on('pointerout', () => {
+            bg.setFillStyle(data.color, 0.4);
+            this.tweens.add({
+                targets: container,
+                scale: 1,
+                duration: 150,
+                ease: 'Sine.easeOut',
+            });
+        });
         bg.on('pointerdown', () => this.onCardSelected(data));
 
         return container;
