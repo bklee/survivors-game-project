@@ -60,21 +60,24 @@ export class CharacterSelectScene extends Phaser.Scene {
 
         const charIds = Object.keys(CHARACTERS);
 
-        // 2-row × 3-col 레이아웃
-        const cardWidth = 220;
-        const cardHeight = 310;
-        const cols = 3;
-        const gapX = 28;
-        const gapY = 24;
-        const totalWidth = cols * cardWidth + (cols - 1) * gapX;
-        const startX = (width - totalWidth) / 2 + cardWidth / 2;
-        const startY = 160 + cardHeight / 2;
+        // 동적 레이아웃 — 한 줄 최대 cols 개, 마지막 줄은 자동 중앙 정렬.
+        // 7 캐릭터 = 첫 줄 4 + 둘째 줄 3 (center). 화면 720px 안에 들어가도록 카드 축소.
+        const cardWidth = 200;
+        const cardHeight = 260;
+        const cols = 4;
+        const gapX = 24;
+        const gapY = 18;
+        const startY = 150 + cardHeight / 2; // 첫 줄 top = 150
 
         charIds.forEach((id, index) => {
             const char = CHARACTERS[id];
-            const col = index % cols;
             const row = Math.floor(index / cols);
-            const x = startX + col * (cardWidth + gapX);
+            const col = index % cols;
+            // 이 행의 카드 수 (마지막 행은 nCols 이하)
+            const rowCardCount = Math.min(cols, charIds.length - row * cols);
+            const rowWidth = rowCardCount * cardWidth + (rowCardCount - 1) * gapX;
+            const rowStartX = (width - rowWidth) / 2 + cardWidth / 2;
+            const x = rowStartX + col * (cardWidth + gapX);
             const y = startY + row * (cardHeight + gapY);
 
             const isUnlocked = unlockedList.includes(char.id);
@@ -90,11 +93,11 @@ export class CharacterSelectScene extends Phaser.Scene {
                 .setInteractive({ useHandCursor: true })
                 .setDepth(1);
 
-            // 캐릭터 스프라이트
+            // 캐릭터 스프라이트 (카드 cardHeight 260 에 맞춰 약간 위로)
             const idleFrame = char.id === 'necromancer' ? 'necromancer_f0' : `${char.id}_idle_0`;
             const sprite = this.add
-                .sprite(x, y - 50, 'dungeon', idleFrame)
-                .setScale(3.0)
+                .sprite(x, y - 35, 'dungeon', idleFrame)
+                .setScale(2.6)
                 .setDepth(2);
 
             // tint 설정
@@ -109,7 +112,7 @@ export class CharacterSelectScene extends Phaser.Scene {
             if (isUnlocked) {
                 this.tweens.add({
                     targets: sprite,
-                    y: y - 60,
+                    y: y - 45,
                     duration: 1000,
                     yoyo: true,
                     repeat: -1,
@@ -117,10 +120,10 @@ export class CharacterSelectScene extends Phaser.Scene {
                 });
             }
 
-            // 이름
+            // 이름 — 카드 상단
             this.add
-                .text(x, y - 120, char.name, {
-                    fontSize: '22px',
+                .text(x, y - 105, char.name, {
+                    fontSize: '20px',
                     color: isUnlocked ? '#ffd700' : '#555555',
                     fontStyle: 'bold',
                 })
@@ -128,11 +131,11 @@ export class CharacterSelectScene extends Phaser.Scene {
                 .setDepth(2);
 
             if (isUnlocked) {
-                // 스탯 표시
+                // 스탯 표시 — 카드 하단
                 const statsText = `HP: ${char.baseStats.health}  SPD: ${char.baseStats.speed}\nDMG: ×${char.baseStats.damage}`;
                 this.add
-                    .text(x, y + 80, statsText, {
-                        fontSize: '17px',
+                    .text(x, y + 70, statsText, {
+                        fontSize: '15px',
                         color: '#aaaaaa',
                         align: 'center',
                         lineSpacing: 4,
@@ -144,10 +147,10 @@ export class CharacterSelectScene extends Phaser.Scene {
                 this.add
                     .text(
                         x,
-                        y + 55,
+                        y + 45,
                         I18n.t('char_select_locked', { cost: char.unlockCost ?? '?' }),
                         {
-                            fontSize: '19px',
+                            fontSize: '17px',
                             color: '#888888',
                         },
                     )
@@ -156,16 +159,16 @@ export class CharacterSelectScene extends Phaser.Scene {
 
                 if (canAfford) {
                     this.add
-                        .text(x, y + 90, I18n.t('char_select_unlock'), {
-                            fontSize: '15px',
+                        .text(x, y + 78, I18n.t('char_select_unlock'), {
+                            fontSize: '14px',
                             color: '#ffd700',
                         })
                         .setOrigin(0.5)
                         .setDepth(2);
                 } else {
                     this.add
-                        .text(x, y + 90, I18n.t('char_select_short'), {
-                            fontSize: '15px',
+                        .text(x, y + 78, I18n.t('char_select_short'), {
+                            fontSize: '14px',
                             color: '#554444',
                         })
                         .setOrigin(0.5)
