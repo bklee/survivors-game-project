@@ -13,10 +13,7 @@ export class GameOverScene extends Phaser.Scene {
         super('GameOverScene');
     }
 
-    private reviveUsed: boolean = false;
-
     init(data: { stage?: number; enemiesKilled?: number; synergiesActivated?: number } = {}) {
-        this.reviveUsed = false;
         this.stage = data.stage ?? 1;
         this.enemiesKilled = data.enemiesKilled ?? 0;
         this.synergiesActivated = data.synergiesActivated ?? 0;
@@ -106,38 +103,38 @@ export class GameOverScene extends Phaser.Scene {
             retryBtn.setScale(1);
         });
 
-        // 6. 부활 버튼 (게임당 1회) — 광고 보면 부활
-        if (!this.reviveUsed) {
-            const reviveBtn = this.add
-                .text(width / 2, height / 2 + 60, I18n.t('gameover_revive_ad'), {
-                    fontFamily: '"MedievalSharp", cursive',
-                    fontSize: '24px',
-                    color: '#ffd700',
-                    backgroundColor: '#333333',
-                    padding: { x: 16, y: 8 },
-                })
-                .setOrigin(0.5)
-                .setInteractive({ useHandCursor: true });
+        // 6. 부활 버튼 — 광고 보면 부활. 게임당 무한 (매 사망마다 다시 표시).
+        const reviveBtn = this.add
+            .text(width / 2, height / 2 + 60, I18n.t('gameover_revive_ad'), {
+                fontFamily: '"MedievalSharp", cursive',
+                fontSize: '24px',
+                color: '#ffd700',
+                backgroundColor: '#333333',
+                padding: { x: 16, y: 8 },
+            })
+            .setOrigin(0.5)
+            .setInteractive({ useHandCursor: true });
 
-            reviveBtn.on('pointerdown', async () => {
-                reviveBtn.disableInteractive();
-                const success = await PokiSDK.rewardedBreak();
-                ApiClient.trackEvent(success ? 'ad_view' : 'ad_skip', {
-                    placement: 'revive',
-                    stage: this.stage,
-                });
-                if (success) {
-                    this.sound.stopAll();
-                    this.cameras.main.fadeOut(800, 0, 0, 0);
-                    this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => {
-                        this.scene.stop('GameOverScene');
-                        this.scene.resume('MainScene', { revive: true });
-                    });
-                } else {
-                    reviveBtn.setText(I18n.t('upgrade_ad_failed'));
-                    reviveBtn.setColor('#888888');
-                }
+        reviveBtn.on('pointerdown', async () => {
+            reviveBtn.disableInteractive();
+            const success = await PokiSDK.rewardedBreak();
+            ApiClient.trackEvent(success ? 'ad_view' : 'ad_skip', {
+                placement: 'revive',
+                stage: this.stage,
             });
-        }
+            if (success) {
+                // MainScene 의 player Health 복구 요청 (MainScene 측에서 receiver 처리)
+                window.dispatchEvent(new CustomEvent('ad_revive_requested'));
+                this.sound.stopAll();
+                this.cameras.main.fadeOut(800, 0, 0, 0);
+                this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => {
+                    this.scene.stop('GameOverScene');
+                    this.scene.resume('MainScene');
+                });
+            } else {
+                reviveBtn.setText(I18n.t('upgrade_ad_failed'));
+                reviveBtn.setColor('#888888');
+            }
+        });
     }
 }
