@@ -87,6 +87,22 @@ export const CHARACTERS: Record<string, CharacterData> = {
             run: { x: 192, y: 132, w: 16, h: 28, count: 4 },
         },
     },
+    DWARF: {
+        name: 'Dwarf',
+        id: 'dwarf',
+        description: {
+            ko: '단단한 광부. 큰 검을 휘두른다.',
+            en: 'Sturdy miner. Swings a heavy blade.',
+        },
+        unlockCost: 7500,
+        baseStats: { health: 180, speed: 80, damage: 1.5, mana: 0 },
+        // sprite 는 knight frames 재활용 (추후 dungeon atlas 에 별도 dwarf 좌표 발견 시 교체).
+        // CharacterSelectScene + PlayerSystem 에서 갈색 tint 로 구분.
+        frames: {
+            idle: { x: 128, y: 68, w: 16, h: 28, count: 4 },
+            run: { x: 192, y: 68, w: 16, h: 28, count: 4 },
+        },
+    },
 };
 
 export const BACKGROUND_FLOOR = { x: 16, y: 64, w: 16, h: 16 };
