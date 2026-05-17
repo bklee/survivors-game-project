@@ -233,6 +233,7 @@ export class MainScene extends Phaser.Scene {
         else if (this.selectedCharId === 'necromancer') charTypeId = 3;
         else if (this.selectedCharId === 'druid') charTypeId = 4;
         else if (this.selectedCharId === 'engineer') charTypeId = 5;
+        else if (this.selectedCharId === 'dwarf') charTypeId = 0; // knight 무기 (검) 공유
 
         addComponent(world, WeaponEvolution, this.playerId);
         WeaponEvolution.evolutionId[this.playerId] = -1;
