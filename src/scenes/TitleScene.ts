@@ -10,8 +10,42 @@ export class TitleScene extends Phaser.Scene {
         const { width, height } = this.scale;
         this.cameras.main.fadeIn(1000, 0, 0, 0);
 
-        // Background Image
-        this.add.image(width / 2, height / 2, 'main_bg').setDisplaySize(width, height);
+        // Background Image — 미세한 줌 & 패닝으로 살아있는 느낌
+        const bg = this.add.image(width / 2, height / 2, 'main_bg').setDisplaySize(width, height);
+        bg.setScale(1.05);
+        this.tweens.add({
+            targets: bg,
+            scaleX: 1.1,
+            scaleY: 1.1,
+            duration: 8000,
+            yoyo: true,
+            repeat: -1,
+            ease: 'Sine.easeInOut',
+        });
+        // 어두운 오버레이 (텍스트 가독성)
+        this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.35);
+
+        // 게임 타이틀 — 화면 상단 중앙
+        const titleTextObj = this.add
+            .text(width / 2, height / 2 - 200, 'MAGICKA SURVIVORS', {
+                fontFamily: '"MedievalSharp", cursive',
+                fontSize: '72px',
+                color: '#ffd700',
+                fontStyle: 'bold',
+                stroke: '#000000',
+                strokeThickness: 8,
+                shadow: { offsetX: 3, offsetY: 3, color: '#5a3300', blur: 16, fill: true },
+            })
+            .setOrigin(0.5);
+        // 타이틀에 미세한 hover 애니메이션
+        this.tweens.add({
+            targets: titleTextObj,
+            y: titleTextObj.y - 8,
+            duration: 2000,
+            yoyo: true,
+            repeat: -1,
+            ease: 'Sine.easeInOut',
+        });
 
         // Home Button (Top Left)
         const homeBtn = this.add
