@@ -20,6 +20,20 @@ export default defineConfig(({ mode }) => {
             outDir: isPoki ? 'dist-poki' : 'dist',
             assetsInlineLimit: 0,
             target: 'esnext',
+            // 라이브러리별 chunk 분리 — 게임 코드 수정 시에도 라이브러리 chunk 는 캐시 유지.
+            // Phaser 가 가장 큰 의존성 (~1MB 차지) 이라 별도 분리하면 효과 큼.
+            rollupOptions: {
+                output: {
+                    manualChunks(id) {
+                        if (id.includes('node_modules')) {
+                            if (id.includes('phaser')) return 'phaser';
+                            if (id.includes('bitecs')) return 'bitecs';
+                            if (id.includes('rot-js')) return 'rot-js';
+                            return 'vendor';
+                        }
+                    },
+                },
+            },
         },
     };
 });
