@@ -3,6 +3,7 @@ import { MetaProgress } from '../core/MetaProgress';
 import { PokiSDK } from '../integrations/PokiSDK';
 import { ApiClient } from '../integrations/ApiClient';
 import { I18n } from '../i18n/I18n';
+import { globalStats } from '../core/PlayerStats';
 
 export class GameOverScene extends Phaser.Scene {
     private stage: number = 1;
@@ -36,9 +37,10 @@ export class GameOverScene extends Phaser.Scene {
         // 2. Overlay
         this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.2);
 
-        // 3. 정수 정산
+        // 3. 정수 정산 — base + 코인 환전 (100 coin = 1 essence)
+        const coinEssence = Math.floor(globalStats.totalCoins / 100);
         const baseEssence =
-            this.stage * 10 + this.enemiesKilled * 0.5 + this.synergiesActivated * 5;
+            this.stage * 10 + this.enemiesKilled * 0.5 + this.synergiesActivated * 5 + coinEssence;
         const discoveryLevel = MetaProgress.load().skillTree.discovery;
         const discoveryBonus = 1 + discoveryLevel * 0.1;
         const finalEssence = Math.floor(baseEssence * discoveryBonus);
