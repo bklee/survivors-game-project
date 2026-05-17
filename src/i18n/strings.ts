@@ -56,6 +56,10 @@ export const STRINGS = {
     upgrade_stat_cdr_desc: { ko: '쿨다운 감소', en: 'Cooldown reduced' },
     upgrade_stat_pickup_title: { ko: '획득 범위 +20%', en: 'Pickup Range +20%' },
     upgrade_stat_pickup_desc: { ko: 'XP/아이템 픽업 범위', en: 'XP/item pickup range' },
+    upgrade_stat_maxhp_title: { ko: '최대 HP +25', en: 'Max HP +25' },
+    upgrade_stat_maxhp_desc: { ko: '최대 체력 증가 + 완전 회복', en: 'Max health up + full heal' },
+    upgrade_stat_bigdmg_title: { ko: '데미지 +25%', en: 'Damage +25%' },
+    upgrade_stat_bigdmg_desc: { ko: '큰 폭으로 데미지 증가', en: 'Massive damage boost' },
 } as const;
 
 export type StringKey = keyof typeof STRINGS;
