@@ -41,6 +41,12 @@ export const STRINGS = {
     skill_tree_essence_label: { ko: '정수: {amount}', en: 'Essence: {amount}' },
     skill_tree_node_cost: { ko: '({cost} 정수)', en: '({cost} Essence)' },
 
+    // UI Toasts
+    synergy_discovered_toast: {
+        ko: '✦ 새 시너지 발견: {name}!\n+50 정수',
+        en: '✦ New synergy discovered: {name}!\n+50 Essence',
+    },
+
     // Upgrade Stat Cards
     upgrade_stat_damage_title: { ko: '데미지 +15%', en: 'Damage +15%' },
     upgrade_stat_damage_desc: { ko: '모든 공격 데미지 증가', en: 'All attack damage increased' },
