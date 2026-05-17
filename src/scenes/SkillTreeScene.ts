@@ -1,12 +1,13 @@
 import Phaser from 'phaser';
 import { SKILL_TREE, SkillNodeDef } from '../constants/SkillTreeConfig';
 import { MetaProgress } from '../core/MetaProgress';
+import { I18n, tr } from '../i18n/I18n';
 
-const BRANCH_LABELS: Record<'combat' | 'survival' | 'discovery', string> = {
-    combat: '⚔ 전투',
-    survival: '🛡 생존',
-    discovery: '🔍 발견',
-};
+function branchLabel(branch: 'combat' | 'survival' | 'discovery'): string {
+    if (branch === 'combat') return I18n.t('skill_tree_branch_combat');
+    if (branch === 'survival') return I18n.t('skill_tree_branch_survival');
+    return I18n.t('skill_tree_branch_discovery');
+}
 
 const BRANCH_COLORS: Record<'combat' | 'survival' | 'discovery', number> = {
     combat: 0xc0392b,
@@ -29,7 +30,7 @@ export class SkillTreeScene extends Phaser.Scene {
 
         // 타이틀
         this.add
-            .text(width / 2, 36, '스킬 트리', {
+            .text(width / 2, 36, I18n.t('skill_tree_title'), {
                 fontFamily: '"MedievalSharp", cursive',
                 fontSize: '36px',
                 color: '#ffd700',
@@ -60,7 +61,7 @@ export class SkillTreeScene extends Phaser.Scene {
 
             // 계열 제목
             this.add
-                .text(colX, 90, BRANCH_LABELS[branch], {
+                .text(colX, 90, branchLabel(branch), {
                     fontFamily: '"MedievalSharp", cursive',
                     fontSize: '24px',
                     color: '#ffffff',
@@ -116,11 +117,12 @@ export class SkillTreeScene extends Phaser.Scene {
             .rectangle(x, y, nodeWidth, 44, cardColor, cardAlpha)
             .setStrokeStyle(2, strokeColor, strokeAlpha);
 
+        const nodeName = tr(node.name);
         const label = unlocked
-            ? `✓ ${node.name}`
+            ? `✓ ${nodeName}`
             : isNext
-              ? `${node.name}  (${node.cost} 정수)`
-              : `🔒 ${node.name}`;
+              ? `${nodeName}  ${I18n.t('skill_tree_node_cost', { cost: node.cost })}`
+              : `🔒 ${nodeName}`;
 
         this.add
             .text(x, y - 6, label, {
@@ -131,7 +133,7 @@ export class SkillTreeScene extends Phaser.Scene {
             .setOrigin(0.5);
 
         this.add
-            .text(x, y + 10, node.description, {
+            .text(x, y + 10, tr(node.description), {
                 fontSize: '12px',
                 color: unlocked ? '#ccffcc' : '#aaaaaa',
                 align: 'center',
@@ -153,6 +155,6 @@ export class SkillTreeScene extends Phaser.Scene {
 
     private refreshEssenceText() {
         const e = MetaProgress.load().essence;
-        this.essenceText.setText(`정수: ${e}`);
+        this.essenceText.setText(I18n.t('skill_tree_essence_label', { amount: e }));
     }
 }
