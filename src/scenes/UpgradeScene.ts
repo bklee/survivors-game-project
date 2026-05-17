@@ -1,7 +1,8 @@
 import Phaser from 'phaser';
 import { PokiSDK } from '../integrations/PokiSDK';
 import { ApiClient } from '../integrations/ApiClient';
-import { I18n } from '../i18n/I18n';
+import { I18n, tr } from '../i18n/I18n';
+import { StringKey } from '../i18n/strings';
 import { Element, ELEMENT_INFO } from '../constants/AlchemyConfig';
 import { applySlotChange } from '../systems/AlchemySystem';
 import {
@@ -44,40 +45,40 @@ type CardData = {
 const STAT_OPTIONS: {
     key: StatPayload['statKey'];
     pct: number;
-    title: string;
-    desc: string;
+    titleKey: StringKey;
+    descKey: StringKey;
     color: number;
     icon: string;
 }[] = [
     {
         key: 'damageMult',
         pct: 0.15,
-        title: '데미지 +15%',
-        desc: '모든 공격 데미지 증가',
+        titleKey: 'upgrade_stat_damage_title',
+        descKey: 'upgrade_stat_damage_desc',
         color: 0xff5722,
         icon: '⚔',
     },
     {
         key: 'moveSpeedMult',
         pct: 0.1,
-        title: '이동속도 +10%',
-        desc: '이동 속도 증가',
+        titleKey: 'upgrade_stat_speed_title',
+        descKey: 'upgrade_stat_speed_desc',
         color: 0x4caf50,
         icon: '⚡',
     },
     {
         key: 'cooldownMult',
         pct: 0.1,
-        title: 'CDR +10%',
-        desc: '쿨다운 감소',
+        titleKey: 'upgrade_stat_cdr_title',
+        descKey: 'upgrade_stat_cdr_desc',
         color: 0x2196f3,
         icon: '⏱',
     },
     {
         key: 'pickupRadiusMult',
         pct: 0.2,
-        title: '획득 범위 +20%',
-        desc: 'XP/아이템 픽업 범위',
+        titleKey: 'upgrade_stat_pickup_title',
+        descKey: 'upgrade_stat_pickup_desc',
         color: 0xffeb3b,
         icon: '🧲',
     },
@@ -190,8 +191,8 @@ export class UpgradeScene extends Phaser.Scene {
                 type: 'stat',
                 statKey: stat.key,
                 pct: stat.pct,
-                title: stat.title,
-                description: stat.desc,
+                title: I18n.t(stat.titleKey),
+                description: I18n.t(stat.descKey),
                 icon: stat.icon,
                 color: stat.color,
             });
@@ -205,7 +206,7 @@ export class UpgradeScene extends Phaser.Scene {
                     type: 'evolution',
                     def: ev,
                     title: ev.name,
-                    description: ev.description,
+                    description: tr(ev.description),
                     icon: '✦',
                     color: 0xffd700,
                 });
@@ -225,7 +226,7 @@ export class UpgradeScene extends Phaser.Scene {
                         type: 'relic',
                         relicDef: relic,
                         title: relic.name,
-                        description: relic.description,
+                        description: tr(relic.description),
                         icon: '✦',
                         color: 0xff6b00,
                     });
