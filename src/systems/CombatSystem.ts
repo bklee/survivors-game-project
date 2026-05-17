@@ -198,15 +198,50 @@ export const createCombatSystem = (juice: JuicePipeline) => {
             const targetId = allEnemies[i];
             if (Health.current[targetId] <= 0) {
                 const isBoss = hasComponent(world, Boss, targetId);
-                if (isBoss) {
+                const tx = Position.x[targetId];
+                const ty = Position.y[targetId];
+
+                // === Stage 9+ 보스 분열 (30%) — 처치 시 작은 보스 2개로 분열 ===
+                // 분열되면 stage_clear 발사 안 함 → WaveSystem 이 Boss count 0 될 때 자연스럽게 stage_clear
+                let didSplit = false;
+                if (isBoss && globalStats.currentStage >= 9 && Math.random() < 0.3) {
+                    const typeId = SpriteInfo.textureIndex[targetId];
+                    const newHp = Math.max(50, Health.max[targetId] * 0.25);
+                    for (let off = 0; off < 2; off++) {
+                        const sid = addEntity(world);
+                        addComponent(world, Position, sid);
+                        addComponent(world, Velocity, sid);
+                        addComponent(world, Health, sid);
+                        addComponent(world, SpriteInfo, sid);
+                        addComponent(world, Animation, sid);
+                        addComponent(world, Enemy, sid);
+                        addComponent(world, Boss, sid);
+                        Position.x[sid] = tx + (off === 0 ? -60 : 60);
+                        Position.y[sid] = ty + (off === 0 ? -30 : 30);
+                        const angle = Math.random() * Math.PI * 2;
+                        Velocity.x[sid] = Math.cos(angle) * 40;
+                        Velocity.y[sid] = Math.sin(angle) * 40;
+                        Health.current[sid] = newHp;
+                        Health.max[sid] = newHp;
+                        SpriteInfo.textureIndex[sid] = typeId;
+                        Animation.frameRate[sid] = 8;
+                        Animation.timer[sid] = 0;
+                    }
+                    didSplit = true;
+                    // 분열된 새 보스 중 한 개의 HP 로 UI 막대 갱신 (대표 표시)
+                    window.dispatchEvent(
+                        new CustomEvent('boss_hp', {
+                            detail: { current: newHp, max: newHp, name: 'SPLIT BOSS' },
+                        }),
+                    );
+                }
+
+                if (isBoss && !didSplit) {
                     window.dispatchEvent(
                         new CustomEvent('boss_hp', { detail: { current: 0, max: 100 } }),
                     ); // Hide boss bar
                     window.dispatchEvent(new CustomEvent('stage_clear'));
                 }
-
-                const tx = Position.x[targetId];
-                const ty = Position.y[targetId];
 
                 // 사용자 요청: 스테이지가 올라갈수록 몬스터가 주는 경험치도 비례해서 상승 (스테이지당 20%씩 복리 증가)
                 const stageScale = Math.pow(1.2, globalStats.currentStage - 1);
