@@ -341,6 +341,23 @@ export class MainScene extends Phaser.Scene {
         };
         window.addEventListener('synergy_discovered', synergyActivatedHandler);
 
+        // 광고 부활 — GameOverScene 에서 rewarded ad 성공 시 dispatch.
+        // Player Health 를 max 의 50% 로 복구하고 MainScene 이 resume 될 때
+        // deathHandler 가 다시 트리거되지 않게 함.
+        const adReviveHandler = () => {
+            if (this.playerId === undefined) return;
+            Health.current[this.playerId] = Math.floor(Health.max[this.playerId] * 0.5);
+            window.dispatchEvent(
+                new CustomEvent('hp_updated', {
+                    detail: {
+                        current: Health.current[this.playerId],
+                        max: Health.max[this.playerId],
+                    },
+                }),
+            );
+        };
+        window.addEventListener('ad_revive_requested', adReviveHandler);
+
         const deathHandler = () => {
             // Phoenix Feather 부활 시도
             if (this.relicSystem.tryRevive(this.playerId)) {
@@ -514,6 +531,7 @@ export class MainScene extends Phaser.Scene {
             window.removeEventListener('enemy_killed', enemyKilledHandler);
             window.removeEventListener('synergy_discovered', synergyActivatedHandler);
             window.removeEventListener('player_died', deathHandler);
+            window.removeEventListener('ad_revive_requested', adReviveHandler);
             window.removeEventListener('keydown', recipeHandler);
             window.removeEventListener('next_stage', nextStageHandler);
             window.removeEventListener('stage_clear', stageClearInternalHandler);
