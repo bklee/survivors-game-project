@@ -1,6 +1,19 @@
 import { addEntity, addComponent, defineQuery, hasComponent, removeEntity } from 'bitecs';
 import { world } from '../core/World';
-import { Animation, Position, Velocity, Health, SpriteInfo, Enemy, Player, Boss, EnemyProjectile, Lifespan, Scale, ActionState } from '../components';
+import {
+    Animation,
+    Position,
+    Velocity,
+    Health,
+    SpriteInfo,
+    Enemy,
+    Player,
+    Boss,
+    EnemyProjectile,
+    Lifespan,
+    Scale,
+    ActionState,
+} from '../components';
 import { DungeonGenerator } from '../core/DungeonGenerator';
 
 const enemyQuery = defineQuery([Enemy, Position, Velocity]);
@@ -50,8 +63,8 @@ export class NightDirector {
         const enemies = enemyQuery(world);
 
         // Spawn normal enemies up to maxEnemiesToSpawn
-        let spawnInterval = Math.max(200, 1000 - (this.stage * 100));
-        let maxConcurrent = 30 + (this.stage * 10);
+        let spawnInterval = Math.max(200, 1000 - this.stage * 100);
+        let maxConcurrent = 30 + this.stage * 10;
 
         // Optimization: Reduce concurrent enemies during boss fights to save performance and adjust difficulty
         if (this.bossSpawned) {
@@ -119,9 +132,11 @@ export class NightDirector {
                     const bx = Position.x[eid];
                     const by = Position.y[eid];
 
-                    if (typeId === 69) { // Big Demon (대악마)
+                    if (typeId === 69) {
+                        // Big Demon (대악마)
                         this.spawnDemonFireAttack(bx, by, playerX, playerY, isBerserk);
-                    } else if (typeId === 89) { // Ogre (오우거)
+                    } else if (typeId === 89) {
+                        // Ogre (오우거)
                         this.spawnOgreSlamAttack(eid, bx, by, isBerserk);
                     } else {
                         // Big Zombie 및 기타 보스는 기본 탄막 유지
@@ -136,8 +151,10 @@ export class NightDirector {
         // 3개 스테이지 단위로 카테고리(0:Undead, 1:Orc, 2:Demon) 고정
         const categoryIndex = Math.floor((this.stage - 1) / 3) % 3;
         let pool: number[] = [];
-        if (categoryIndex === 0) pool = [70, 71, 72, 73, 74, 75]; // Undead
-        else if (categoryIndex === 1) pool = [80, 81, 82, 83]; // Orc
+        if (categoryIndex === 0)
+            pool = [70, 71, 72, 73, 74, 75]; // Undead
+        else if (categoryIndex === 1)
+            pool = [80, 81, 82, 83]; // Orc
         else pool = [60, 61, 62]; // Demon
         return pool[Math.floor(Math.random() * pool.length)];
     }
@@ -176,14 +193,23 @@ export class NightDirector {
         let hp = 10 * intensity * this.globalDifficultyMultiplier;
 
         // Stat adjustments based on category
-        if (typeId >= 80) { speed *= 0.8; hp *= 1.5; } // Orcs: slower but tougher
-        else if (typeId >= 60 && typeId < 70) { speed *= 1.05; hp *= 1.1; } // Demons: slightly faster (was 1.2)
+        if (typeId >= 80) {
+            speed *= 0.8;
+            hp *= 1.5;
+        } // Orcs: slower but tougher
+        else if (typeId >= 60 && typeId < 70) {
+            speed *= 1.05;
+            hp *= 1.1;
+        } // Demons: slightly faster (was 1.2)
 
         // Cap speed to 190 (player is 200) to ensure maneuvering is possible
         speed = Math.min(speed, 190);
 
         // Specific monster tweaks
-        if (typeId === 71) { speed *= 0.7; hp *= 1.2; } // Necromancer: slightly slower
+        if (typeId === 71) {
+            speed *= 0.7;
+            hp *= 1.2;
+        } // Necromancer: slightly slower
 
         const angle = Math.random() * Math.PI * 2;
         Velocity.x[eid] = Math.cos(angle) * speed;
@@ -222,24 +248,56 @@ export class NightDirector {
         Velocity.x[eid] = Math.cos(angle) * 35;
         Velocity.y[eid] = Math.sin(angle) * 35;
 
-        let hp = 1000 * this.globalDifficultyMultiplier * (this.stage / 3);
+        const hp = 1000 * this.globalDifficultyMultiplier * (this.stage / 3);
         Health.current[eid] = hp;
         Health.max[eid] = hp;
         SpriteInfo.textureIndex[eid] = typeId;
         Animation.frameRate[eid] = 6;
         Animation.timer[eid] = 0;
 
-        if (typeId === 89) { // Ogre
+        if (typeId === 89) {
+            // Ogre
             addComponent(world, ActionState, eid);
             ActionState.attackDuration[eid] = 600;
         }
 
-        const bName = typeId === 69 ? "BIG DEMON" : (typeId === 79 ? "BIG ZOMBIE" : "OGRE");
-        window.dispatchEvent(new CustomEvent('boss_hp', {
-            detail: { current: hp, max: hp, name: bName }
-        }));
+        const bName = typeId === 69 ? 'BIG DEMON' : typeId === 79 ? 'BIG ZOMBIE' : 'OGRE';
+        window.dispatchEvent(
+            new CustomEvent('boss_hp', {
+                detail: { current: hp, max: hp, name: bName },
+            }),
+        );
+
+        // === Stage 6+ 분신 변종 — 25% 확률 ===
+        // 메인 보스 옆에 약화된 분신 1개 spawn (HP 30%, dmg 50%, 더 작음).
+        // Boss component 없음 → 별도 보스 HP 막대 표시 안 됨, 사망 시 분열 처리 X.
+        if (this.stage >= 6 && Math.random() < 0.25) {
+            this.spawnBossClone(pos.x + 150, pos.y, typeId, hp * 0.3);
+        }
     }
 
+    /** 분신 — 메인 보스의 약화 복제본 (Boss 컴포넌트 없음, 별도 HP 막대 없음) */
+    private spawnBossClone(x: number, y: number, typeId: number, hp: number) {
+        const eid = addEntity(world);
+        addComponent(world, Position, eid);
+        addComponent(world, Velocity, eid);
+        addComponent(world, Health, eid);
+        addComponent(world, SpriteInfo, eid);
+        addComponent(world, Animation, eid);
+        addComponent(world, Enemy, eid);
+        // 의도적으로 Boss 컴포넌트 미부착 — 일반 강한 적으로 취급
+
+        Position.x[eid] = x;
+        Position.y[eid] = y;
+        const angle = Math.random() * Math.PI * 2;
+        Velocity.x[eid] = Math.cos(angle) * 50;
+        Velocity.y[eid] = Math.sin(angle) * 50;
+        Health.current[eid] = hp;
+        Health.max[eid] = hp;
+        SpriteInfo.textureIndex[eid] = typeId;
+        Animation.frameRate[eid] = 8;
+        Animation.timer[eid] = 0;
+    }
 
     private spawnBarrage(x: number, y: number, isBerserk: boolean = false) {
         const baseCount = 12;
@@ -252,7 +310,8 @@ export class NightDirector {
             addComponent(world, EnemyProjectile, beid);
             addComponent(world, SpriteInfo, beid);
             addComponent(world, Lifespan, beid);
-            Position.x[beid] = x; Position.y[beid] = y;
+            Position.x[beid] = x;
+            Position.y[beid] = y;
             Velocity.x[beid] = Math.cos(angle) * 150;
             Velocity.y[beid] = Math.sin(angle) * 150;
             Lifespan.duration[beid] = 1200;
@@ -260,7 +319,13 @@ export class NightDirector {
         }
     }
 
-    private spawnDemonFireAttack(bx: number, by: number, px: number, py: number, isBerserk: boolean = false) {
+    private spawnDemonFireAttack(
+        bx: number,
+        by: number,
+        px: number,
+        py: number,
+        isBerserk: boolean = false,
+    ) {
         // 플레이어 방향으로 연쇄 불기둥 생성
         const baseCount = 5;
         const count = isBerserk ? baseCount * 2 : baseCount; // 폭주 시 불기둥 10개 (거리 증가)
@@ -300,7 +365,6 @@ export class NightDirector {
         }
     }
 
-
     private spawnOgreSlamAttack(eid: number, bx: number, by: number, isBerserk: boolean = false) {
         // 배트 휘두르기 애니메이션 트리거
         if (hasComponent(world, ActionState, eid)) {
@@ -326,7 +390,7 @@ export class NightDirector {
             Velocity.x[feid] = Math.cos(angle) * 200;
             Velocity.y[feid] = Math.sin(angle) * 200;
             SpriteInfo.textureIndex[feid] = 101; // Wizard's Ice (Spell Ice) - 충격파 대용
-            Scale.value[feid] = 1.0; 
+            Scale.value[feid] = 1.0;
             Lifespan.duration[feid] = 1000;
             Animation.timer[feid] = 0;
         }
@@ -346,7 +410,7 @@ export class NightDirector {
 
         // 적 생성 수량: 현재 스테이지 번호 × 20마리, 최대 100마리 제한
         this.maxEnemiesToSpawn = Math.min(stage * 20, 100);
-        
+
         this.spawnedEnemiesCount = 0;
 
         const enemies = enemyQuery(world);
