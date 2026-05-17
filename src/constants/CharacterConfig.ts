@@ -1,7 +1,9 @@
+import { I18nString } from '../i18n/I18n';
+
 export interface CharacterData {
     name: string;
     id: string;
-    description?: string;
+    description?: I18nString;
     unlockCost?: number;
     baseStats: {
         health: number;
@@ -46,7 +48,10 @@ export const CHARACTERS: Record<string, CharacterData> = {
     NECROMANCER: {
         name: 'Necromancer',
         id: 'necromancer',
-        description: '어둠의 마법사. 소울 볼트 발사.',
+        description: {
+            ko: '어둠의 마법사. 소울 볼트 발사.',
+            en: 'Dark mage. Fires soul bolts.',
+        },
         unlockCost: 1500,
         baseStats: { health: 80, speed: 110, damage: 1.4, mana: 120 },
         frames: {
@@ -57,7 +62,10 @@ export const CHARACTERS: Record<string, CharacterData> = {
     DRUID: {
         name: 'Druid',
         id: 'druid',
-        description: '자연의 술사. 가시 덩굴 발사.',
+        description: {
+            ko: '자연의 술사. 가시 덩굴 발사.',
+            en: 'Nature druid. Fires thorn vines.',
+        },
         unlockCost: 3000,
         baseStats: { health: 90, speed: 105, damage: 1.2, mana: 100 },
         frames: {
@@ -68,7 +76,10 @@ export const CHARACTERS: Record<string, CharacterData> = {
     ENGINEER: {
         name: 'Engineer',
         id: 'engineer',
-        description: '기계공. 푸른 마법탄 발사.',
+        description: {
+            ko: '기계공. 푸른 마법탄 발사.',
+            en: 'Engineer. Fires azure magic bolts.',
+        },
         unlockCost: 5000,
         baseStats: { health: 100, speed: 95, damage: 1.0, mana: 80 },
         frames: {

@@ -26,6 +26,12 @@ export const STRINGS = {
     },
     gameover_retry: { ko: 'RETRY', en: 'RETRY' },
     gameover_revive_ad: { ko: '광고 보고 부활', en: 'Watch Ad to Revive' },
+
+    // Common
+    common_back: { ko: '뒤로 가기', en: 'Back' },
+
+    // Codex Scene
+    codex_title: { ko: '시너지 도감  ({found}/{total})', en: 'Synergy Codex  ({found}/{total})' },
 } as const;
 
 export type StringKey = keyof typeof STRINGS;
