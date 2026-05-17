@@ -706,6 +706,7 @@ export class UIScene extends Phaser.Scene {
 
     private handleCoinCollected = (e: CustomEvent<any>) => {
         this.totalCoins += e.detail?.amount || 1;
+        globalStats.totalCoins = this.totalCoins;
         this.coinText.setText(this.totalCoins.toLocaleString());
         this.coinIcon.x = this.coinText.x + this.coinText.width + 20;
         this.sound.play('coin_pickup', { volume: 0.8 });
