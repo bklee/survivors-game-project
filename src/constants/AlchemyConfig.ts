@@ -1,3 +1,5 @@
+import { I18nString } from '../i18n/I18n';
+
 export const Element = {
     FIRE: 0,
     ICE: 1,
@@ -28,7 +30,7 @@ export interface SynergyDef {
     id: string;
     name: string;
     elements: [Element, Element, Element]; // 정렬된 3원소
-    description: string;
+    description: I18nString;
 }
 
 const sortTuple = (a: Element, b: Element, c: Element): [Element, Element, Element] => {
@@ -41,121 +43,181 @@ export const SYNERGIES: SynergyDef[] = [
         id: 'plasma_storm',
         name: 'Plasma Storm',
         elements: sortTuple(Element.FIRE, Element.LIGHTNING, Element.ICE),
-        description: '30프레임마다 화면 무작위 위치에 번개 폭풍 (300 dmg)',
+        description: {
+            ko: '30프레임마다 화면 무작위 위치에 번개 폭풍 (300 dmg)',
+            en: 'Lightning storm at random location every 30 frames (300 dmg)',
+        },
     },
     {
         id: 'volcanic_plague',
         name: 'Volcanic Plague',
         elements: sortTuple(Element.FIRE, Element.POISON, Element.EARTH),
-        description: '적 사망 시 독구덩이 (5초, DOT 8%)',
+        description: {
+            ko: '적 사망 시 독구덩이 (5초, DOT 8%)',
+            en: 'Poison pit on enemy death (5s, DOT 8%)',
+        },
     },
     {
         id: 'tempest',
         name: 'Tempest',
         elements: sortTuple(Element.ICE, Element.LIGHTNING, Element.AIR),
-        description: '플레이어 주변 회오리 (반경 200, 둔화+체인)',
+        description: {
+            ko: '플레이어 주변 회오리 (반경 200, 둔화+체인)',
+            en: 'Whirlwind around player (radius 200, slow + chain)',
+        },
     },
     {
         id: 'eruption',
         name: 'Eruption',
         elements: sortTuple(Element.EARTH, Element.AIR, Element.FIRE),
-        description: '5초마다 적 위치 폭발 (반경 100, 200 dmg)',
+        description: {
+            ko: '5초마다 적 위치 폭발 (반경 100, 200 dmg)',
+            en: 'Explosion at enemy position every 5s (radius 100, 200 dmg)',
+        },
     },
     {
         id: 'cryotoxin',
         name: 'Cryotoxin',
         elements: sortTuple(Element.POISON, Element.ICE, Element.LIGHTNING),
-        description: '적 처치 시 50% 얼음 폭발 (반경 80)',
+        description: {
+            ko: '적 처치 시 50% 얼음 폭발 (반경 80)',
+            en: 'On kill: 50% ice explosion (radius 80)',
+        },
     },
     {
         id: 'frostbite',
         name: 'Frostbite',
         elements: sortTuple(Element.FIRE, Element.ICE, Element.POISON),
-        description: '5초마다 가장 가까운 적 빙결 1.5초 + 중독',
+        description: {
+            ko: '5초마다 가장 가까운 적 빙결 1.5초 + 중독',
+            en: 'Freeze nearest enemy 1.5s + poison, every 5s',
+        },
     },
     {
         id: 'cinder_burst',
         name: 'Cinder Burst',
         elements: sortTuple(Element.FIRE, Element.ICE, Element.EARTH),
-        description: '적 처치 시 25% 확률 잔해 폭발 (반경 60, 100dmg)',
+        description: {
+            ko: '적 처치 시 25% 확률 잔해 폭발 (반경 60, 100dmg)',
+            en: 'On kill: 25% chance debris explosion (radius 60, 100dmg)',
+        },
     },
     {
         id: 'blizzard_strike',
         name: 'Blizzard Strike',
         elements: sortTuple(Element.FIRE, Element.ICE, Element.AIR),
-        description: '플레이어 위 3초마다 빙판 낙하 (반경 80, 180dmg + 0.5초 둔화)',
+        description: {
+            ko: '플레이어 위 3초마다 빙판 낙하 (반경 80, 180dmg + 0.5초 둔화)',
+            en: 'Ice falls above player every 3s (radius 80, 180dmg + 0.5s slow)',
+        },
     },
     {
         id: 'magma_field',
         name: 'Magma Field',
         elements: sortTuple(Element.FIRE, Element.LIGHTNING, Element.EARTH),
-        description: '플레이어 주변 반경 120 용암 지대 (틱당 max HP 2% + 마비 5%)',
+        description: {
+            ko: '플레이어 주변 반경 120 용암 지대 (틱당 max HP 2% + 마비 5%)',
+            en: 'Lava zone around player radius 120 (per tick: max HP 2% + 5% stun)',
+        },
     },
     {
         id: 'arc_lightning',
         name: 'Arc Lightning',
         elements: sortTuple(Element.FIRE, Element.LIGHTNING, Element.AIR),
-        description: '공격 시 25% 확률 인근 적 2명 체인 (50dmg)',
+        description: {
+            ko: '공격 시 25% 확률 인근 적 2명 체인 (50dmg)',
+            en: 'On attack: 25% chance chain to 2 enemies (50dmg)',
+        },
     },
     {
         id: 'plague_wind',
         name: 'Plague Wind',
         elements: sortTuple(Element.FIRE, Element.POISON, Element.AIR),
-        description: '8초마다 화면 무작위 4곳 독풍 (반경 70, 200dmg + DOT)',
+        description: {
+            ko: '8초마다 화면 무작위 4곳 독풍 (반경 70, 200dmg + DOT)',
+            en: 'Poison wind at 4 random spots every 8s (radius 70, 200dmg + DOT)',
+        },
     },
     {
         id: 'blight_storm',
         name: 'Blight Storm',
         elements: sortTuple(Element.FIRE, Element.LIGHTNING, Element.POISON),
-        description: '플레이어 주변 회오리 (반경 180) 적 둔화 40% + 중독',
+        description: {
+            ko: '플레이어 주변 회오리 (반경 180) 적 둔화 40% + 중독',
+            en: 'Whirlwind around player (radius 180), slow 40% + poison',
+        },
     },
     {
         id: 'whirlwind',
         name: 'Whirlwind',
         elements: sortTuple(Element.ICE, Element.LIGHTNING, Element.EARTH),
-        description: '플레이어 주변 회오리 반경 200, 60프레임마다 80dmg + 넉백',
+        description: {
+            ko: '플레이어 주변 회오리 반경 200, 60프레임마다 80dmg + 넉백',
+            en: 'Whirlwind around player radius 200, 80dmg + knockback every 60 frames',
+        },
     },
     {
         id: 'glacial_spike',
         name: 'Glacial Spike',
         elements: sortTuple(Element.ICE, Element.POISON, Element.EARTH),
-        description: '15프레임마다 가장 강한 적에게 얼음 가시 (250dmg + 1초 둔화)',
+        description: {
+            ko: '15프레임마다 가장 강한 적에게 얼음 가시 (250dmg + 1초 둔화)',
+            en: 'Ice spike to strongest enemy every 15 frames (250dmg + 1s slow)',
+        },
     },
     {
         id: 'mire',
         name: 'Mire',
         elements: sortTuple(Element.ICE, Element.POISON, Element.AIR),
-        description: '8초마다 화면 무작위 위치 늪 (반경 80, 3초 지속, 둔화+중독)',
+        description: {
+            ko: '8초마다 화면 무작위 위치 늪 (반경 80, 3초 지속, 둔화+중독)',
+            en: 'Swamp at random position every 8s (radius 80, lasts 3s, slow + poison)',
+        },
     },
     {
         id: 'glacial_nova',
         name: 'Glacial Nova',
         elements: sortTuple(Element.ICE, Element.EARTH, Element.AIR),
-        description: '10초마다 플레이어 중심 냉기 폭발 (반경 200, 100dmg + 0.5초 둔화)',
+        description: {
+            ko: '10초마다 플레이어 중심 냉기 폭발 (반경 200, 100dmg + 0.5초 둔화)',
+            en: 'Frost explosion at player every 10s (radius 200, 100dmg + 0.5s slow)',
+        },
     },
     {
         id: 'static_field',
         name: 'Static Field',
         elements: sortTuple(Element.LIGHTNING, Element.POISON, Element.EARTH),
-        description: '플레이어 주변 반경 180 전기장 (틱당 25dmg + 5% 마비)',
+        description: {
+            ko: '플레이어 주변 반경 180 전기장 (틱당 25dmg + 5% 마비)',
+            en: 'Static field around player radius 180 (per tick 25dmg + 5% stun)',
+        },
     },
     {
         id: 'toxic_tempest',
         name: 'Toxic Tempest',
         elements: sortTuple(Element.LIGHTNING, Element.POISON, Element.AIR),
-        description: '12초마다 전체 독 충격파 (모든 적 1초 마비 + 50dmg DOT)',
+        description: {
+            ko: '12초마다 전체 독 충격파 (모든 적 1초 마비 + 50dmg DOT)',
+            en: 'Global poison shockwave every 12s (1s stun + 50dmg DOT to all enemies)',
+        },
     },
     {
         id: 'cyclone',
         name: 'Cyclone',
         elements: sortTuple(Element.LIGHTNING, Element.EARTH, Element.AIR),
-        description: '플레이어 따라다니는 사이클론 (반경 150, 적 끌어당김 + 100dmg/sec)',
+        description: {
+            ko: '플레이어 따라다니는 사이클론 (반경 150, 적 끌어당김 + 100dmg/sec)',
+            en: 'Cyclone follows player (radius 150, pulls enemies + 100dmg/sec)',
+        },
     },
     {
         id: 'cascade',
         name: 'Cascade',
         elements: sortTuple(Element.POISON, Element.EARTH, Element.AIR),
-        description: '적 처치 시 인근 적 1명에게 30% 데미지 폭발',
+        description: {
+            ko: '적 처치 시 인근 적 1명에게 30% 데미지 폭발',
+            en: 'On kill: explosion to 1 nearby enemy for 30% damage',
+        },
     },
 ];
 
