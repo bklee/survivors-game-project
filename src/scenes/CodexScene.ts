@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { SYNERGIES, ELEMENT_INFO } from '../constants/AlchemyConfig';
 import { MetaProgress } from '../core/MetaProgress';
+import { I18n, tr } from '../i18n/I18n';
 
 export class CodexScene extends Phaser.Scene {
     constructor() {
@@ -14,7 +15,7 @@ export class CodexScene extends Phaser.Scene {
 
         const discovered = MetaProgress.load().discoveredSynergies;
         this.add
-            .text(width / 2, 40, `시너지 도감  (${discovered.length}/20)`, {
+            .text(width / 2, 40, I18n.t('codex_title', { found: discovered.length, total: 20 }), {
                 fontFamily: '"MedievalSharp", cursive',
                 fontSize: '36px',
                 color: '#ffd700',
@@ -60,7 +61,7 @@ export class CodexScene extends Phaser.Scene {
                     .setOrigin(0.5);
 
                 this.add
-                    .text(x, y + 28, syn.description, {
+                    .text(x, y + 28, tr(syn.description), {
                         fontSize: '11px',
                         color: '#cccccc',
                         wordWrap: { width: cardW - 16 },
@@ -78,7 +79,7 @@ export class CodexScene extends Phaser.Scene {
         });
 
         const back = this.add
-            .text(width / 2, height - 30, '뒤로 가기', {
+            .text(width / 2, height - 30, I18n.t('common_back'), {
                 fontSize: '24px',
                 color: '#ffffff',
                 backgroundColor: '#222222',

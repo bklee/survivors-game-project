@@ -54,3 +54,14 @@ export class I18n {
         return s;
     }
 }
+
+/** 데이터 파일에서 다국어 문자열을 표현할 때 쓰는 타입.
+ *  단순 string 은 그대로 사용 (영어/숫자 데이터). 한글 데이터는 객체로. */
+export type I18nString = string | { ko: string; en?: string };
+
+/** I18nString 을 현재 언어 문자열로 변환. en 미번역 시 ko fallback. */
+export function tr(s: I18nString): string {
+    if (typeof s === 'string') return s;
+    const lang = I18n.getLang();
+    return s[lang] || s.ko;
+}

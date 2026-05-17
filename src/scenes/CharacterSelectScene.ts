@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { CHARACTERS } from '../constants/CharacterConfig';
 import { MetaProgress } from '../core/MetaProgress';
 import { ApiClient } from '../integrations/ApiClient';
+import { I18n } from '../i18n/I18n';
 
 export class CharacterSelectScene extends Phaser.Scene {
     constructor() {
@@ -31,7 +32,7 @@ export class CharacterSelectScene extends Phaser.Scene {
 
         // Title
         this.add
-            .text(width / 2, 70, 'CHOOSE YOUR HERO!', {
+            .text(width / 2, 70, I18n.t('char_select_title'), {
                 fontFamily: '"MedievalSharp", cursive',
                 fontSize: '56px',
                 color: '#ffd700',
@@ -49,7 +50,7 @@ export class CharacterSelectScene extends Phaser.Scene {
 
         // 정수 표시
         this.add
-            .text(width / 2, 120, `보유 정수: ${myEssence}`, {
+            .text(width / 2, 120, I18n.t('char_select_essence', { amount: myEssence }), {
                 fontSize: '22px',
                 color: '#aaddff',
                 fontStyle: 'bold',
@@ -140,16 +141,21 @@ export class CharacterSelectScene extends Phaser.Scene {
             } else {
                 // 자물쇠 + 비용
                 this.add
-                    .text(x, y + 55, `🔒 ${char.unlockCost ?? '?'} 정수`, {
-                        fontSize: '19px',
-                        color: '#888888',
-                    })
+                    .text(
+                        x,
+                        y + 55,
+                        I18n.t('char_select_locked', { cost: char.unlockCost ?? '?' }),
+                        {
+                            fontSize: '19px',
+                            color: '#888888',
+                        },
+                    )
                     .setOrigin(0.5)
                     .setDepth(2);
 
                 if (canAfford) {
                     this.add
-                        .text(x, y + 90, '[클릭하여 해금]', {
+                        .text(x, y + 90, I18n.t('char_select_unlock'), {
                             fontSize: '15px',
                             color: '#ffd700',
                         })
@@ -157,7 +163,7 @@ export class CharacterSelectScene extends Phaser.Scene {
                         .setDepth(2);
                 } else {
                     this.add
-                        .text(x, y + 90, '정수 부족', {
+                        .text(x, y + 90, I18n.t('char_select_short'), {
                             fontSize: '15px',
                             color: '#554444',
                         })
