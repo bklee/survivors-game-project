@@ -3,6 +3,7 @@ import { defineQuery, hasComponent } from 'bitecs';
 import { world } from '../core/World';
 import { Position, Player, Enemy, Boss, Health, Mana } from '../components';
 import { globalStats } from '../core/PlayerStats';
+import { I18n } from '../i18n/I18n';
 import { VirtualJoystick } from '../ui/VirtualJoystick';
 import { AlchemySlotUI } from '../ui/AlchemySlotUI';
 import { TriggerButton } from '../ui/TriggerButton';
@@ -866,14 +867,19 @@ export class UIScene extends Phaser.Scene {
     private handleSynergyDiscovered = (e: CustomEvent<{ name: string }>) => {
         const synergy = e.detail;
         const toast = this.add
-            .text(this.scale.width / 2, 200, `✦ 새 시너지 발견: ${synergy.name}!\n+50 정수`, {
-                fontFamily: '"MedievalSharp", cursive',
-                fontSize: '32px',
-                color: '#ffd700',
-                align: 'center',
-                stroke: '#000000',
-                strokeThickness: 6,
-            })
+            .text(
+                this.scale.width / 2,
+                200,
+                I18n.t('synergy_discovered_toast', { name: synergy.name }),
+                {
+                    fontFamily: '"MedievalSharp", cursive',
+                    fontSize: '32px',
+                    color: '#ffd700',
+                    align: 'center',
+                    stroke: '#000000',
+                    strokeThickness: 6,
+                },
+            )
             .setOrigin(0.5)
             .setDepth(2000);
 
