@@ -68,15 +68,17 @@
 <body>
   <div id="orientation-warning">
     <div style="font-size: 48px; margin-bottom: 20px;">🔄</div>
-    <div style="font-weight: bold; margin-bottom: 10px;">가로 모드로 회전해 주세요!</div>
-    <div style="font-size: 16px; color: #aaa;">원활한 플레이를 위해 기기를 가로로 눕혀주세요.</div>
+    <div style="font-weight: bold; margin-bottom: 10px;">Please rotate to landscape!<br/>가로 모드로 회전해 주세요!</div>
+    <div style="font-size: 16px; color: #aaa;">Hold your device sideways for the best experience. / 원활한 플레이를 위해 기기를 가로로 눕혀주세요.</div>
   </div>
   <div id="game-container"></div>
   <script type="module" src="./src/main.ts"></script>
   <script>
-if ('serviceWorker' in navigator) {
+// Service Worker 는 자체 도메인에서만 등록. Poki iframe 환경에서는 skip.
+const isInIframe = window.top !== window.self;
+if (!isInIframe && 'serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js').catch(console.error);
+        navigator.serviceWorker.register('./sw.js').catch(console.error);
     });
 }
   </script>
