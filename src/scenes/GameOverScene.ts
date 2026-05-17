@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { MetaProgress } from '../core/MetaProgress';
 import { PokiSDK } from '../integrations/PokiSDK';
 import { ApiClient } from '../integrations/ApiClient';
+import { I18n } from '../i18n/I18n';
 
 export class GameOverScene extends Phaser.Scene {
     private stage: number = 1;
@@ -50,14 +51,19 @@ export class GameOverScene extends Phaser.Scene {
 
         // 4. 정수 획득 표시
         this.add
-            .text(width / 2, height / 2 - 80, `+ ${finalEssence} 정수\n(총: ${totalEssence})`, {
-                fontFamily: '"MedievalSharp", cursive',
-                fontSize: '32px',
-                color: '#ffd700',
-                align: 'center',
-                stroke: '#000000',
-                strokeThickness: 4,
-            })
+            .text(
+                width / 2,
+                height / 2 - 80,
+                I18n.t('gameover_essence', { amount: finalEssence, total: totalEssence }),
+                {
+                    fontFamily: '"MedievalSharp", cursive',
+                    fontSize: '32px',
+                    color: '#ffd700',
+                    align: 'center',
+                    stroke: '#000000',
+                    strokeThickness: 4,
+                },
+            )
             .setOrigin(0.5);
 
         // 5. Retry Button
@@ -67,7 +73,7 @@ export class GameOverScene extends Phaser.Scene {
             .setStrokeStyle(3, 0xffd700);
 
         this.add
-            .text(width / 2, height / 2 + 150, 'RETRY', {
+            .text(width / 2, height / 2 + 150, I18n.t('gameover_retry'), {
                 fontFamily: '"MedievalSharp", cursive',
                 fontSize: '40px',
                 color: '#ffffff',
@@ -103,7 +109,7 @@ export class GameOverScene extends Phaser.Scene {
         // 6. 부활 버튼 (게임당 1회) — 광고 보면 부활
         if (!this.reviveUsed) {
             const reviveBtn = this.add
-                .text(width / 2, height / 2 + 60, '광고 보고 부활', {
+                .text(width / 2, height / 2 + 60, I18n.t('gameover_revive_ad'), {
                     fontFamily: '"MedievalSharp", cursive',
                     fontSize: '24px',
                     color: '#ffd700',
@@ -128,7 +134,7 @@ export class GameOverScene extends Phaser.Scene {
                         this.scene.resume('MainScene', { revive: true });
                     });
                 } else {
-                    reviveBtn.setText('광고 시청 실패');
+                    reviveBtn.setText(I18n.t('upgrade_ad_failed'));
                     reviveBtn.setColor('#888888');
                 }
             });
