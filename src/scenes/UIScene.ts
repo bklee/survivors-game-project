@@ -550,7 +550,8 @@ export class UIScene extends Phaser.Scene {
 
     update(_t: number, delta: number) {
         this.minimapTimer += delta;
-        if (this.minimapTimer >= 500) {
+        // 1000ms 마다 minimap 다시 그림 (이전 500ms — dungeon 10000 cell 매 0.5s 전부 재계산 부담)
+        if (this.minimapTimer >= 1000) {
             this.updateMinimap();
             this.minimapTimer = 0;
         }
