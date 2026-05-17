@@ -2,16 +2,16 @@ import { describe, it, expect } from 'vitest';
 import { RELICS, hasRelic, setRelic, countRelics } from '../../src/constants/RelicConfig';
 
 describe('RelicConfig', () => {
-    it('12개 유물 정의', () => {
-        expect(RELICS).toHaveLength(12);
+    it('16개 유물 정의', () => {
+        expect(RELICS).toHaveLength(16);
     });
 
-    it('각 유물의 bit는 0~11 고유', () => {
+    it('각 유물의 bit는 0~15 고유', () => {
         const bits = RELICS.map((r) => r.bit);
-        expect(new Set(bits).size).toBe(12);
+        expect(new Set(bits).size).toBe(16);
         bits.forEach((b) => {
             expect(b).toBeGreaterThanOrEqual(0);
-            expect(b).toBeLessThan(12);
+            expect(b).toBeLessThan(16);
         });
     });
 
