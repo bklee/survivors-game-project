@@ -173,7 +173,7 @@ export class TitleScene extends Phaser.Scene {
                 .setStrokeStyle(2, 0xffd700);
 
             this.add
-                .text(width / 2, iapY, '광고 제거 ₩5,500', {
+                .text(width / 2, iapY, '광고 제거 ₩2,000', {
                     fontFamily: '"MedievalSharp", cursive',
                     fontSize: '20px',
                     color: '#ffd700',
