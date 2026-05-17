@@ -64,7 +64,9 @@ export class NightDirector {
 
         // Spawn normal enemies up to maxEnemiesToSpawn
         let spawnInterval = Math.max(200, 1000 - this.stage * 100);
-        let maxConcurrent = 30 + this.stage * 10;
+        // 고스테이지 (stage 12+) 에서 적이 너무 많아 프레임 드롭 — 150 으로 cap.
+        // 난이도는 적 HP/DMG 와 시너지/광폭/분신/분열로 보상.
+        let maxConcurrent = Math.min(150, 30 + this.stage * 10);
 
         // Optimization: Reduce concurrent enemies during boss fights to save performance and adjust difficulty
         if (this.bossSpawned) {
@@ -107,12 +109,23 @@ export class NightDirector {
         const playerY = Position.y[playerEid];
 
         const activeEnemies = enemyQuery(world);
+        // 화면 밖 멀리 있는 적은 chase 계산 skip — 카메라 viewport 약 1280x720 의 두 배
+        // 거리(1800px²) 안에 있을 때만 매 프레임 추적. 더 멀리 있는 적은 마지막 velocity 유지.
+        // Boss 는 항상 풀 update (탄막 등).
+        const CHASE_DIST_SQ = 1800 * 1800;
         for (let i = 0; i < activeEnemies.length; i++) {
             const eid = activeEnemies[i];
             const dx = playerX - Position.x[eid];
             const dy = playerY - Position.y[eid];
-            const distance = Math.hypot(dx, dy);
+            const distSq = dx * dx + dy * dy;
+            const isBoss = hasComponent(world, Boss, eid);
 
+            // distance-based culling: 멀고 비-보스 적은 추적 계산 skip
+            if (!isBoss && distSq > CHASE_DIST_SQ) {
+                continue;
+            }
+
+            const distance = Math.sqrt(distSq);
             if (distance > 0) {
                 const currentSpeed = Math.hypot(Velocity.x[eid], Velocity.y[eid]);
                 const speed = currentSpeed > 0 ? currentSpeed : 50;
@@ -120,7 +133,7 @@ export class NightDirector {
                 Velocity.y[eid] = (dy / distance) * speed;
             }
 
-            if (hasComponent(world, Boss, eid)) {
+            if (isBoss) {
                 const hpPercent = Health.current[eid] / Health.max[eid];
                 const isBerserk = hpPercent <= 0.5;
                 const attackInterval = isBerserk ? 1500 : 3000; // 폭주 시 공격 주기 2배 빨라짐
