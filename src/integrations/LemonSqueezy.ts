@@ -12,7 +12,7 @@ export const PRODUCTS: Record<string, PaymentProduct> = {
     no_ads_pass: {
         id: 'no_ads_pass',
         name: 'No-Ads Pass',
-        priceKrw: 5500,
+        priceKrw: 2000,
         lsCheckoutUrl: import.meta.env.VITE_LS_NO_ADS_URL || '',
     },
 };
