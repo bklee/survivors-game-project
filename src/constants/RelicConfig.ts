@@ -89,6 +89,30 @@ export const RELICS: RelicDef[] = [
         name: 'Alchemist Sigil',
         description: { ko: '시너지 강화 효과 +30%', en: 'Synergy effects +30%' },
     },
+    {
+        id: 'iron_hide',
+        bit: 12,
+        name: 'Iron Hide',
+        description: { ko: '시작 보너스 HP +30', en: 'Starting bonus HP +30' },
+    },
+    {
+        id: 'bronze_anvil',
+        bit: 13,
+        name: 'Bronze Anvil',
+        description: { ko: '데미지 +20%', en: 'Damage +20%' },
+    },
+    {
+        id: 'hawk_eye',
+        bit: 14,
+        name: 'Hawk Eye',
+        description: { ko: '획득 범위 +50%', en: 'Pickup range +50%' },
+    },
+    {
+        id: 'quickdraw',
+        bit: 15,
+        name: 'Quickdraw',
+        description: { ko: '쿨다운 -15%', en: 'Cooldown -15%' },
+    },
 ];
 
 export function hasRelic(bitmask: number, bit: number): boolean {
@@ -101,7 +125,7 @@ export function setRelic(bitmask: number, bit: number): number {
 
 export function countRelics(bitmask: number): number {
     let count = 0;
-    for (let i = 0; i < 12; i++) {
+    for (let i = 0; i < 16; i++) {
         if (hasRelic(bitmask, i)) count++;
     }
     return count;

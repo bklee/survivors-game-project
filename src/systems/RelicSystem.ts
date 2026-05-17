@@ -31,6 +31,10 @@ export class RelicSystem {
         if (hasRelic(mask, 3)) globalStats.coinMult = (globalStats.coinMult ?? 1) * 1.5; // Greed Pouch
         if (hasRelic(mask, 4)) globalStats.pickupRadiusMult *= 2.0; // Magnet Core
         if (hasRelic(mask, 6)) globalStats.manaRegenMult = (globalStats.manaRegenMult ?? 1) * 1.3; // Mana Battery
+        if (hasRelic(mask, 12)) globalStats.bonusMaxHp += 30; // Iron Hide
+        if (hasRelic(mask, 13)) globalStats.damageMult *= 1.2; // Bronze Anvil
+        if (hasRelic(mask, 14)) globalStats.pickupRadiusMult *= 1.5; // Hawk Eye
+        if (hasRelic(mask, 15)) globalStats.cooldownMult *= 0.85; // Quickdraw
         // Scout Helmet (bit 7), Echo Boots (bit 10) 는 UI/PlayerSystem에서 별도 처리
     }
 
