@@ -139,18 +139,31 @@ export class UpgradeScene extends Phaser.Scene {
             this.cards.push(card);
         });
 
-        // 카드 1장 더 버튼 (1회 한정) — 광고 보면 추가 카드 1장
+        // 카드 1장 더 버튼 (레벨업당 1회) — 광고 보면 추가 카드 1장.
+        // 디자인 강화: 카드 아래 가까이 + 큰 폰트 + 노란 강조색 + 펄스로 시선 유도.
         let extraCardUsed = false;
+        const extraBtnY = cardY + cardHeight / 2 + 50;
         const extraCardBtn = this.add
-            .text(this.scale.width / 2, this.scale.height - 50, I18n.t('upgrade_extra_card_ad'), {
-                fontSize: '18px',
-                color: '#aaaaaa',
-                backgroundColor: '#222222',
-                padding: { x: 12, y: 6 },
+            .text(this.scale.width / 2, extraBtnY, '🎬  ' + I18n.t('upgrade_extra_card_ad'), {
+                fontFamily: '"MedievalSharp", cursive',
+                fontSize: '24px',
+                color: '#ffd700',
+                backgroundColor: '#1e1e1e',
+                stroke: '#000000',
+                strokeThickness: 3,
+                padding: { x: 18, y: 10 },
             })
             .setOrigin(0.5)
-            .setDepth(1)
+            .setDepth(2)
             .setInteractive({ useHandCursor: true });
+        this.tweens.add({
+            targets: extraCardBtn,
+            scale: 1.05,
+            duration: 700,
+            yoyo: true,
+            repeat: -1,
+            ease: 'Sine.easeInOut',
+        });
 
         extraCardBtn.on('pointerdown', async () => {
             if (extraCardUsed) return;
