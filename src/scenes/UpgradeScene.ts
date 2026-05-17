@@ -1,6 +1,5 @@
 import Phaser from 'phaser';
 import { PokiSDK } from '../integrations/PokiSDK';
-import { LemonSqueezy } from '../integrations/LemonSqueezy';
 import { ApiClient } from '../integrations/ApiClient';
 import { Element, ELEMENT_INFO } from '../constants/AlchemyConfig';
 import { applySlotChange } from '../systems/AlchemySystem';
@@ -130,14 +129,12 @@ export class UpgradeScene extends Phaser.Scene {
             this.cards.push(card);
         });
 
-        // 카드 1장 더 버튼 (1회 한정) — No-Ads Pass 보유 시 광고 없이 즉시 추가
-        const hasNoAds = LemonSqueezy.hasProduct('no_ads_pass');
-        const extraBtnLabel = hasNoAds ? '✦ 카드 1장 더' : '광고 보고 카드 1장 더';
+        // 카드 1장 더 버튼 (1회 한정) — 광고 보면 추가 카드 1장
         let extraCardUsed = false;
         const extraCardBtn = this.add
-            .text(this.scale.width / 2, this.scale.height - 50, extraBtnLabel, {
+            .text(this.scale.width / 2, this.scale.height - 50, '광고 보고 카드 1장 더', {
                 fontSize: '18px',
-                color: hasNoAds ? '#ffd700' : '#aaaaaa',
+                color: '#aaaaaa',
                 backgroundColor: '#222222',
                 padding: { x: 12, y: 6 },
             })
@@ -149,15 +146,10 @@ export class UpgradeScene extends Phaser.Scene {
             if (extraCardUsed) return;
             extraCardUsed = true;
             extraCardBtn.disableInteractive().setAlpha(0.5);
-            let success: boolean;
-            if (hasNoAds) {
-                success = true;
-            } else {
-                success = await PokiSDK.rewardedBreak();
-                ApiClient.trackEvent(success ? 'ad_view' : 'ad_skip', {
-                    placement: 'extra_card',
-                });
-            }
+            const success = await PokiSDK.rewardedBreak();
+            ApiClient.trackEvent(success ? 'ad_view' : 'ad_skip', {
+                placement: 'extra_card',
+            });
             if (success) {
                 const extraCards = this.pickRandomCards(1);
                 if (extraCards.length > 0) {
