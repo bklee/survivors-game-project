@@ -9,6 +9,8 @@ export const globalStats = {
     currentLevel: 1,
     coinMult: 1,
     manaRegenMult: 1,
+    /** 현재 게임 중 누적 코인 — GameOverScene 의 essence 환전에 사용 */
+    totalCoins: 0,
 };
 
 import { MetaProgress } from './MetaProgress';

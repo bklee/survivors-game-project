@@ -132,6 +132,7 @@ export class MainScene extends Phaser.Scene {
         globalStats.cooldownMult = 1;
         globalStats.pickupRadiusMult = 1;
         globalStats.bonusMaxHp = 0;
+        globalStats.totalCoins = 0;
 
         // Apply meta-progression skill tree bonuses on top of base stats
         applySkillTreeBonuses();
