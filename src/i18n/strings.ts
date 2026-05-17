@@ -32,6 +32,24 @@ export const STRINGS = {
 
     // Codex Scene
     codex_title: { ko: '시너지 도감  ({found}/{total})', en: 'Synergy Codex  ({found}/{total})' },
+
+    // Skill Tree Scene
+    skill_tree_title: { ko: '스킬 트리', en: 'Skill Tree' },
+    skill_tree_branch_combat: { ko: '⚔ 전투', en: '⚔ Combat' },
+    skill_tree_branch_survival: { ko: '🛡 생존', en: '🛡 Survival' },
+    skill_tree_branch_discovery: { ko: '🔍 발견', en: '🔍 Discovery' },
+    skill_tree_essence_label: { ko: '정수: {amount}', en: 'Essence: {amount}' },
+    skill_tree_node_cost: { ko: '({cost} 정수)', en: '({cost} Essence)' },
+
+    // Upgrade Stat Cards
+    upgrade_stat_damage_title: { ko: '데미지 +15%', en: 'Damage +15%' },
+    upgrade_stat_damage_desc: { ko: '모든 공격 데미지 증가', en: 'All attack damage increased' },
+    upgrade_stat_speed_title: { ko: '이동속도 +10%', en: 'Move Speed +10%' },
+    upgrade_stat_speed_desc: { ko: '이동 속도 증가', en: 'Move speed increased' },
+    upgrade_stat_cdr_title: { ko: 'CDR +10%', en: 'CDR +10%' },
+    upgrade_stat_cdr_desc: { ko: '쿨다운 감소', en: 'Cooldown reduced' },
+    upgrade_stat_pickup_title: { ko: '획득 범위 +20%', en: 'Pickup Range +20%' },
+    upgrade_stat_pickup_desc: { ko: 'XP/아이템 픽업 범위', en: 'XP/item pickup range' },
 } as const;
 
 export type StringKey = keyof typeof STRINGS;
