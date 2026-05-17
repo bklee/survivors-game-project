@@ -142,7 +142,7 @@ export class UpgradeScene extends Phaser.Scene {
         // 카드 1장 더 버튼 (레벨업당 1회) — 광고 보면 추가 카드 1장.
         // 디자인 강화: 카드 아래 가까이 + 큰 폰트 + 노란 강조색 + 펄스로 시선 유도.
         let extraCardUsed = false;
-        const extraBtnY = cardY + cardHeight / 2 + 50;
+        const extraBtnY = cardY + cardHeight / 2 + 25; // 카드 하단 가까이
         const extraCardBtn = this.add
             .text(this.scale.width / 2, extraBtnY, '🎬  ' + I18n.t('upgrade_extra_card_ad'), {
                 fontFamily: '"MedievalSharp", cursive',
