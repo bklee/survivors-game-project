@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { PokiSDK } from '../integrations/PokiSDK';
 import { ApiClient } from '../integrations/ApiClient';
+import { I18n } from '../i18n/I18n';
 import { Element, ELEMENT_INFO } from '../constants/AlchemyConfig';
 import { applySlotChange } from '../systems/AlchemySystem';
 import {
@@ -107,7 +108,7 @@ export class UpgradeScene extends Phaser.Scene {
         );
         bg.setDepth(0);
 
-        const title = this.add.text(this.scale.width / 2, 80, 'LEVEL UP! 카드를 선택하세요', {
+        const title = this.add.text(this.scale.width / 2, 80, I18n.t('upgrade_title'), {
             fontSize: '32px',
             color: '#ffd700',
             fontStyle: 'bold',
@@ -132,7 +133,7 @@ export class UpgradeScene extends Phaser.Scene {
         // 카드 1장 더 버튼 (1회 한정) — 광고 보면 추가 카드 1장
         let extraCardUsed = false;
         const extraCardBtn = this.add
-            .text(this.scale.width / 2, this.scale.height - 50, '광고 보고 카드 1장 더', {
+            .text(this.scale.width / 2, this.scale.height - 50, I18n.t('upgrade_extra_card_ad'), {
                 fontSize: '18px',
                 color: '#aaaaaa',
                 backgroundColor: '#222222',
@@ -160,7 +161,7 @@ export class UpgradeScene extends Phaser.Scene {
                     extraCardBtn.setText(`+ ${extraCard.title}`).setColor('#ffd700');
                 }
             } else {
-                extraCardBtn.setText('광고 시청 실패').setColor('#888888');
+                extraCardBtn.setText(I18n.t('upgrade_ad_failed')).setColor('#888888');
             }
         });
     }

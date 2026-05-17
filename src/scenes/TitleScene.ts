@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { I18n } from '../i18n/I18n';
 
 export class TitleScene extends Phaser.Scene {
     constructor() {
@@ -14,7 +15,7 @@ export class TitleScene extends Phaser.Scene {
 
         // Home Button (Top Left)
         const homeBtn = this.add
-            .text(20, 20, '🏠 Home', {
+            .text(20, 20, I18n.t('title_home'), {
                 fontFamily: '"MedievalSharp", cursive',
                 fontSize: '24px',
                 color: '#ffffff',
@@ -30,6 +31,25 @@ export class TitleScene extends Phaser.Scene {
         homeBtn.on('pointerover', () => homeBtn.setTint(0xffff00));
         homeBtn.on('pointerout', () => homeBtn.clearTint());
 
+        // 언어 토글 (Top Right)
+        const langBtn = this.add
+            .text(width - 20, 20, I18n.getLang() === 'ko' ? '🌐 EN' : '🌐 한', {
+                fontFamily: '"MedievalSharp", cursive',
+                fontSize: '20px',
+                color: '#ffffff',
+                backgroundColor: '#00000088',
+                padding: { x: 10, y: 5 },
+            })
+            .setOrigin(1, 0)
+            .setInteractive({ useHandCursor: true });
+
+        langBtn.on('pointerdown', () => {
+            I18n.toggle();
+            this.scene.restart(); // 즉시 새 언어 반영
+        });
+        langBtn.on('pointerover', () => langBtn.setTint(0xffff00));
+        langBtn.on('pointerout', () => langBtn.clearTint());
+
         // 메뉴 레이아웃 — START + 보조 메뉴 (스킬 트리 + 시너지 도감 가로 묶음)
         const startY = height / 2 + 100;
         const subY = startY + 90;
@@ -41,7 +61,7 @@ export class TitleScene extends Phaser.Scene {
             .setStrokeStyle(3, 0xffd700);
 
         const startText = this.add
-            .text(width / 2, startY, 'START', {
+            .text(width / 2, startY, I18n.t('title_start'), {
                 fontFamily: '"MedievalSharp", cursive',
                 fontSize: '40px',
                 color: '#ffffff',
@@ -107,7 +127,7 @@ export class TitleScene extends Phaser.Scene {
             .setStrokeStyle(2, 0x4db8ff);
 
         this.add
-            .text(subLeftX, subY, '스킬 트리', {
+            .text(subLeftX, subY, I18n.t('title_skill_tree'), {
                 fontFamily: '"MedievalSharp", cursive',
                 fontSize: '22px',
                 color: '#4db8ff',
@@ -137,7 +157,7 @@ export class TitleScene extends Phaser.Scene {
             .setStrokeStyle(2, 0xcc88ff);
 
         this.add
-            .text(subRightX, subY, '시너지 도감', {
+            .text(subRightX, subY, I18n.t('title_codex'), {
                 fontFamily: '"MedievalSharp", cursive',
                 fontSize: '22px',
                 color: '#cc88ff',
