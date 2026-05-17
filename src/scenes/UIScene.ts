@@ -26,7 +26,6 @@ export class UIScene extends Phaser.Scene {
     private mpBar!: Phaser.GameObjects.Rectangle;
     private mpText!: Phaser.GameObjects.Text;
     private mpContainer!: Phaser.GameObjects.Container;
-    private skillPointsText!: Phaser.GameObjects.Text;
     private selectedCharId: string = 'wizard';
 
     private bossHpBar?: Phaser.GameObjects.Rectangle;
@@ -49,7 +48,6 @@ export class UIScene extends Phaser.Scene {
     private coinText!: Phaser.GameObjects.Text;
     private coinIcon!: Phaser.GameObjects.Image;
     private totalCoins = 0;
-    private skillPoints = 0;
 
     // Minimap
     private minimapGraphics!: Phaser.GameObjects.Graphics;
@@ -79,7 +77,6 @@ export class UIScene extends Phaser.Scene {
         this.currentXp = 0;
         this.xpToNextLevel = 100;
         this.totalCoins = 0;
-        this.skillPoints = 0;
         this.spawningComplete = false;
         this.dungeonMap = [];
         this.discoveredMap = [];
@@ -104,16 +101,6 @@ export class UIScene extends Phaser.Scene {
 
         // redundnant dummy text to keep compatibility if referenced elsewhere
         this.levelText = this.add.text(0, 0, '', { fontSize: '0px' }).setVisible(false);
-
-        this.skillPointsText = this.add
-            .text(1270, 710, 'SP: 0', {
-                fontSize: '48px',
-                color: '#ffcc00',
-                fontStyle: 'bold',
-                stroke: '#000000',
-                strokeThickness: 6,
-            })
-            .setOrigin(1, 1);
 
         this.coinText = this.add
             .text(10, 115, '0', {
@@ -382,7 +369,6 @@ export class UIScene extends Phaser.Scene {
         this.uiContainer.add([
             this.stageLevelText,
             this.levelText,
-            this.skillPointsText,
             this.statsText,
             this.hpFrame,
             this.hpBar,
@@ -558,7 +544,6 @@ export class UIScene extends Phaser.Scene {
     private updateStageLevelText() {
         this.stageLevelText.setText(`Stage ${this.currentStage}`);
         this.expLabel.setText(`Level ${this.currentLevel}`);
-        this.skillPointsText.setText(`SP: ${this.skillPoints}`);
         const p = Phaser.Math.Clamp(this.currentXp / this.xpToNextLevel, 0, 1);
         this.xpBar.width = Math.max(1, (400 - 8) * p);
     }
@@ -736,7 +721,6 @@ export class UIScene extends Phaser.Scene {
         if (this.currentXp >= this.xpToNextLevel) {
             this.currentLevel++;
             globalStats.currentLevel = this.currentLevel;
-            this.skillPoints++;
             this.currentXp -= this.xpToNextLevel;
             this.xpToNextLevel = Math.floor(this.xpToNextLevel * 1.5);
             this.sound.play('level_up', { volume: 0.5 });
