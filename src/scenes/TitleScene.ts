@@ -10,7 +10,7 @@ export class TitleScene extends Phaser.Scene {
         const { width, height } = this.scale;
         this.cameras.main.fadeIn(1000, 0, 0, 0);
 
-        // Background Image — 미세한 줌 & 패닝으로 살아있는 느낌
+        // Background Image — 미세한 줌 & 패닝
         const bg = this.add.image(width / 2, height / 2, 'main_bg').setDisplaySize(width, height);
         bg.setScale(1.05);
         this.tweens.add({
@@ -22,14 +22,19 @@ export class TitleScene extends Phaser.Scene {
             repeat: -1,
             ease: 'Sine.easeInOut',
         });
-        // 어두운 오버레이 (텍스트 가독성)
-        this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.35);
+        // 가벼운 전체 오버레이
+        this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.2);
+        // 상단 영역 추가 마스킹 — 배경 이미지의 기존 'SURVIVORS' 글자 가리기.
+        // (배경 PNG 자체를 수정하지 않고 오버레이로 처리. 위치/크기는 시각 확인 후 조정 가능)
+        const maskG = this.add.graphics();
+        maskG.fillGradientStyle(0x000000, 0x000000, 0x000000, 0x000000, 0.95, 0.95, 0.0, 0.0);
+        maskG.fillRect(0, 0, width, 220);
 
-        // 게임 타이틀 — 화면 상단 중앙
+        // 새 게임 타이틀 — 화면 상단 중앙
         const titleTextObj = this.add
-            .text(width / 2, height / 2 - 200, 'MAGICKA SURVIVORS', {
+            .text(width / 2, 90, 'MAGICKA SURVIVORS', {
                 fontFamily: '"MedievalSharp", cursive',
-                fontSize: '72px',
+                fontSize: '64px',
                 color: '#ffd700',
                 fontStyle: 'bold',
                 stroke: '#000000',
@@ -37,10 +42,9 @@ export class TitleScene extends Phaser.Scene {
                 shadow: { offsetX: 3, offsetY: 3, color: '#5a3300', blur: 16, fill: true },
             })
             .setOrigin(0.5);
-        // 타이틀에 미세한 hover 애니메이션
         this.tweens.add({
             targets: titleTextObj,
-            y: titleTextObj.y - 8,
+            y: titleTextObj.y - 6,
             duration: 2000,
             yoyo: true,
             repeat: -1,
