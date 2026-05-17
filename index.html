@@ -26,10 +26,12 @@
     #game-container {
       width: 100%;
       height: 100%;
+      touch-action: none; /* 모바일 핀치줌/스크롤 차단 — 게임 드래그 입력만 */
     }
 
     canvas {
       display: block;
+      touch-action: none;
     }
 
     #orientation-warning {

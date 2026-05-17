@@ -14,6 +14,13 @@ export class PlayerSystem {
     private isDashing: boolean = false;
     private dashCooldown: number = 0;
 
+    // 모바일 터치 입력 — 첫 터치 위치 = 가상 조이스틱 중심, 드래그 방향 = 이동
+    private touchActive: boolean = false;
+    private touchOriginX: number = 0;
+    private touchOriginY: number = 0;
+    private touchCurrentX: number = 0;
+    private touchCurrentY: number = 0;
+
     constructor(charData: CharacterData) {
         this.charData = charData;
         window.addEventListener('keydown', (e) => {
@@ -21,10 +28,38 @@ export class PlayerSystem {
             if (e.code === 'ShiftLeft' && this.dashCooldown <= 0) {
                 this.isDashing = true;
                 this.dashCooldown = 2000;
-                setTimeout(() => { this.isDashing = false; }, 300);
+                setTimeout(() => {
+                    this.isDashing = false;
+                }, 300);
             }
         });
-        window.addEventListener('keyup', (e) => { this.keys[e.code] = false; });
+        window.addEventListener('keyup', (e) => {
+            this.keys[e.code] = false;
+        });
+
+        const onTouchStart = (e: TouchEvent) => {
+            const t = e.touches[0];
+            if (!t) return;
+            this.touchOriginX = t.clientX;
+            this.touchOriginY = t.clientY;
+            this.touchCurrentX = t.clientX;
+            this.touchCurrentY = t.clientY;
+            this.touchActive = true;
+        };
+        const onTouchMove = (e: TouchEvent) => {
+            if (!this.touchActive) return;
+            const t = e.touches[0];
+            if (!t) return;
+            this.touchCurrentX = t.clientX;
+            this.touchCurrentY = t.clientY;
+        };
+        const onTouchEnd = (e: TouchEvent) => {
+            if (e.touches.length === 0) this.touchActive = false;
+        };
+        window.addEventListener('touchstart', onTouchStart, { passive: true });
+        window.addEventListener('touchmove', onTouchMove, { passive: true });
+        window.addEventListener('touchend', onTouchEnd, { passive: true });
+        window.addEventListener('touchcancel', onTouchEnd, { passive: true });
     }
 
     public update(dt: number) {
@@ -37,6 +72,18 @@ export class PlayerSystem {
         if (this.keys['KeyS'] || this.keys['ArrowDown']) inputY += 1;
         if (this.keys['KeyA'] || this.keys['ArrowLeft']) inputX -= 1;
         if (this.keys['KeyD'] || this.keys['ArrowRight']) inputX += 1;
+
+        // 모바일 터치 입력 — 키보드 입력 없을 때만 적용 (충돌 방지)
+        if (inputX === 0 && inputY === 0 && this.touchActive) {
+            const dx = this.touchCurrentX - this.touchOriginX;
+            const dy = this.touchCurrentY - this.touchOriginY;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            const DEAD_ZONE = 20; // px — 미세한 떨림 무시
+            if (dist > DEAD_ZONE) {
+                inputX = dx / dist;
+                inputY = dy / dist;
+            }
+        }
 
         const ents = playerQuery(world);
         for (let i = 0; i < ents.length; i++) {
