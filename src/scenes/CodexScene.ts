@@ -46,9 +46,9 @@ export class CodexScene extends Phaser.Scene {
 
         // 20 시너지 — 5 cols × 4 rows 로 배치하여 뒤로가기 버튼(y≈690)과 겹치지 않게.
         const cols = 5;
-        const cardW = 220;
-        const cardH = 110;
-        const gap = 12;
+        const cardW = 235;
+        const cardH = 120;
+        const gap = 10;
         const totalW = cols * cardW + (cols - 1) * gap;
         const startX = (width - totalW) / 2 + cardW / 2;
         const startY = 110 + cardH / 2;
@@ -68,26 +68,34 @@ export class CodexScene extends Phaser.Scene {
             if (isDiscovered) {
                 const elementIcons = syn.elements.map((e) => ELEMENT_INFO[e].icon).join(' ');
                 this.add
-                    .text(x, y - 32, elementIcons, {
-                        fontSize: '20px',
+                    .text(x, y - 38, elementIcons, {
+                        fontSize: '22px',
                     })
                     .setOrigin(0.5);
 
+                // 시너지 이름 — MedievalSharp 유지 (장식성), 골드 + stroke 로 대비 강화
                 this.add
-                    .text(x, y - 5, syn.name, {
+                    .text(x, y - 10, syn.name, {
                         fontFamily: '"MedievalSharp", cursive',
-                        fontSize: '18px',
+                        fontSize: '20px',
                         color: '#ffd700',
                         fontStyle: 'bold',
+                        stroke: '#000000',
+                        strokeThickness: 3,
                     })
                     .setOrigin(0.5);
 
+                // 설명 — sans-serif 로 가독성 우선 (MedievalSharp 는 본문에 적합하지 않음)
                 this.add
                     .text(x, y + 28, tr(syn.description), {
-                        fontSize: '11px',
-                        color: '#cccccc',
+                        fontFamily: 'Arial, sans-serif',
+                        fontSize: '14px',
+                        color: '#ffffff',
+                        stroke: '#000000',
+                        strokeThickness: 2,
                         wordWrap: { width: cardW - 16 },
                         align: 'center',
+                        lineSpacing: 2,
                     })
                     .setOrigin(0.5);
             } else {

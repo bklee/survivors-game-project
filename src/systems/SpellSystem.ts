@@ -73,14 +73,16 @@ export class SpellSystem {
         const px = Position.x[playerEid];
         const py = Position.y[playerEid];
 
-        const animDuration = this.selectedCharId === 'knight' ? 250 : 400;
+        const animDuration =
+            this.selectedCharId === 'knight' || this.selectedCharId === 'dwarf' ? 250 : 400;
         this.spellCooldowns.set(spellId, 500 * globalStats.cooldownMult);
 
         window.dispatchEvent(new CustomEvent('combo_cast', { detail: { duration: animDuration } }));
 
         const extraProjectiles = Math.floor((globalStats.currentLevel || 1) / 10);
 
-        if (this.selectedCharId === 'knight') {
+        if (this.selectedCharId === 'knight' || this.selectedCharId === 'dwarf') {
+            // dwarf 는 knight 와 동일한 검 슬래시 공격 (도끼 시각 + 슬래시 이펙트)
             window.dispatchEvent(new CustomEvent('play_sound', { detail: 'fire_cast' }));
             for (let i = 0; i <= extraProjectiles; i++) {
                 const angle = this.calculateAngleOffset(i);
