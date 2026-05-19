@@ -529,6 +529,9 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                                 // atlas cleaver-like sprite (양손 도끼 라인 추정)
                                 weaponTex = 'dungeon';
                                 weaponFrame = 'weapon_cleaver_atlas';
+                            } else if (charKey === 'dwarf') {
+                                // dwarf 전용 도끼
+                                weaponTex = 'weapon_axe';
                             } else {
                                 weaponTex = 'dungeon';
                                 weaponFrame = 'weapon_bow';
@@ -585,7 +588,10 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                             : charKey === 'ogre'
                               ? -10
                               : -7;
-                    const baseRot = charKey === 'knight' || charKey === 'ogre' ? -Math.PI / 4 : 0;
+                    const baseRot =
+                        charKey === 'knight' || charKey === 'ogre' || charKey === 'dwarf'
+                            ? -Math.PI / 4
+                            : 0;
 
                     let swingRot = 0;
                     // Player uses global timer, Bosses use their own ActionState
@@ -608,7 +614,7 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                             1 - currentAttackTimer / currentAttackDuration,
                         );
 
-                        if (charKey === 'knight' || charKey === 'ogre') {
+                        if (charKey === 'knight' || charKey === 'ogre' || charKey === 'dwarf') {
                             swingRot = Math.sin(progress * Math.PI) * (Math.PI * 0.8);
                         } else if (charKey === 'wizard' || charKey === 'necromancer') {
                             swingRot = Math.sin(progress * Math.PI) * (Math.PI / 15);

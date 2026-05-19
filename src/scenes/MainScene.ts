@@ -348,11 +348,45 @@ export class MainScene extends Phaser.Scene {
         window.addEventListener('synergy_discovered', synergyActivatedHandler);
 
         // 광고 부활 — GameOverScene 에서 rewarded ad 성공 시 dispatch.
-        // Player Health 를 max 의 50% 로 복구하고 MainScene 이 resume 될 때
-        // deathHandler 가 다시 트리거되지 않게 함.
+        // Player Health 를 max 의 50% 로 복구하고, 주변 적/보스가 없는 안전한 floor 로 텔레포트.
         const adReviveHandler = () => {
             if (this.playerId === undefined) return;
             Health.current[this.playerId] = Math.floor(Health.max[this.playerId] * 0.5);
+
+            // 안전한 위치 찾기: 현재 위치로부터 300~800px 떨어진 floor 중
+            // 250px 반경 안에 적/보스 없는 지점. 최대 12회 시도, 실패 시 최선의 후보.
+            const px = Position.x[this.playerId];
+            const py = Position.y[this.playerId];
+            const enemyPosQuery = defineQuery([Enemy, Position]);
+            const enemies = enemyPosQuery(world);
+            const SAFE_RADIUS_SQ = 250 * 250;
+
+            let best = { x: px, y: py };
+            let bestMinDistSq = -1;
+            for (let attempt = 0; attempt < 12; attempt++) {
+                const candidate = this.dungeon.getFloorPixelNear(px, py, 300, 800);
+                let minDistSq = Infinity;
+                for (let i = 0; i < enemies.length; i++) {
+                    const eid = enemies[i];
+                    const dx = candidate.x - Position.x[eid];
+                    const dy = candidate.y - Position.y[eid];
+                    const distSq = dx * dx + dy * dy;
+                    if (distSq < minDistSq) minDistSq = distSq;
+                }
+                if (minDistSq >= SAFE_RADIUS_SQ) {
+                    best = candidate;
+                    break;
+                }
+                if (minDistSq > bestMinDistSq) {
+                    bestMinDistSq = minDistSq;
+                    best = candidate;
+                }
+            }
+            Position.x[this.playerId] = best.x;
+            Position.y[this.playerId] = best.y;
+            // 카메라도 새 위치로 즉시 따라가게 — pan effect 없이 snap
+            this.cameras.main.centerOn(best.x, best.y);
+
             window.dispatchEvent(
                 new CustomEvent('hp_updated', {
                     detail: {
