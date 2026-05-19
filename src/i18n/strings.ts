@@ -17,6 +17,8 @@ export const STRINGS = {
     // Upgrade Scene
     upgrade_title: { ko: 'LEVEL UP! 카드를 선택하세요', en: 'LEVEL UP! Choose a card' },
     upgrade_extra_card_ad: { ko: '광고 보고 카드 1장 더', en: 'Watch Ad for Extra Card' },
+    upgrade_extra_card_unlocked: { ko: '카드 2장 선택 가능!', en: 'Pick 2 cards!' },
+    upgrade_pick_one_more: { ko: '카드 1장 더 선택!', en: 'Pick one more card!' },
     upgrade_ad_failed: { ko: '광고 시청 실패', en: 'Ad watch failed' },
 
     // GameOver Scene
