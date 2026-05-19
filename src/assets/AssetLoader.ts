@@ -39,6 +39,12 @@ export class AssetLoader {
             this.scene.load.image(`super_slash_f${i}`, `assets/frames/super_slash_f${i}.png`);
             this.scene.load.image(`spell_fire_f${i}`, `assets/frames/spell_fire_f${i}.png`);
         }
+
+        // Dwarf 전용 스프라이트 — 0x72 atlas 에 좌표 없음 → frames/ 의 개별 PNG 로드
+        for (let i = 0; i < 4; i++) {
+            this.scene.load.image(`dwarf_idle_f${i}`, `assets/frames/dwarf_m_idle_anim_f${i}.png`);
+            this.scene.load.image(`dwarf_run_f${i}`, `assets/frames/dwarf_m_run_anim_f${i}.png`);
+        }
         // We will define all monster, coin, and chest frames in defineFrames() using the dungeon tileset
     }
 

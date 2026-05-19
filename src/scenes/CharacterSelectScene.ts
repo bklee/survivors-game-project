@@ -94,17 +94,26 @@ export class CharacterSelectScene extends Phaser.Scene {
                 .setDepth(1);
 
             // 캐릭터 스프라이트 (카드 cardHeight 260 에 맞춰 약간 위로)
-            const idleFrame = char.id === 'necromancer' ? 'necromancer_f0' : `${char.id}_idle_0`;
-            const sprite = this.add
-                .sprite(x, y - 35, 'dungeon', idleFrame)
-                .setScale(2.6)
-                .setDepth(2);
+            // dwarf 는 atlas 외부 standalone 텍스처 사용
+            let sprite: Phaser.GameObjects.Sprite;
+            if (char.id === 'dwarf') {
+                sprite = this.add
+                    .sprite(x, y - 35, 'dwarf_idle_f0')
+                    .setScale(2.6)
+                    .setDepth(2);
+            } else {
+                const idleFrame =
+                    char.id === 'necromancer' ? 'necromancer_f0' : `${char.id}_idle_0`;
+                sprite = this.add
+                    .sprite(x, y - 35, 'dungeon', idleFrame)
+                    .setScale(2.6)
+                    .setDepth(2);
+            }
 
-            // tint 설정
+            // tint 설정 — dwarf 는 별도 스프라이트가 있으므로 tint 불필요
             if (char.id === 'necromancer') sprite.setTint(0x9c27b0);
             else if (char.id === 'druid') sprite.setTint(0x4caf50);
             else if (char.id === 'engineer') sprite.setTint(0x607d8b);
-            else if (char.id === 'dwarf') sprite.setTint(0x8d6e63);
 
             if (!isUnlocked) sprite.setAlpha(0.35);
 
@@ -205,7 +214,6 @@ export class CharacterSelectScene extends Phaser.Scene {
                     if (char.id === 'necromancer') sprite.setTint(0x9c27b0);
                     else if (char.id === 'druid') sprite.setTint(0x4caf50);
                     else if (char.id === 'engineer') sprite.setTint(0x607d8b);
-                    else if (char.id === 'dwarf') sprite.setTint(0x8d6e63);
                     else sprite.clearTint();
                 }
             });

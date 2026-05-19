@@ -9,6 +9,7 @@ import {
     Enemy,
     Player,
     Boss,
+    BossClone,
     EnemyProjectile,
     Lifespan,
     Scale,
@@ -300,6 +301,7 @@ export class NightDirector {
         addComponent(world, Animation, eid);
         addComponent(world, Enemy, eid);
         // 의도적으로 Boss 컴포넌트 미부착 — 일반 강한 적으로 취급
+        addComponent(world, BossClone, eid);
 
         Position.x[eid] = x;
         Position.y[eid] = y;

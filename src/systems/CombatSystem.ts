@@ -7,6 +7,7 @@ import {
     Velocity,
     SpriteInfo,
     Boss,
+    BossSplit,
     Player,
     EnemyProjectile,
     Enemy,
@@ -216,6 +217,7 @@ export const createCombatSystem = (juice: JuicePipeline) => {
                         addComponent(world, Animation, sid);
                         addComponent(world, Enemy, sid);
                         addComponent(world, Boss, sid);
+                        addComponent(world, BossSplit, sid);
                         Position.x[sid] = tx + (off === 0 ? -60 : 60);
                         Position.y[sid] = ty + (off === 0 ? -30 : 30);
                         const angle = Math.random() * Math.PI * 2;

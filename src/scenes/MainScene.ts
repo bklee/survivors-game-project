@@ -235,11 +235,13 @@ export class MainScene extends Phaser.Scene {
         else if (this.selectedCharId === 'necromancer') charTypeId = 3;
         else if (this.selectedCharId === 'druid') charTypeId = 4;
         else if (this.selectedCharId === 'engineer') charTypeId = 5;
-        else if (this.selectedCharId === 'dwarf') charTypeId = 0; // knight 무기 (검) 공유
+        else if (this.selectedCharId === 'dwarf') charTypeId = 6; // dwarf 전용 스프라이트
 
+        // dwarf 는 knight 무기 evolution(0) 공유 — sprite 만 별도
+        const weaponFamily = this.selectedCharId === 'dwarf' ? 0 : charTypeId;
         addComponent(world, WeaponEvolution, this.playerId);
         WeaponEvolution.evolutionId[this.playerId] = -1;
-        WeaponEvolution.baseWeaponId[this.playerId] = charTypeId;
+        WeaponEvolution.baseWeaponId[this.playerId] = weaponFamily;
 
         addComponent(world, Relic, this.playerId);
         Relic.bitmask[this.playerId] = 0;
