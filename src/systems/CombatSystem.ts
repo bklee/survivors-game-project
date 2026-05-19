@@ -1,3 +1,4 @@
+import Phaser from 'phaser';
 import { defineQuery, removeEntity, addEntity, addComponent, hasComponent } from 'bitecs';
 import {
     Position,
@@ -30,7 +31,7 @@ const SOUND_THROTTLE_MS = 50;
 let dmgNumbersThisFrame = 0;
 const MAX_DMG_NUMBERS_PER_FRAME = 8;
 
-export const createCombatSystem = (juice: JuicePipeline) => {
+export const createCombatSystem = (juice: JuicePipeline, scene: Phaser.Scene) => {
     return (dt: number) => {
         const deltaSec = dt / 1000;
         const now = performance.now();
@@ -203,39 +204,45 @@ export const createCombatSystem = (juice: JuicePipeline) => {
                 const ty = Position.y[targetId];
 
                 // === Stage 9+ 보스 분열 (30%) — 처치 시 작은 보스 2개로 분열 ===
-                // 분열되면 stage_clear 발사 안 함 → WaveSystem 이 Boss count 0 될 때 자연스럽게 stage_clear
+                // 사용자 요청: 분열 직전 2초 워닝 → 그 후 실제 분열.
                 let didSplit = false;
                 if (isBoss && globalStats.currentStage >= 9 && Math.random() < 0.3) {
+                    didSplit = true;
                     const typeId = SpriteInfo.textureIndex[targetId];
                     const newHp = Math.max(50, Health.max[targetId] * 0.25);
-                    for (let off = 0; off < 2; off++) {
-                        const sid = addEntity(world);
-                        addComponent(world, Position, sid);
-                        addComponent(world, Velocity, sid);
-                        addComponent(world, Health, sid);
-                        addComponent(world, SpriteInfo, sid);
-                        addComponent(world, Animation, sid);
-                        addComponent(world, Enemy, sid);
-                        addComponent(world, Boss, sid);
-                        addComponent(world, BossSplit, sid);
-                        Position.x[sid] = tx + (off === 0 ? -60 : 60);
-                        Position.y[sid] = ty + (off === 0 ? -30 : 30);
-                        const angle = Math.random() * Math.PI * 2;
-                        Velocity.x[sid] = Math.cos(angle) * 40;
-                        Velocity.y[sid] = Math.sin(angle) * 40;
-                        Health.current[sid] = newHp;
-                        Health.max[sid] = newHp;
-                        SpriteInfo.textureIndex[sid] = typeId;
-                        Animation.frameRate[sid] = 8;
-                        Animation.timer[sid] = 0;
-                    }
-                    didSplit = true;
-                    // 분열된 새 보스 중 한 개의 HP 로 UI 막대 갱신 (대표 표시)
+                    // 워닝 토스트 — UIScene 에서 handleBossWarning 으로 표시.
                     window.dispatchEvent(
-                        new CustomEvent('boss_hp', {
-                            detail: { current: newHp, max: newHp, name: 'SPLIT BOSS' },
-                        }),
+                        new CustomEvent('boss_warning', { detail: { kind: 'split' } }),
                     );
+                    // 2초 후 실제 분열 + boss_hp UI 갱신 (워닝과 동기화).
+                    scene.time.delayedCall(2000, () => {
+                        for (let off = 0; off < 2; off++) {
+                            const sid = addEntity(world);
+                            addComponent(world, Position, sid);
+                            addComponent(world, Velocity, sid);
+                            addComponent(world, Health, sid);
+                            addComponent(world, SpriteInfo, sid);
+                            addComponent(world, Animation, sid);
+                            addComponent(world, Enemy, sid);
+                            addComponent(world, Boss, sid);
+                            addComponent(world, BossSplit, sid);
+                            Position.x[sid] = tx + (off === 0 ? -60 : 60);
+                            Position.y[sid] = ty + (off === 0 ? -30 : 30);
+                            const angle = Math.random() * Math.PI * 2;
+                            Velocity.x[sid] = Math.cos(angle) * 40;
+                            Velocity.y[sid] = Math.sin(angle) * 40;
+                            Health.current[sid] = newHp;
+                            Health.max[sid] = newHp;
+                            SpriteInfo.textureIndex[sid] = typeId;
+                            Animation.frameRate[sid] = 8;
+                            Animation.timer[sid] = 0;
+                        }
+                        window.dispatchEvent(
+                            new CustomEvent('boss_hp', {
+                                detail: { current: newHp, max: newHp, name: 'SPLIT BOSS' },
+                            }),
+                        );
+                    });
                 }
 
                 if (isBoss && !didSplit) {
