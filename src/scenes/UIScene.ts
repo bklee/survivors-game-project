@@ -738,6 +738,18 @@ export class UIScene extends Phaser.Scene {
             this.time.delayedCall(1000, () => {
                 this.statsText.setScale(1).clearTint();
             });
+            // 레벨업 골드 링 폭발 파티클
+            const cx = this.scale.width / 2;
+            const cy = this.scale.height / 2;
+            const ring = this.add.circle(cx, cy, 10, 0xffd700, 0.8).setDepth(3000);
+            this.tweens.add({
+                targets: ring,
+                radius: 120,
+                alpha: 0,
+                duration: 600,
+                ease: 'Cubic.easeOut',
+                onComplete: () => ring.destroy(),
+            });
 
             const players = this.playerQuery(world);
             if (players.length > 0) {
