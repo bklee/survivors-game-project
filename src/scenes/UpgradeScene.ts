@@ -133,17 +133,19 @@ export class UpgradeScene extends Phaser.Scene {
         const cardWidth = 200;
         const cardHeight = 280;
         const gap = 40;
-        const totalWidth = cardWidth * 3 + gap * 2;
-        const startX = (this.scale.width - totalWidth) / 2 + cardWidth / 2;
         const cardY = this.scale.height / 2;
 
         const spawnCards = () => {
             // 기존 카드 모두 파괴
             this.cards.forEach((c) => c.destroy());
             this.cards = [];
-            const cardData = this.pickRandomCards(3);
+            // 광고 시청 시(maxPicks=2) 4장, 기본 3장
+            const count = this.maxPicks === 2 ? 4 : 3;
+            const totalW = count * cardWidth + (count - 1) * gap;
+            const sx = (this.scale.width - totalW) / 2 + cardWidth / 2;
+            const cardData = this.pickRandomCards(count);
             cardData.forEach((data, i) => {
-                const x = startX + i * (cardWidth + gap);
+                const x = sx + i * (cardWidth + gap);
                 const card = this.createCard(x, cardY, cardWidth, cardHeight, data);
                 this.cards.push(card);
             });
