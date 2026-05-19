@@ -44,8 +44,9 @@ export class CodexScene extends Phaser.Scene {
                     : 0xff3333;
         this.add.rectangle(barX, barY, fillW, barH, fillColor, 1).setOrigin(0, 0);
 
-        const cols = 4;
-        const cardW = 280;
+        // 20 시너지 — 5 cols × 4 rows 로 배치하여 뒤로가기 버튼(y≈690)과 겹치지 않게.
+        const cols = 5;
+        const cardW = 220;
         const cardH = 110;
         const gap = 12;
         const totalW = cols * cardW + (cols - 1) * gap;
