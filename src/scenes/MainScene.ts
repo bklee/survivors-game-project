@@ -97,6 +97,9 @@ export class MainScene extends Phaser.Scene {
     private floorBlitter!: Phaser.GameObjects.Blitter;
     private currentStage: number = 1;
     private isPausedForClear: boolean = false;
+    // player_died 가 매 프레임 발사되어 GameOverScene 이 중복 launch 되는 것 방지.
+    // 부활 시 false 로 리셋해서 다음 사망도 처리.
+    private deathHandled: boolean = false;
     private enemiesKilled: number = 0;
     private synergiesActivated: number = 0;
     private sessionStartMs: number = 0;
@@ -351,6 +354,8 @@ export class MainScene extends Phaser.Scene {
         // Player Health 를 max 의 50% 로 복구하고, 주변 적/보스가 없는 안전한 floor 로 텔레포트.
         const adReviveHandler = () => {
             if (this.playerId === undefined) return;
+            // 다음 사망도 다시 처리될 수 있도록 guard 리셋.
+            this.deathHandled = false;
             Health.current[this.playerId] = Math.floor(Health.max[this.playerId] * 0.5);
 
             // 안전한 위치 찾기: 현재 위치로부터 300~800px 떨어진 floor 중
@@ -399,10 +404,15 @@ export class MainScene extends Phaser.Scene {
         window.addEventListener('ad_revive_requested', adReviveHandler);
 
         const deathHandler = () => {
+            // 중복 호출 방지 — CombatSystem 이 매 프레임 player_died 를 dispatch 하므로
+            // deathHandled guard 없이는 GameOverScene 이 60+ 회 launch 큐잉됨 (부활 시 폭주).
+            if (this.deathHandled) return;
+
             // Phoenix Feather 부활 시도
             if (this.relicSystem.tryRevive(this.playerId)) {
-                return; // 부활 성공 — 사망 처리 스킵
+                return; // 부활 성공 — 사망 처리 스킵 (deathHandled 는 아직 false 유지)
             }
+            this.deathHandled = true;
 
             // 세션 종료 분석 + leaderboard 제출 (best-effort)
             const durationSec = Math.max(0, Math.floor((Date.now() - this.sessionStartMs) / 1000));
