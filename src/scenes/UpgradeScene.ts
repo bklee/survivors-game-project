@@ -96,6 +96,9 @@ export class UpgradeScene extends Phaser.Scene {
     private cards: Phaser.GameObjects.Container[] = [];
     private playerEid: number = -1;
     private playerLevel: number = 1;
+    // 광고 시청 시 2장 선택 가능 — 기본 1.
+    private maxPicks: number = 1;
+    private picksDone: number = 0;
 
     constructor() {
         super({ key: 'UpgradeScene' });
@@ -104,6 +107,8 @@ export class UpgradeScene extends Phaser.Scene {
     init(data: { playerEid: number; playerLevel?: number }) {
         this.playerEid = data.playerEid;
         this.playerLevel = data.playerLevel ?? globalStats.currentLevel ?? 1;
+        this.maxPicks = 1;
+        this.picksDone = 0;
     }
 
     create() {
@@ -216,11 +221,30 @@ export class UpgradeScene extends Phaser.Scene {
                 const extraCards = this.pickRandomCards(1);
                 if (extraCards.length > 0) {
                     const extraCard = extraCards[0];
-                    const extraX = startX + 3 * (cardWidth + gap);
-                    const card = this.createCard(extraX, cardY, cardWidth, cardHeight, extraCard);
+                    // 임시 위치에 생성 — 곧 4장 균형 배치로 setPosition.
+                    const tempX = this.scale.width / 2;
+                    const card = this.createCard(tempX, cardY, cardWidth, cardHeight, extraCard);
                     this.cards.push(card);
-                    extraCardBtn.setText(`+ ${extraCard.title}`).setColor('#ffd700');
+                    // 4장 중앙 재정렬 (3장 레이아웃은 한쪽으로 치우치므로 X 좌표 다시 계산)
+                    const totalCount = this.cards.length;
+                    const newTotalW = totalCount * cardWidth + (totalCount - 1) * gap;
+                    const newStartX = (this.scale.width - newTotalW) / 2 + cardWidth / 2;
+                    this.cards.forEach((c, idx) => {
+                        const nx = newStartX + idx * (cardWidth + gap);
+                        this.tweens.add({
+                            targets: c,
+                            x: nx,
+                            duration: 350,
+                            ease: 'Quad.easeOut',
+                        });
+                    });
                 }
+                // 광고 시청 보상: 카드 2장 선택 허용
+                this.maxPicks = 2;
+                extraCardBtn
+                    .setText(I18n.t('upgrade_extra_card_unlocked'))
+                    .setColor('#ffd700')
+                    .setAlpha(0.95);
             } else {
                 extraCardBtn.setText(I18n.t('upgrade_ad_failed')).setColor('#888888');
             }
@@ -378,12 +402,12 @@ export class UpgradeScene extends Phaser.Scene {
                 ease: 'Sine.easeOut',
             });
         });
-        bg.on('pointerdown', () => this.onCardSelected(data));
+        bg.on('pointerdown', () => this.onCardSelected(data, container));
 
         return container;
     }
 
-    private onCardSelected(data: CardData) {
+    private onCardSelected(data: CardData, container: Phaser.GameObjects.Container) {
         ApiClient.trackEvent('card_select', {
             type: data.type,
             title: data.title,
@@ -391,8 +415,29 @@ export class UpgradeScene extends Phaser.Scene {
         if (this.playerEid >= 0) {
             this.applyCard(data);
         }
-        this.scene.resume('MainScene');
-        this.scene.stop();
+        this.picksDone += 1;
+
+        if (this.picksDone >= this.maxPicks) {
+            this.scene.resume('MainScene');
+            this.scene.stop();
+            return;
+        }
+
+        // 광고로 2장 모드 — 첫 카드 선택 후 컨테이너 제거 + 안내 표시
+        container.destroy();
+        this.cards = this.cards.filter((c) => c !== container);
+        // 화면 상단 안내 — '카드 1장 더 선택!'
+        this.add
+            .text(this.scale.width / 2, 180, I18n.t('upgrade_pick_one_more'), {
+                fontFamily: '"MedievalSharp", cursive',
+                fontSize: '24px',
+                color: '#ffd700',
+                fontStyle: 'bold',
+                stroke: '#000000',
+                strokeThickness: 3,
+            })
+            .setOrigin(0.5)
+            .setDepth(3);
     }
 
     private applyCard(card: CardData) {
