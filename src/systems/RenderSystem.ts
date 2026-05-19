@@ -590,7 +590,7 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                             : charKey === 'ogre'
                               ? -10
                               : charKey === 'dwarf'
-                                ? 3 // dwarf 는 도끼를 살짝 아래 (얼굴 위치 회피)
+                                ? 1 // dwarf 는 도끼를 캐릭터 중앙선 약간 위 (사용자 조정)
                                 : -7;
                     const baseRot =
                         charKey === 'knight' || charKey === 'ogre' || charKey === 'dwarf'
