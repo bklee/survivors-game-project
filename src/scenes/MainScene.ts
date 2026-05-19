@@ -674,14 +674,7 @@ export class MainScene extends Phaser.Scene {
         this.nightDirector.update(delta);
         this.playerSystem.update(delta);
 
-        const dX = this.uiScene?.joystick?.vector?.x || 0;
-        const dY = this.uiScene?.joystick?.vector?.y || 0;
-        if (dX !== 0 || dY !== 0) {
-            const speed = this.charData.baseStats.speed * globalStats.moveSpeedMult;
-            Velocity.x[this.playerId] = dX * speed;
-            Velocity.y[this.playerId] = dY * speed;
-            this.spellSystem.setFacing(dX, dY);
-        }
+        // 가상 조이스틱 입력 제거 — PlayerSystem 의 window touch (전 화면 드래그) 가 대체.
 
         this.spellSystem.update(delta);
         this.physicsSystem(delta);
