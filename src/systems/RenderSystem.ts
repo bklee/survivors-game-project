@@ -9,6 +9,8 @@ import {
     Interactive,
     Rotation,
     Boss,
+    BossClone,
+    BossSplit,
     Player,
     Scale,
     ActionState,
@@ -108,6 +110,7 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                 charKey = 'wizard'; // druid: wizard 프레임 재사용
             else if (typeId === 5)
                 charKey = 'wizard'; // engineer: wizard 프레임 재사용
+            else if (typeId === 6) charKey = 'dwarf';
             else if (typeId === 10) charKey = 'imp';
             else if (typeId === 11) charKey = 'demon';
             else if (typeId === 12) charKey = 'orc';
@@ -183,9 +186,12 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
 
             const isPlayer = hasComponent(world, Player, eid);
 
-            // 캐릭터 typeId(0=knight,1=wizard,2=elf)이지만 Player 컴포넌트가 없으면 렌더링하지 않음
+            // 캐릭터 typeId(0=knight,1=wizard,2=elf,3=necromancer,6=dwarf)이지만 Player 컴포넌트가 없으면 렌더링하지 않음
             // (bitECS 기본값 0으로 인해 wizard 스프라이트가 바닥 구조물로 나타나는 문제 방지)
-            if ((typeId === 0 || typeId === 1 || typeId === 2 || typeId === 3) && !isPlayer)
+            if (
+                (typeId === 0 || typeId === 1 || typeId === 2 || typeId === 3 || typeId === 6) &&
+                !isPlayer
+            )
                 continue;
 
             const isPillarPart = typeId >= 90 && typeId <= 95;
@@ -300,6 +306,13 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                 Animation.timer[eid] += dt;
                 const fIdx = Math.floor(Animation.timer[eid] / (1000 / rate)) % 4;
                 frameName = `necromancer_f${fIdx}`;
+            } else if (typeId === 6) {
+                // Dwarf: 0x72 atlas 에 좌표 없음 → standalone 텍스처 사용
+                const rate = Animation.frameRate[eid] || 8;
+                Animation.timer[eid] += dt;
+                const fIdx = Math.floor(Animation.timer[eid] / (1000 / rate)) % 4;
+                textureKey = `dwarf_${state}_f${fIdx}`;
+                frameName = '';
             } else {
                 const rate = Animation.frameRate[eid] || 8;
                 Animation.timer[eid] += dt;
@@ -386,9 +399,25 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
 
                 sprite.setVisible(true);
                 const isBoss = hasComponent(world, Boss, eid);
+                const isBossSplit = hasComponent(world, BossSplit, eid);
+                const isBossClone = hasComponent(world, BossClone, eid);
                 if (hasComponent(world, Scale, eid)) {
                     sprite.setScale(Scale.value[eid]);
                     sprite.clearTint();
+                } else if (isBossClone) {
+                    // 분신 — 메인 보스의 환영 (작고 푸르스름한 반투명)
+                    sprite.setScale(1.6);
+                    sprite.setTint(0x88bbff);
+                    sprite.setAlpha(0.7);
+                } else if (isBossSplit) {
+                    // 분열 — 깨진 파편 (중간 크기, 짙은 진홍 + 약한 글로우)
+                    sprite.setScale(1.8);
+                    sprite.setTint(0xff5544);
+                    if ((sprite as any).lastGlowColor !== 0xff5544) {
+                        sprite.postFX.clear();
+                        sprite.postFX.addGlow(0xff2200, 2, 0);
+                        (sprite as any).lastGlowColor = 0xff5544;
+                    }
                 } else if (isBoss) {
                     sprite.setScale(2.5);
                     const hpPercent = Health.current[eid] / Health.max[eid];
