@@ -125,7 +125,6 @@ export class UpgradeScene extends Phaser.Scene {
         title.setOrigin(0.5);
         title.setDepth(1);
 
-        const cardData = this.pickRandomCards(3);
         const cardWidth = 200;
         const cardHeight = 280;
         const gap = 40;
@@ -133,11 +132,51 @@ export class UpgradeScene extends Phaser.Scene {
         const startX = (this.scale.width - totalWidth) / 2 + cardWidth / 2;
         const cardY = this.scale.height / 2;
 
-        cardData.forEach((data, i) => {
-            const x = startX + i * (cardWidth + gap);
-            const card = this.createCard(x, cardY, cardWidth, cardHeight, data);
-            this.cards.push(card);
+        const spawnCards = () => {
+            // 기존 카드 모두 파괴
+            this.cards.forEach((c) => c.destroy());
+            this.cards = [];
+            const cardData = this.pickRandomCards(3);
+            cardData.forEach((data, i) => {
+                const x = startX + i * (cardWidth + gap);
+                const card = this.createCard(x, cardY, cardWidth, cardHeight, data);
+                this.cards.push(card);
+            });
+        };
+        spawnCards();
+
+        // === 재추첨 버튼 (코인 100) — 카드 3장 다시 뽑기 ===
+        const REROLL_COST = 100;
+        const rerollBtn = this.add
+            .text(this.scale.width / 2, 130, `🎲 재추첨  💰 ${REROLL_COST}`, {
+                fontFamily: '"MedievalSharp", cursive',
+                fontSize: '20px',
+                color: '#ffaa00',
+                backgroundColor: '#3a2a1a',
+                stroke: '#000000',
+                strokeThickness: 2,
+                padding: { x: 14, y: 6 },
+            })
+            .setOrigin(0.5)
+            .setDepth(2);
+        const refreshRerollBtn = () => {
+            const affordable = globalStats.totalCoins >= REROLL_COST;
+            rerollBtn.setColor(affordable ? '#ffaa00' : '#666666');
+            rerollBtn.setBackgroundColor(affordable ? '#3a2a1a' : '#1a1a1a');
+            if (affordable) rerollBtn.setInteractive({ useHandCursor: true });
+            else rerollBtn.disableInteractive();
+        };
+        rerollBtn.on('pointerdown', () => {
+            if (globalStats.totalCoins < REROLL_COST) return;
+            globalStats.totalCoins -= REROLL_COST;
+            // UIScene 코인 표시 갱신 — coin_collected 이벤트 (negative 로 호환 안 됨, 직접 갱신)
+            window.dispatchEvent(
+                new CustomEvent('coin_collected', { detail: { amount: -REROLL_COST } }),
+            );
+            spawnCards();
+            refreshRerollBtn();
         });
+        refreshRerollBtn();
 
         // 카드 1장 더 버튼 (레벨업당 1회) — 광고 보면 추가 카드 1장.
         // 디자인 강화: 카드 아래 가까이 + 큰 폰트 + 노란 강조색 + 펄스로 시선 유도.
