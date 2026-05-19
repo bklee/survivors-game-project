@@ -803,51 +803,199 @@ export class UIScene extends Phaser.Scene {
     private handleStageClear = () => {
         this.bossHpContainer?.setVisible(false);
         const panel = this.add
-            .rectangle(640, 360, 600, 340, 0x000000, 0.9)
+            .rectangle(640, 360, 660, 520, 0x000000, 0.92)
             .setStrokeStyle(4, 0xffd700)
             .setDepth(998);
         this.stageClearText
             .setVisible(true)
-            .setPosition(640, 280)
+            .setPosition(640, 160)
             .setText(`STAGE ${this.currentStage} CLEAR!`);
         const reward = this.add
-            .text(640, 360, 'BATTLE REWARD:\nALL STATS +10%', {
-                fontSize: '32px',
+            .text(640, 240, 'BATTLE REWARD:\nALL STATS +10%', {
+                fontSize: '24px',
                 color: '#00ff00',
                 align: 'center',
                 fontStyle: 'bold',
             })
             .setOrigin(0.5)
             .setDepth(999);
-        const tapToContinue = this.add
-            .text(640, 460, '- Touch to continue -', {
-                fontSize: '24px',
-                color: '#ffffff',
-                fontStyle: 'italic',
+
+        // === 🛒 Shop ===
+        const shopHeader = this.add
+            .text(640, 320, '🛒  SHOP', {
+                fontFamily: '"MedievalSharp", cursive',
+                fontSize: '22px',
+                color: '#ffd700',
+                fontStyle: 'bold',
             })
             .setOrigin(0.5)
             .setDepth(999);
 
-        this.tweens.add({
-            targets: [panel, this.stageClearText, reward, tapToContinue],
-            scale: { from: 0.8, to: 1 },
-            alpha: { from: 0, to: 1 },
-            duration: 500,
-            ease: 'Back.easeOut',
-            onComplete: () => {
-                const proceed = () => {
-                    this.input.off('pointerdown', proceed);
-                    this.input.keyboard?.off('keydown', proceed);
-                    panel.destroy();
-                    reward.destroy();
-                    tapToContinue.destroy();
-                    this.stageClearText.setVisible(false);
-                    window.dispatchEvent(new CustomEvent('next_stage'));
-                };
-                this.input.once('pointerdown', proceed);
-                this.input.keyboard?.once('keydown', proceed);
+        type ShopItem = {
+            icon: string;
+            label: string;
+            cost: number;
+            apply: () => void;
+        };
+        const items: ShopItem[] = [
+            {
+                icon: '❤️',
+                label: 'HP 회복',
+                cost: 50,
+                apply: () => {
+                    const players = this.playerQuery(world);
+                    if (players.length > 0) {
+                        const pid = players[0];
+                        Health.current[pid] = Health.max[pid];
+                        window.dispatchEvent(
+                            new CustomEvent('hp_updated', {
+                                detail: { current: Health.current[pid], max: Health.max[pid] },
+                            }),
+                        );
+                    }
+                },
             },
+            {
+                icon: '⚔️',
+                label: 'DMG +5%',
+                cost: 100,
+                apply: () => {
+                    globalStats.damageMult *= 1.05;
+                },
+            },
+            {
+                icon: '⚡',
+                label: 'SPD +5%',
+                cost: 75,
+                apply: () => {
+                    globalStats.moveSpeedMult *= 1.05;
+                },
+            },
+        ];
+
+        const btnW = 180;
+        const btnH = 70;
+        const btnGap = 18;
+        const totalBtnW = items.length * btnW + (items.length - 1) * btnGap;
+        const btnStartX = 640 - totalBtnW / 2 + btnW / 2;
+        const btnY = 380;
+
+        const shopBtns: Array<{
+            bg: Phaser.GameObjects.Rectangle;
+            text: Phaser.GameObjects.Text;
+            used: boolean;
+            item: ShopItem;
+        }> = [];
+
+        const refreshShopButtons = () => {
+            for (const sb of shopBtns) {
+                const affordable = !sb.used && globalStats.totalCoins >= sb.item.cost;
+                if (sb.used) {
+                    sb.bg.setFillStyle(0x222222, 0.7).setStrokeStyle(2, 0x444444);
+                    sb.text.setColor('#666666').setText(`✓ ${sb.item.icon}`);
+                } else if (affordable) {
+                    sb.bg.setFillStyle(0x3d2b1f, 0.9).setStrokeStyle(2, 0xffd700);
+                    sb.text.setColor('#ffd700');
+                } else {
+                    sb.bg.setFillStyle(0x1a1a1a, 0.7).setStrokeStyle(2, 0x555555);
+                    sb.text.setColor('#666666');
+                }
+            }
+        };
+
+        items.forEach((item, idx) => {
+            const bx = btnStartX + idx * (btnW + btnGap);
+            const bg = this.add
+                .rectangle(bx, btnY, btnW, btnH, 0x3d2b1f, 0.9)
+                .setStrokeStyle(2, 0xffd700)
+                .setDepth(999)
+                .setInteractive({ useHandCursor: true });
+            const text = this.add
+                .text(bx, btnY, `${item.icon} ${item.label}\n💰 ${item.cost}`, {
+                    fontFamily: '"MedievalSharp", cursive',
+                    fontSize: '15px',
+                    color: '#ffd700',
+                    align: 'center',
+                    lineSpacing: 4,
+                })
+                .setOrigin(0.5)
+                .setDepth(1000);
+            const sb = { bg, text, used: false, item };
+            shopBtns.push(sb);
+            bg.on('pointerdown', () => {
+                if (sb.used) return;
+                if (globalStats.totalCoins < item.cost) return;
+                globalStats.totalCoins -= item.cost;
+                this.totalCoins = globalStats.totalCoins;
+                this.coinText.setText(this.totalCoins.toLocaleString());
+                item.apply();
+                sb.used = true;
+                refreshShopButtons();
+            });
         });
+        refreshShopButtons();
+
+        // 코인 표시 (현재 보유)
+        const coinNote = this.add
+            .text(640, 445, `💰 보유: ${globalStats.totalCoins}`, {
+                fontSize: '17px',
+                color: '#ffffff',
+            })
+            .setOrigin(0.5)
+            .setDepth(999);
+        const refreshCoinNote = () => coinNote.setText(`💰 보유: ${globalStats.totalCoins}`);
+        shopBtns.forEach((sb) => {
+            sb.bg.on('pointerup', refreshCoinNote);
+        });
+
+        // Continue 버튼
+        const continueBtn = this.add
+            .rectangle(640, 500, 220, 50, 0x1e2a3a, 0.9)
+            .setStrokeStyle(3, 0xffffff)
+            .setDepth(999)
+            .setInteractive({ useHandCursor: true });
+        const continueText = this.add
+            .text(640, 500, 'Continue ▶', {
+                fontFamily: '"MedievalSharp", cursive',
+                fontSize: '22px',
+                color: '#ffffff',
+                fontStyle: 'bold',
+            })
+            .setOrigin(0.5)
+            .setDepth(1000);
+
+        this.tweens.add({
+            targets: [
+                panel,
+                this.stageClearText,
+                reward,
+                shopHeader,
+                ...shopBtns.flatMap((sb) => [sb.bg, sb.text]),
+                coinNote,
+                continueBtn,
+                continueText,
+            ],
+            scale: { from: 0.85, to: 1 },
+            alpha: { from: 0, to: 1 },
+            duration: 400,
+            ease: 'Back.easeOut',
+        });
+
+        const proceed = () => {
+            panel.destroy();
+            reward.destroy();
+            shopHeader.destroy();
+            coinNote.destroy();
+            continueBtn.destroy();
+            continueText.destroy();
+            shopBtns.forEach((sb) => {
+                sb.bg.destroy();
+                sb.text.destroy();
+            });
+            this.stageClearText.setVisible(false);
+            window.dispatchEvent(new CustomEvent('next_stage'));
+        };
+        continueBtn.on('pointerdown', proceed);
     };
 
     private handleSynergyDiscovered = (e: CustomEvent<{ name: string }>) => {
