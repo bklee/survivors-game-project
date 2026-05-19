@@ -46,6 +46,8 @@ const renderQuery = defineQuery([Position, SpriteInfo]);
 const bobs: (Phaser.GameObjects.Bob | undefined)[] = [];
 const sprites: (Phaser.GameObjects.Sprite | undefined)[] = [];
 const playerWeaponSprites: (Phaser.GameObjects.Sprite | undefined)[] = [];
+// 보스 변종 (Clone/Split) 머리 위 라벨 — 매 프레임 위치만 따라감.
+const bossVariantLabels: (Phaser.GameObjects.Text | undefined)[] = [];
 
 window.addEventListener('combo_cast', (e: any) => {
     (window as any).playerAttackTimer = e.detail?.duration || 400;
@@ -409,6 +411,23 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                     sprite.setScale(1.6);
                     sprite.setTint(0x88bbff);
                     sprite.setAlpha(0.7);
+                    // 머리 위 라벨
+                    let label = bossVariantLabels[eid];
+                    if (!label) {
+                        label = _scene.add
+                            .text(0, 0, '분신', {
+                                fontFamily: '"MedievalSharp", cursive',
+                                fontSize: '16px',
+                                color: '#aaddff',
+                                fontStyle: 'bold',
+                                stroke: '#000033',
+                                strokeThickness: 4,
+                            })
+                            .setOrigin(0.5);
+                        bossVariantLabels[eid] = label;
+                    }
+                    label.setPosition(Position.x[eid], Position.y[eid] - 50);
+                    label.setDepth(sprite.depth + 1);
                 } else if (isBossSplit) {
                     // 분열 — 깨진 파편 (중간 크기, 짙은 진홍 + 약한 글로우)
                     sprite.setScale(1.8);
@@ -418,6 +437,23 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                         sprite.postFX.addGlow(0xff2200, 2, 0);
                         (sprite as any).lastGlowColor = 0xff5544;
                     }
+                    // 머리 위 라벨
+                    let label = bossVariantLabels[eid];
+                    if (!label) {
+                        label = _scene.add
+                            .text(0, 0, '분열', {
+                                fontFamily: '"MedievalSharp", cursive',
+                                fontSize: '18px',
+                                color: '#ff8866',
+                                fontStyle: 'bold',
+                                stroke: '#330000',
+                                strokeThickness: 4,
+                            })
+                            .setOrigin(0.5);
+                        bossVariantLabels[eid] = label;
+                    }
+                    label.setPosition(Position.x[eid], Position.y[eid] - 55);
+                    label.setDepth(sprite.depth + 1);
                 } else if (isBoss) {
                     sprite.setScale(2.5);
                     const hpPercent = Health.current[eid] / Health.max[eid];
@@ -741,6 +777,12 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
             if (playerWeaponSprites[i] && !activeEids.has(i)) {
                 playerWeaponSprites[i]!.destroy();
                 playerWeaponSprites[i] = undefined;
+            }
+        }
+        for (let i = 0; i < bossVariantLabels.length; i++) {
+            if (bossVariantLabels[i] && !activeEids.has(i)) {
+                bossVariantLabels[i]!.destroy();
+                bossVariantLabels[i] = undefined;
             }
         }
     };
