@@ -559,7 +559,9 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                                   : 0.8,
                         );
                         wSprite.setDepth(
-                            isBoss && charKey === 'ogre' ? sprite.depth - 1 : sprite.depth + 1,
+                            (isBoss && charKey === 'ogre') || charKey === 'dwarf'
+                                ? sprite.depth - 1 // dwarf 도끼는 캐릭터 뒤에 표시
+                                : sprite.depth + 1,
                         );
                         playerWeaponSprites[eid] = wSprite;
                     }
@@ -588,7 +590,7 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                             : charKey === 'ogre'
                               ? -10
                               : charKey === 'dwarf'
-                                ? 8 // dwarf 는 도끼를 허리 높이로 (얼굴 위치 회피)
+                                ? 3 // dwarf 는 도끼를 살짝 아래 (얼굴 위치 회피)
                                 : -7;
                     const baseRot =
                         charKey === 'knight' || charKey === 'ogre' || charKey === 'dwarf'
@@ -646,7 +648,9 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                     }
 
                     wSprite.setDepth(
-                        isBoss && charKey === 'ogre' ? sprite.depth - 1 : sprite.depth + 1,
+                        (isBoss && charKey === 'ogre') || charKey === 'dwarf'
+                            ? sprite.depth - 1 // dwarf 도끼는 캐릭터 뒤에 표시
+                            : sprite.depth + 1,
                     ); // Depth consistency
                     wSprite.setVisible(true);
                     wSprite.alpha = currentAlpha;
