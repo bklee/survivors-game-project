@@ -8,13 +8,24 @@ export interface MetaProgressData {
     relicSlots: number;
 }
 
+const STARTER_CHARACTERS = ['knight', 'wizard', 'elf', 'dwarf'];
+
 const DEFAULT: MetaProgressData = {
     essence: 0,
-    unlockedCharacters: ['knight', 'wizard', 'elf'],
+    unlockedCharacters: [...STARTER_CHARACTERS],
     discoveredSynergies: [],
     skillTree: { combat: 0, survival: 0, discovery: 0 },
     relicSlots: 3,
 };
+
+// 기존 세이브에서 누락된 starter 를 자동 보강 — dwarf 가 starter 로 승격된 이후 마이그레이션.
+function ensureStarters(list: string[]): string[] {
+    const out = [...list];
+    for (const c of STARTER_CHARACTERS) {
+        if (!out.includes(c)) out.push(c);
+    }
+    return out;
+}
 
 export const MetaProgress = {
     load(): MetaProgressData {
@@ -31,6 +42,9 @@ export const MetaProgress = {
             return {
                 ...DEFAULT,
                 ...parsed,
+                unlockedCharacters: ensureStarters(
+                    parsed.unlockedCharacters ?? DEFAULT.unlockedCharacters,
+                ),
                 skillTree: { ...DEFAULT.skillTree, ...(parsed.skillTree ?? {}) },
             };
         } catch {
