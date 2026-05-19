@@ -89,6 +89,13 @@ export class SpellSystem {
                 const dir = this.rotateVector(this.lastFacingX, this.lastFacingY, angle);
                 this.spawnKnightAttack(px, py, dir.x, dir.y);
             }
+            // 레벨 보너스 — 10레벨마다 파이어볼 1개씩 추가 발사 (정면 + 좌우 분산)
+            const bonusFireballs = Math.floor((globalStats.currentLevel || 1) / 10);
+            for (let i = 0; i < bonusFireballs; i++) {
+                const angle = this.calculateAngleOffset(i);
+                const dir = this.rotateVector(this.lastFacingX, this.lastFacingY, angle);
+                this.spawnFireballProjectile(px, py, dir.x, dir.y);
+            }
         } else if (this.selectedCharId === 'elf') {
             this.scene.time.delayedCall(300, () => {
                 const playersNow = playerQuery(world);
@@ -172,6 +179,18 @@ export class SpellSystem {
         Spell.pierce[eid] = 3;
         Velocity.x[eid] = dx * 400;
         Velocity.y[eid] = dy * 400;
+        Rotation.angle[eid] = Math.atan2(dy, dx);
+    }
+
+    // Knight/Dwarf 레벨 보너스 — 정면으로 날아가는 파이어볼 (검 슬래시와 별개).
+    private spawnFireballProjectile(x: number, y: number, dx: number, dy: number) {
+        const eid = this.createBaseSpell(x + dx * 25, y + dy * 25, 100);
+        Spell.damage[eid] = 35 * globalStats.damageMult;
+        Spell.radius[eid] = 25;
+        Spell.duration[eid] = 1200;
+        Spell.pierce[eid] = 3;
+        Velocity.x[eid] = dx * 450;
+        Velocity.y[eid] = dy * 450;
         Rotation.angle[eid] = Math.atan2(dy, dx);
     }
 
