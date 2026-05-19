@@ -4,7 +4,6 @@ import { world } from '../core/World';
 import { Position, Player, Enemy, Boss, Health, Mana } from '../components';
 import { globalStats } from '../core/PlayerStats';
 import { I18n } from '../i18n/I18n';
-import { VirtualJoystick } from '../ui/VirtualJoystick';
 import { AlchemySlotUI } from '../ui/AlchemySlotUI';
 import { TriggerButton } from '../ui/TriggerButton';
 
@@ -56,7 +55,6 @@ export class UIScene extends Phaser.Scene {
     private minimapOverlay!: Phaser.GameObjects.Rectangle;
     private isMinimapEnlarged = false;
 
-    public joystick!: VirtualJoystick;
     private minimapTimer = 0;
     private alchemySlotUI!: AlchemySlotUI;
     private triggerButton!: TriggerButton;
@@ -94,10 +92,6 @@ export class UIScene extends Phaser.Scene {
                 strokeThickness: 8,
             })
             .setOrigin(0, 0);
-
-        const { width, height } = this.scale;
-        this.joystick = new VirtualJoystick(this, width / 2, height - 100, 60);
-        this.joystick.setVisible(false);
 
         // redundnant dummy text to keep compatibility if referenced elsewhere
         this.levelText = this.add.text(0, 0, '', { fontSize: '0px' }).setVisible(false);
@@ -415,7 +409,6 @@ export class UIScene extends Phaser.Scene {
         // Define Handlers
         const showUI = () => {
             this.uiContainer.setVisible(true);
-            this.joystick.setVisible(true);
             this.minimapContainer.setVisible(true);
             this.syncInitialState();
             this.repositionUIBars();
