@@ -10,6 +10,7 @@ import {
     Player,
     Boss,
     BossClone,
+    BossSplit,
     EnemyProjectile,
     Lifespan,
     Scale,
@@ -159,8 +160,15 @@ export class NightDirector {
                     const typeId = SpriteInfo.textureIndex[eid];
                     const bx = Position.x[eid];
                     const by = Position.y[eid];
+                    // 분열 보스는 약화된 패턴만 — 탄막 절반, 특수기술 미사용.
+                    const isSplit = hasComponent(world, Boss, eid)
+                        ? hasComponent(world, BossSplit, eid)
+                        : false;
 
-                    if (typeId === 69) {
+                    if (isSplit) {
+                        // 분열은 항상 기본 탄막 (count 절반), 폭주/특수기술 X.
+                        this.spawnBarrage(bx, by, false, 0.5);
+                    } else if (typeId === 69) {
                         // Big Demon (대악마)
                         this.spawnDemonFireAttack(bx, by, playerX, playerY, isBerserk);
                     } else if (typeId === 89) {
@@ -329,9 +337,18 @@ export class NightDirector {
         Animation.timer[eid] = 0;
     }
 
-    private spawnBarrage(x: number, y: number, isBerserk: boolean = false) {
+    private spawnBarrage(
+        x: number,
+        y: number,
+        isBerserk: boolean = false,
+        countMultiplier: number = 1,
+    ) {
         const baseCount = 12;
-        const count = isBerserk ? baseCount * 2 : baseCount; // 폭주 시 탄막 수 2배
+        // 폭주 시 탄막 2배, 분열 등 약화 모드 (countMultiplier 0.5) 시 절반.
+        const count = Math.max(
+            2,
+            Math.floor((isBerserk ? baseCount * 2 : baseCount) * countMultiplier),
+        );
         for (let i = 0; i < count; i++) {
             const angle = (i / count) * Math.PI * 2;
             const beid = addEntity(world);

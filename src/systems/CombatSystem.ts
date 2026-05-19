@@ -200,8 +200,39 @@ export const createCombatSystem = (juice: JuicePipeline, scene: Phaser.Scene) =>
             const targetId = allEnemies[i];
             if (Health.current[targetId] <= 0) {
                 const isBoss = hasComponent(world, Boss, targetId);
+                const isBossClone = hasComponent(world, BossClone, targetId);
+                const isBossSplit = hasComponent(world, BossSplit, targetId);
                 const tx = Position.x[targetId];
                 const ty = Position.y[targetId];
+
+                // 변종 사망 시 색상 폭발 이펙트 — Clone: 푸른 안개, Split: 진홍 폭발.
+                if (isBossClone || isBossSplit) {
+                    const color = isBossClone ? 0x88bbff : 0xff5544;
+                    const burst = scene.add.circle(tx, ty, 40, color, 0.7).setDepth(2000);
+                    scene.tweens.add({
+                        targets: burst,
+                        scale: 2.5,
+                        alpha: 0,
+                        duration: 500,
+                        ease: 'Quad.easeOut',
+                        onComplete: () => burst.destroy(),
+                    });
+                    // 4 방향 spark
+                    for (let s = 0; s < 4; s++) {
+                        const angle = (s / 4) * Math.PI * 2 + Math.random() * 0.5;
+                        const spark = scene.add.circle(tx, ty, 8, color, 1).setDepth(2001);
+                        scene.tweens.add({
+                            targets: spark,
+                            x: tx + Math.cos(angle) * 120,
+                            y: ty + Math.sin(angle) * 120,
+                            scale: 0,
+                            alpha: 0,
+                            duration: 400,
+                            ease: 'Cubic.easeOut',
+                            onComplete: () => spark.destroy(),
+                        });
+                    }
+                }
 
                 // === Stage 9+ 보스 분열 (30%) — 처치 시 작은 보스 2개로 분열 ===
                 // 사용자 요청: 분열 직전 2초 워닝 → 그 후 실제 분열.
