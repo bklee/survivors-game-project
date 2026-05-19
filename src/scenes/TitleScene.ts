@@ -69,14 +69,17 @@ export class TitleScene extends Phaser.Scene {
         homeBtn.on('pointerover', () => homeBtn.setTint(0xffff00));
         homeBtn.on('pointerout', () => homeBtn.clearTint());
 
-        // 언어 토글 (Top Right)
+        // 언어 토글 (Top Right) — Home 버튼과 같은 fontSize/padding 으로 수평 정렬, 가시성 강화.
         const langBtn = this.add
-            .text(width - 20, 20, I18n.getLang() === 'ko' ? '🌐 EN' : '🌐 한', {
+            .text(width - 20, 20, I18n.getLang() === 'ko' ? '🌐 EN' : '🌐 한국어', {
                 fontFamily: '"MedievalSharp", cursive',
-                fontSize: '20px',
-                color: '#ffffff',
-                backgroundColor: '#00000088',
+                fontSize: '24px',
+                color: '#ffd700',
+                fontStyle: 'bold',
+                backgroundColor: '#000000bb',
                 padding: { x: 10, y: 5 },
+                stroke: '#5a3300',
+                strokeThickness: 2,
             })
             .setOrigin(1, 0)
             .setInteractive({ useHandCursor: true });
@@ -89,7 +92,8 @@ export class TitleScene extends Phaser.Scene {
         langBtn.on('pointerout', () => langBtn.clearTint());
 
         // 메뉴 레이아웃 — START + 보조 메뉴 (스킬 트리 + 시너지 도감 가로 묶음)
-        const startY = height / 2 + 100;
+        // 사용자 요청: 메뉴 그룹을 화면 하단쪽으로 이동.
+        const startY = height / 2 + 180;
         const subY = startY + 90;
 
         // START Button (메인 액션)
