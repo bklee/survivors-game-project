@@ -280,6 +280,7 @@ export class NightDirector {
                 detail: { current: hp, max: hp, name: bName },
             }),
         );
+        window.dispatchEvent(new CustomEvent('boss_lore_shown', { detail: { typeId } }));
 
         // === Stage 6+ 분신 변종 — 25% 확률 ===
         // 메인 보스 옆에 약화된 분신 1개 spawn (HP 30%, dmg 50%, 더 작음).
