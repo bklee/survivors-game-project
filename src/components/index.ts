@@ -41,6 +41,9 @@ export const Animation = defineComponent({
 export const Player = defineComponent();
 export const Enemy = defineComponent();
 export const Boss = defineComponent();
+// 보스 변종 마커 — 시각적 차별화에 사용 (RenderSystem 에서 스케일/틴트 분기)
+export const BossClone = defineComponent();
+export const BossSplit = defineComponent();
 export const EnemyProjectile = defineComponent();
 export const Chest = defineComponent();
 export const Scale = defineComponent({ value: Types.f32 });
