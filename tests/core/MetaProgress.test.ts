@@ -6,13 +6,31 @@ describe('MetaProgress', () => {
         localStorage.clear();
     });
 
-    it('초기 상태: essence 0, 잠금 해제 3개, 도감 비어있음', () => {
+    it('초기 상태: essence 0, 잠금 해제 4개(dwarf 기본), 도감 비어있음', () => {
         const m = MetaProgress.load();
         expect(m.essence).toBe(0);
-        expect(m.unlockedCharacters).toEqual(['knight', 'wizard', 'elf']);
+        expect(m.unlockedCharacters).toEqual(['knight', 'wizard', 'elf', 'dwarf']);
         expect(m.discoveredSynergies).toEqual([]);
         expect(m.skillTree).toEqual({ combat: 0, survival: 0, discovery: 0 });
         expect(m.relicSlots).toBe(3);
+    });
+
+    it('기존 세이브에서 dwarf 가 빠져있으면 load 시 자동 보강', () => {
+        // 이전 버전 (3 starter) 으로 저장된 데이터 시뮬레이션
+        localStorage.setItem(
+            'survivors_meta_progress_v1',
+            JSON.stringify({
+                essence: 100,
+                unlockedCharacters: ['knight', 'wizard', 'elf'],
+                discoveredSynergies: [],
+                skillTree: { combat: 1, survival: 0, discovery: 0 },
+                relicSlots: 3,
+            }),
+        );
+        const m = MetaProgress.load();
+        expect(m.essence).toBe(100);
+        expect(m.unlockedCharacters).toContain('dwarf');
+        expect(m.skillTree.combat).toBe(1);
     });
 
     it('addEssence는 누적된다', () => {

@@ -45,18 +45,20 @@ export const CHARACTERS: Record<string, CharacterData> = {
             run: { x: 192, y: 4, w: 16, h: 28, count: 4 },
         },
     },
-    NECROMANCER: {
-        name: 'Necromancer',
-        id: 'necromancer',
+    DWARF: {
+        name: 'Dwarf',
+        id: 'dwarf',
         description: {
-            ko: '어둠의 마법사. 소울 볼트 발사.',
-            en: 'Dark mage. Fires soul bolts.',
+            ko: '단단한 광부. 큰 검을 휘두른다.',
+            en: 'Sturdy miner. Swings a heavy blade.',
         },
-        unlockCost: 1500,
-        baseStats: { health: 80, speed: 110, damage: 1.4, mana: 120 },
+        // 기본 캐릭터 — unlockCost 없음 (starter)
+        baseStats: { health: 180, speed: 80, damage: 1.5, mana: 0 },
+        // dwarf 전용 standalone 스프라이트(dwarf_idle_f*/dwarf_run_f*) 사용.
+        // frames 좌표는 charTypeId=6 분기에서 무시됨 (RenderSystem 참고).
         frames: {
-            idle: { x: 128, y: 132, w: 16, h: 28, count: 4 },
-            run: { x: 192, y: 132, w: 16, h: 28, count: 4 },
+            idle: { x: 128, y: 68, w: 16, h: 28, count: 4 },
+            run: { x: 192, y: 68, w: 16, h: 28, count: 4 },
         },
     },
     DRUID: {
@@ -87,20 +89,18 @@ export const CHARACTERS: Record<string, CharacterData> = {
             run: { x: 192, y: 132, w: 16, h: 28, count: 4 },
         },
     },
-    DWARF: {
-        name: 'Dwarf',
-        id: 'dwarf',
+    NECROMANCER: {
+        name: 'Necromancer',
+        id: 'necromancer',
         description: {
-            ko: '단단한 광부. 큰 검을 휘두른다.',
-            en: 'Sturdy miner. Swings a heavy blade.',
+            ko: '어둠의 마법사. 소울 볼트 발사.',
+            en: 'Dark mage. Fires soul bolts.',
         },
         unlockCost: 7500,
-        baseStats: { health: 180, speed: 80, damage: 1.5, mana: 0 },
-        // sprite 는 knight frames 재활용 (추후 dungeon atlas 에 별도 dwarf 좌표 발견 시 교체).
-        // CharacterSelectScene + PlayerSystem 에서 갈색 tint 로 구분.
+        baseStats: { health: 80, speed: 110, damage: 1.4, mana: 120 },
         frames: {
-            idle: { x: 128, y: 68, w: 16, h: 28, count: 4 },
-            run: { x: 192, y: 68, w: 16, h: 28, count: 4 },
+            idle: { x: 128, y: 132, w: 16, h: 28, count: 4 },
+            run: { x: 192, y: 132, w: 16, h: 28, count: 4 },
         },
     },
 };
