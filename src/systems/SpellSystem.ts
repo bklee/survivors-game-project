@@ -183,12 +183,12 @@ export class SpellSystem {
     }
 
     // Knight/Dwarf 레벨 보너스 — 정면으로 날아가는 파이어볼 (검 슬래시와 별개).
-    // 사거리는 약 245px (vx 350 × 0.7s) — 화면 절반 못 미치는 정도로 절제.
+    // 사거리 약 122px (vx 350 × 0.35s) — 근거리 견제용.
     private spawnFireballProjectile(x: number, y: number, dx: number, dy: number) {
         const eid = this.createBaseSpell(x + dx * 25, y + dy * 25, 100);
         Spell.damage[eid] = 35 * globalStats.damageMult;
         Spell.radius[eid] = 25;
-        Spell.duration[eid] = 700;
+        Spell.duration[eid] = 350;
         Spell.pierce[eid] = 3;
         Velocity.x[eid] = dx * 350;
         Velocity.y[eid] = dy * 350;
