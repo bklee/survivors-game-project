@@ -3,7 +3,8 @@ import { defineQuery, hasComponent } from 'bitecs';
 import { world } from '../core/World';
 import { Position, Player, Enemy, Boss, Health, Mana } from '../components';
 import { globalStats } from '../core/PlayerStats';
-import { I18n } from '../i18n/I18n';
+import { I18n, tr } from '../i18n/I18n';
+import type { ChapterDef } from '../constants/ChapterConfig';
 import { AlchemySlotUI } from '../ui/AlchemySlotUI';
 import { TriggerButton } from '../ui/TriggerButton';
 
@@ -454,6 +455,7 @@ export class UIScene extends Phaser.Scene {
             'synergy_discovered',
             this.handleSynergyDiscovered as EventListener,
         );
+        window.addEventListener('chapter_started', this.handleChapterStarted as EventListener);
 
         this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
             window.removeEventListener('game_started', gameStartedHandler);
@@ -1021,6 +1023,62 @@ export class UIScene extends Phaser.Scene {
             duration: 3000,
             ease: 'Quad.easeIn',
             onComplete: () => toast.destroy(),
+        });
+    };
+
+    private handleChapterStarted = (e: CustomEvent<ChapterDef>) => {
+        const chapter = e.detail;
+        const centerX = this.scale.width / 2;
+        // 챕터 이름 — 큰 텍스트
+        const nameText = this.add
+            .text(centerX, 280, tr(chapter.name), {
+                fontFamily: '"MedievalSharp", cursive',
+                fontSize: '44px',
+                color: '#ffd700',
+                fontStyle: 'bold',
+                align: 'center',
+                stroke: '#000000',
+                strokeThickness: 6,
+                shadow: { offsetX: 2, offsetY: 2, color: '#5a3300', blur: 12, fill: true },
+            })
+            .setOrigin(0.5)
+            .setDepth(2000)
+            .setAlpha(0);
+        // Lore — 작은 텍스트
+        const loreText = this.add
+            .text(centerX, 340, tr(chapter.lore), {
+                fontFamily: '"MedievalSharp", cursive',
+                fontSize: '22px',
+                color: '#ffffff',
+                align: 'center',
+                stroke: '#000000',
+                strokeThickness: 4,
+                wordWrap: { width: 800 },
+            })
+            .setOrigin(0.5)
+            .setDepth(2000)
+            .setAlpha(0);
+
+        // 페이드 인 (500ms) → 유지 (3.5s) → 페이드 아웃 (1s)
+        this.tweens.add({
+            targets: [nameText, loreText],
+            alpha: 1,
+            duration: 500,
+            ease: 'Quad.easeOut',
+            onComplete: () => {
+                this.time.delayedCall(3500, () => {
+                    this.tweens.add({
+                        targets: [nameText, loreText],
+                        alpha: 0,
+                        duration: 1000,
+                        ease: 'Quad.easeIn',
+                        onComplete: () => {
+                            nameText.destroy();
+                            loreText.destroy();
+                        },
+                    });
+                });
+            },
         });
     };
 
