@@ -21,6 +21,7 @@ export class AssetLoader {
             'weapon_green_magic_staff',
             './assets/frames/weapon_green_magic_staff.png',
         );
+        this.scene.load.image('weapon_axe', './assets/frames/weapon_axe.png');
         this.scene.load.image('main_bg', './assets/main.png');
         this.scene.load.image('loading_bg', './assets/loading.jpg');
         this.scene.load.image('hp_icon', './assets/frames/ui_heart_full.png');
