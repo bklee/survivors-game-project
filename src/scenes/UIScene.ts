@@ -705,11 +705,15 @@ export class UIScene extends Phaser.Scene {
     }
 
     private handleCoinCollected = (e: CustomEvent<any>) => {
-        this.totalCoins += e.detail?.amount || 1;
+        const amount = e.detail?.amount ?? 1;
+        this.totalCoins += amount;
         globalStats.totalCoins = this.totalCoins;
         this.coinText.setText(this.totalCoins.toLocaleString());
         this.coinIcon.x = this.coinText.x + this.coinText.width + 20;
-        this.sound.play('coin_pickup', { volume: 0.8 });
+        // 양수 (획득) 에만 픽업 사운드. 음수 (재추첨/상점 소비) 는 무음.
+        if (amount > 0) {
+            this.sound.play('coin_pickup', { volume: 0.8 });
+        }
     };
 
     private handleXpPercent = (e: CustomEvent<number>) => {
