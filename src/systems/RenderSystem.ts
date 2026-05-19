@@ -587,7 +587,9 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                             ? 4
                             : charKey === 'ogre'
                               ? -10
-                              : -7;
+                              : charKey === 'dwarf'
+                                ? 8 // dwarf 는 도끼를 허리 높이로 (얼굴 위치 회피)
+                                : -7;
                     const baseRot =
                         charKey === 'knight' || charKey === 'ogre' || charKey === 'dwarf'
                             ? -Math.PI / 4
