@@ -30,6 +30,8 @@ export class NightDirector {
     private spawningCompleteDispatched: boolean = false;
     private bossSpawned: boolean = false;
     private bossBarrageTimer: number = 0;
+    // 보스가 berserk 진입(50% HP) 시 한 번만 워닝 dispatch — 매 프레임 재발사 방지.
+    private berserkWarnedBossEid: number = -1;
     private globalDifficultyMultiplier = 1.0;
     private lastSpawnTime: number = 0;
     private dungeon: DungeonGenerator;
@@ -58,6 +60,8 @@ export class NightDirector {
         if (isBossStage && !this.bossSpawned && this.timeElapsed >= 3000) {
             this.spawnBoss();
             this.bossSpawned = true;
+            // 보스 등장 시점에 일반 적 스폰을 즉시 종료 → spawning_complete 분기 진입, stage_clear 정상 트리거.
+            this.spawnedEnemiesCount = this.maxEnemiesToSpawn;
             window.dispatchEvent(new CustomEvent('boss_spawned'));
         }
 
@@ -65,14 +69,15 @@ export class NightDirector {
 
         // Spawn normal enemies up to maxEnemiesToSpawn
         let spawnInterval = Math.max(200, 1000 - this.stage * 100);
-        // 고스테이지 (stage 12+) 에서 적이 너무 많아 프레임 드롭 — 150 으로 cap.
+        // 고스테이지(stage 20+) 에서 적이 너무 많아 프레임 드롭 — 150 → 80 으로 cap.
         // 난이도는 적 HP/DMG 와 시너지/광폭/분신/분열로 보상.
-        let maxConcurrent = Math.min(150, 30 + this.stage * 10);
+        let maxConcurrent = Math.min(80, 30 + this.stage * 6);
 
-        // Optimization: Reduce concurrent enemies during boss fights to save performance and adjust difficulty
+        // 보스 등장 후에는 일반 적 추가 스폰을 정지 (사용자 요청: 한계치 고정).
+        // 보스가 등장하면 그 시점의 적만 처리하면 됨 — 추가 적은 더 이상 spawn 하지 않음.
         if (this.bossSpawned) {
-            maxConcurrent = Math.min(maxConcurrent, 25);
-            spawnInterval *= 1.5; // Spawn slower
+            maxConcurrent = 0;
+            spawnInterval = Number.POSITIVE_INFINITY;
         }
 
         if (this.spawnedEnemiesCount < this.maxEnemiesToSpawn && enemies.length < maxConcurrent) {
@@ -137,6 +142,15 @@ export class NightDirector {
             if (isBoss) {
                 const hpPercent = Health.current[eid] / Health.max[eid];
                 const isBerserk = hpPercent <= 0.5;
+                // berserk 첫 진입 시 워닝 — 같은 보스에 대해 1회만 발사.
+                if (isBerserk && this.berserkWarnedBossEid !== eid) {
+                    this.berserkWarnedBossEid = eid;
+                    window.dispatchEvent(
+                        new CustomEvent('boss_warning', {
+                            detail: { kind: 'berserk' },
+                        }),
+                    );
+                }
                 const attackInterval = isBerserk ? 1500 : 3000; // 폭주 시 공격 주기 2배 빨라짐
 
                 this.bossBarrageTimer += dt;
@@ -418,6 +432,7 @@ export class NightDirector {
         this.stage = stage;
         this.timeElapsed = 0;
         this.bossSpawned = false;
+        this.berserkWarnedBossEid = -1;
         this.stageClearDispatched = false;
         this.spawningCompleteDispatched = false;
         this.lastSpawnTime = 0;

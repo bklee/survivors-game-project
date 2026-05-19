@@ -458,6 +458,7 @@ export class UIScene extends Phaser.Scene {
         );
         window.addEventListener('chapter_started', this.handleChapterStarted as EventListener);
         window.addEventListener('boss_lore_shown', this.handleBossLore as EventListener);
+        window.addEventListener('boss_warning', this.handleBossWarning as EventListener);
 
         this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
             window.removeEventListener('game_started', gameStartedHandler);
@@ -485,6 +486,7 @@ export class UIScene extends Phaser.Scene {
                 this.handleChapterStarted as EventListener,
             );
             window.removeEventListener('boss_lore_shown', this.handleBossLore as EventListener);
+            window.removeEventListener('boss_warning', this.handleBossWarning as EventListener);
         });
 
         const mainScene = this.scene.get('MainScene') as any;
@@ -1185,6 +1187,61 @@ export class UIScene extends Phaser.Scene {
                         targets: text,
                         alpha: 0,
                         duration: 800,
+                        ease: 'Quad.easeIn',
+                        onComplete: () => text.destroy(),
+                    });
+                });
+            },
+        });
+    };
+
+    private handleBossWarning = (e: CustomEvent<{ kind: 'split' | 'berserk' }>) => {
+        const kind = e.detail.kind;
+        const messages: Record<string, { ko: string; en: string }> = {
+            split: { ko: '⚠ 분열 임박!', en: '⚠ SPLIT INCOMING!' },
+            berserk: { ko: '⚠ 보스 폭주!', en: '⚠ BOSS ENRAGED!' },
+        };
+        const msg = messages[kind] ?? messages.split;
+        const centerX = this.scale.width / 2;
+        const y = this.scale.height / 2 - 40;
+
+        // 빨간 강조 토스트 (페이드 인 0.3s → 유지 1.4s → 페이드 아웃 0.3s = 총 2s).
+        // 펄스 효과로 시선 유도.
+        const text = this.add
+            .text(centerX, y, tr(msg), {
+                fontFamily: '"MedievalSharp", cursive',
+                fontSize: '52px',
+                color: '#ff3344',
+                fontStyle: 'bold',
+                stroke: '#ffffff',
+                strokeThickness: 6,
+                shadow: { offsetX: 3, offsetY: 3, color: '#000000', blur: 12, fill: true },
+            })
+            .setOrigin(0.5)
+            .setDepth(2100)
+            .setAlpha(0)
+            .setScale(0.8);
+
+        this.tweens.add({
+            targets: text,
+            alpha: 1,
+            scale: 1.0,
+            duration: 300,
+            ease: 'Back.easeOut',
+            onComplete: () => {
+                this.tweens.add({
+                    targets: text,
+                    scale: 1.08,
+                    duration: 250,
+                    yoyo: true,
+                    repeat: 2,
+                    ease: 'Sine.easeInOut',
+                });
+                this.time.delayedCall(1400, () => {
+                    this.tweens.add({
+                        targets: text,
+                        alpha: 0,
+                        duration: 300,
                         ease: 'Quad.easeIn',
                         onComplete: () => text.destroy(),
                     });
