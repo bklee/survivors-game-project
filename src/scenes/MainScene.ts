@@ -25,6 +25,7 @@ import { PlayerSystem } from '../systems/PlayerSystem';
 import { NightDirector } from '../systems/WaveSystem';
 
 import { CHARACTERS } from '../constants/CharacterConfig';
+import { findChapter, isChapterStart } from '../constants/ChapterConfig';
 
 import { JuicePipeline } from '../fx/JuicePipeline';
 import { PlasmaStorm } from '../fx/PlasmaStorm';
@@ -305,6 +306,8 @@ export class MainScene extends Phaser.Scene {
             }
             window.dispatchEvent(new CustomEvent('stage_updated', { detail: this.currentStage }));
             window.dispatchEvent(new CustomEvent('char_selected', { detail: this.selectedCharId }));
+            // 게임 시작 — Ch1 인트로 토스트
+            window.dispatchEvent(new CustomEvent('chapter_started', { detail: findChapter(1) }));
         }, 100);
 
         import('../core/PlayerStats').then((m) => {
@@ -432,6 +435,15 @@ export class MainScene extends Phaser.Scene {
             this.currentStage++;
             globalStats.currentStage = this.currentStage;
             this.isPausedForClear = false;
+
+            // 새 챕터 진입 시 인트로 토스트
+            if (isChapterStart(this.currentStage)) {
+                window.dispatchEvent(
+                    new CustomEvent('chapter_started', {
+                        detail: findChapter(this.currentStage),
+                    }),
+                );
+            }
 
             // 5 스테이지마다 interstitial 광고 (수익 채널 — 게임 흐름 자연스러운 break)
             if (this.currentStage > 1 && this.currentStage % 5 === 0) {
