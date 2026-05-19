@@ -5,6 +5,7 @@ import { Position, Player, Enemy, Boss, Health, Mana } from '../components';
 import { globalStats } from '../core/PlayerStats';
 import { I18n, tr } from '../i18n/I18n';
 import type { ChapterDef } from '../constants/ChapterConfig';
+import { BOSS_LORE, findChapter, isChapterEnd } from '../constants/ChapterConfig';
 import { AlchemySlotUI } from '../ui/AlchemySlotUI';
 import { TriggerButton } from '../ui/TriggerButton';
 
@@ -456,6 +457,7 @@ export class UIScene extends Phaser.Scene {
             this.handleSynergyDiscovered as EventListener,
         );
         window.addEventListener('chapter_started', this.handleChapterStarted as EventListener);
+        window.addEventListener('boss_lore_shown', this.handleBossLore as EventListener);
 
         this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
             window.removeEventListener('game_started', gameStartedHandler);
@@ -478,6 +480,11 @@ export class UIScene extends Phaser.Scene {
                 'synergy_discovered',
                 this.handleSynergyDiscovered as EventListener,
             );
+            window.removeEventListener(
+                'chapter_started',
+                this.handleChapterStarted as EventListener,
+            );
+            window.removeEventListener('boss_lore_shown', this.handleBossLore as EventListener);
         });
 
         const mainScene = this.scene.get('MainScene') as any;
@@ -801,6 +808,68 @@ export class UIScene extends Phaser.Scene {
 
     private handleStageClear = () => {
         this.bossHpContainer?.setVisible(false);
+
+        // 챕터 마지막 스테이지(5/10/15) 클리어 시 → outro 토스트 먼저, 끝나면 panel.
+        if (isChapterEnd(this.currentStage)) {
+            const ch = findChapter(this.currentStage);
+            if (ch.outro) {
+                this.showChapterOutro(ch.outro, () => this.showStageClearPanel());
+                return;
+            }
+        }
+        this.showStageClearPanel();
+    };
+
+    private showChapterOutro(outro: import('../i18n/I18n').I18nString, onDone: () => void) {
+        const centerX = this.scale.width / 2;
+        const centerY = this.scale.height / 2;
+        const dim = this.add
+            .rectangle(centerX, centerY, this.scale.width, this.scale.height, 0x000000, 0.7)
+            .setDepth(1999)
+            .setAlpha(0);
+        const outroText = this.add
+            .text(centerX, centerY, tr(outro), {
+                fontFamily: '"MedievalSharp", cursive',
+                fontSize: '30px',
+                color: '#ffd700',
+                align: 'center',
+                stroke: '#000000',
+                strokeThickness: 5,
+                wordWrap: { width: 900 },
+                shadow: { offsetX: 2, offsetY: 2, color: '#5a3300', blur: 12, fill: true },
+            })
+            .setOrigin(0.5)
+            .setDepth(2000)
+            .setAlpha(0);
+
+        // 페이드 인 (800ms) → 유지 (3.5s) → 페이드 아웃 (1s) → onDone
+        this.tweens.add({
+            targets: [dim, outroText],
+            alpha: { from: 0, to: 1 },
+            duration: 800,
+            ease: 'Quad.easeOut',
+            onComplete: () => {
+                // dim 은 0.7 까지만, 텍스트는 1
+                dim.setAlpha(0.7);
+                outroText.setAlpha(1);
+                this.time.delayedCall(3500, () => {
+                    this.tweens.add({
+                        targets: [dim, outroText],
+                        alpha: 0,
+                        duration: 1000,
+                        ease: 'Quad.easeIn',
+                        onComplete: () => {
+                            dim.destroy();
+                            outroText.destroy();
+                            onDone();
+                        },
+                    });
+                });
+            },
+        });
+    }
+
+    private showStageClearPanel() {
         const panel = this.add
             .rectangle(640, 360, 660, 520, 0x000000, 0.92)
             .setStrokeStyle(4, 0xffd700)
@@ -995,7 +1064,7 @@ export class UIScene extends Phaser.Scene {
             window.dispatchEvent(new CustomEvent('next_stage'));
         };
         continueBtn.on('pointerdown', proceed);
-    };
+    }
 
     private handleSynergyDiscovered = (e: CustomEvent<{ name: string }>) => {
         const synergy = e.detail;
@@ -1076,6 +1145,48 @@ export class UIScene extends Phaser.Scene {
                             nameText.destroy();
                             loreText.destroy();
                         },
+                    });
+                });
+            },
+        });
+    };
+
+    private handleBossLore = (e: CustomEvent<{ typeId: number }>) => {
+        const lore = BOSS_LORE[e.detail.typeId];
+        if (!lore) return;
+        const centerX = this.scale.width / 2;
+        // 화면 중하단 — 보스 HP 막대(상단) 와 겹치지 않도록 아래쪽 배치.
+        const y = this.scale.height - 180;
+        const text = this.add
+            .text(centerX, y, tr(lore), {
+                fontFamily: '"MedievalSharp", cursive',
+                fontSize: '24px',
+                color: '#ff6b6b',
+                fontStyle: 'italic',
+                align: 'center',
+                stroke: '#000000',
+                strokeThickness: 4,
+                wordWrap: { width: 900 },
+                shadow: { offsetX: 2, offsetY: 2, color: '#000000', blur: 6, fill: true },
+            })
+            .setOrigin(0.5)
+            .setDepth(1900)
+            .setAlpha(0);
+
+        // 페이드 인 (400ms) → 유지 (2.5s) → 페이드 아웃 (800ms)
+        this.tweens.add({
+            targets: text,
+            alpha: 1,
+            duration: 400,
+            ease: 'Quad.easeOut',
+            onComplete: () => {
+                this.time.delayedCall(2500, () => {
+                    this.tweens.add({
+                        targets: text,
+                        alpha: 0,
+                        duration: 800,
+                        ease: 'Quad.easeIn',
+                        onComplete: () => text.destroy(),
                     });
                 });
             },
