@@ -119,6 +119,9 @@ export const createCombatSystem = (juice: JuicePipeline, scene: Phaser.Scene) =>
             // 3. Player Death Check
             if (Health.current[playerEid] <= 0) {
                 juice.whiteFlash(500);
+                window.dispatchEvent(
+                    new CustomEvent('screen_shake', { detail: { intensity: 0.02, duration: 500 } }),
+                );
                 window.dispatchEvent(new CustomEvent('player_died'));
             }
         }
@@ -232,6 +235,12 @@ export const createCombatSystem = (juice: JuicePipeline, scene: Phaser.Scene) =>
                             onComplete: () => spark.destroy(),
                         });
                     }
+                    // 변종 사망 약한 shake
+                    window.dispatchEvent(
+                        new CustomEvent('screen_shake', {
+                            detail: { intensity: 0.01, duration: 200 },
+                        }),
+                    );
                 }
 
                 // === Stage 9+ 보스 분열 (30%) — 처치 시 작은 보스 2개로 분열 ===
@@ -280,6 +289,12 @@ export const createCombatSystem = (juice: JuicePipeline, scene: Phaser.Scene) =>
                     window.dispatchEvent(
                         new CustomEvent('boss_hp', { detail: { current: 0, max: 100 } }),
                     ); // Hide boss bar
+                    // 보스 사망 강한 shake
+                    window.dispatchEvent(
+                        new CustomEvent('screen_shake', {
+                            detail: { intensity: 0.025, duration: 600 },
+                        }),
+                    );
                     window.dispatchEvent(new CustomEvent('stage_clear'));
                 }
 

@@ -304,6 +304,8 @@ export class NightDirector {
             }),
         );
         window.dispatchEvent(new CustomEvent('boss_lore_shown', { detail: { typeId } }));
+        // 보스 등장 임팩트 사운드
+        window.dispatchEvent(new CustomEvent('play_sound', { detail: 'level_up' }));
 
         // === Stage 6+ 분신 변종 — 25% 확률 ===
         // 메인 보스 옆에 약화된 분신 1개 spawn (HP 30%, dmg 50%, 더 작음).
