@@ -100,6 +100,35 @@ CREATE INDEX IF NOT EXISTS idx_daily_rewards_player_time
     ON daily_rewards(player_id, claimed_at DESC);
 
 -- ============================================================
+-- Daily Quests (M4 Phase 3 — Sprint 3)
+-- quests: 매일 KST 자정 3개 랜덤 할당. 동일 day 의 동일 quest_id 중복 차단.
+-- quest_progress: lock contention 분리를 위해 별도 테이블.
+-- ============================================================
+CREATE TABLE IF NOT EXISTS quests (
+    id SERIAL PRIMARY KEY,
+    player_id INTEGER NOT NULL REFERENCES players(id) ON DELETE CASCADE,
+    quest_id TEXT NOT NULL,
+    target_value INTEGER NOT NULL,
+    reward_essence INTEGER NOT NULL,
+    assigned_date DATE NOT NULL,
+    assigned_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS idx_quests_player_date_questid
+    ON quests(player_id, assigned_date, quest_id);
+
+CREATE INDEX IF NOT EXISTS idx_quests_player_date
+    ON quests(player_id, assigned_date DESC);
+
+CREATE TABLE IF NOT EXISTS quest_progress (
+    quest_db_id INTEGER PRIMARY KEY REFERENCES quests(id) ON DELETE CASCADE,
+    current_value INTEGER NOT NULL DEFAULT 0,
+    completed_at TIMESTAMPTZ,
+    claimed_at TIMESTAMPTZ,
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- ============================================================
 -- 헬퍼 함수: 플레이어 last_seen_at 자동 갱신
 -- ============================================================
 CREATE OR REPLACE FUNCTION update_player_last_seen()
