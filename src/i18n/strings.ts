@@ -67,6 +67,32 @@ export const STRINGS = {
         en: '✦ New synergy discovered: {name}!\n+50 Essence',
     },
 
+    // Daily Quests
+    quest_panel_title: { ko: '오늘의 퀘스트', en: 'Daily Quests' },
+    quest_panel_combo: {
+        ko: '3개 완료 보너스: +{coins} 코인',
+        en: 'Complete all 3: +{coins} coins',
+    },
+    quest_claim_btn: { ko: '받기', en: 'Claim' },
+    quest_claimed: { ko: '받음', en: 'Claimed' },
+    quest_locked: { ko: '진행 중', en: 'In progress' },
+    quest_completed_toast: {
+        ko: '✓ {name} 완료! +{essence} 정수',
+        en: '✓ {name} complete! +{essence} essence',
+    },
+    quest_combo_toast: {
+        ko: '🎉 일일 퀘스트 모두 완료! +{coins} 코인',
+        en: '🎉 All quests complete! +{coins} coins',
+    },
+    // Quest descriptions (서버 description_key 와 매칭)
+    quest_kill_100: { ko: '적 100마리 처치', en: 'Defeat 100 enemies' },
+    quest_kill_300: { ko: '적 300마리 처치', en: 'Defeat 300 enemies' },
+    quest_stage_3: { ko: '스테이지 3 도달', en: 'Reach Stage 3' },
+    quest_stage_5: { ko: '스테이지 5 도달', en: 'Reach Stage 5' },
+    quest_synergy_5: { ko: '시너지 5개 발견', en: 'Discover 5 synergies' },
+    quest_survive_5m: { ko: '5분 생존', en: 'Survive 5 minutes' },
+    quest_play_2: { ko: '2판 플레이', en: 'Play 2 sessions' },
+
     // Upgrade Stat Cards
     upgrade_stat_damage_title: { ko: '데미지 +15%', en: 'Damage +15%' },
     upgrade_stat_damage_desc: { ko: '모든 공격 데미지 증가', en: 'All attack damage increased' },

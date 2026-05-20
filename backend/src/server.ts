@@ -5,6 +5,7 @@ import eventsRouter from './routes/events.js';
 import webhookRouter from './routes/webhook.js';
 import playerRouter from './routes/player.js';
 import dailyRewardRouter from './routes/daily-reward.js';
+import questsRouter from './routes/quests.js';
 
 const app = express();
 
@@ -44,6 +45,7 @@ app.use('/api/events', eventsRouter);
 app.use('/api/ls-webhook', webhookRouter);
 app.use('/api/player', playerRouter);
 app.use('/api/daily-reward', dailyRewardRouter);
+app.use('/api/quests', questsRouter);
 
 // 404
 app.use((_req, res) => res.status(404).json({ error: 'not found' }));
