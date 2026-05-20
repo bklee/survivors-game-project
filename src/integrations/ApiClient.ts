@@ -66,6 +66,26 @@ export interface DailyRewardClaimFail {
 
 export type DailyRewardClaimResult = DailyRewardClaimSuccess | DailyRewardClaimFail;
 
+export type LeaderboardWindow = 'all' | 'weekly' | 'daily';
+
+export interface LeaderboardEntry {
+    rank: number | string; // RANK() OVER 가 string 으로 직렬화될 수 있음 — Number 캐스팅 필요
+    nickname: string | null;
+    score: number;
+    stage_reached: number | null;
+    character_id: string;
+    duration_seconds: number | null;
+    submitted_at: string;
+}
+
+export interface LeaderboardResponse {
+    entries: LeaderboardEntry[];
+    me: { rank: number; score: number } | null;
+    window: LeaderboardWindow;
+    character_id: string | null;
+    total_entries_in_window: number;
+}
+
 interface QueuedEvent {
     event_type: EventType;
     payload?: Record<string, unknown>;
@@ -150,6 +170,49 @@ export class ApiClient {
         if (!r) return null;
         try {
             return (await r.json()) as DailyRewardClaimResult;
+        } catch {
+            return null;
+        }
+    }
+
+    /** Leaderboard 조회. window/character 필터 + 본인 순위 포함. 네트워크 실패 시 null. */
+    static async fetchLeaderboard(
+        window: LeaderboardWindow = 'all',
+        characterId?: string,
+        limit = 50,
+    ): Promise<LeaderboardResponse | null> {
+        const params = new URLSearchParams();
+        params.set('window', window);
+        params.set('limit', String(limit));
+        params.set('device_id', Identity.getDeviceId());
+        if (characterId) params.set('character_id', characterId);
+
+        const controller = new AbortController();
+        const t = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+        try {
+            const r = await fetch(`${API_BASE}/leaderboard?${params.toString()}`, {
+                signal: controller.signal,
+            });
+            if (!r.ok) return null;
+            return (await r.json()) as LeaderboardResponse;
+        } catch (err) {
+            console.warn('[ApiClient] fetchLeaderboard failed:', err);
+            return null;
+        } finally {
+            clearTimeout(t);
+        }
+    }
+
+    /** 닉네임 변경. 성공 시 새 닉네임 반환. 실패/검증 실패 시 null. */
+    static async updateNickname(nickname: string): Promise<string | null> {
+        const r = await postJson(`${API_BASE}/player/nickname`, {
+            device_id: Identity.getDeviceId(),
+            nickname,
+        });
+        if (!r?.ok) return null;
+        try {
+            const data = (await r.json()) as { ok: boolean; nickname?: string };
+            return data.nickname ?? null;
         } catch {
             return null;
         }

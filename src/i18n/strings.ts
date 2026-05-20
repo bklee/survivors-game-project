@@ -5,7 +5,25 @@ export const STRINGS = {
     title_start: { ko: 'START', en: 'START' },
     title_skill_tree: { ko: '스킬 트리', en: 'Skill Tree' },
     title_codex: { ko: '시너지 도감', en: 'Codex' },
+    title_leaderboard: { ko: '리더보드', en: 'Leaderboard' },
     title_home: { ko: '🏠 Home', en: '🏠 Home' },
+
+    // Leaderboard Scene
+    leaderboard_title: { ko: '🏆 리더보드', en: '🏆 Leaderboard' },
+    leaderboard_tab_all: { ko: '전체', en: 'All-Time' },
+    leaderboard_tab_weekly: { ko: '주간', en: 'Weekly' },
+    leaderboard_tab_daily: { ko: '일간', en: 'Daily' },
+    leaderboard_col_rank: { ko: '순위', en: 'Rank' },
+    leaderboard_col_nickname: { ko: '닉네임', en: 'Player' },
+    leaderboard_col_character: { ko: '캐릭터', en: 'Hero' },
+    leaderboard_col_score: { ko: '점수', en: 'Score' },
+    leaderboard_col_stage: { ko: '스테이지', en: 'Stage' },
+    leaderboard_empty: { ko: '아직 등록된 점수가 없습니다.', en: 'No scores yet.' },
+    leaderboard_loading: { ko: '불러오는 중...', en: 'Loading...' },
+    leaderboard_error: { ko: '불러오기 실패 — 다시 시도', en: 'Failed to load — retry' },
+    leaderboard_me_rank: { ko: '내 최고: {rank}위 ({score})', en: 'Your best: #{rank} ({score})' },
+    leaderboard_me_none: { ko: '아직 점수 미등록', en: 'No score yet' },
+    leaderboard_back: { ko: '← 뒤로', en: '← Back' },
 
     // Character Select Scene
     char_select_title: { ko: 'CHOOSE YOUR HERO!', en: 'CHOOSE YOUR HERO!' },
