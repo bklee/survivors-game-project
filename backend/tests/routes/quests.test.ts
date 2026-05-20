@@ -158,18 +158,28 @@ describe('POST /api/quests/progress', () => {
             })
             // upsert 1 (kill_100 +50 → 50, not completed yet)
             .mockResolvedValueOnce({
-                rows: [{ current_value: 50, completed_at: null, was_insert: true }],
-                rowCount: 1,
-            })
-            // upsert 2 (synergy_5 +5 → 5, completed)
-            .mockResolvedValueOnce({
                 rows: [
-                    { current_value: 5, completed_at: '2026-05-21T07:00:00Z', was_insert: true },
+                    {
+                        current_value: 50,
+                        completed_at: null,
+                        was_insert: true,
+                        was_newly_completed: false,
+                    },
                 ],
                 rowCount: 1,
             })
-            // 신규 완료 보강 UPDATE
-            .mockResolvedValueOnce({ rowCount: 1 })
+            // upsert 2 (synergy_5 +5 → 5, completed 신규)
+            .mockResolvedValueOnce({
+                rows: [
+                    {
+                        current_value: 5,
+                        completed_at: '2026-05-21T07:00:00Z',
+                        was_insert: true,
+                        was_newly_completed: true,
+                    },
+                ],
+                rowCount: 1,
+            })
             .mockResolvedValueOnce({}); // COMMIT
 
         const res = await request(app)
