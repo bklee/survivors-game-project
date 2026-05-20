@@ -101,6 +101,23 @@ export class TitleScene extends Phaser.Scene {
         langBtn.on('pointerover', () => langBtn.setTint(0xffff00));
         langBtn.on('pointerout', () => langBtn.clearTint());
 
+        // 일일 퀘스트 아이콘 (lang 버튼 왼쪽). 클릭 시 popup 으로 launch.
+        const questBtn = this.add
+            .text(width - 20, 70, '📜 ' + I18n.t('quest_panel_title'), {
+                fontFamily: '"MedievalSharp", cursive',
+                fontSize: '20px',
+                color: '#ffd700',
+                backgroundColor: '#000000bb',
+                padding: { x: 10, y: 5 },
+                stroke: '#5a3300',
+                strokeThickness: 2,
+            })
+            .setOrigin(1, 0)
+            .setInteractive({ useHandCursor: true });
+        questBtn.on('pointerdown', () => this.scene.launch('QuestPanelScene'));
+        questBtn.on('pointerover', () => questBtn.setTint(0xffffaa));
+        questBtn.on('pointerout', () => questBtn.clearTint());
+
         // 메뉴 레이아웃 — START + 보조 메뉴 (스킬 트리 + 시너지 도감 가로 묶음)
         // 사용자 요청: 메뉴 그룹을 화면 하단쪽으로 이동.
         const startY = height / 2 + 180;
