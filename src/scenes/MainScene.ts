@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { defineQuery, addEntity, addComponent, hasComponent, removeEntity } from 'bitecs';
 import { PokiSDK } from '../integrations/PokiSDK';
 import { ApiClient } from '../integrations/ApiClient';
+import { QuestTracker } from '../systems/QuestTracker';
 import { world } from '../core/World';
 import {
     Position,
@@ -154,6 +155,8 @@ export class MainScene extends Phaser.Scene {
         this.synergiesActivated = 0;
         this.sessionStartMs = Date.now();
         ApiClient.trackEvent('session_start', { character_id: this.selectedCharId });
+        // Daily quest: play_2_sessions (세션 시작당 1)
+        QuestTracker.add('play_2_sessions', 1);
 
         this.dungeon = new DungeonGenerator(100, 100);
 
@@ -337,6 +340,9 @@ export class MainScene extends Phaser.Scene {
         const enemyKilledHandler = () => {
             this.relicSystem.onEnemyKilled();
             this.enemiesKilled++;
+            // Daily quest: kill_100 / kill_300 누적 (5초 batch flush)
+            QuestTracker.add('kill_100', 1);
+            QuestTracker.add('kill_300', 1);
         };
         window.addEventListener('enemy_killed', enemyKilledHandler);
 
@@ -347,6 +353,8 @@ export class MainScene extends Phaser.Scene {
                 synergy: typeof detail === 'object' ? detail : { value: detail },
                 stage: this.currentStage,
             });
+            // Daily quest: synergy_5
+            QuestTracker.add('synergy_5', 1);
         };
         window.addEventListener('synergy_discovered', synergyActivatedHandler);
 
@@ -425,7 +433,12 @@ export class MainScene extends Phaser.Scene {
                 duration_seconds: durationSec,
                 outcome: 'death',
             });
+            // Daily quest: survive_5m (300초 이상 생존 시 1)
+            if (durationSec >= 300) {
+                QuestTracker.setMax('survive_5m', 1);
+            }
             void ApiClient.flush();
+            void QuestTracker.flush();
             void ApiClient.submitLeaderboard({
                 score,
                 character_id: this.selectedCharId,
@@ -481,6 +494,9 @@ export class MainScene extends Phaser.Scene {
             this.currentStage++;
             globalStats.currentStage = this.currentStage;
             this.isPausedForClear = false;
+            // Daily quest: stage_3 / stage_5 — setMax 로 도달 최댓값만 유지
+            QuestTracker.setMax('stage_3', this.currentStage);
+            QuestTracker.setMax('stage_5', this.currentStage);
 
             // 새 챕터 진입 시 인트로 토스트
             if (isChapterStart(this.currentStage)) {

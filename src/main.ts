@@ -14,6 +14,7 @@ import { SkillTreeScene } from './scenes/SkillTreeScene';
 import { CodexScene } from './scenes/CodexScene';
 import { DailyRewardModal } from './scenes/DailyRewardModal';
 import { LeaderboardScene } from './scenes/LeaderboardScene';
+import { QuestPanelScene } from './scenes/QuestPanelScene';
 
 const config: Phaser.Types.Core.GameConfig = {
     type: Phaser.AUTO,
@@ -44,6 +45,7 @@ const config: Phaser.Types.Core.GameConfig = {
         CodexScene,
         DailyRewardModal,
         LeaderboardScene,
+        QuestPanelScene,
     ],
     pixelArt: true,
     backgroundColor: '#111111',
