@@ -18,7 +18,8 @@ export type EventType =
     | 'iap_funnel_view'
     | 'iap_funnel_click'
     | 'iap_funnel_complete'
-    | 'pwa_install';
+    | 'pwa_install'
+    | 'daily_reward_claim';
 
 export interface PlayerInfo {
     exists: boolean;
@@ -34,6 +35,36 @@ export interface LeaderboardSubmit {
     stage_reached?: number;
     duration_seconds?: number;
 }
+
+export interface DailyRewardPreview {
+    essence: number;
+    coins: number;
+}
+
+export interface DailyRewardStatus {
+    can_claim: boolean;
+    next_day: number;
+    streak_count: number;
+    preview_reward: DailyRewardPreview;
+    last_claimed_at: string | null;
+    next_claim_available_at: string;
+}
+
+export interface DailyRewardClaimSuccess {
+    ok: true;
+    granted: DailyRewardPreview;
+    streak_day: number;
+    streak_count: number;
+    total_essence: number;
+}
+
+export interface DailyRewardClaimFail {
+    ok: false;
+    error: string;
+    next_claim_available_at?: string;
+}
+
+export type DailyRewardClaimResult = DailyRewardClaimSuccess | DailyRewardClaimFail;
 
 interface QueuedEvent {
     event_type: EventType;
@@ -90,6 +121,38 @@ export class ApiClient {
         const body = { ...payload, device_id: Identity.getDeviceId() };
         const r = await postJson(`${API_BASE}/leaderboard`, body);
         return !!r?.ok;
+    }
+
+    /** Daily Reward 상태 조회. 네트워크 실패 시 null (모달 표시하지 않음). */
+    static async getDailyRewardStatus(deviceId?: string): Promise<DailyRewardStatus | null> {
+        const id = deviceId ?? Identity.getDeviceId();
+        const controller = new AbortController();
+        const t = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+        try {
+            const r = await fetch(`${API_BASE}/daily-reward/${encodeURIComponent(id)}`, {
+                signal: controller.signal,
+            });
+            if (!r.ok) return null;
+            return (await r.json()) as DailyRewardStatus;
+        } catch (err) {
+            console.warn('[ApiClient] getDailyRewardStatus failed:', err);
+            return null;
+        } finally {
+            clearTimeout(t);
+        }
+    }
+
+    /** Daily Reward 청구. 성공/중복/네트워크 실패 모두 명시적 결과 반환. */
+    static async claimDailyReward(): Promise<DailyRewardClaimResult | null> {
+        const r = await postJson(`${API_BASE}/daily-reward/claim`, {
+            device_id: Identity.getDeviceId(),
+        });
+        if (!r) return null;
+        try {
+            return (await r.json()) as DailyRewardClaimResult;
+        } catch {
+            return null;
+        }
     }
 
     /** 이벤트는 즉시 전송하지 않고 큐에 적재 → 5초마다 / 50개 도달 시 flush. */
