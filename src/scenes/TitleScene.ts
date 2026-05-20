@@ -165,71 +165,68 @@ export class TitleScene extends Phaser.Scene {
             startBtn.setScale(1);
         });
 
-        // 보조 메뉴 — 가로 묶음 (스킬 트리 + 시너지 도감)
+        // 보조 메뉴 — 한 줄 3개 (스킬 트리 + 시너지 도감 + 리더보드)
         const subW = 170;
         const subH = 52;
-        const subGap = 24;
-        const subLeftX = width / 2 - (subW / 2 + subGap / 2);
-        const subRightX = width / 2 + (subW / 2 + subGap / 2);
+        const subGap = 18;
+        const subTotalW = 3 * subW + 2 * subGap;
+        const subStartX = width / 2 - subTotalW / 2 + subW / 2;
+        const subPositions = [0, 1, 2].map((i) => subStartX + i * (subW + subGap));
 
-        // SKILL TREE Button (왼쪽)
-        const skillBtn = this.add
-            .rectangle(subLeftX, subY, subW, subH, 0x1a2b3d, 0.8)
-            .setInteractive({ useHandCursor: true })
-            .setStrokeStyle(2, 0x4db8ff);
+        // helper — 보조 메뉴 버튼 1개 만들기
+        const makeSubButton = (
+            x: number,
+            labelKey: string,
+            sceneKey: string,
+            colors: { fill: number; hoverFill: number; stroke: number; text: string },
+        ) => {
+            const btn = this.add
+                .rectangle(x, subY, subW, subH, colors.fill, 0.8)
+                .setInteractive({ useHandCursor: true })
+                .setStrokeStyle(2, colors.stroke);
 
-        this.add
-            .text(subLeftX, subY, I18n.t('title_skill_tree'), {
-                fontFamily: '"MedievalSharp", cursive',
-                fontSize: '22px',
-                color: '#4db8ff',
-                fontStyle: 'bold',
-            })
-            .setOrigin(0.5);
+            this.add
+                .text(x, subY, I18n.t(labelKey), {
+                    fontFamily: '"MedievalSharp", cursive',
+                    fontSize: '22px',
+                    color: colors.text,
+                    fontStyle: 'bold',
+                })
+                .setOrigin(0.5);
 
-        skillBtn.on('pointerdown', () => {
-            this.cameras.main.fadeOut(300, 0, 0, 0);
-            this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => {
-                this.scene.start('SkillTreeScene');
+            btn.on('pointerdown', () => {
+                this.cameras.main.fadeOut(300, 0, 0, 0);
+                this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => {
+                    this.scene.start(sceneKey);
+                });
             });
-        });
-        skillBtn.on('pointerover', () => {
-            skillBtn.setFillStyle(0x253d52, 1);
-            skillBtn.setScale(1.04);
-        });
-        skillBtn.on('pointerout', () => {
-            skillBtn.setFillStyle(0x1a2b3d, 0.8);
-            skillBtn.setScale(1);
-        });
-
-        // CODEX Button (오른쪽)
-        const codexBtn = this.add
-            .rectangle(subRightX, subY, subW, subH, 0x2d1a3d, 0.8)
-            .setInteractive({ useHandCursor: true })
-            .setStrokeStyle(2, 0xcc88ff);
-
-        this.add
-            .text(subRightX, subY, I18n.t('title_codex'), {
-                fontFamily: '"MedievalSharp", cursive',
-                fontSize: '22px',
-                color: '#cc88ff',
-                fontStyle: 'bold',
-            })
-            .setOrigin(0.5);
-
-        codexBtn.on('pointerdown', () => {
-            this.cameras.main.fadeOut(300, 0, 0, 0);
-            this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => {
-                this.scene.start('CodexScene');
+            btn.on('pointerover', () => {
+                btn.setFillStyle(colors.hoverFill, 1);
+                btn.setScale(1.04);
             });
+            btn.on('pointerout', () => {
+                btn.setFillStyle(colors.fill, 0.8);
+                btn.setScale(1);
+            });
+        };
+
+        makeSubButton(subPositions[0], 'title_skill_tree', 'SkillTreeScene', {
+            fill: 0x1a2b3d,
+            hoverFill: 0x253d52,
+            stroke: 0x4db8ff,
+            text: '#4db8ff',
         });
-        codexBtn.on('pointerover', () => {
-            codexBtn.setFillStyle(0x3d2552, 1);
-            codexBtn.setScale(1.04);
+        makeSubButton(subPositions[1], 'title_codex', 'CodexScene', {
+            fill: 0x2d1a3d,
+            hoverFill: 0x3d2552,
+            stroke: 0xcc88ff,
+            text: '#cc88ff',
         });
-        codexBtn.on('pointerout', () => {
-            codexBtn.setFillStyle(0x2d1a3d, 0.8);
-            codexBtn.setScale(1);
+        makeSubButton(subPositions[2], 'title_leaderboard', 'LeaderboardScene', {
+            fill: 0x3d2b1f,
+            hoverFill: 0x5a4030,
+            stroke: 0xffd700,
+            text: '#ffd700',
         });
     }
 
