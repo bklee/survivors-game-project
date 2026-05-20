@@ -13,6 +13,7 @@ import { RecipeScene } from './scenes/RecipeScene';
 import { SkillTreeScene } from './scenes/SkillTreeScene';
 import { CodexScene } from './scenes/CodexScene';
 import { DailyRewardModal } from './scenes/DailyRewardModal';
+import { LeaderboardScene } from './scenes/LeaderboardScene';
 
 const config: Phaser.Types.Core.GameConfig = {
     type: Phaser.AUTO,
@@ -42,6 +43,7 @@ const config: Phaser.Types.Core.GameConfig = {
         SkillTreeScene,
         CodexScene,
         DailyRewardModal,
+        LeaderboardScene,
     ],
     pixelArt: true,
     backgroundColor: '#111111',
