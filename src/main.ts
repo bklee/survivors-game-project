@@ -12,6 +12,7 @@ import { CharacterSelectScene } from './scenes/CharacterSelectScene';
 import { RecipeScene } from './scenes/RecipeScene';
 import { SkillTreeScene } from './scenes/SkillTreeScene';
 import { CodexScene } from './scenes/CodexScene';
+import { DailyRewardModal } from './scenes/DailyRewardModal';
 
 const config: Phaser.Types.Core.GameConfig = {
     type: Phaser.AUTO,
@@ -40,6 +41,7 @@ const config: Phaser.Types.Core.GameConfig = {
         RecipeScene,
         SkillTreeScene,
         CodexScene,
+        DailyRewardModal,
     ],
     pixelArt: true,
     backgroundColor: '#111111',
