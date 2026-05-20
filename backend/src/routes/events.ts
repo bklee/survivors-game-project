@@ -16,6 +16,7 @@ const EVENT_TYPES = [
     'iap_funnel_click',
     'iap_funnel_complete',
     'pwa_install',
+    'daily_reward_claim',
 ] as const;
 
 const EventSchema = z.object({
