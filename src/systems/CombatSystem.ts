@@ -8,6 +8,7 @@ import {
     Velocity,
     SpriteInfo,
     Boss,
+    BossClone,
     BossSplit,
     Player,
     EnemyProjectile,
