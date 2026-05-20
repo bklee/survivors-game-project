@@ -5,11 +5,17 @@ import { pool } from '../db/pool.js';
 const router = Router();
 
 // 정적 퀘스트 풀 (설계 doc §2.2). description 은 i18n 에서 클라이언트가 렌더링.
+// update_mode:
+//   - 'sum': 클라이언트 delta 누적 (kill, synergy, play count)
+//   - 'max': high-water-mark — 같은 값 재전송해도 누적 X (stage 도달, survive 플래그)
+export type QuestUpdateMode = 'sum' | 'max';
+
 export interface QuestDef {
     quest_id: string;
-    description_key: string; // i18n 키 (클라이언트에서 변환)
+    description_key: string;
     target_value: number;
     reward_essence: number;
+    update_mode: QuestUpdateMode;
 }
 
 export const QUEST_POOL: ReadonlyArray<QuestDef> = [
@@ -18,32 +24,49 @@ export const QUEST_POOL: ReadonlyArray<QuestDef> = [
         description_key: 'quest_kill_100',
         target_value: 100,
         reward_essence: 20,
+        update_mode: 'sum',
     },
     {
         quest_id: 'kill_300',
         description_key: 'quest_kill_300',
         target_value: 300,
         reward_essence: 40,
+        update_mode: 'sum',
     },
-    { quest_id: 'stage_3', description_key: 'quest_stage_3', target_value: 3, reward_essence: 30 },
-    { quest_id: 'stage_5', description_key: 'quest_stage_5', target_value: 5, reward_essence: 50 },
+    {
+        quest_id: 'stage_3',
+        description_key: 'quest_stage_3',
+        target_value: 3,
+        reward_essence: 30,
+        update_mode: 'max',
+    },
+    {
+        quest_id: 'stage_5',
+        description_key: 'quest_stage_5',
+        target_value: 5,
+        reward_essence: 50,
+        update_mode: 'max',
+    },
     {
         quest_id: 'synergy_5',
         description_key: 'quest_synergy_5',
         target_value: 5,
         reward_essence: 25,
+        update_mode: 'sum',
     },
     {
         quest_id: 'survive_5m',
         description_key: 'quest_survive_5m',
         target_value: 1,
         reward_essence: 30,
+        update_mode: 'max',
     },
     {
         quest_id: 'play_2_sessions',
         description_key: 'quest_play_2',
         target_value: 2,
         reward_essence: 20,
+        update_mode: 'sum',
     },
 ];
 
@@ -226,46 +249,46 @@ router.post('/progress', async (req, res) => {
 
         for (const inc of increments) {
             const q = questMap.get(inc.quest_id);
-            if (!q) continue; // 오늘 할당된 적 없는 quest 는 무시 (race / 잘못된 클라이언트)
+            if (!q) continue; // 오늘 할당된 적 없는 quest 는 무시
+            const def = QUEST_POOL.find((p) => p.quest_id === inc.quest_id);
+            if (!def) continue;
 
-            const upsertR = await client.query(
-                `INSERT INTO quest_progress (quest_db_id, current_value, updated_at)
-                 VALUES ($1, $2, NOW())
-                 ON CONFLICT (quest_db_id) DO UPDATE
-                 SET current_value = LEAST(quest_progress.current_value + $2, $3),
-                     updated_at = NOW(),
-                     completed_at = CASE
-                         WHEN quest_progress.completed_at IS NULL
-                              AND quest_progress.current_value + $2 >= $3
-                         THEN NOW()
-                         ELSE quest_progress.completed_at
-                     END
-                 RETURNING current_value, completed_at,
-                           (xmax = 0) AS was_insert`,
-                [q.id, inc.delta, q.target],
-            );
+            // mode 에 따라 SQL 분기. INSERT/ON CONFLICT 모두 동일 cap + completed_at 동시 set.
+            // RETURNING was_newly_completed 로 신규 완료 여부 정확 판정 (over-count 방지).
+            const isMax = def.update_mode === 'max';
+            // INSERT 시 value: max → delta 그대로(작게 들어와도 OK), sum → LEAST(delta, target)
+            // CONFLICT 시 value: max → GREATEST(prev, delta) 캡, sum → LEAST(prev+delta, target)
+            const insertValueExpr = isMax ? 'LEAST($2, $3)' : 'LEAST($2, $3)';
+            const updateValueExpr = isMax
+                ? 'LEAST(GREATEST(quest_progress.current_value, $2), $3)'
+                : 'LEAST(quest_progress.current_value + $2, $3)';
+            // was_newly_completed: 이번 쿼리에서 처음 completed 가 set 되었는가
+            const sql = `
+                INSERT INTO quest_progress (quest_db_id, current_value, completed_at, updated_at)
+                VALUES ($1, ${insertValueExpr},
+                        CASE WHEN ${insertValueExpr} >= $3 THEN NOW() ELSE NULL END,
+                        NOW())
+                ON CONFLICT (quest_db_id) DO UPDATE
+                SET current_value = ${updateValueExpr},
+                    updated_at = NOW(),
+                    completed_at = CASE
+                        WHEN quest_progress.completed_at IS NULL
+                             AND ${updateValueExpr} >= $3
+                        THEN NOW()
+                        ELSE quest_progress.completed_at
+                    END
+                RETURNING current_value,
+                          completed_at,
+                          (xmax = 0) AS was_insert,
+                          (
+                              completed_at IS NOT NULL
+                              AND completed_at >= NOW() - INTERVAL '1 second'
+                          ) AS was_newly_completed
+            `;
+            const upsertR = await client.query(sql, [q.id, inc.delta, q.target]);
             const row = upsertR.rows[0];
             const completed = !!row.completed_at;
-            // 신규 완료: INSERT 인데 current >= target 이거나, UPDATE 인데 completed_at 이 이번에 새로 설정됨
-            // 단순화: 응답에 was_just_completed 별도 필드 없이 클라이언트가 이전 상태와 비교 가능.
-            // 신규 완료 카운터 — 이번 호출에서 completed_at 이 set 되었는지 판단:
-            // INSERT 시: current_value >= target 이면 completed_at 가 같이 set (현재 SQL 은 INSERT 시 completed_at 미설정)
-            // 보완: 별도 UPDATE 로 처리
-            if (completed && row.was_insert && row.current_value >= q.target) {
-                await client.query(
-                    `UPDATE quest_progress SET completed_at = NOW()
-                     WHERE quest_db_id = $1 AND completed_at IS NULL`,
-                    [q.id],
-                );
-                newlyCompleted++;
-            } else if (completed && !row.was_insert) {
-                // ON CONFLICT 분기에서 이번에 처음 완료된 경우 — 이전 current 가 < target 이었음
-                // (완료 후 추가 progress 들어와도 completed_at 유지)
-                // 간단히 "이번 호출에서 completed_at = NOW() ± 1초 이내" 면 신규 완료로 카운트
-                // 더 안전한 방식: SQL 에서 was_just_completed 도 RETURNING 으로 받기
-                // 여기서는 클라이언트가 GET 으로 재확인하는 것을 권장 → newlyCompleted 는 best-effort
-                newlyCompleted++;
-            }
+            if (row.was_newly_completed) newlyCompleted++;
 
             updated.push({
                 quest_id: inc.quest_id,
