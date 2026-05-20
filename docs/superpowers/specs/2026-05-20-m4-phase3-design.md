@@ -937,6 +937,21 @@ Phase 3 Week 3 종료 시점에 다음을 만족하면 Section 5 진행:
 9. **퀘스트 보상 지급 시점.** 자동 vs claim 버튼 클릭? UX 차이 (자동은 surprise 감, claim 은 control 감). 일단 claim 버튼 선택했으나 재검토 여지.
 10. **localStorage 캐시 정책.** daily reward / quest 상태를 캐시할 경우, 서버와 어긋날 때 어떻게 reconcile? 일단 "캐시는 표시용, 권위는 서버" 원칙.
 
+### Resolutions (2026-05-20, pre-merge)
+
+Sprint 진입 전 기본값. Sprint 진행 중 데이터로 재검토.
+
+1. **닉네임 입력 시점** → 자동 생성 (`Player_${5digit}`) + CharacterSelectScene 에 "닉네임 변경" 선택 메뉴. **강제 입력 X** (이탈 위험). Sprint 2.
+2. **퀘스트 풀** → **7개로 시작.** Phase 3 안에서는 확장 X. Sprint 6 회고에서 "퀘스트 중복 피로도" 지표 확인 후 Phase 4 에서 결정.
+3. **streak grace period** → **도입 X** (Phase 3). 솔로 운영에서 grace period 는 데이터 노이즈만 증가. streak 끊김 = 정상 신호로 측정. Phase 4 후보.
+4. **Combo bonus +500 coin** → 일단 **유지.** Sprint 4 대시보드에서 평균 일일 코인 증가량을 모니터링, 인플레이션 우려 시 +300 으로 하향. Sprint 6 결정.
+5. **Admin IP allowlist** → Phase 3 에서는 **Basic Auth 만.** allowlist 는 외부 접근 발생 시 즉시 추가 가능하도록 nginx 설정 분리. Cloudflare Access 는 Phase 4+.
+6. **events 30일 cleanup cron** → **Phase 3 종료 후 활성화.** 대시보드 trend 윈도우를 14/30/90일로 동시 노출하여 데이터 부족 위험 최소화. Sprint 6 에서 활성화 결정.
+7. **Poki + Web Push 호환성** → Sprint 5 진입 조건에 "Poki SDK 문서 + 정책 확인" 게이트 추가. 충돌 시 Sprint 5 **자동 폐기**.
+8. **세션 정의** → `session_end` 누락 시 `session_start` 후 **15분 cap** 적용 (window function). heartbeat 도입은 Phase 4 후보.
+9. **퀘스트 보상 지급** → **Claim 버튼** 유지 (control 감 + 재방문 유도). 자동 지급은 A/B 후보 Phase 4.
+10. **localStorage 캐시 정책** → **"캐시는 표시용, 권위는 서버"** 원칙 유지. 클라이언트 부팅 시 1회 동기화, 진행 중에는 낙관적 업데이트 + 서버 응답으로 보정.
+
 ---
 
 ## Implementation Plan
