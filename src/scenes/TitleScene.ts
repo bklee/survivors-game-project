@@ -1,7 +1,10 @@
 import Phaser from 'phaser';
 import { I18n } from '../i18n/I18n';
+import { ApiClient } from '../integrations/ApiClient';
 
 export class TitleScene extends Phaser.Scene {
+    private dailyRewardChecked = false;
+
     constructor() {
         super('TitleScene');
     }
@@ -9,6 +12,13 @@ export class TitleScene extends Phaser.Scene {
     create() {
         const { width, height } = this.scale;
         this.cameras.main.fadeIn(1000, 0, 0, 0);
+
+        // Daily Reward 상태 조회 → can_claim 이면 모달 자동 표시 (fire-and-forget)
+        // restart() 시 중복 호출 방지를 위해 dailyRewardChecked 플래그 사용.
+        if (!this.dailyRewardChecked) {
+            this.dailyRewardChecked = true;
+            this.checkDailyReward();
+        }
 
         // Background Image — 미세한 줌 & 패닝
         const bg = this.add.image(width / 2, height / 2, 'main_bg').setDisplaySize(width, height);
@@ -221,5 +231,13 @@ export class TitleScene extends Phaser.Scene {
             codexBtn.setFillStyle(0x2d1a3d, 0.8);
             codexBtn.setScale(1);
         });
+    }
+
+    private async checkDailyReward(): Promise<void> {
+        const status = await ApiClient.getDailyRewardStatus();
+        if (!status || !status.can_claim) return;
+        // TitleScene 이 아직 활성 상태인지 확인 (씬 전환 중이면 launch 무시)
+        if (!this.scene.isActive('TitleScene')) return;
+        this.scene.launch('DailyRewardModal', { status });
     }
 }
