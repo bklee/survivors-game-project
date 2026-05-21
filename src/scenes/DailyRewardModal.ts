@@ -40,17 +40,33 @@ export class DailyRewardModal extends Phaser.Scene {
     create() {
         const { width, height } = this.scale;
 
-        // 배경 오버레이
+        // 모달 박스 크기 — overlay 핸들러에서 모달 영역 검사에 사용
+        const modalW = 720;
+        const modalH = 440;
+        const modalLeft = (width - modalW) / 2;
+        const modalRight = modalLeft + modalW;
+        const modalTop = (height - modalH) / 2;
+        const modalBottom = modalTop + modalH;
+
+        // 배경 오버레이 — 모달 영역 밖 클릭만 close. 모달 영역 클릭은 무시
+        // (받기 버튼/닫기X 의 자체 핸들러가 처리하므로 overlay 가 가로채면 안 됨).
         const overlay = this.add
             .rectangle(width / 2, height / 2, width, height, 0x000000, 0.75)
             .setInteractive();
-        overlay.on('pointerdown', () => {
-            if (!this.claiming) this.close();
+        overlay.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
+            if (this.claiming) return;
+            if (
+                pointer.x >= modalLeft &&
+                pointer.x <= modalRight &&
+                pointer.y >= modalTop &&
+                pointer.y <= modalBottom
+            ) {
+                return; // 모달 영역 안 — 무시
+            }
+            this.close();
         });
 
         // 모달 박스
-        const modalW = 720;
-        const modalH = 440;
         this.add
             .rectangle(width / 2, height / 2, modalW, modalH, 0x2a1f10, 0.95)
             .setStrokeStyle(3, 0xffd700);
