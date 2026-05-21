@@ -74,6 +74,26 @@
   <div id="game-container"></div>
   <script type="module" src="./src/main.ts"></script>
   <script>
+// SW cache self-heal — 옛 v1/v2 SW 캐시 잔존 사용자를 위한 1회성 자가 정리.
+// 새 index.html 이 도달한 시점에 SW 등록이 있으면 모두 unregister + reload.
+// localStorage 키로 1회만 실행. v4 마커가 없는 모든 device 가 다음 진입 시 자동 cleanup.
+(function () {
+    if (!('serviceWorker' in navigator)) return;
+    if (window.top !== window.self) return; // iframe (Poki) skip
+    const HEAL_KEY = 'survivors_sw_heal_v4';
+    if (localStorage.getItem(HEAL_KEY)) return;
+    navigator.serviceWorker.getRegistrations().then(function (regs) {
+        if (regs.length === 0) {
+            localStorage.setItem(HEAL_KEY, '1');
+            return;
+        }
+        Promise.all(regs.map(function (r) { return r.unregister(); })).then(function () {
+            localStorage.setItem(HEAL_KEY, '1');
+            location.reload();
+        });
+    }).catch(function () { localStorage.setItem(HEAL_KEY, '1'); });
+})();
+
 // Service Worker 는 자체 도메인에서만 등록. Poki iframe 환경에서는 skip.
 const isInIframe = window.top !== window.self;
 if (!isInIframe && 'serviceWorker' in navigator) {
