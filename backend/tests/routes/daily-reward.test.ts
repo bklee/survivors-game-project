@@ -46,7 +46,7 @@ describe('GET /api/daily-reward/:device_id', () => {
         expect(res.body.can_claim).toBe(true);
         expect(res.body.next_day).toBe(1);
         expect(res.body.streak_count).toBe(1);
-        expect(res.body.preview_reward).toEqual({ essence: 10, coins: 0 });
+        expect(res.body.preview_reward).toEqual({ essence: 100, coins: 0 });
     });
 
     it('어제 청구한 플레이어 → can_claim:true + 다음 day', async () => {
@@ -67,7 +67,7 @@ describe('GET /api/daily-reward/:device_id', () => {
         expect(res.body.can_claim).toBe(true);
         expect(res.body.next_day).toBe(3);
         expect(res.body.streak_count).toBe(3);
-        expect(res.body.preview_reward).toEqual({ essence: 25, coins: 0 });
+        expect(res.body.preview_reward).toEqual({ essence: 250, coins: 0 });
     });
 
     it('오늘 이미 청구한 플레이어 → can_claim:false', async () => {
@@ -125,7 +125,7 @@ describe('GET /api/daily-reward/:device_id', () => {
         expect(res.body.can_claim).toBe(true);
         expect(res.body.next_day).toBe(1);
         expect(res.body.streak_count).toBe(8);
-        expect(res.body.preview_reward).toEqual({ essence: 10, coins: 0 });
+        expect(res.body.preview_reward).toEqual({ essence: 100, coins: 0 });
     });
 
     it('짧은 device_id 는 400', async () => {
@@ -143,7 +143,7 @@ describe('POST /api/daily-reward/claim', () => {
             .mockResolvedValueOnce({ rows: [{ today: '2026-05-21' }], rowCount: 1 }) // today
             .mockResolvedValueOnce({ rows: [], rowCount: 0 }) // last claim 없음
             .mockResolvedValueOnce({ rows: [{ id: 1 }], rowCount: 1 }) // INSERT daily_rewards
-            .mockResolvedValueOnce({ rows: [{ total_essence: 10 }], rowCount: 1 }) // UPDATE players
+            .mockResolvedValueOnce({ rows: [{ total_essence: 100 }], rowCount: 1 }) // UPDATE players
             .mockResolvedValueOnce({ rowCount: 1 }) // INSERT events
             .mockResolvedValueOnce({}); // COMMIT
 
@@ -154,17 +154,17 @@ describe('POST /api/daily-reward/claim', () => {
         expect(res.status).toBe(200);
         expect(res.body).toEqual({
             ok: true,
-            granted: { essence: 10, coins: 0 },
+            granted: { essence: 100, coins: 0 },
             streak_day: 1,
             streak_count: 1,
-            total_essence: 10,
+            total_essence: 100,
         });
         expect(clientQuery.mock.calls[0][0]).toBe('BEGIN');
         expect(clientQuery.mock.calls.at(-1)?.[0]).toBe('COMMIT');
         expect(clientRelease).toHaveBeenCalledTimes(1);
     });
 
-    it('Day 7 청구 → 100 essence + 1000 coins', async () => {
+    it('Day 7 청구 → 1000 essence + 10000 coins', async () => {
         clientQuery
             .mockResolvedValueOnce({}) // BEGIN
             .mockResolvedValueOnce({ rows: [{ id: 42 }], rowCount: 1 }) // player
@@ -174,7 +174,7 @@ describe('POST /api/daily-reward/claim', () => {
                 rowCount: 1,
             })
             .mockResolvedValueOnce({ rows: [{ id: 99 }], rowCount: 1 }) // INSERT
-            .mockResolvedValueOnce({ rows: [{ total_essence: 270 }], rowCount: 1 })
+            .mockResolvedValueOnce({ rows: [{ total_essence: 2700 }], rowCount: 1 })
             .mockResolvedValueOnce({ rowCount: 1 }) // events
             .mockResolvedValueOnce({}); // COMMIT
 
@@ -182,7 +182,7 @@ describe('POST /api/daily-reward/claim', () => {
             .post('/api/daily-reward/claim')
             .send({ device_id: DEVICE_ID });
 
-        expect(res.body.granted).toEqual({ essence: 100, coins: 1000 });
+        expect(res.body.granted).toEqual({ essence: 1000, coins: 10000 });
         expect(res.body.streak_day).toBe(7);
     });
 
