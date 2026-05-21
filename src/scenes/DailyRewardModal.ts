@@ -24,6 +24,7 @@ export class DailyRewardModal extends Phaser.Scene {
     private onClose?: () => void;
     private claimBtnText?: Phaser.GameObjects.Text;
     private claimBtnBg?: Phaser.GameObjects.Rectangle;
+    private cellPositions: { day: number; cx: number; cy: number }[] = [];
 
     constructor() {
         super('DailyRewardModal');
@@ -64,10 +65,12 @@ export class DailyRewardModal extends Phaser.Scene {
             .setOrigin(0.5);
 
         // streak 표시
-        const streakLine =
-            this.statusData.streak_count <= 1
+        const canClaim = this.statusData.can_claim;
+        const streakLine = canClaim
+            ? this.statusData.streak_count <= 1
                 ? '오늘이 첫 보상!'
-                : `오늘 받으면 ${this.statusData.streak_count}일째 연속`;
+                : `오늘 받으면 ${this.statusData.streak_count}일째 연속`
+            : `연속 ${this.statusData.streak_count}일째 — 내일 KST 자정 이후 가능`;
         this.add
             .text(width / 2, height / 2 - modalH / 2 + 78, streakLine, {
                 fontFamily: '"MedievalSharp", cursive',
@@ -83,8 +86,10 @@ export class DailyRewardModal extends Phaser.Scene {
         const gapY = 14;
         const row1Y = height / 2 - 30;
         const row2Y = row1Y + cellH + gapY;
-        const todayDay = this.statusData.next_day;
+        const todayDay = canClaim ? this.statusData.next_day : -1;
+        const lastClaimedDay = canClaim ? -1 : ((this.statusData.streak_count - 1) % 7) + 1;
 
+        this.cellPositions = [];
         for (let i = 0; i < 7; i++) {
             const day = i + 1;
             const reward = REWARD_PREVIEW[i];
@@ -95,9 +100,10 @@ export class DailyRewardModal extends Phaser.Scene {
             const startX = width / 2 - rowWidth / 2 + cellW / 2;
             const cx = startX + colInRow * (cellW + gapX);
             const cy = isRow1 ? row1Y : row2Y;
+            this.cellPositions.push({ day, cx, cy });
 
-            const isToday = day === todayDay;
-            const isPast = day < todayDay; // 시각적 단순화
+            const isToday = canClaim && day === todayDay;
+            const isPast = canClaim ? day < todayDay : day <= lastClaimedDay;
             const fillColor = isToday ? 0x4d3a1f : isPast ? 0x1a1410 : 0x2a1f15;
             const strokeColor = isToday ? 0xffd700 : 0x5a4030;
             const strokeWidth = isToday ? 3 : 1;
@@ -150,32 +156,47 @@ export class DailyRewardModal extends Phaser.Scene {
 
         // 받기 버튼
         const claimY = height / 2 + modalH / 2 - 55;
-        this.claimBtnBg = this.add
-            .rectangle(width / 2, claimY, 260, 60, 0x3d2b1f, 1)
-            .setStrokeStyle(3, 0xffd700)
-            .setInteractive({ useHandCursor: true });
+        if (canClaim) {
+            this.claimBtnBg = this.add
+                .rectangle(width / 2, claimY, 260, 60, 0x3d2b1f, 1)
+                .setStrokeStyle(3, 0xffd700)
+                .setInteractive({ useHandCursor: true });
 
-        const previewLabel = `받기 (+${this.statusData.preview_reward.essence}E${
-            this.statusData.preview_reward.coins > 0
-                ? `, +${this.statusData.preview_reward.coins}C`
-                : ''
-        })`;
-        this.claimBtnText = this.add
-            .text(width / 2, claimY, previewLabel, {
-                fontFamily: '"MedievalSharp", cursive',
-                fontSize: '24px',
-                color: '#ffffff',
-                fontStyle: 'bold',
-            })
-            .setOrigin(0.5);
+            const previewLabel = `받기 (+${this.statusData.preview_reward.essence}E${
+                this.statusData.preview_reward.coins > 0
+                    ? `, +${this.statusData.preview_reward.coins}C`
+                    : ''
+            })`;
+            this.claimBtnText = this.add
+                .text(width / 2, claimY, previewLabel, {
+                    fontFamily: '"MedievalSharp", cursive',
+                    fontSize: '24px',
+                    color: '#ffffff',
+                    fontStyle: 'bold',
+                })
+                .setOrigin(0.5);
 
-        this.claimBtnBg.on('pointerover', () => {
-            if (!this.claiming) this.claimBtnBg!.setFillStyle(0x5a4030);
-        });
-        this.claimBtnBg.on('pointerout', () => {
-            if (!this.claiming) this.claimBtnBg!.setFillStyle(0x3d2b1f);
-        });
-        this.claimBtnBg.on('pointerdown', () => this.handleClaim());
+            this.claimBtnBg.on('pointerover', () => {
+                if (!this.claiming) this.claimBtnBg!.setFillStyle(0x5a4030);
+            });
+            this.claimBtnBg.on('pointerout', () => {
+                if (!this.claiming) this.claimBtnBg!.setFillStyle(0x3d2b1f);
+            });
+            this.claimBtnBg.on('pointerdown', () => this.handleClaim());
+        } else {
+            this.claimBtnBg = this.add
+                .rectangle(width / 2, claimY, 320, 60, 0x333333, 1)
+                .setStrokeStyle(2, 0x666666);
+            // setInteractive 호출 안 함 — 비활성 상태
+            this.claimBtnText = this.add
+                .text(width / 2, claimY, '오늘은 이미 받았어요', {
+                    fontFamily: '"MedievalSharp", cursive',
+                    fontSize: '22px',
+                    color: '#999999',
+                    fontStyle: 'bold',
+                })
+                .setOrigin(0.5);
+        }
 
         // 닫기 (X)
         const closeBtn = this.add
@@ -215,6 +236,21 @@ export class DailyRewardModal extends Phaser.Scene {
 
         // 성공 — essence 적립 (localStorage)
         MetaProgress.addEssence(result.granted.essence);
+
+        // 받은 셀에 ✓ 체크를 즉시 표시 — claim 직후 시각적 피드백
+        const claimedDay =
+            (result as { streak_day?: number }).streak_day ?? this.statusData.next_day;
+        const cell = this.cellPositions.find((c) => c.day === claimedDay);
+        if (cell) {
+            this.add
+                .text(cell.cx, cell.cy - 10, '✓', {
+                    fontFamily: '"MedievalSharp", cursive',
+                    fontSize: '28px',
+                    color: '#44cc44',
+                    fontStyle: 'bold',
+                })
+                .setOrigin(0.5);
+        }
 
         this.claimBtnText!.setText(
             `+${result.granted.essence}E${
