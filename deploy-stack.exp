@@ -86,6 +86,30 @@ if [ "$MODE" = "full" ] || [ "$MODE" = "server" ]; then
         git fetch origin '$DEPLOY_BRANCH'
         git checkout '$DEPLOY_BRANCH'
         git pull --ff-only origin '$DEPLOY_BRANCH'
+
+        echo '===> [migrate] schema_migrations 부트스트랩 + 미적용 파일 순차 적용'
+        docker exec survivors-postgres psql -U survivors_app -d survivors -v ON_ERROR_STOP=1 -c \"
+            CREATE TABLE IF NOT EXISTS schema_migrations (
+                filename TEXT PRIMARY KEY,
+                applied_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+            );
+        \"
+        for sql_file in \$(ls '$STACK_REMOTE_DIR/infra/postgres/migrations/'*.sql 2>/dev/null | LC_ALL=C sort); do
+            fname=\$(basename \"\$sql_file\")
+            already=\$(docker exec survivors-postgres psql -U survivors_app -d survivors -tAc \"SELECT 1 FROM schema_migrations WHERE filename='\$fname'\")
+            if [ \"\$already\" = \"1\" ]; then
+                echo \"  - \$fname (skip, already applied)\"
+            else
+                echo \"  - \$fname (applying)\"
+                if ! docker exec -i survivors-postgres psql -U survivors_app -d survivors -v ON_ERROR_STOP=1 < \"\$sql_file\"; then
+                    echo \"  - \$fname (FAILED — aborting deploy)\" >&2
+                    exit 1
+                fi
+                docker exec survivors-postgres psql -U survivors_app -d survivors -v ON_ERROR_STOP=1 -c \"INSERT INTO schema_migrations (filename) VALUES ('\$fname')\"
+                echo \"  - \$fname (done)\"
+            fi
+        done
+
         cd infra
         docker compose build api
         docker compose up -d --no-deps api
