@@ -1,4 +1,4 @@
-const CACHE_NAME = 'magicka-surv-v2';
+const CACHE_NAME = 'magicka-surv-v3';
 const PRECACHE_URLS = [
     '/',
     '/index.html',
@@ -28,6 +28,30 @@ self.addEventListener('fetch', (event) => {
     const url = new URL(event.request.url);
     if (url.origin !== self.location.origin) return; // 외부 도메인 (Poki SDK 등) skip
 
+    // HTML/navigation 요청은 network-first — 새 배포가 즉시 반영되도록.
+    // 자산(JS/PNG/MP3 등)은 cache-first 유지 — 오프라인/속도.
+    const isNavigation =
+        event.request.mode === 'navigate' ||
+        (event.request.destination === '' && url.pathname.endsWith('.html')) ||
+        url.pathname === '/' ||
+        url.pathname.endsWith('/');
+
+    if (isNavigation) {
+        event.respondWith(
+            fetch(event.request)
+                .then((response) => {
+                    if (response && response.status === 200 && response.type === 'basic') {
+                        const clone = response.clone();
+                        caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+                    }
+                    return response;
+                })
+                .catch(() => caches.match(event.request).then((c) => c || caches.match('/index.html'))),
+        );
+        return;
+    }
+
+    // 자산: cache-first + lazy fill
     event.respondWith(
         caches.match(event.request).then((cached) =>
             cached || fetch(event.request).then((response) => {
@@ -37,11 +61,7 @@ self.addEventListener('fetch', (event) => {
                 const clone = response.clone();
                 caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
                 return response;
-            }).catch(() => {
-                // 오프라인 fallback — root HTML 반환
-                if (event.request.mode === 'navigate') return caches.match('/index.html');
-                return new Response('Offline', { status: 503 });
-            })
+            }).catch(() => new Response('Offline', { status: 503 }))
         )
     );
 });
