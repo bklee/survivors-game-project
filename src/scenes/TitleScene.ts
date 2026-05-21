@@ -118,6 +118,23 @@ export class TitleScene extends Phaser.Scene {
         questBtn.on('pointerover', () => questBtn.setTint(0xffffaa));
         questBtn.on('pointerout', () => questBtn.clearTint());
 
+        // 매일 보상 아이콘 (lang 버튼 왼쪽, 일일 퀘스트 버튼 위). 클릭 시 popup launch.
+        const dailyBtn = this.add
+            .text(width - 20, 30, '🎁 매일 보상', {
+                fontFamily: '"MedievalSharp", cursive',
+                fontSize: '20px',
+                color: '#ffd700',
+                backgroundColor: '#000000bb',
+                padding: { x: 10, y: 5 },
+                stroke: '#5a3300',
+                strokeThickness: 2,
+            })
+            .setOrigin(1, 0)
+            .setInteractive({ useHandCursor: true });
+        dailyBtn.on('pointerdown', () => void this.openDailyRewardModal());
+        dailyBtn.on('pointerover', () => dailyBtn.setTint(0xffffaa));
+        dailyBtn.on('pointerout', () => dailyBtn.clearTint());
+
         // 메뉴 레이아웃 — START + 보조 메뉴 (스킬 트리 + 시너지 도감 가로 묶음)
         // 사용자 요청: 메뉴 그룹을 화면 하단쪽으로 이동.
         const startY = height / 2 + 180;
@@ -251,6 +268,13 @@ export class TitleScene extends Phaser.Scene {
         const status = await ApiClient.getDailyRewardStatus();
         if (!status || !status.can_claim) return;
         // TitleScene 이 아직 활성 상태인지 확인 (씬 전환 중이면 launch 무시)
+        if (!this.scene.isActive('TitleScene')) return;
+        this.scene.launch('DailyRewardModal', { status });
+    }
+
+    private async openDailyRewardModal(): Promise<void> {
+        const status = await ApiClient.getDailyRewardStatus();
+        if (!status) return; // 네트워크 실패 시 무시
         if (!this.scene.isActive('TitleScene')) return;
         this.scene.launch('DailyRewardModal', { status });
     }
