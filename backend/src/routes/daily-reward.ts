@@ -4,15 +4,16 @@ import { pool } from '../db/pool.js';
 
 const router = Router();
 
-// Day 1~7 보상 테이블. Day 7 = 100 essence + 1000 coins 보너스.
+// Day 1~7 보상 테이블. 사용자 요청으로 10배 상향 (2026-05-21).
+// Day 7 = 1000 essence + 10000 coins 보너스.
 export const REWARD_TABLE: ReadonlyArray<{ essence: number; coins: number }> = [
-    { essence: 10, coins: 0 },
-    { essence: 15, coins: 0 },
-    { essence: 25, coins: 0 },
-    { essence: 30, coins: 0 },
-    { essence: 40, coins: 0 },
-    { essence: 50, coins: 0 },
-    { essence: 100, coins: 1000 },
+    { essence: 100, coins: 0 },
+    { essence: 150, coins: 0 },
+    { essence: 250, coins: 0 },
+    { essence: 300, coins: 0 },
+    { essence: 400, coins: 0 },
+    { essence: 500, coins: 0 },
+    { essence: 1000, coins: 10000 },
 ];
 
 const DeviceParamSchema = z.string().min(8).max(64);
