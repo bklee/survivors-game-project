@@ -48,24 +48,23 @@ export class CharacterSelectScene extends Phaser.Scene {
         const unlockedList = meta.unlockedCharacters;
         const myEssence = meta.essence;
 
-        // 정수 표시
+        // 정수 + 영구 코인 가로 나란히 배치 (essence 왼쪽, coin 오른쪽, 가운데 정렬)
         this.add
-            .text(width / 2, 120, I18n.t('char_select_essence', { amount: myEssence }), {
+            .text(width / 2 - 12, 120, I18n.t('char_select_essence', { amount: myEssence }), {
                 fontSize: '22px',
                 color: '#aaddff',
                 fontStyle: 'bold',
             })
-            .setOrigin(0.5)
+            .setOrigin(1, 0.5)
             .setDepth(100);
 
-        // 코인 표시 (영구 적립 coin)
         this.add
-            .text(width / 2, 145, `🪙 ${meta.coins}`, {
-                fontSize: '18px',
+            .text(width / 2 + 12, 120, `🪙 ${meta.coins}`, {
+                fontSize: '22px',
                 color: '#ffd700',
                 fontStyle: 'bold',
             })
-            .setOrigin(0.5)
+            .setOrigin(0, 0.5)
             .setDepth(100);
 
         const charIds = Object.keys(CHARACTERS);
