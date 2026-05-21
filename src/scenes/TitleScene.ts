@@ -4,6 +4,7 @@ import { ApiClient } from '../integrations/ApiClient';
 
 export class TitleScene extends Phaser.Scene {
     private dailyRewardChecked = false;
+    private dailyBtn?: Phaser.GameObjects.Text;
 
     constructor() {
         super('TitleScene');
@@ -119,7 +120,7 @@ export class TitleScene extends Phaser.Scene {
         questBtn.on('pointerout', () => questBtn.clearTint());
 
         // 매일 보상 아이콘 (lang 버튼 y=20, 일일 퀘스트 버튼 y=70 아래 y=120). 클릭 시 popup launch.
-        const dailyBtn = this.add
+        this.dailyBtn = this.add
             .text(width - 20, 120, '🎁 매일 보상', {
                 fontFamily: '"MedievalSharp", cursive',
                 fontSize: '20px',
@@ -131,9 +132,9 @@ export class TitleScene extends Phaser.Scene {
             })
             .setOrigin(1, 0)
             .setInteractive({ useHandCursor: true });
-        dailyBtn.on('pointerdown', () => void this.openDailyRewardModal());
-        dailyBtn.on('pointerover', () => dailyBtn.setTint(0xffffaa));
-        dailyBtn.on('pointerout', () => dailyBtn.clearTint());
+        this.dailyBtn.on('pointerdown', () => void this.openDailyRewardModal());
+        this.dailyBtn.on('pointerover', () => this.dailyBtn?.setTint(0xffffaa));
+        this.dailyBtn.on('pointerout', () => this.dailyBtn?.clearTint());
 
         // 메뉴 레이아웃 — START + 보조 메뉴 (스킬 트리 + 시너지 도감 가로 묶음)
         // 사용자 요청: 메뉴 그룹을 화면 하단쪽으로 이동.
@@ -264,18 +265,37 @@ export class TitleScene extends Phaser.Scene {
         });
     }
 
+    private updateDailyBtnState(canClaim: boolean): void {
+        if (!this.dailyBtn) return;
+        if (canClaim) {
+            this.dailyBtn.setText('🎁 매일 보상');
+            this.dailyBtn.setColor('#ffd700');
+        } else {
+            this.dailyBtn.setText('✅ 매일 보상');
+            this.dailyBtn.setColor('#44cc44');
+        }
+    }
+
     private async checkDailyReward(): Promise<void> {
         const status = await ApiClient.getDailyRewardStatus();
-        if (!status || !status.can_claim) return;
+        if (!status) return;
         // TitleScene 이 아직 활성 상태인지 확인 (씬 전환 중이면 launch 무시)
         if (!this.scene.isActive('TitleScene')) return;
-        this.scene.launch('DailyRewardModal', { status });
+        // 버튼 외관 갱신 (받은 상태 ✅ 녹색 / 안 받음 🎁 금색)
+        this.updateDailyBtnState(status.can_claim);
+        // 자동 표시는 받을 수 있을 때만
+        if (status.can_claim) {
+            this.scene.launch('DailyRewardModal', { status });
+        }
     }
 
     private async openDailyRewardModal(): Promise<void> {
         const status = await ApiClient.getDailyRewardStatus();
         if (!status) return; // 네트워크 실패 시 무시
         if (!this.scene.isActive('TitleScene')) return;
+        this.updateDailyBtnState(status.can_claim);
+        // 사용자가 능동적으로 버튼을 눌러 진입한 경우엔 받은 상태에서도 모달 표시 (streak/체크 확인용).
+        // 모달 내부 받기 버튼은 can_claim:false 시 자동 비활성.
         this.scene.launch('DailyRewardModal', { status });
     }
 }
