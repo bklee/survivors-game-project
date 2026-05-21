@@ -144,3 +144,12 @@ CREATE TRIGGER trigger_events_last_seen
     FOR EACH ROW
     WHEN (NEW.player_id IS NOT NULL)
     EXECUTE FUNCTION update_player_last_seen();
+
+-- Migration tracking — deploy-stack.exp 가 idempotent 하게 운영하기 위한 ledger
+CREATE TABLE IF NOT EXISTS schema_migrations (
+    filename TEXT PRIMARY KEY,
+    applied_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+INSERT INTO schema_migrations (filename)
+VALUES ('2026-05-21-phase3-tables.sql')
+ON CONFLICT (filename) DO NOTHING;
