@@ -83,6 +83,7 @@ if [ "$MODE" = "full" ] || [ "$MODE" = "server" ]; then
     ssh $SSH_OPTS "$DEPLOY_HOST" "
         set -e
         cd '$STACK_REMOTE_DIR'
+        git checkout -- dist/ 2>/dev/null || true
         git fetch origin '$DEPLOY_BRANCH'
         git checkout '$DEPLOY_BRANCH'
         git pull --ff-only origin '$DEPLOY_BRANCH'
