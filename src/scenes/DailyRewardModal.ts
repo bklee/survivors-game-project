@@ -64,17 +64,16 @@ export class DailyRewardModal extends Phaser.Scene {
             .setOrigin(0.5);
 
         // streak 표시
+        const streakLine =
+            this.statusData.streak_count <= 1
+                ? '오늘이 첫 보상!'
+                : `오늘 받으면 ${this.statusData.streak_count}일째 연속`;
         this.add
-            .text(
-                width / 2,
-                height / 2 - modalH / 2 + 78,
-                `연속 ${this.statusData.streak_count}일째`,
-                {
-                    fontFamily: '"MedievalSharp", cursive',
-                    fontSize: '20px',
-                    color: '#cccccc',
-                },
-            )
+            .text(width / 2, height / 2 - modalH / 2 + 78, streakLine, {
+                fontFamily: '"MedievalSharp", cursive',
+                fontSize: '20px',
+                color: '#cccccc',
+            })
             .setOrigin(0.5);
 
         // 7일 캘린더 (2줄: 4 + 3)
@@ -106,6 +105,17 @@ export class DailyRewardModal extends Phaser.Scene {
             this.add
                 .rectangle(cx, cy, cellW, cellH, fillColor, 1)
                 .setStrokeStyle(strokeWidth, strokeColor);
+
+            if (isPast) {
+                this.add
+                    .text(cx, cy - 10, '✓', {
+                        fontFamily: '"MedievalSharp", cursive',
+                        fontSize: '28px',
+                        color: '#44cc44',
+                        fontStyle: 'bold',
+                    })
+                    .setOrigin(0.5);
+            }
 
             // Day 라벨
             this.add
