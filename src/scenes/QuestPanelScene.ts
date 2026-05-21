@@ -30,7 +30,8 @@ export class QuestPanelScene extends Phaser.Scene {
         const modalH = 440;
         this.add
             .rectangle(width / 2, height / 2, modalW, modalH, 0x2a1f10, 0.95)
-            .setStrokeStyle(3, 0xffd700);
+            .setStrokeStyle(3, 0xffd700)
+            .setInteractive();
 
         this.add
             .text(width / 2, height / 2 - modalH / 2 + 30, I18n.t('quest_panel_title'), {
