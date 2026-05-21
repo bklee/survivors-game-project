@@ -3,14 +3,15 @@ import { ApiClient, type DailyRewardStatus } from '../integrations/ApiClient';
 import { MetaProgress } from '../core/MetaProgress';
 
 // Day 1~7 보상 (서버와 동일 — 미리보기용. 권위는 서버 응답)
+// 2026-05-21 사용자 요청으로 10배 상향. Day 7 = 1000 essence + 10000 coins.
 const REWARD_PREVIEW: ReadonlyArray<{ essence: number; coins: number }> = [
-    { essence: 10, coins: 0 },
-    { essence: 15, coins: 0 },
-    { essence: 25, coins: 0 },
-    { essence: 30, coins: 0 },
-    { essence: 40, coins: 0 },
-    { essence: 50, coins: 0 },
-    { essence: 100, coins: 1000 },
+    { essence: 100, coins: 0 },
+    { essence: 150, coins: 0 },
+    { essence: 250, coins: 0 },
+    { essence: 300, coins: 0 },
+    { essence: 400, coins: 0 },
+    { essence: 500, coins: 0 },
+    { essence: 1000, coins: 10000 },
 ];
 
 interface ModalData {
