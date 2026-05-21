@@ -94,14 +94,17 @@ if [ "$MODE" = "full" ] || [ "$MODE" = "server" ]; then
                 applied_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
             );
         \"
-        for sql_file in \$(ls '$STACK_REMOTE_DIR/infra/postgres/migrations/'*.sql 2>/dev/null | sort); do
+        for sql_file in \$(ls '$STACK_REMOTE_DIR/infra/postgres/migrations/'*.sql 2>/dev/null | LC_ALL=C sort); do
             fname=\$(basename \"\$sql_file\")
             already=\$(docker exec survivors-postgres psql -U survivors_app -d survivors -tAc \"SELECT 1 FROM schema_migrations WHERE filename='\$fname'\")
             if [ \"\$already\" = \"1\" ]; then
                 echo \"  - \$fname (skip, already applied)\"
             else
                 echo \"  - \$fname (applying)\"
-                docker exec -i survivors-postgres psql -U survivors_app -d survivors -v ON_ERROR_STOP=1 < \"\$sql_file\"
+                if ! docker exec -i survivors-postgres psql -U survivors_app -d survivors -v ON_ERROR_STOP=1 < \"\$sql_file\"; then
+                    echo \"  - \$fname (FAILED — aborting deploy)\" >&2
+                    exit 1
+                fi
                 docker exec survivors-postgres psql -U survivors_app -d survivors -v ON_ERROR_STOP=1 -c \"INSERT INTO schema_migrations (filename) VALUES ('\$fname')\"
                 echo \"  - \$fname (done)\"
             fi
