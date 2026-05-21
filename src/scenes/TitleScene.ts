@@ -118,9 +118,9 @@ export class TitleScene extends Phaser.Scene {
         questBtn.on('pointerover', () => questBtn.setTint(0xffffaa));
         questBtn.on('pointerout', () => questBtn.clearTint());
 
-        // 매일 보상 아이콘 (lang 버튼 왼쪽, 일일 퀘스트 버튼 위). 클릭 시 popup launch.
+        // 매일 보상 아이콘 (lang 버튼 y=20, 일일 퀘스트 버튼 y=70 아래 y=120). 클릭 시 popup launch.
         const dailyBtn = this.add
-            .text(width - 20, 30, '🎁 매일 보상', {
+            .text(width - 20, 120, '🎁 매일 보상', {
                 fontFamily: '"MedievalSharp", cursive',
                 fontSize: '20px',
                 color: '#ffd700',
