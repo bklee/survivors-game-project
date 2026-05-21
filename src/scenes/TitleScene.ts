@@ -283,9 +283,12 @@ export class TitleScene extends Phaser.Scene {
         if (!this.scene.isActive('TitleScene')) return;
         // 버튼 외관 갱신 (받은 상태 ✅ 녹색 / 안 받음 🎁 금색)
         this.updateDailyBtnState(status.can_claim);
-        // 자동 표시는 받을 수 있을 때만
+        // 자동 표시는 받을 수 있을 때만. 모달 닫힐 때 onClose 로 dailyBtn 외관 재갱신.
         if (status.can_claim) {
-            this.scene.launch('DailyRewardModal', { status });
+            this.scene.launch('DailyRewardModal', {
+                status,
+                onClose: () => void this.refreshDailyBtnState(),
+            });
         }
     }
 
@@ -294,8 +297,18 @@ export class TitleScene extends Phaser.Scene {
         if (!status) return; // 네트워크 실패 시 무시
         if (!this.scene.isActive('TitleScene')) return;
         this.updateDailyBtnState(status.can_claim);
-        // 사용자가 능동적으로 버튼을 눌러 진입한 경우엔 받은 상태에서도 모달 표시 (streak/체크 확인용).
-        // 모달 내부 받기 버튼은 can_claim:false 시 자동 비활성.
-        this.scene.launch('DailyRewardModal', { status });
+        // 사용자가 능동적으로 버튼을 눌러 진입한 경우엔 받은 상태에서도 모달 표시.
+        // 모달 닫힐 때 (claim 성공 후 자동 닫힘 포함) dailyBtn 외관 즉시 재갱신.
+        this.scene.launch('DailyRewardModal', {
+            status,
+            onClose: () => void this.refreshDailyBtnState(),
+        });
+    }
+
+    private async refreshDailyBtnState(): Promise<void> {
+        const status = await ApiClient.getDailyRewardStatus();
+        if (!status) return;
+        if (!this.scene.isActive('TitleScene')) return;
+        this.updateDailyBtnState(status.can_claim);
     }
 }
