@@ -58,6 +58,16 @@ export class CharacterSelectScene extends Phaser.Scene {
             .setOrigin(0.5)
             .setDepth(100);
 
+        // 코인 표시 (영구 적립 coin)
+        this.add
+            .text(width / 2, 145, `🪙 ${meta.coins}`, {
+                fontSize: '18px',
+                color: '#ffd700',
+                fontStyle: 'bold',
+            })
+            .setOrigin(0.5)
+            .setDepth(100);
+
         const charIds = Object.keys(CHARACTERS);
 
         // 동적 레이아웃 — 한 줄 최대 cols 개, 마지막 줄은 자동 중앙 정렬.

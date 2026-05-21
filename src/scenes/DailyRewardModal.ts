@@ -236,6 +236,9 @@ export class DailyRewardModal extends Phaser.Scene {
 
         // 성공 — essence 적립 (localStorage)
         MetaProgress.addEssence(result.granted.essence);
+        if (result.granted.coins > 0) {
+            MetaProgress.addCoins(result.granted.coins);
+        }
 
         // 받은 셀에 ✓ 체크를 즉시 표시 — claim 직후 시각적 피드백
         const claimedDay =
