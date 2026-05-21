@@ -1,4 +1,4 @@
-const CACHE_NAME = 'magicka-surv-v1';
+const CACHE_NAME = 'magicka-surv-v2';
 const PRECACHE_URLS = [
     '/',
     '/index.html',
