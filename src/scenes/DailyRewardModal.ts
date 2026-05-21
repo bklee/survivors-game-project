@@ -24,6 +24,7 @@ export class DailyRewardModal extends Phaser.Scene {
     private onClose?: () => void;
     private claimBtnText?: Phaser.GameObjects.Text;
     private claimBtnBg?: Phaser.GameObjects.Rectangle;
+    private cellPositions: { day: number; cx: number; cy: number }[] = [];
 
     constructor() {
         super('DailyRewardModal');
@@ -88,6 +89,7 @@ export class DailyRewardModal extends Phaser.Scene {
         const todayDay = canClaim ? this.statusData.next_day : -1;
         const lastClaimedDay = canClaim ? -1 : ((this.statusData.streak_count - 1) % 7) + 1;
 
+        this.cellPositions = [];
         for (let i = 0; i < 7; i++) {
             const day = i + 1;
             const reward = REWARD_PREVIEW[i];
@@ -98,6 +100,7 @@ export class DailyRewardModal extends Phaser.Scene {
             const startX = width / 2 - rowWidth / 2 + cellW / 2;
             const cx = startX + colInRow * (cellW + gapX);
             const cy = isRow1 ? row1Y : row2Y;
+            this.cellPositions.push({ day, cx, cy });
 
             const isToday = canClaim && day === todayDay;
             const isPast = canClaim ? day < todayDay : day <= lastClaimedDay;
@@ -233,6 +236,21 @@ export class DailyRewardModal extends Phaser.Scene {
 
         // 성공 — essence 적립 (localStorage)
         MetaProgress.addEssence(result.granted.essence);
+
+        // 받은 셀에 ✓ 체크를 즉시 표시 — claim 직후 시각적 피드백
+        const claimedDay =
+            (result as { streak_day?: number }).streak_day ?? this.statusData.next_day;
+        const cell = this.cellPositions.find((c) => c.day === claimedDay);
+        if (cell) {
+            this.add
+                .text(cell.cx, cell.cy - 10, '✓', {
+                    fontFamily: '"MedievalSharp", cursive',
+                    fontSize: '28px',
+                    color: '#44cc44',
+                    fontStyle: 'bold',
+                })
+                .setOrigin(0.5);
+        }
 
         this.claimBtnText!.setText(
             `+${result.granted.essence}E${
