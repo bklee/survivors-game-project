@@ -2,6 +2,7 @@ const STORAGE_KEY = 'survivors_meta_progress_v1';
 
 export interface MetaProgressData {
     essence: number;
+    coins: number; // 영구 적립 coin (daily reward Day 7 등). 인게임 globalStats.totalCoins 와 별개.
     unlockedCharacters: string[];
     discoveredSynergies: string[];
     skillTree: { combat: number; survival: number; discovery: number };
@@ -12,6 +13,7 @@ const STARTER_CHARACTERS = ['knight', 'wizard', 'elf', 'dwarf'];
 
 const DEFAULT: MetaProgressData = {
     essence: 0,
+    coins: 0,
     unlockedCharacters: [...STARTER_CHARACTERS],
     discoveredSynergies: [],
     skillTree: { combat: 0, survival: 0, discovery: 0 },
@@ -65,6 +67,22 @@ export const MetaProgress = {
         const data = this.load();
         data.essence += amount;
         this.save(data);
+    },
+
+    addCoins(amount: number): void {
+        if (amount <= 0) return;
+        const data = this.load();
+        data.coins += amount;
+        this.save(data);
+    },
+
+    spendCoins(amount: number): boolean {
+        if (amount <= 0) return true;
+        const data = this.load();
+        if (data.coins < amount) return false;
+        data.coins -= amount;
+        this.save(data);
+        return true;
     },
 
     unlockCharacter(id: string, cost: number): boolean {
