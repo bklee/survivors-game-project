@@ -30,7 +30,8 @@ export class QuestPanelScene extends Phaser.Scene {
         const modalH = 440;
         this.add
             .rectangle(width / 2, height / 2, modalW, modalH, 0x2a1f10, 0.95)
-            .setStrokeStyle(3, 0xffd700);
+            .setStrokeStyle(3, 0xffd700)
+            .setInteractive();
 
         this.add
             .text(width / 2, height / 2 - modalH / 2 + 30, I18n.t('quest_panel_title'), {
@@ -52,10 +53,10 @@ export class QuestPanelScene extends Phaser.Scene {
             .setInteractive({ useHandCursor: true });
         closeBtn.on('pointerdown', () => this.close());
 
-        void this.load();
+        void this.refresh();
     }
 
-    private async load() {
+    private async refresh() {
         this.state = 'loading';
         this.render();
         const r = await QuestClient.fetchStatus();
@@ -99,7 +100,7 @@ export class QuestPanelScene extends Phaser.Scene {
                 })
                 .setOrigin(0.5)
                 .setInteractive({ useHandCursor: true });
-            errText.on('pointerdown', () => void this.load());
+            errText.on('pointerdown', () => void this.refresh());
             this.addToGroup(errText);
             return;
         }
@@ -210,15 +211,15 @@ export class QuestPanelScene extends Phaser.Scene {
     private async handleClaim(quest_id: string) {
         const r = await QuestClient.claim(quest_id);
         if (!r || !r.ok) {
-            // 실패 — 다시 load 로 상태 보정
-            void this.load();
+            // 실패 — 다시 refresh 로 상태 보정
+            void this.refresh();
             return;
         }
         if (r.granted_essence) {
             MetaProgress.addEssence(r.granted_essence);
         }
         // 단순화: 재로드로 UI 갱신
-        void this.load();
+        void this.refresh();
     }
 
     private addToGroup(obj: Phaser.GameObjects.GameObject) {
