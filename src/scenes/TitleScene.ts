@@ -294,7 +294,8 @@ export class TitleScene extends Phaser.Scene {
         if (!status) return; // 네트워크 실패 시 무시
         if (!this.scene.isActive('TitleScene')) return;
         this.updateDailyBtnState(status.can_claim);
-        if (!status.can_claim) return; // 이미 받음 — 모달 안 뜸
+        // 사용자가 능동적으로 버튼을 눌러 진입한 경우엔 받은 상태에서도 모달 표시 (streak/체크 확인용).
+        // 모달 내부 받기 버튼은 can_claim:false 시 자동 비활성.
         this.scene.launch('DailyRewardModal', { status });
     }
 }
