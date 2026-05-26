@@ -110,8 +110,7 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
             else if (typeId === 3) charKey = 'necromancer';
             else if (typeId === 4)
                 charKey = 'wizard'; // druid: wizard 프레임 재사용
-            else if (typeId === 5)
-                charKey = 'wizard'; // engineer: wizard 프레임 재사용
+            else if (typeId === 5) charKey = 'lizard';
             else if (typeId === 6) charKey = 'dwarf';
             else if (typeId === 10) charKey = 'imp';
             else if (typeId === 11) charKey = 'demon';
@@ -498,7 +497,7 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                         } else if (typeId === 4) {
                             sprite.setTint(0x4caf50); // druid: 녹색
                         } else if (typeId === 5) {
-                            sprite.setTint(0x607d8b); // engineer: 회청색
+                            sprite.setTint(0x4caf50); // lizard: 녹색
                         } else {
                             sprite.clearTint();
                         }
