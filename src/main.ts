@@ -70,9 +70,11 @@ PokiSDK.init().then(() => {
 // 자체가 listener 에 도달 안 함 (한글 IME 또는 브라우저 확장 의심).
 const unlockAllChars = () => {
     const data = MetaProgress.load();
-    for (const id of Object.keys(CHARACTERS)) {
-        if (!data.unlockedCharacters.includes(id)) {
-            data.unlockedCharacters.push(id);
+    // CHARACTERS 의 key 는 'KNIGHT' (대문자), 하지만 char.id 는 'knight' (소문자).
+    // CharacterSelectScene 은 char.id 로 unlockedCharacters 매칭하므로 char.id push 해야 함.
+    for (const char of Object.values(CHARACTERS)) {
+        if (!data.unlockedCharacters.includes(char.id)) {
+            data.unlockedCharacters.push(char.id);
         }
     }
     MetaProgress.save(data);
