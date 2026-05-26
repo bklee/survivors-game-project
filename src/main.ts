@@ -80,9 +80,23 @@ const unlockAllChars = () => {
 };
 (window as unknown as { unlockAllChars: () => void }).unlockAllChars = unlockAllChars;
 console.log(
-    '%c[Survivors Debug] 캐릭터 모두 해제: 콘솔에 unlockAllChars() 입력 또는 Shift+T',
+    '%c[Survivors Debug] 캐릭터 모두 해제: URL 끝에 ?unlock 추가 또는 콘솔 unlockAllChars() 또는 Shift+T',
     'color: #ff66cc; font-weight: bold;',
 );
+
+// URL trigger — ?unlock 또는 #unlock 이면 자동 unlock. 키 / console 무관 100% 작동.
+// 재진입 loop 방지: localStorage 마커로 1 회만.
+const url = new URL(location.href);
+if (
+    (url.searchParams.has('unlock') || url.hash.includes('unlock')) &&
+    !localStorage.getItem('survivors_url_unlock_done')
+) {
+    localStorage.setItem('survivors_url_unlock_done', '1');
+    url.searchParams.delete('unlock');
+    url.hash = '';
+    history.replaceState(null, '', url.pathname + url.search + url.hash);
+    unlockAllChars();
+}
 
 window.addEventListener(
     'keydown',
