@@ -58,13 +58,14 @@ window.addEventListener('appinstalled', () => {
     ApiClient.trackEvent('pwa_install');
 });
 
-let gameInstance: Phaser.Game | null = null;
 PokiSDK.init().then(() => {
-    gameInstance = new Phaser.Game(config);
+    new Phaser.Game(config);
     setTimeout(() => PokiSDK.gameLoadingFinished(), 1000);
 });
 
-// 디버그 — Shift+Q: 모든 캐릭터 unlock. 글로벌 (어느 scene 에서든 작동).
+// 디버그 — Shift+Q: 모든 캐릭터 unlock + 페이지 reload. 글로벌.
+// PR #100 (reload) 작동 확인됨. PR #101/#102 의 scene.restart 분기는
+// 일부 사용자에서 실패. 단순화 — 무조건 reload 로 작동 보장.
 window.addEventListener(
     'keydown',
     (e) => {
@@ -78,21 +79,7 @@ window.addEventListener(
             }
         }
         MetaProgress.save(data);
-        // CharacterSelectScene 활성이면 그것만 restart. 실패하면 location.reload 로 fallback.
-        let restarted = false;
-        try {
-            const charSelect = gameInstance?.scene.getScene('CharacterSelectScene');
-            if (charSelect && gameInstance?.scene.isActive('CharacterSelectScene')) {
-                charSelect.scene.restart();
-                restarted = true;
-            }
-        } catch (err) {
-            console.warn('[DEBUG] scene restart failed:', err);
-        }
-        if (!restarted) {
-            // 다른 scene 에 있거나 restart 실패 — reload 로 보장
-            location.reload();
-        }
+        location.reload();
     },
     true,
 );
