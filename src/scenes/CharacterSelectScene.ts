@@ -126,7 +126,7 @@ export class CharacterSelectScene extends Phaser.Scene {
             // tint 설정 — dwarf 는 별도 스프라이트가 있으므로 tint 불필요
             if (char.id === 'necromancer') sprite.setTint(0x9c27b0);
             else if (char.id === 'druid') sprite.setTint(0x4caf50);
-            else if (char.id === 'engineer') sprite.setTint(0x607d8b);
+            else if (char.id === 'lizard') sprite.setTint(0x4caf50);
 
             if (!isUnlocked) sprite.setAlpha(0.35);
 
@@ -226,7 +226,7 @@ export class CharacterSelectScene extends Phaser.Scene {
                 if (isUnlocked) {
                     if (char.id === 'necromancer') sprite.setTint(0x9c27b0);
                     else if (char.id === 'druid') sprite.setTint(0x4caf50);
-                    else if (char.id === 'engineer') sprite.setTint(0x607d8b);
+                    else if (char.id === 'lizard') sprite.setTint(0x4caf50);
                     else sprite.clearTint();
                 }
             });
