@@ -36,3 +36,4 @@ deploy.exp.local
 .vscode/
 .idea/
 Thumbs.db
+.gstack/
