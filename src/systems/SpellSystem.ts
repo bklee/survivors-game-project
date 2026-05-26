@@ -123,7 +123,7 @@ export class SpellSystem {
                 const dir = this.rotateVector(this.lastFacingX, this.lastFacingY, angle);
                 this.spawnDruidAttack(px, py, dir.x, dir.y, i === 0);
             }
-        } else if (this.selectedCharId === 'engineer') {
+        } else if (this.selectedCharId === 'lizard') {
             window.dispatchEvent(new CustomEvent('play_sound', { detail: 'fire_cast' }));
             for (let i = 0; i <= extraProjectiles; i++) {
                 const angle = this.calculateAngleOffset(i);

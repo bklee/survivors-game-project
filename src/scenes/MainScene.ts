@@ -228,7 +228,7 @@ export class MainScene extends Phaser.Scene {
             this.selectedCharId === 'elf' ||
             this.selectedCharId === 'necromancer' ||
             this.selectedCharId === 'druid' ||
-            this.selectedCharId === 'engineer'
+            this.selectedCharId === 'lizard'
         ) {
             addComponent(world, Mana, this.playerId);
             Mana.current[this.playerId] = this.charData.baseStats.mana;
@@ -240,7 +240,7 @@ export class MainScene extends Phaser.Scene {
         else if (this.selectedCharId === 'elf') charTypeId = 2;
         else if (this.selectedCharId === 'necromancer') charTypeId = 3;
         else if (this.selectedCharId === 'druid') charTypeId = 4;
-        else if (this.selectedCharId === 'engineer') charTypeId = 5;
+        else if (this.selectedCharId === 'lizard') charTypeId = 5;
         else if (this.selectedCharId === 'dwarf') charTypeId = 6; // dwarf 전용 스프라이트
 
         // dwarf 는 knight 무기 evolution(0) 공유 — sprite 만 별도
