@@ -48,21 +48,25 @@ export class CharacterSelectScene extends Phaser.Scene {
         const unlockedList = meta.unlockedCharacters;
         const myEssence = meta.essence;
 
-        // 정수 + 영구 코인 — 우측 상단 위아래 stack. 사용자 요청 한 줄 아래로 (y=30/60 → 60/90).
+        // 정수 + 영구 코인 — 우측 상단 위아래 stack. 잘림 방지 위해 padding 30 + stroke + 폰트 22.
         this.add
-            .text(width - 20, 60, I18n.t('char_select_essence', { amount: myEssence }), {
-                fontSize: '20px',
+            .text(width - 30, 60, I18n.t('char_select_essence', { amount: myEssence }), {
+                fontSize: '22px',
                 color: '#aaddff',
                 fontStyle: 'bold',
+                stroke: '#000000',
+                strokeThickness: 4,
             })
             .setOrigin(1, 0.5)
             .setDepth(100);
 
         this.add
-            .text(width - 20, 90, `🪙 ${meta.coins}`, {
-                fontSize: '20px',
+            .text(width - 30, 95, `🪙 ${meta.coins}`, {
+                fontSize: '22px',
                 color: '#ffd700',
                 fontStyle: 'bold',
+                stroke: '#000000',
+                strokeThickness: 4,
             })
             .setOrigin(1, 0.5)
             .setDepth(100);
@@ -228,10 +232,11 @@ export class CharacterSelectScene extends Phaser.Scene {
             });
         });
 
-        // 디버그 — 모든 캐릭터 unlock. 두 경로 모두 제공:
-        // (1) Shift+Q 단축키 (IME isComposing 우회 + code/key 다중 매치)
-        // (2) UI 버튼 — 키 입력 차단 환경(한글 IME 등) 대비 보장
-        const unlockAll = () => {
+        // 디버그 단축키 — Shift+Q: 모든 캐릭터 unlock. IME 합성 무시 + code/key 다중 매치.
+        const debugHandler = (e: KeyboardEvent) => {
+            if (e.isComposing) return;
+            const isQ = e.code === 'KeyQ' || e.key === 'Q' || e.key === 'q';
+            if (!isQ || !e.shiftKey) return;
             const data = MetaProgress.load();
             for (const id of Object.keys(CHARACTERS)) {
                 if (!data.unlockedCharacters.includes(id)) {
@@ -241,30 +246,10 @@ export class CharacterSelectScene extends Phaser.Scene {
             MetaProgress.save(data);
             this.scene.restart();
         };
-
-        // (1) 키 단축키 listener
-        const debugHandler = (e: KeyboardEvent) => {
-            if (e.isComposing) return; // IME 합성 중 무시
-            const isQ = e.code === 'KeyQ' || e.key === 'Q' || e.key === 'q';
-            if (isQ && e.shiftKey) {
-                unlockAll();
-            }
-        };
-        window.addEventListener('keydown', debugHandler);
-        this.events.once('shutdown', () => window.removeEventListener('keydown', debugHandler));
-
-        // (2) UI 버튼 — 우측 상단 essence/coin 아래
-        const debugBtn = this.add
-            .text(width - 20, 120, '🔓 ALL', {
-                fontSize: '14px',
-                color: '#ff66cc',
-                backgroundColor: '#440022',
-                padding: { x: 6, y: 3 },
-                fontStyle: 'bold',
-            })
-            .setOrigin(1, 0.5)
-            .setDepth(100)
-            .setInteractive({ useHandCursor: true });
-        debugBtn.on('pointerdown', () => unlockAll());
+        // capture phase 로 등록 — 다른 listener 가 stopPropagation 해도 먼저 수신.
+        window.addEventListener('keydown', debugHandler, true);
+        this.events.once('shutdown', () =>
+            window.removeEventListener('keydown', debugHandler, true),
+        );
     }
 }
