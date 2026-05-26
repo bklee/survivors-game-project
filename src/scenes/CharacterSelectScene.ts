@@ -231,25 +231,5 @@ export class CharacterSelectScene extends Phaser.Scene {
                 }
             });
         });
-
-        // 디버그 단축키 — Shift+T: 모든 캐릭터 unlock. IME 합성 무시 + code/key 다중 매치.
-        const debugHandler = (e: KeyboardEvent) => {
-            if (e.isComposing) return;
-            const isT = e.code === 'KeyT' || e.key === 'T' || e.key === 't';
-            if (!isT || !e.shiftKey) return;
-            const data = MetaProgress.load();
-            for (const char of Object.values(CHARACTERS)) {
-                if (!data.unlockedCharacters.includes(char.id)) {
-                    data.unlockedCharacters.push(char.id);
-                }
-            }
-            MetaProgress.save(data);
-            this.scene.restart();
-        };
-        // capture phase 로 등록 — 다른 listener 가 stopPropagation 해도 먼저 수신.
-        window.addEventListener('keydown', debugHandler, true);
-        this.events.once('shutdown', () =>
-            window.removeEventListener('keydown', debugHandler, true),
-        );
     }
 }
