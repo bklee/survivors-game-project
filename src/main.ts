@@ -78,10 +78,20 @@ window.addEventListener(
             }
         }
         MetaProgress.save(data);
-        // CharacterSelectScene 활성이면 그것만 restart (전체 reload 회피)
-        const charSelect = gameInstance?.scene.getScene('CharacterSelectScene');
-        if (charSelect && gameInstance?.scene.isActive('CharacterSelectScene')) {
-            charSelect.scene.restart();
+        // CharacterSelectScene 활성이면 그것만 restart. 실패하면 location.reload 로 fallback.
+        let restarted = false;
+        try {
+            const charSelect = gameInstance?.scene.getScene('CharacterSelectScene');
+            if (charSelect && gameInstance?.scene.isActive('CharacterSelectScene')) {
+                charSelect.scene.restart();
+                restarted = true;
+            }
+        } catch (err) {
+            console.warn('[DEBUG] scene restart failed:', err);
+        }
+        if (!restarted) {
+            // 다른 scene 에 있거나 restart 실패 — reload 로 보장
+            location.reload();
         }
     },
     true,
