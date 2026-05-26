@@ -75,18 +75,18 @@ export const CHARACTERS: Record<string, CharacterData> = {
             run: { x: 192, y: 132, w: 16, h: 28, count: 4 },
         },
     },
-    ENGINEER: {
-        name: 'Engineer',
-        id: 'engineer',
+    LIZARD: {
+        name: 'Lizard',
+        id: 'lizard',
         description: {
-            ko: '기계공. 푸른 마법탄 발사.',
-            en: 'Engineer. Fires azure magic bolts.',
+            ko: '도마뱀 전사. 푸른 마법탄 발사.',
+            en: 'Lizard warrior. Fires azure magic bolts.',
         },
         unlockCost: 5000,
         baseStats: { health: 100, speed: 95, damage: 1.0, mana: 80 },
         frames: {
-            idle: { x: 128, y: 132, w: 16, h: 28, count: 4 },
-            run: { x: 192, y: 132, w: 16, h: 28, count: 4 },
+            idle: { x: 128, y: 196, w: 16, h: 28, count: 4 },
+            run: { x: 192, y: 196, w: 16, h: 28, count: 4 },
         },
     },
     NECROMANCER: {
