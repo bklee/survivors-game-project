@@ -60,7 +60,7 @@ export class QuestClient {
     /** 오늘의 quest 목록 + progress 조회. 네트워크 실패 시 null. */
     static async fetchStatus(): Promise<QuestsResponse | null> {
         const id = Identity.getDeviceId();
-        const r = await fetchWithTimeout(`${API_BASE}/quests/${encodeURIComponent(id)}`);
+        const r = await fetchWithTimeout(`${API_BASE}/quests/${encodeURIComponent(id)}/`);
         if (!r?.ok) return null;
         try {
             return (await r.json()) as QuestsResponse;

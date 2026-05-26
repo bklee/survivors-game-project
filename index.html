@@ -95,11 +95,23 @@
 })();
 
 // Service Worker 는 자체 도메인에서만 등록. Poki iframe 환경에서는 skip.
+// localhost / 127.0.0.1 (dev 모드) 에서도 skip — vite proxy 와 SW 의 fetch
+// 가로채기가 충돌하여 CORS/301 에러 유발 (사용자 device 진단으로 확정).
 const isInIframe = window.top !== window.self;
-if (!isInIframe && 'serviceWorker' in navigator) {
+const isLocalDev =
+    location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+if (!isInIframe && !isLocalDev && 'serviceWorker' in navigator) {
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('./sw.js').catch(console.error);
     });
+} else if (isLocalDev && 'serviceWorker' in navigator) {
+    // 이미 등록된 SW 잔존 시 자동 정리 (개발자가 prod 빌드 후 dev 로 돌아왔을 때).
+    navigator.serviceWorker.getRegistrations().then(function (regs) {
+        if (regs.length > 0) {
+            Promise.all(regs.map(function (r) { return r.unregister(); }))
+                .then(function () { location.reload(); });
+        }
+    }).catch(function () {});
 }
   </script>
 </body>
