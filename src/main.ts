@@ -80,7 +80,7 @@ const unlockAllChars = () => {
 };
 (window as unknown as { unlockAllChars: () => void }).unlockAllChars = unlockAllChars;
 console.log(
-    '%c[Survivors Debug] 캐릭터 모두 해제: 콘솔에 unlockAllChars() 입력 또는 Shift+Q',
+    '%c[Survivors Debug] 캐릭터 모두 해제: 콘솔에 unlockAllChars() 입력 또는 Shift+T',
     'color: #ff66cc; font-weight: bold;',
 );
 
@@ -88,8 +88,8 @@ window.addEventListener(
     'keydown',
     (e) => {
         if (e.isComposing) return;
-        const isQ = e.code === 'KeyQ' || e.key === 'Q' || e.key === 'q';
-        if (!isQ || !e.shiftKey) return;
+        const isT = e.code === 'KeyT' || e.key === 'T' || e.key === 't';
+        if (!isT || !e.shiftKey) return;
         unlockAllChars();
     },
     true,
