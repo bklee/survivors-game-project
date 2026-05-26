@@ -228,21 +228,43 @@ export class CharacterSelectScene extends Phaser.Scene {
             });
         });
 
-        // 디버그 단축키 — Shift+Q: 모든 캐릭터 unlock. window 직접 listen (MainScene 의
-        // Shift+B/C/R/L 과 동일 패턴) — canvas focus 부족 시에도 작동 보장.
-        const debugHandler = (e: KeyboardEvent) => {
-            if (e.code === 'KeyQ' && e.shiftKey) {
-                const data = MetaProgress.load();
-                for (const id of Object.keys(CHARACTERS)) {
-                    if (!data.unlockedCharacters.includes(id)) {
-                        data.unlockedCharacters.push(id);
-                    }
+        // 디버그 — 모든 캐릭터 unlock. 두 경로 모두 제공:
+        // (1) Shift+Q 단축키 (IME isComposing 우회 + code/key 다중 매치)
+        // (2) UI 버튼 — 키 입력 차단 환경(한글 IME 등) 대비 보장
+        const unlockAll = () => {
+            const data = MetaProgress.load();
+            for (const id of Object.keys(CHARACTERS)) {
+                if (!data.unlockedCharacters.includes(id)) {
+                    data.unlockedCharacters.push(id);
                 }
-                MetaProgress.save(data);
-                this.scene.restart();
+            }
+            MetaProgress.save(data);
+            this.scene.restart();
+        };
+
+        // (1) 키 단축키 listener
+        const debugHandler = (e: KeyboardEvent) => {
+            if (e.isComposing) return; // IME 합성 중 무시
+            const isQ = e.code === 'KeyQ' || e.key === 'Q' || e.key === 'q';
+            if (isQ && e.shiftKey) {
+                unlockAll();
             }
         };
         window.addEventListener('keydown', debugHandler);
         this.events.once('shutdown', () => window.removeEventListener('keydown', debugHandler));
+
+        // (2) UI 버튼 — 우측 상단 essence/coin 아래
+        const debugBtn = this.add
+            .text(width - 20, 120, '🔓 ALL', {
+                fontSize: '14px',
+                color: '#ff66cc',
+                backgroundColor: '#440022',
+                padding: { x: 6, y: 3 },
+                fontStyle: 'bold',
+            })
+            .setOrigin(1, 0.5)
+            .setDepth(100)
+            .setInteractive({ useHandCursor: true });
+        debugBtn.on('pointerdown', () => unlockAll());
     }
 }
