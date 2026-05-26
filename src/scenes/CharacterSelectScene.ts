@@ -48,11 +48,10 @@ export class CharacterSelectScene extends Phaser.Scene {
         const unlockedList = meta.unlockedCharacters;
         const myEssence = meta.essence;
 
-        // 정수 + 영구 코인 — 화면 우측 상단, 타이틀(y=70)과 같은 라인.
-        // coin 이 가장 우측, essence 는 그 왼쪽. 둘 다 우측 정렬 (origin 1).
+        // 정수 + 영구 코인 — 화면 우측 상단에 위아래로 stack 배치 (타이틀과 글자 간섭 회피).
         this.add
-            .text(width - 220, 70, I18n.t('char_select_essence', { amount: myEssence }), {
-                fontSize: '22px',
+            .text(width - 20, 30, I18n.t('char_select_essence', { amount: myEssence }), {
+                fontSize: '20px',
                 color: '#aaddff',
                 fontStyle: 'bold',
             })
@@ -60,8 +59,8 @@ export class CharacterSelectScene extends Phaser.Scene {
             .setDepth(100);
 
         this.add
-            .text(width - 80, 70, `🪙 ${meta.coins}`, {
-                fontSize: '22px',
+            .text(width - 20, 60, `🪙 ${meta.coins}`, {
+                fontSize: '20px',
                 color: '#ffd700',
                 fontStyle: 'bold',
             })
