@@ -61,7 +61,7 @@ export class CharacterSelectScene extends Phaser.Scene {
             .setDepth(100);
 
         this.add
-            .text(width - 30, 95, `🪙 ${meta.coins}`, {
+            .text(width - 30, 105, `🪙 ${meta.coins}`, {
                 fontSize: '22px',
                 color: '#ffd700',
                 fontStyle: 'bold',
