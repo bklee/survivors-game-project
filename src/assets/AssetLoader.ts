@@ -226,6 +226,8 @@ export class AssetLoader {
         texture.add('weapon_staff', 0, 324, 129, 8, 30);
         // Necromancer Cleaver (사용자 측정 좌표 318, 128)
         texture.add('weapon_cleaver_atlas', 0, 318, 128, 12, 30);
+        // Lizard Hammer (사용자 측정 좌표 307, 39)
+        texture.add('weapon_hammer_atlas', 0, 307, 39, 10, 24);
 
         // Props
         texture.add('prop_crate', 0, 288, 408, 16, 24);
