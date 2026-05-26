@@ -237,6 +237,7 @@ export class CharacterSelectScene extends Phaser.Scene {
             if (e.isComposing) return;
             const isQ = e.code === 'KeyQ' || e.key === 'Q' || e.key === 'q';
             if (!isQ || !e.shiftKey) return;
+            console.log('[DEBUG] Shift+Q detected — unlocking all characters');
             const data = MetaProgress.load();
             for (const id of Object.keys(CHARACTERS)) {
                 if (!data.unlockedCharacters.includes(id)) {
@@ -244,6 +245,7 @@ export class CharacterSelectScene extends Phaser.Scene {
                 }
             }
             MetaProgress.save(data);
+            console.log('[DEBUG] save done — calling scene.restart()');
             this.scene.restart();
         };
         // capture phase 로 등록 — 다른 listener 가 stopPropagation 해도 먼저 수신.

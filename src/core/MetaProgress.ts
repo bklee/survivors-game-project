@@ -60,7 +60,11 @@ export const MetaProgress = {
     },
 
     save(data: MetaProgressData): void {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        } catch (e) {
+            console.warn('[MetaProgress] save failed (localStorage blocked?):', e);
+        }
     },
 
     addEssence(amount: number): void {
