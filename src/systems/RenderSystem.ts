@@ -600,7 +600,8 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                             (isBoss && charKey === 'ogre') ||
                                 charKey === 'dwarf' ||
                                 charKey === 'necromancer' ||
-                                charKey === 'knight'
+                                charKey === 'knight' ||
+                                charKey === 'wizard'
                                 ? sprite.depth - 1 // dwarf/necromancer/knight 무기는 캐릭터 뒤에 표시
                                 : sprite.depth + 1,
                         );
@@ -702,7 +703,8 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                         (isBoss && charKey === 'ogre') ||
                             charKey === 'dwarf' ||
                             charKey === 'necromancer' ||
-                            charKey === 'knight'
+                            charKey === 'knight' ||
+                            charKey === 'wizard'
                             ? sprite.depth - 1 // dwarf/necromancer/knight 무기는 캐릭터 뒤
                             : sprite.depth + 1,
                     ); // Depth consistency
