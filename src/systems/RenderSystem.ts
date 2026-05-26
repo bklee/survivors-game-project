@@ -635,7 +635,10 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                                 ? -2 // dwarf 는 도끼를 가슴~허리 사이 (사용자 조정)
                                 : -7;
                     const baseRot =
-                        charKey === 'knight' || charKey === 'ogre' || charKey === 'dwarf'
+                        charKey === 'knight' ||
+                        charKey === 'ogre' ||
+                        charKey === 'dwarf' ||
+                        charKey === 'lizard'
                             ? -Math.PI / 4
                             : 0;
 
@@ -660,7 +663,12 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                             1 - currentAttackTimer / currentAttackDuration,
                         );
 
-                        if (charKey === 'knight' || charKey === 'ogre' || charKey === 'dwarf') {
+                        if (
+                            charKey === 'knight' ||
+                            charKey === 'ogre' ||
+                            charKey === 'dwarf' ||
+                            charKey === 'lizard'
+                        ) {
                             swingRot = Math.sin(progress * Math.PI) * (Math.PI * 0.8);
                         } else if (charKey === 'wizard' || charKey === 'necromancer') {
                             swingRot = Math.sin(progress * Math.PI) * (Math.PI / 15);
