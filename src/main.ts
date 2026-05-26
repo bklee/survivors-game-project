@@ -2,6 +2,8 @@ import './errorLogger';
 import Phaser from 'phaser';
 import { PokiSDK } from './integrations/PokiSDK';
 import { ApiClient } from './integrations/ApiClient';
+import { MetaProgress } from './core/MetaProgress';
+import { CHARACTERS } from './constants/CharacterConfig';
 import { BootScene } from './scenes/BootScene';
 import { MainScene } from './scenes/MainScene';
 import { UpgradeScene } from './scenes/UpgradeScene';
@@ -60,3 +62,25 @@ PokiSDK.init().then(() => {
     new Phaser.Game(config);
     setTimeout(() => PokiSDK.gameLoadingFinished(), 1000);
 });
+
+// 디버그 — Shift+Q: 모든 캐릭터 unlock. 글로벌 (어느 scene 에서든 작동).
+// scene 단위 listener 가 사용자 device 에서 작동 안 한 사고 (PR #94~#97) 의 최종 fix.
+window.addEventListener(
+    'keydown',
+    (e) => {
+        if (e.isComposing) return;
+        const isQ = e.code === 'KeyQ' || e.key === 'Q' || e.key === 'q';
+        if (!isQ || !e.shiftKey) return;
+        console.log('[DEBUG] global Shift+Q — unlocking all characters');
+        const data = MetaProgress.load();
+        for (const id of Object.keys(CHARACTERS)) {
+            if (!data.unlockedCharacters.includes(id)) {
+                data.unlockedCharacters.push(id);
+            }
+        }
+        MetaProgress.save(data);
+        console.log('[DEBUG] save done — reloading page');
+        location.reload();
+    },
+    true,
+);
