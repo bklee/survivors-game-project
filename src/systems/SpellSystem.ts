@@ -128,7 +128,7 @@ export class SpellSystem {
             for (let i = 0; i <= extraProjectiles; i++) {
                 const angle = this.calculateAngleOffset(i);
                 const dir = this.rotateVector(this.lastFacingX, this.lastFacingY, angle);
-                this.spawnEngineerAttack(px, py, dir.x, dir.y, i === 0);
+                this.spawnLizardAttack(px, py, dir.x, dir.y, i === 0);
             }
         } else {
             window.dispatchEvent(new CustomEvent('play_sound', { detail: 'fire_cast' }));
@@ -328,8 +328,8 @@ export class SpellSystem {
         }
     }
 
-    private spawnEngineerAttack(x: number, y: number, dx: number, dy: number, playSound: boolean) {
-        // 회청색 빠른 마법탄 — 관통력 낮지만 빠름
+    private spawnLizardAttack(x: number, y: number, dx: number, dy: number, playSound: boolean) {
+        // 녹색 빠른 마법탄 — 관통력 낮지만 빠름
         const speed = 500;
         const lifetimeMs = 500;
         const eid = this.createBaseSpell(x + dx * 20, y + dy * 20, 99);
@@ -341,8 +341,8 @@ export class SpellSystem {
         Velocity.y[eid] = dy * speed;
         Rotation.angle[eid] = Math.atan2(dy, dx);
 
-        const bolt = this.scene.add.rectangle(x + dx * 20, y + dy * 20, 16, 4, 0x607d8b, 1);
-        bolt.setStrokeStyle(1, 0x90a4ae, 0.9);
+        const bolt = this.scene.add.rectangle(x + dx * 20, y + dy * 20, 16, 4, 0x4caf50, 1);
+        bolt.setStrokeStyle(1, 0x81c784, 0.9);
         bolt.setRotation(Math.atan2(dy, dx));
         bolt.setDepth(20);
 
