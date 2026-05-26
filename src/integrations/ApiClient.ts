@@ -124,7 +124,7 @@ export class ApiClient {
         const controller = new AbortController();
         const t = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
         try {
-            const r = await fetch(`${API_BASE}/player/${encodeURIComponent(id)}`, {
+            const r = await fetch(`${API_BASE}/player/${encodeURIComponent(id)}/`, {
                 signal: controller.signal,
             });
             if (!r.ok) return { exists: false, no_ads_pass: false };
@@ -150,7 +150,7 @@ export class ApiClient {
         const controller = new AbortController();
         const t = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
         try {
-            const r = await fetch(`${API_BASE}/daily-reward/${encodeURIComponent(id)}`, {
+            const r = await fetch(`${API_BASE}/daily-reward/${encodeURIComponent(id)}/`, {
                 signal: controller.signal,
             });
             if (!r.ok) return null;
@@ -191,7 +191,7 @@ export class ApiClient {
         const controller = new AbortController();
         const t = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
         try {
-            const r = await fetch(`${API_BASE}/leaderboard?${params.toString()}`, {
+            const r = await fetch(`${API_BASE}/leaderboard/?${params.toString()}`, {
                 signal: controller.signal,
             });
             if (!r.ok) return null;
