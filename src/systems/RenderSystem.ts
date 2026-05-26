@@ -563,6 +563,10 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                                 // atlas cleaver-like sprite (양손 도끼 라인 추정)
                                 weaponTex = 'dungeon';
                                 weaponFrame = 'weapon_cleaver_atlas';
+                            } else if (charKey === 'lizard') {
+                                // 사용자 요청: lizard 는 hammer (atlas 좌표 307,39)
+                                weaponTex = 'dungeon';
+                                weaponFrame = 'weapon_hammer_atlas';
                             } else if (charKey === 'dwarf') {
                                 // dwarf 전용 도끼
                                 weaponTex = 'weapon_axe';
