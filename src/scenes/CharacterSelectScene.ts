@@ -228,17 +228,21 @@ export class CharacterSelectScene extends Phaser.Scene {
             });
         });
 
-        // 디버그 단축키 — Shift+Q: 모든 캐릭터 unlock
-        this.input.keyboard?.on('keydown-Q', (event: KeyboardEvent) => {
-            if (!event.shiftKey) return;
-            const data = MetaProgress.load();
-            for (const id of Object.keys(CHARACTERS)) {
-                if (!data.unlockedCharacters.includes(id)) {
-                    data.unlockedCharacters.push(id);
+        // 디버그 단축키 — Shift+Q: 모든 캐릭터 unlock. window 직접 listen (MainScene 의
+        // Shift+B/C/R/L 과 동일 패턴) — canvas focus 부족 시에도 작동 보장.
+        const debugHandler = (e: KeyboardEvent) => {
+            if (e.code === 'KeyQ' && e.shiftKey) {
+                const data = MetaProgress.load();
+                for (const id of Object.keys(CHARACTERS)) {
+                    if (!data.unlockedCharacters.includes(id)) {
+                        data.unlockedCharacters.push(id);
+                    }
                 }
+                MetaProgress.save(data);
+                this.scene.restart();
             }
-            MetaProgress.save(data);
-            this.scene.restart();
-        });
+        };
+        window.addEventListener('keydown', debugHandler);
+        this.events.once('shutdown', () => window.removeEventListener('keydown', debugHandler));
     }
 }
