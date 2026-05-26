@@ -601,7 +601,8 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                                 charKey === 'dwarf' ||
                                 charKey === 'necromancer' ||
                                 charKey === 'knight' ||
-                                charKey === 'wizard'
+                                charKey === 'wizard' ||
+                                charKey === 'lizard'
                                 ? sprite.depth - 1 // dwarf/necromancer/knight 무기는 캐릭터 뒤에 표시
                                 : sprite.depth + 1,
                         );
@@ -635,7 +636,9 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                               ? -10
                               : charKey === 'dwarf'
                                 ? -2 // dwarf 는 도끼를 가슴~허리 사이 (사용자 조정)
-                                : -7;
+                                : charKey === 'lizard'
+                                  ? 0 // lizard 는 망치를 약간 아래로 (사용자 조정)
+                                  : -7;
                     const baseRot =
                         charKey === 'knight' ||
                         charKey === 'ogre' ||
@@ -704,7 +707,8 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                             charKey === 'dwarf' ||
                             charKey === 'necromancer' ||
                             charKey === 'knight' ||
-                            charKey === 'wizard'
+                            charKey === 'wizard' ||
+                            charKey === 'lizard'
                             ? sprite.depth - 1 // dwarf/necromancer/knight 무기는 캐릭터 뒤
                             : sprite.depth + 1,
                     ); // Depth consistency
