@@ -227,5 +227,18 @@ export class CharacterSelectScene extends Phaser.Scene {
                 }
             });
         });
+
+        // 디버그 단축키 — Shift+Q: 모든 캐릭터 unlock
+        this.input.keyboard?.on('keydown-Q', (event: KeyboardEvent) => {
+            if (!event.shiftKey) return;
+            const data = MetaProgress.load();
+            for (const id of Object.keys(CHARACTERS)) {
+                if (!data.unlockedCharacters.includes(id)) {
+                    data.unlockedCharacters.push(id);
+                }
+            }
+            MetaProgress.save(data);
+            this.scene.restart();
+        });
     }
 }
