@@ -29,6 +29,16 @@ function ensureStarters(list: string[]): string[] {
     return out;
 }
 
+// 'engineer' → 'lizard' 마이그레이션 (PR #111 캐릭터 교체). 중복 제거 보장.
+function migrateEngineerToLizard(list: string[]): string[] {
+    const out: string[] = [];
+    for (const id of list) {
+        const mapped = id === 'engineer' ? 'lizard' : id;
+        if (!out.includes(mapped)) out.push(mapped);
+    }
+    return out;
+}
+
 export const MetaProgress = {
     load(): MetaProgressData {
         try {
@@ -45,7 +55,9 @@ export const MetaProgress = {
                 ...DEFAULT,
                 ...parsed,
                 unlockedCharacters: ensureStarters(
-                    parsed.unlockedCharacters ?? DEFAULT.unlockedCharacters,
+                    migrateEngineerToLizard(
+                        parsed.unlockedCharacters ?? DEFAULT.unlockedCharacters,
+                    ),
                 ),
                 skillTree: { ...DEFAULT.skillTree, ...(parsed.skillTree ?? {}) },
             };
