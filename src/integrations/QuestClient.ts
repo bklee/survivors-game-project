@@ -74,7 +74,8 @@ export class QuestClient {
         increments: { quest_id: string; delta: number }[],
     ): Promise<ProgressResponse | null> {
         if (increments.length === 0) return { ok: true, updated: [], newly_completed_count: 0 };
-        const r = await fetchWithTimeout(`${API_BASE}/quests/progress`, {
+        // trailing slash: nginx 의 301 redirect 가 POST body 를 잃지 않도록 직접 매치.
+        const r = await fetchWithTimeout(`${API_BASE}/quests/progress/`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -92,7 +93,7 @@ export class QuestClient {
 
     /** quest 청구. 응답 ok/error 그대로 반환. */
     static async claim(quest_id: string): Promise<ClaimResponse | null> {
-        const r = await fetchWithTimeout(`${API_BASE}/quests/claim`, {
+        const r = await fetchWithTimeout(`${API_BASE}/quests/claim/`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ device_id: Identity.getDeviceId(), quest_id }),

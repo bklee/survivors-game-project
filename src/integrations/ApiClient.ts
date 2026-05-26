@@ -139,7 +139,8 @@ export class ApiClient {
 
     static async submitLeaderboard(payload: LeaderboardSubmit): Promise<boolean> {
         const body = { ...payload, device_id: Identity.getDeviceId() };
-        const r = await postJson(`${API_BASE}/leaderboard`, body);
+        // trailing slash: nginx 의 301 redirect 가 POST body 를 잃지 않도록 직접 매치.
+        const r = await postJson(`${API_BASE}/leaderboard/`, body);
         return !!r?.ok;
     }
 
@@ -164,7 +165,7 @@ export class ApiClient {
 
     /** Daily Reward 청구. 성공/중복/네트워크 실패 모두 명시적 결과 반환. */
     static async claimDailyReward(): Promise<DailyRewardClaimResult | null> {
-        const r = await postJson(`${API_BASE}/daily-reward/claim`, {
+        const r = await postJson(`${API_BASE}/daily-reward/claim/`, {
             device_id: Identity.getDeviceId(),
         });
         if (!r) return null;
@@ -205,7 +206,7 @@ export class ApiClient {
 
     /** 닉네임 변경. 성공 시 새 닉네임 반환. 실패/검증 실패 시 null. */
     static async updateNickname(nickname: string): Promise<string | null> {
-        const r = await postJson(`${API_BASE}/player/nickname`, {
+        const r = await postJson(`${API_BASE}/player/nickname/`, {
             device_id: Identity.getDeviceId(),
             nickname,
         });
@@ -244,7 +245,7 @@ export class ApiClient {
     static async flush(): Promise<boolean> {
         if (this.queue.length === 0) return true;
         const batch = this.queue.splice(0, MAX_BATCH);
-        const r = await postJson(`${API_BASE}/events`, { events: batch });
+        const r = await postJson(`${API_BASE}/events/`, { events: batch });
         if (!r?.ok) {
             // 실패 시 앞쪽으로 되돌림 (선입선출 유지)
             this.queue = [...batch, ...this.queue];
@@ -261,7 +262,7 @@ export class ApiClient {
             const blob = new Blob([JSON.stringify({ events: batch })], {
                 type: 'application/json',
             });
-            const ok = navigator.sendBeacon?.(`${API_BASE}/events`, blob);
+            const ok = navigator.sendBeacon?.(`${API_BASE}/events/`, blob);
             if (!ok) {
                 // 실패 시 복구 (다음 라이프사이클에서 flush 시도)
                 this.queue = [...batch, ...this.queue];
