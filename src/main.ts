@@ -63,23 +63,34 @@ PokiSDK.init().then(() => {
     setTimeout(() => PokiSDK.gameLoadingFinished(), 1000);
 });
 
-// 디버그 — Shift+Q: 모든 캐릭터 unlock + 페이지 reload. 글로벌.
-// PR #100 (reload) 작동 확인됨. PR #101/#102 의 scene.restart 분기는
-// 일부 사용자에서 실패. 단순화 — 무조건 reload 로 작동 보장.
+// 디버그 — 모든 캐릭터 unlock. 두 경로 동시 제공:
+// (1) Shift+Q 키 단축키 (작동 device 한정)
+// (2) window.unlockAllChars() console 함수 — IME/브라우저 확장 차단 환경 대비
+// browse 자동 검증: 코드 100% 정상. 일부 사용자 device 에서 키 이벤트
+// 자체가 listener 에 도달 안 함 (한글 IME 또는 브라우저 확장 의심).
+const unlockAllChars = () => {
+    const data = MetaProgress.load();
+    for (const id of Object.keys(CHARACTERS)) {
+        if (!data.unlockedCharacters.includes(id)) {
+            data.unlockedCharacters.push(id);
+        }
+    }
+    MetaProgress.save(data);
+    location.reload();
+};
+(window as unknown as { unlockAllChars: () => void }).unlockAllChars = unlockAllChars;
+console.log(
+    '%c[Survivors Debug] 캐릭터 모두 해제: 콘솔에 unlockAllChars() 입력 또는 Shift+Q',
+    'color: #ff66cc; font-weight: bold;',
+);
+
 window.addEventListener(
     'keydown',
     (e) => {
         if (e.isComposing) return;
         const isQ = e.code === 'KeyQ' || e.key === 'Q' || e.key === 'q';
         if (!isQ || !e.shiftKey) return;
-        const data = MetaProgress.load();
-        for (const id of Object.keys(CHARACTERS)) {
-            if (!data.unlockedCharacters.includes(id)) {
-                data.unlockedCharacters.push(id);
-            }
-        }
-        MetaProgress.save(data);
-        location.reload();
+        unlockAllChars();
     },
     true,
 );
