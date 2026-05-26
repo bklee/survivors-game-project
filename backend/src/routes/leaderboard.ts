@@ -10,7 +10,7 @@ const CHARACTER_IDS = [
     'elf',
     'necromancer',
     'druid',
-    'engineer',
+    'lizard',
     'dwarf',
 ] as const;
 
