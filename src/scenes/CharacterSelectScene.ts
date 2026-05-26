@@ -238,9 +238,9 @@ export class CharacterSelectScene extends Phaser.Scene {
             const isT = e.code === 'KeyT' || e.key === 'T' || e.key === 't';
             if (!isT || !e.shiftKey) return;
             const data = MetaProgress.load();
-            for (const id of Object.keys(CHARACTERS)) {
-                if (!data.unlockedCharacters.includes(id)) {
-                    data.unlockedCharacters.push(id);
+            for (const char of Object.values(CHARACTERS)) {
+                if (!data.unlockedCharacters.includes(char.id)) {
+                    data.unlockedCharacters.push(char.id);
                 }
             }
             MetaProgress.save(data);
