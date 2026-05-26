@@ -63,50 +63,22 @@ PokiSDK.init().then(() => {
     setTimeout(() => PokiSDK.gameLoadingFinished(), 1000);
 });
 
-// 디버그 — 모든 캐릭터 unlock. 두 경로 동시 제공:
-// (1) Shift+Q 키 단축키 (작동 device 한정)
-// (2) window.unlockAllChars() console 함수 — IME/브라우저 확장 차단 환경 대비
-// browse 자동 검증: 코드 100% 정상. 일부 사용자 device 에서 키 이벤트
-// 자체가 listener 에 도달 안 함 (한글 IME 또는 브라우저 확장 의심).
-const unlockAllChars = () => {
-    const data = MetaProgress.load();
-    // CHARACTERS 의 key 는 'KNIGHT' (대문자), 하지만 char.id 는 'knight' (소문자).
-    // CharacterSelectScene 은 char.id 로 unlockedCharacters 매칭하므로 char.id push 해야 함.
-    for (const char of Object.values(CHARACTERS)) {
-        if (!data.unlockedCharacters.includes(char.id)) {
-            data.unlockedCharacters.push(char.id);
-        }
-    }
-    MetaProgress.save(data);
-    location.reload();
-};
-(window as unknown as { unlockAllChars: () => void }).unlockAllChars = unlockAllChars;
-console.log(
-    '%c[Survivors Debug] 캐릭터 모두 해제: URL 끝에 ?unlock 추가 또는 콘솔 unlockAllChars() 또는 Shift+T',
-    'color: #ff66cc; font-weight: bold;',
-);
-
-// URL trigger — ?unlock 또는 #unlock 이면 자동 unlock. 키 / console 무관 100% 작동.
-// 재진입 loop 방지: localStorage 마커로 1 회만.
-const url = new URL(location.href);
-if (
-    (url.searchParams.has('unlock') || url.hash.includes('unlock')) &&
-    !localStorage.getItem('survivors_url_unlock_done')
-) {
-    localStorage.setItem('survivors_url_unlock_done', '1');
-    url.searchParams.delete('unlock');
-    url.hash = '';
-    history.replaceState(null, '', url.pathname + url.search + url.hash);
-    unlockAllChars();
-}
-
+// 디버그 — Shift+T: 모든 캐릭터 unlock. CHARACTERS 의 key 는 대문자, char.id 는 소문자.
+// CharacterSelectScene 은 char.id 로 매칭하므로 push 도 char.id (소문자) 로.
 window.addEventListener(
     'keydown',
     (e) => {
         if (e.isComposing) return;
         const isT = e.code === 'KeyT' || e.key === 'T' || e.key === 't';
         if (!isT || !e.shiftKey) return;
-        unlockAllChars();
+        const data = MetaProgress.load();
+        for (const char of Object.values(CHARACTERS)) {
+            if (!data.unlockedCharacters.includes(char.id)) {
+                data.unlockedCharacters.push(char.id);
+            }
+        }
+        MetaProgress.save(data);
+        location.reload();
     },
     true,
 );
