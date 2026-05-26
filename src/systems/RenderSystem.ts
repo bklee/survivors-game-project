@@ -496,9 +496,8 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                             sprite.setTint(0x9c27b0); // necromancer: 보라색
                         } else if (typeId === 4) {
                             sprite.setTint(0x4caf50); // druid: 녹색
-                        } else if (typeId === 5) {
-                            sprite.setTint(0x4caf50); // lizard: 녹색
                         } else {
+                            // lizard (typeId 5) 는 원래 sprite 색 유지
                             sprite.clearTint();
                         }
                         // --- 캐릭터 오오라 효과 (Level thresholds) ---
