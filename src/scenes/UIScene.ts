@@ -99,8 +99,14 @@ export class UIScene extends Phaser.Scene {
         // redundnant dummy text to keep compatibility if referenced elsewhere
         this.levelText = this.add.text(0, 0, '', { fontSize: '0px' }).setVisible(false);
 
+        // 아이콘 → 금액 순서. icon 은 좌측 고정, text 는 icon 우측에서 시작.
+        this.coinIcon = this.add
+            .image(10, 75, 'dungeon', 'coin_f0')
+            .setScale(3.5)
+            .setOrigin(0, 0.5);
+
         this.coinText = this.add
-            .text(10, 115, '0', {
+            .text(this.coinIcon.x + this.coinIcon.displayWidth + 10, 75, '0', {
                 fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
                 fontSize: '40px',
                 color: '#ffffff',
@@ -108,11 +114,6 @@ export class UIScene extends Phaser.Scene {
                 stroke: '#000000',
                 strokeThickness: 7,
             })
-            .setOrigin(0, 0.5);
-
-        this.coinIcon = this.add
-            .image(this.coinText.x + this.coinText.width + 20, 115, 'dungeon', 'coin_f0')
-            .setScale(3.5)
             .setOrigin(0, 0.5);
         this.statsText = this.add
             .text(10, 170, this.getStatsString(), {
@@ -344,6 +345,31 @@ export class UIScene extends Phaser.Scene {
             quitBtnBg.setVisible(v);
             quitBtnText.setVisible(v);
         };
+
+        // 음소거 토글 — 게임 전체 sound mute. 초기 상태 동기화 + 클릭 시 토글.
+        // 아이콘만 보면 🔊 / 🔇 차이가 작아 식별 어려움 → 색도 변경 (off 시 회색).
+        const updateMuteBtn = () => {
+            const muted = this.sound.mute;
+            muteBtn.setText(muted ? '🔇' : '🔊');
+            muteBtn.setColor(muted ? '#888888' : '#ffffff');
+        };
+        updateMuteBtn();
+        // Hit area 보강 — 텍스트 bounding 보다 패딩 영역까지 명시. 첫 클릭 빗나감 방지.
+        muteBtn.setInteractive(
+            new Phaser.Geom.Rectangle(-8, -6, muteBtn.width + 16, muteBtn.height + 12),
+            Phaser.Geom.Rectangle.Contains,
+        );
+        muteBtn.input!.cursor = 'pointer';
+        muteBtn.on('pointerdown', () => {
+            this.sound.mute = !this.sound.mute;
+            // 이미 재생 중인 BGM/SFX 에도 즉시 적용 (Phaser SoundManager.mute setter 보강).
+            // BaseSound 추상엔 mute 없지만 WebAudioSound 등 구체 클래스엔 존재.
+            const muted = this.sound.mute;
+            this.sound
+                .getAllPlaying()
+                .forEach((s) => ((s as unknown as { mute: boolean }).mute = muted));
+            updateMuteBtn();
+        });
 
         pauseBtn.on('pointerdown', () => {
             const ms = this.scene.get('MainScene');
@@ -720,7 +746,6 @@ export class UIScene extends Phaser.Scene {
         this.totalCoins += amount;
         globalStats.totalCoins = this.totalCoins;
         this.coinText.setText(this.totalCoins.toLocaleString());
-        this.coinIcon.x = this.coinText.x + this.coinText.width + 20;
         // 양수 (획득) 에만 픽업 사운드. 음수 (재추첨/상점 소비) 는 무음.
         if (amount > 0) {
             this.sound.play('coin_pickup', { volume: 0.8 });
