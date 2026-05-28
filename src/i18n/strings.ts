@@ -74,6 +74,10 @@ export const STRINGS = {
         en: 'Complete all 3: +{coins} coins',
     },
     quest_claim_btn: { ko: '받기', en: 'Claim' },
+    quest_progress_reward: {
+        ko: '{current} / {target}  •  +{essence} 정수',
+        en: '{current} / {target}  •  +{essence} essence',
+    },
     quest_claimed: { ko: '받음', en: 'Claimed' },
     quest_locked: { ko: '진행 중', en: 'In progress' },
     quest_completed_toast: {
