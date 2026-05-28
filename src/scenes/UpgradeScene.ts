@@ -153,28 +153,70 @@ export class UpgradeScene extends Phaser.Scene {
         spawnCards();
 
         // === 재추첨 버튼 (코인 100) — 카드 3장 다시 뽑기 ===
+        // 카드 아래에 stack (extra-card 버튼은 cardY + cardH/2 + 45 사용). reroll 은 그 아래.
         const REROLL_COST = 100;
+        const rerollBtnY = cardY + cardHeight / 2 + 100;
         const rerollBtn = this.add
-            .text(this.scale.width / 2, 130, `🎲 재추첨  💰 ${REROLL_COST}`, {
+            .text(this.scale.width / 2, rerollBtnY, `🎲 재추첨  💰 ${REROLL_COST}`, {
                 fontFamily: '"MedievalSharp", cursive',
-                fontSize: '20px',
+                fontSize: '22px',
                 color: '#ffaa00',
                 backgroundColor: '#3a2a1a',
                 stroke: '#000000',
-                strokeThickness: 2,
-                padding: { x: 14, y: 6 },
+                strokeThickness: 3,
+                padding: { x: 16, y: 8 },
             })
             .setOrigin(0.5)
             .setDepth(2);
+
+        // 활성화 상태 펄스 (코인 충분 시만 — extra-card 와 동일 패턴, 시선 유도)
+        let rerollPulse: Phaser.Tweens.Tween | null = null;
+        const startRerollPulse = () => {
+            if (rerollPulse) return;
+            rerollPulse = this.tweens.add({
+                targets: rerollBtn,
+                scale: 1.05,
+                duration: 700,
+                yoyo: true,
+                repeat: -1,
+                ease: 'Sine.easeInOut',
+            });
+        };
+        const stopRerollPulse = () => {
+            if (rerollPulse) {
+                rerollPulse.stop();
+                rerollPulse = null;
+                rerollBtn.setScale(1);
+            }
+        };
+
         const refreshRerollBtn = () => {
             const affordable = globalStats.totalCoins >= REROLL_COST;
             rerollBtn.setColor(affordable ? '#ffaa00' : '#666666');
             rerollBtn.setBackgroundColor(affordable ? '#3a2a1a' : '#1a1a1a');
-            if (affordable) rerollBtn.setInteractive({ useHandCursor: true });
-            else rerollBtn.disableInteractive();
+            if (affordable) {
+                rerollBtn.setInteractive({ useHandCursor: true });
+                startRerollPulse();
+            } else {
+                rerollBtn.disableInteractive();
+                stopRerollPulse();
+            }
         };
         rerollBtn.on('pointerdown', () => {
             if (globalStats.totalCoins < REROLL_COST) return;
+            // 클릭 피드백 — punch (scale 0.92 → 1.0 bounce) + 배경 플래시
+            stopRerollPulse();
+            this.tweens.add({
+                targets: rerollBtn,
+                scale: 0.92,
+                duration: 80,
+                yoyo: true,
+                ease: 'Back.easeOut',
+                onComplete: () => rerollBtn.setScale(1),
+            });
+            rerollBtn.setBackgroundColor('#ffaa00');
+            this.time.delayedCall(120, () => rerollBtn.setBackgroundColor('#3a2a1a'));
+
             globalStats.totalCoins -= REROLL_COST;
             // UIScene 코인 표시 갱신 — coin_collected 이벤트 (negative 로 호환 안 됨, 직접 갱신)
             window.dispatchEvent(
