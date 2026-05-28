@@ -31,7 +31,7 @@ export class SkillTreeScene extends Phaser.Scene {
         // 타이틀
         this.add
             .text(width / 2, 36, I18n.t('skill_tree_title'), {
-                fontFamily: '"MedievalSharp", cursive',
+                fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
                 fontSize: '36px',
                 color: '#ffd700',
                 fontStyle: 'bold',
@@ -41,7 +41,7 @@ export class SkillTreeScene extends Phaser.Scene {
         // 정수 잔액 표시
         this.essenceText = this.add
             .text(width - 20, 36, '', {
-                fontFamily: '"MedievalSharp", cursive',
+                fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
                 fontSize: '22px',
                 color: '#ffd700',
             })
@@ -62,7 +62,7 @@ export class SkillTreeScene extends Phaser.Scene {
             // 계열 제목
             this.add
                 .text(colX, 90, branchLabel(branch), {
-                    fontFamily: '"MedievalSharp", cursive',
+                    fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
                     fontSize: '24px',
                     color: '#ffffff',
                     fontStyle: 'bold',
@@ -89,6 +89,7 @@ export class SkillTreeScene extends Phaser.Scene {
             .setInteractive({ useHandCursor: true });
         this.add
             .text(width / 2, height - 30, '뒤로 가기', {
+                fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
                 fontSize: '22px',
                 color: '#ffffff',
             })
@@ -126,6 +127,7 @@ export class SkillTreeScene extends Phaser.Scene {
 
         this.add
             .text(x, y - 6, label, {
+                fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
                 fontSize: '15px',
                 color: unlocked ? '#ffffff' : canUnlock ? '#ffd700' : '#888888',
                 align: 'center',
@@ -134,6 +136,7 @@ export class SkillTreeScene extends Phaser.Scene {
 
         this.add
             .text(x, y + 10, tr(node.description), {
+                fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
                 fontSize: '12px',
                 color: unlocked ? '#ccffcc' : '#aaaaaa',
                 align: 'center',
