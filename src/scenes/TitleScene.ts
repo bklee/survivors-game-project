@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { I18n } from '../i18n/I18n';
 import { ApiClient } from '../integrations/ApiClient';
+import { TEXT_STYLES } from '../ui/Theme';
 
 export class TitleScene extends Phaser.Scene {
     private dailyRewardChecked = false;
@@ -41,19 +42,10 @@ export class TitleScene extends Phaser.Scene {
         maskG.fillGradientStyle(0x000000, 0x000000, 0x000000, 0x000000, 0.95, 0.95, 0.0, 0.0);
         maskG.fillRect(0, 0, width, 220);
 
-        // 새 게임 타이틀 — 화면 상단 중앙, 2 행 (MAGICKA / SURVIVORS)
-        // 앤티크 청동 (#b08d57) — 차분한 브론즈 톤. 다크 브론즈 shadow 로 깊이감.
+        // 새 게임 타이틀 — 화면 상단 중앙, 2 행 (MAGICKA / SURVIVORS).
+        // Theme.TEXT_STYLES.titleHero — D2 풍 Cinzel Decorative + 청동 톤.
         const titleTextObj = this.add
-            .text(width / 2, 180, 'MAGICKA\nSURVIVORS', {
-                fontFamily: '"MedievalSharp", cursive',
-                fontSize: '80px',
-                color: '#b08d57',
-                fontStyle: 'bold',
-                stroke: '#1a0e00',
-                strokeThickness: 10,
-                align: 'center',
-                shadow: { offsetX: 3, offsetY: 3, color: '#4a3520', blur: 18, fill: true },
-            })
+            .text(width / 2, 180, 'MAGICKA\nSURVIVORS', TEXT_STYLES.titleHero)
             .setOrigin(0.5)
             .setLetterSpacing(8);
         this.tweens.add({
@@ -68,7 +60,7 @@ export class TitleScene extends Phaser.Scene {
         // Home Button (Top Left)
         const homeBtn = this.add
             .text(20, 20, I18n.t('title_home'), {
-                fontFamily: '"MedievalSharp", cursive',
+                fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
                 fontSize: '24px',
                 color: '#ffffff',
                 backgroundColor: '#00000088',
@@ -86,7 +78,7 @@ export class TitleScene extends Phaser.Scene {
         // 언어 토글 (Top Right) — Home 버튼과 같은 fontSize/padding 으로 수평 정렬, 가시성 강화.
         const langBtn = this.add
             .text(width - 20, 20, I18n.getLang() === 'ko' ? '🌐 EN' : '🌐 한국어', {
-                fontFamily: '"MedievalSharp", cursive',
+                fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
                 fontSize: '24px',
                 color: '#ffd700',
                 fontStyle: 'bold',
@@ -108,7 +100,7 @@ export class TitleScene extends Phaser.Scene {
         // 일일 퀘스트 아이콘 (lang 버튼 왼쪽). 클릭 시 popup 으로 launch.
         const questBtn = this.add
             .text(width - 20, 70, '📜 ' + I18n.t('quest_panel_title'), {
-                fontFamily: '"MedievalSharp", cursive',
+                fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
                 fontSize: '20px',
                 color: '#ffd700',
                 backgroundColor: '#000000bb',
@@ -125,7 +117,7 @@ export class TitleScene extends Phaser.Scene {
         // 매일 보상 아이콘 (lang 버튼 y=20, 일일 퀘스트 버튼 y=70 아래 y=120). 클릭 시 popup launch.
         this.dailyBtn = this.add
             .text(width - 20, 120, I18n.t('daily_reward_btn'), {
-                fontFamily: '"MedievalSharp", cursive',
+                fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
                 fontSize: '20px',
                 color: '#ffd700',
                 backgroundColor: '#000000bb',
@@ -152,7 +144,7 @@ export class TitleScene extends Phaser.Scene {
 
         const startText = this.add
             .text(width / 2, startY, I18n.t('title_start'), {
-                fontFamily: '"MedievalSharp", cursive',
+                fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
                 fontSize: '40px',
                 color: '#ffffff',
                 fontStyle: 'bold',
@@ -225,7 +217,7 @@ export class TitleScene extends Phaser.Scene {
 
             this.add
                 .text(x, subY, I18n.t(labelKey), {
-                    fontFamily: '"MedievalSharp", cursive',
+                    fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
                     fontSize: '22px',
                     color: colors.text,
                     fontStyle: 'bold',
