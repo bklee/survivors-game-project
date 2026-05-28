@@ -135,19 +135,6 @@ router.get('/dashboard.html', async (_req, res) => {
         const synergy = synergyR.rows;
         const newPlayers = newPlayerR.rows;
 
-        const maxRuns =
-            topChars.length > 0
-                ? Math.max(...topChars.map((c: { runs: number }) => Number(c.runs)))
-                : 1;
-        const maxDiscoveries =
-            synergy.length > 0
-                ? Math.max(...synergy.map((s: { discoveries: number }) => Number(s.discoveries)))
-                : 1;
-        const maxNewPlayers =
-            newPlayers.length > 0
-                ? Math.max(...newPlayers.map((p: { new_players: number }) => Number(p.new_players)))
-                : 1;
-
         const claimPct =
             claimRate.dau_today > 0
                 ? Math.round((Number(claimRate.claims_today) / Number(claimRate.dau_today)) * 100)
@@ -160,98 +147,405 @@ router.get('/dashboard.html', async (_req, res) => {
         const avgMinStr =
             avgSecNum != null ? `${Math.floor(avgSecNum / 60)}m ${avgSecNum % 60}s` : 'N/A';
 
-        const adMap: Record<string, number> = {};
-        for (const row of adFunnel) {
-            adMap[row.event_type] = Number(row.cnt);
-        }
-        const adView = adMap['ad_view'] ?? 0;
-        const adSkip = adMap['ad_skip'] ?? 0;
-        const adSkipPct = adView > 0 ? Math.round((adSkip / adView) * 100) : 0;
+        // Chart.js 데이터 직렬화 — JSON.stringify 로 script injection 차단 후 </script> 시퀀스 추가 치환
+        const safeJson = (v: unknown) => JSON.stringify(v).replace(/<\/script>/gi, '<\\/script>');
+
+        const topCharsJson = safeJson(topChars);
+        const adFunnelJson = safeJson(adFunnel);
+        const newPlayersJson = safeJson(newPlayers);
+
+        const kstNow = new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' });
 
         res.type('html').send(`<!doctype html>
-<html lang="ko"><head>
-<meta charset="utf-8">
-<meta http-equiv="refresh" content="60">
-<title>Survivors Admin</title>
-<style>
-  body { font: 14px/1.4 -apple-system, sans-serif; padding: 24px; max-width: 1000px; margin: 0 auto; }
-  h1, h2 { border-bottom: 1px solid #ddd; padding-bottom: 4px; }
-  table { border-collapse: collapse; margin: 8px 0 24px; }
-  th, td { border: 1px solid #ccc; padding: 6px 12px; text-align: left; }
-  th { background: #f4f4f4; }
-  .metric { display: inline-block; padding: 12px 20px; border: 1px solid #ddd; border-radius: 8px; margin: 4px; }
-  .metric .v { font-size: 24px; font-weight: 600; }
-  .metric .l { font-size: 11px; color: #888; text-transform: uppercase; }
-  .bar { display: inline-block; height: 12px; background: #5d9; vertical-align: middle; }
-</style>
-</head><body>
-<h1>Survivors Admin Dashboard</h1>
-<p>업데이트: ${new Date().toISOString()} (KST: ${new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' })})</p>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="refresh" content="60">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Survivors Admin</title>
+  <!-- Bootstrap 5 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <!-- Font Awesome 6 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; background: #f8f9fc; }
 
-<h2>Cohort</h2>
-<div class="metric"><div class="l">DAU</div><div class="v">${dau.dau}</div></div>
-<div class="metric"><div class="l">WAU</div><div class="v">${wau.wau}</div></div>
-<div class="metric"><div class="l">D1 Retention</div><div class="v">${d1.d1_pct}%</div></div>
-<div class="metric"><div class="l">D1 New / Retained</div><div class="v">${d1.new_yday} / ${d1.retained}</div></div>
+    /* Sidebar */
+    #sidebar {
+      width: 220px; min-height: 100vh;
+      background: linear-gradient(180deg, #2c3e7a 0%, #1a2551 100%);
+      position: fixed; top: 0; left: 0; z-index: 100;
+    }
+    #sidebar .sidebar-brand {
+      padding: 1.5rem 1rem 1rem;
+      color: #fff; font-size: 1rem; font-weight: 700;
+      border-bottom: 1px solid rgba(255,255,255,.1);
+      display: flex; align-items: center; gap: .5rem;
+    }
+    #sidebar .nav-link {
+      color: rgba(255,255,255,.7); padding: .65rem 1rem;
+      display: flex; align-items: center; gap: .6rem; font-size: .88rem;
+    }
+    #sidebar .nav-link:hover, #sidebar .nav-link.active {
+      color: #fff; background: rgba(255,255,255,.1); border-radius: 4px;
+    }
+    #sidebar .nav-section {
+      padding: .5rem 1rem .2rem;
+      color: rgba(255,255,255,.4); font-size: .7rem; text-transform: uppercase; letter-spacing: .08em;
+    }
 
-<h2>Engagement</h2>
-<div class="metric"><div class="l">Avg Session</div><div class="v">${avgMinStr}</div></div>
-<div class="metric"><div class="l">Daily Reward Claim</div><div class="v">${claimRate.claims_today} / ${claimRate.dau_today} (${claimPct}%)</div></div>
-<div class="metric"><div class="l">Quest Completion</div><div class="v">${quest.completed} / ${quest.total_assigned} (${questPct}%)</div></div>
+    /* Main content */
+    #main { margin-left: 220px; }
 
-<h2>Top Characters (7d)</h2>
-<table>
-  <tr><th>Character</th><th>Runs</th><th>Avg Score</th><th>Avg Stage</th><th></th></tr>
-  ${topChars
-      .map(
-          (c: { character_id: string; runs: number; avg_score: number; avg_stage: number }) => `<tr>
-    <td>${escape(String(c.character_id))}</td>
-    <td>${c.runs}</td>
-    <td>${c.avg_score ?? 'N/A'}</td>
-    <td>${c.avg_stage ?? 'N/A'}</td>
-    <td><span class="bar" style="width:${Math.round((Number(c.runs) / maxRuns) * 200)}px"></span></td>
-  </tr>`,
-      )
-      .join('')}
-</table>
+    /* Topbar */
+    #topbar {
+      height: 56px; background: #fff;
+      border-bottom: 1px solid #e3e6f0;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 1.5rem;
+      position: sticky; top: 0; z-index: 90;
+    }
+    #topbar h4 { margin: 0; font-size: 1rem; font-weight: 600; color: #3d4c6e; }
+    #topbar .updated { font-size: .78rem; color: #888; }
 
-<h2>Ad Funnel (7d)</h2>
-<table>
-  <tr><th>Event</th><th>Count</th></tr>
-  <tr><td>ad_view</td><td>${adView}</td></tr>
-  <tr><td>ad_skip</td><td>${adSkip} (${adSkipPct}% skip rate)</td></tr>
-  <tr><td>iap_funnel_view</td><td>${adMap['iap_funnel_view'] ?? 0}</td></tr>
-  <tr><td>iap_funnel_click</td><td>${adMap['iap_funnel_click'] ?? 0}</td></tr>
-  <tr><td>iap_funnel_complete</td><td>${adMap['iap_funnel_complete'] ?? 0}</td></tr>
-</table>
+    /* KPI Cards */
+    .kpi-card {
+      border: none; border-radius: 8px;
+      border-left: 4px solid;
+      box-shadow: 0 1px 4px rgba(0,0,0,.08);
+    }
+    .kpi-card .kpi-label { font-size: .7rem; text-transform: uppercase; font-weight: 600; letter-spacing: .06em; color: #888; }
+    .kpi-card .kpi-value { font-size: 1.6rem; font-weight: 700; color: #2d3a5e; }
+    .kpi-card .kpi-icon { font-size: 1.8rem; opacity: .25; }
+    .border-left-primary { border-left-color: #4e73df !important; }
+    .border-left-success { border-left-color: #1cc88a !important; }
+    .border-left-info    { border-left-color: #36b9cc !important; }
+    .border-left-warning { border-left-color: #f6c23e !important; }
+    .border-left-secondary { border-left-color: #858796 !important; }
 
-<h2>Synergy Discovery (14d)</h2>
-<table>
-  <tr><th>Synergy</th><th>Discoveries</th><th></th></tr>
-  ${synergy
-      .map(
-          (s: { synergy_id: string; discoveries: number }) => `<tr>
-    <td>${escape(String(s.synergy_id ?? '(unknown)'))}</td>
-    <td>${s.discoveries}</td>
-    <td><span class="bar" style="width:${Math.round((Number(s.discoveries) / maxDiscoveries) * 200)}px"></span></td>
-  </tr>`,
-      )
-      .join('')}
-</table>
+    /* Chart cards */
+    .chart-card { border: none; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+    .chart-card .card-header {
+      background: #fff; border-bottom: 1px solid #e3e6f0;
+      font-size: .85rem; font-weight: 600; color: #3d4c6e;
+      border-radius: 8px 8px 0 0 !important;
+    }
 
-<h2>New Players (14d daily)</h2>
-<table>
-  <tr><th>Day</th><th>New Players</th><th></th></tr>
-  ${newPlayers
-      .map(
-          (p: { day: string; new_players: number }) => `<tr>
-    <td>${escape(String(p.day))}</td>
-    <td>${p.new_players}</td>
-    <td><span class="bar" style="width:${Math.round((Number(p.new_players) / maxNewPlayers) * 200)}px"></span></td>
-  </tr>`,
-      )
-      .join('')}
-</table>
+    /* Table */
+    .admin-table th { background: #f8f9fc; font-size: .78rem; text-transform: uppercase; letter-spacing: .05em; color: #666; }
+    .admin-table td { font-size: .85rem; vertical-align: middle; }
+  </style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<nav id="sidebar">
+  <div class="sidebar-brand">
+    <i class="fa-solid fa-shield-halved"></i> Survivors Admin
+  </div>
+  <ul class="nav flex-column px-2 mt-2">
+    <li class="nav-section">Main</li>
+    <li class="nav-item">
+      <a class="nav-link active" href="#"><i class="fa-solid fa-gauge-high fa-fw"></i> Dashboard</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="#"><i class="fa-solid fa-chart-line fa-fw"></i> Analytics</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="#"><i class="fa-solid fa-gear fa-fw"></i> Settings</a>
+    </li>
+  </ul>
+</nav>
+
+<!-- Main -->
+<div id="main">
+  <!-- Topbar -->
+  <div id="topbar">
+    <h4><i class="fa-solid fa-gauge-high me-2 text-primary"></i>Dashboard Overview</h4>
+    <span class="updated"><i class="fa-regular fa-clock me-1"></i>업데이트: ${kstNow} KST</span>
+  </div>
+
+  <!-- Content -->
+  <div class="container-fluid py-4 px-4">
+
+    <!-- KPI 카드 4개 -->
+    <div class="row g-3 mb-4">
+
+      <!-- DAU -->
+      <div class="col-md-3 col-sm-6">
+        <div class="card kpi-card border-left-primary h-100 py-2">
+          <div class="card-body d-flex justify-content-between align-items-center">
+            <div>
+              <div class="kpi-label">DAU</div>
+              <div class="kpi-value">${dau.dau ?? 0}</div>
+            </div>
+            <i class="fa-solid fa-users kpi-icon text-primary"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- WAU -->
+      <div class="col-md-3 col-sm-6">
+        <div class="card kpi-card border-left-success h-100 py-2">
+          <div class="card-body d-flex justify-content-between align-items-center">
+            <div>
+              <div class="kpi-label">WAU</div>
+              <div class="kpi-value">${wau.wau ?? 0}</div>
+            </div>
+            <i class="fa-solid fa-user-group kpi-icon text-success"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- D1 Retention -->
+      <div class="col-md-3 col-sm-6">
+        <div class="card kpi-card border-left-info h-100 py-2">
+          <div class="card-body d-flex justify-content-between align-items-center">
+            <div>
+              <div class="kpi-label">D1 Retention</div>
+              <div class="kpi-value">${d1.d1_pct ?? 0}%</div>
+            </div>
+            <i class="fa-solid fa-rotate kpi-icon text-info"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- New Players (today) — d1.new_yday = 어제 신규 = 오늘의 D0 cohort -->
+      <div class="col-md-3 col-sm-6">
+        <div class="card kpi-card border-left-warning h-100 py-2">
+          <div class="card-body d-flex justify-content-between align-items-center">
+            <div>
+              <div class="kpi-label">New Players (yday)</div>
+              <div class="kpi-value">${d1.new_yday ?? 0}</div>
+            </div>
+            <i class="fa-solid fa-user-plus kpi-icon text-warning"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2행: Charts -->
+    <div class="row g-3 mb-4">
+
+      <!-- Top Characters Bar Chart -->
+      <div class="col-lg-6">
+        <div class="card chart-card h-100">
+          <div class="card-header d-flex align-items-center gap-2">
+            <i class="fa-solid fa-person-running text-primary"></i> Top Characters (7d)
+          </div>
+          <div class="card-body">
+            ${
+                topChars.length === 0
+                    ? '<p class="text-muted text-center py-4">데이터 없음</p>'
+                    : `<canvas id="topCharsChart" style="max-height:240px"></canvas>
+            <table class="table table-sm admin-table mt-2 mb-0" aria-hidden="true">
+              <thead><tr><th>Character</th><th class="text-end">Runs</th><th class="text-end">Avg Score</th></tr></thead>
+              <tbody>
+                ${topChars
+                    .map(
+                        (c: { character_id: string; runs: number; avg_score: number }) =>
+                            `<tr><td>${escape(String(c.character_id))}</td><td class="text-end">${c.runs}</td><td class="text-end">${c.avg_score ?? 'N/A'}</td></tr>`,
+                    )
+                    .join('')}
+              </tbody>
+            </table>`
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Ad Funnel Doughnut -->
+      <div class="col-lg-6">
+        <div class="card chart-card h-100">
+          <div class="card-header d-flex align-items-center gap-2">
+            <i class="fa-solid fa-bullhorn text-warning"></i> Ad Funnel (7d)
+          </div>
+          <div class="card-body d-flex align-items-center justify-content-center">
+            ${
+                adFunnel.length === 0
+                    ? '<p class="text-muted">데이터 없음</p>'
+                    : '<canvas id="adFunnelChart" style="max-height:260px;max-width:260px"></canvas>'
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3행: New Player Trend + Synergy Discovery -->
+    <div class="row g-3 mb-4">
+
+      <!-- New Player Trend Line Chart -->
+      <div class="col-lg-8">
+        <div class="card chart-card h-100">
+          <div class="card-header d-flex align-items-center gap-2">
+            <i class="fa-solid fa-chart-line text-success"></i> New Player Trend (14d)
+          </div>
+          <div class="card-body">
+            ${
+                newPlayers.length === 0
+                    ? '<p class="text-muted text-center py-4">데이터 없음</p>'
+                    : '<canvas id="newPlayerChart" style="max-height:240px"></canvas>'
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Synergy Discovery Table -->
+      <div class="col-lg-4">
+        <div class="card chart-card h-100">
+          <div class="card-header d-flex align-items-center gap-2">
+            <i class="fa-solid fa-wand-sparkles text-info"></i> Synergy Discovery (14d)
+          </div>
+          <div class="card-body p-0" style="overflow-y:auto;max-height:300px">
+            ${
+                synergy.length === 0
+                    ? '<p class="text-muted text-center py-4">데이터 없음</p>'
+                    : `<table class="table table-sm table-hover admin-table mb-0">
+                <thead><tr><th>Synergy</th><th class="text-end">Discoveries</th></tr></thead>
+                <tbody>
+                  ${synergy
+                      .map(
+                          (s: { synergy_id: string; discoveries: number }) =>
+                              `<tr><td>${escape(String(s.synergy_id ?? '(unknown)'))}</td><td class="text-end">${s.discoveries}</td></tr>`,
+                      )
+                      .join('')}
+                </tbody>
+              </table>`
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4행: Engagement KPIs -->
+    <div class="row g-3 mb-4">
+
+      <!-- Avg Session Duration -->
+      <div class="col-md-4">
+        <div class="card kpi-card border-left-secondary h-100 py-2">
+          <div class="card-body d-flex justify-content-between align-items-center">
+            <div>
+              <div class="kpi-label">Avg Session (7d)</div>
+              <div class="kpi-value">${avgMinStr}</div>
+            </div>
+            <i class="fa-regular fa-clock kpi-icon text-secondary"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Daily Reward Claim Rate -->
+      <div class="col-md-4">
+        <div class="card chart-card h-100">
+          <div class="card-header d-flex align-items-center gap-2">
+            <i class="fa-solid fa-gift text-warning"></i> Daily Reward Claim (today)
+          </div>
+          <div class="card-body">
+            <div class="d-flex justify-content-between mb-1">
+              <small class="text-muted">${claimRate.claims_today ?? 0} / ${claimRate.dau_today ?? 0}</small>
+              <small class="fw-bold">${claimPct}%</small>
+            </div>
+            <div class="progress" style="height:10px">
+              <div class="progress-bar bg-warning" style="width:${claimPct}%" aria-valuenow="${claimPct}" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quest Completion -->
+      <div class="col-md-4">
+        <div class="card chart-card h-100">
+          <div class="card-header d-flex align-items-center gap-2">
+            <i class="fa-solid fa-list-check text-success"></i> Quest Completion (today)
+          </div>
+          <div class="card-body">
+            <div class="d-flex justify-content-between mb-1">
+              <small class="text-muted">${quest.completed ?? 0} / ${quest.total_assigned ?? 0}</small>
+              <small class="fw-bold">${questPct}%</small>
+            </div>
+            <div class="progress" style="height:10px">
+              <div class="progress-bar bg-success" style="width:${questPct}%" aria-valuenow="${questPct}" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /container-fluid -->
+</div><!-- /main -->
+
+<!-- Bootstrap 5 JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Chart.js 4 -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script>
+(function () {
+  // Top Characters bar chart
+  var topCharsData = ${topCharsJson};
+  if (topCharsData.length > 0) {
+    new Chart(document.getElementById('topCharsChart'), {
+      type: 'bar',
+      data: {
+        labels: topCharsData.map(function(r) { return r.character_id; }),
+        datasets: [{
+          label: 'Runs',
+          data: topCharsData.map(function(r) { return Number(r.runs); }),
+          backgroundColor: '#4e73df',
+          borderRadius: 4
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: true,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+      }
+    });
+  }
+
+  // Ad Funnel doughnut
+  var adFunnelData = ${adFunnelJson};
+  if (adFunnelData.length > 0) {
+    new Chart(document.getElementById('adFunnelChart'), {
+      type: 'doughnut',
+      data: {
+        labels: adFunnelData.map(function(r) { return r.event_type; }),
+        datasets: [{
+          data: adFunnelData.map(function(r) { return Number(r.cnt); }),
+          backgroundColor: ['#4e73df','#1cc88a','#36b9cc','#f6c23e','#e74a3b']
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: true,
+        plugins: { legend: { position: 'bottom', labels: { font: { size: 11 } } } }
+      }
+    });
+  }
+
+  // New Player Trend line chart
+  var newPlayersData = ${newPlayersJson};
+  if (newPlayersData.length > 0) {
+    new Chart(document.getElementById('newPlayerChart'), {
+      type: 'line',
+      data: {
+        labels: newPlayersData.map(function(r) { return String(r.day).slice(0, 10); }),
+        datasets: [{
+          label: 'New Players',
+          data: newPlayersData.map(function(r) { return Number(r.new_players); }),
+          borderColor: '#1cc88a', backgroundColor: 'rgba(28,200,138,.1)',
+          fill: true, tension: .35, pointRadius: 4
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: true,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+      }
+    });
+  }
+})();
+</script>
 </body></html>`);
     } catch (err) {
         console.error('[Admin] dashboard error:', err);
