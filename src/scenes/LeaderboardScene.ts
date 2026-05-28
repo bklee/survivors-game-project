@@ -6,7 +6,6 @@ import {
     type LeaderboardResponse,
     type LeaderboardWindow,
 } from '../integrations/ApiClient';
-import { Identity } from '../core/Identity';
 
 type TabKey = LeaderboardWindow;
 type ViewState = 'loading' | 'error' | 'empty' | 'ready';
@@ -23,7 +22,6 @@ const MAX_VISIBLE_ROWS = 12;
 
 export class LeaderboardScene extends Phaser.Scene {
     private currentTab: TabKey = 'all';
-    private deviceId = '';
 
     // 동적으로 갱신되는 UI 노드 — clear 후 재생성
     private contentGroup?: Phaser.GameObjects.Group;
@@ -37,7 +35,6 @@ export class LeaderboardScene extends Phaser.Scene {
 
     create() {
         const { width, height } = this.scale;
-        this.deviceId = Identity.getDeviceId();
         this.cameras.main.fadeIn(400, 0, 0, 0);
 
         // 배경

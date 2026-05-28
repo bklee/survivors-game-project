@@ -62,7 +62,6 @@ export class MainScene extends Phaser.Scene {
     private renderSystem!: (dt: number) => void;
     private playerSystem!: PlayerSystem;
     private nightDirector!: NightDirector;
-    private uiScene!: any;
     private playerId!: number;
     private juicePipeline!: JuicePipeline;
     private combatSystem!: (dt: number) => void;
@@ -325,7 +324,6 @@ export class MainScene extends Phaser.Scene {
         });
 
         this.cameras.main.setZoom(2.5);
-        this.uiScene = this.scene.get('UIScene');
 
         const soundHandler = ((e: CustomEvent<string>) => {
             if (this.cache.audio.exists(e.detail)) {
