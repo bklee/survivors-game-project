@@ -263,13 +263,16 @@ export class UIScene extends Phaser.Scene {
         this.minimapOverlay.on('pointerdown', () => this.toggleMinimap());
 
         // Buttons
+        // padding 키워 default hit area 자체를 확대 (Phaser 의 text hit area 는
+        // padding 영역까지 포함). origin (1, 0) 환경에서 명시 hitArea Rectangle
+        // 을 잘못 잡았던 직전 버그 (좌표계 반전) fix — 단일 setInteractive 만.
         const muteBtn = this.add
             .text(1210, 170, '🔊', {
                 fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
                 fontSize: '32px',
                 color: '#ffffff',
                 backgroundColor: '#00000088',
-                padding: { x: 8, y: 4 },
+                padding: { x: 16, y: 10 },
             })
             .setOrigin(1, 0)
             .setInteractive({ useHandCursor: true });
@@ -354,12 +357,8 @@ export class UIScene extends Phaser.Scene {
             muteBtn.setColor(muted ? '#888888' : '#ffffff');
         };
         updateMuteBtn();
-        // Hit area 보강 — 텍스트 bounding 보다 패딩 영역까지 명시. 첫 클릭 빗나감 방지.
-        muteBtn.setInteractive(
-            new Phaser.Geom.Rectangle(-8, -6, muteBtn.width + 16, muteBtn.height + 12),
-            Phaser.Geom.Rectangle.Contains,
-        );
-        muteBtn.input!.cursor = 'pointer';
+        // Hit area 는 위 text 의 padding 16x10 포함 default. origin (1,0) 환경에서
+        // 명시 Rectangle 좌표계가 반전되어 첫 클릭 빗나가던 직전 버그 제거.
         muteBtn.on('pointerdown', () => {
             this.sound.mute = !this.sound.mute;
             // 이미 재생 중인 BGM/SFX 에도 즉시 적용 (Phaser SoundManager.mute setter 보강).
