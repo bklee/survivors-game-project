@@ -93,6 +93,37 @@ export const STRINGS = {
     quest_survive_5m: { ko: '5분 생존', en: 'Survive 5 minutes' },
     quest_play_2: { ko: '2판 플레이', en: 'Play 2 sessions' },
 
+    // Daily Reward Modal
+    daily_reward_title: { ko: '매일 보상', en: 'Daily Reward' },
+    daily_reward_btn: { ko: '🎁 매일 보상', en: '🎁 Daily Reward' },
+    daily_reward_btn_done: { ko: '✅ 매일 보상', en: '✅ Daily Reward' },
+    daily_reward_first: { ko: '오늘이 첫 보상!', en: "Today's your first reward!" },
+    daily_reward_streak_next: {
+        ko: '오늘 받으면 {n}일째 연속',
+        en: 'Claim today for a {n}-day streak',
+    },
+    daily_reward_streak_done: {
+        ko: '연속 {n}일째 — 내일 KST 자정 이후 가능',
+        en: 'Streak: {n} days — next claim after KST midnight',
+    },
+    daily_reward_claim: { ko: '받기 (+{e}E)', en: 'Claim (+{e}E)' },
+    daily_reward_claim_with_coins: {
+        ko: '받기 (+{e}E, +{c}C)',
+        en: 'Claim (+{e}E, +{c}C)',
+    },
+    daily_reward_already_today: { ko: '오늘은 이미 받았어요', en: 'Already claimed today' },
+    daily_reward_claiming: { ko: '받는 중...', en: 'Claiming...' },
+    daily_reward_network_error: {
+        ko: '네트워크 오류 — 다시 시도',
+        en: 'Network error — retry',
+    },
+    daily_reward_already: { ko: '이미 받았습니다', en: 'Already claimed' },
+    daily_reward_received: { ko: '+{e}E 받음!', en: '+{e}E received!' },
+    daily_reward_received_with_coins: {
+        ko: '+{e}E +{c}C 받음!',
+        en: '+{e}E +{c}C received!',
+    },
+
     // Upgrade Stat Cards
     upgrade_stat_damage_title: { ko: '데미지 +15%', en: 'Damage +15%' },
     upgrade_stat_damage_desc: { ko: '모든 공격 데미지 증가', en: 'All attack damage increased' },
