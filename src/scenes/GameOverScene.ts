@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { MetaProgress } from '../core/MetaProgress';
-import { PokiSDK } from '../integrations/PokiSDK';
+import { AdSDK } from '../integrations/AdSDK';
 import { ApiClient } from '../integrations/ApiClient';
 import { I18n } from '../i18n/I18n';
 import { globalStats } from '../core/PlayerStats';
@@ -119,7 +119,7 @@ export class GameOverScene extends Phaser.Scene {
 
         reviveBtn.on('pointerdown', async () => {
             reviveBtn.disableInteractive();
-            const success = await PokiSDK.rewardedBreak();
+            const success = await AdSDK.rewardedBreak();
             ApiClient.trackEvent(success ? 'ad_view' : 'ad_skip', {
                 placement: 'revive',
                 stage: this.stage,

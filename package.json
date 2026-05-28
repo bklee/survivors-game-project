@@ -6,8 +6,6 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "build:poki": "POKI_BUILD=1 vite build",
-    "package:poki": "POKI_BUILD=1 vite build && cd dist-poki && zip -r ../survivors-poki.zip ./* && cd .. && echo Built: $(ls -lh survivors-poki.zip | awk '{print $5}')",
     "preview": "vite preview",
     "lint": "eslint src --ext ts",
     "format": "prettier --write 'src/**/*.ts'",

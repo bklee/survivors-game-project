@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { defineQuery, addEntity, addComponent, hasComponent, removeEntity } from 'bitecs';
-import { PokiSDK } from '../integrations/PokiSDK';
+import { AdSDK } from '../integrations/AdSDK';
 import { ApiClient } from '../integrations/ApiClient';
 import { QuestTracker } from '../systems/QuestTracker';
 import { world } from '../core/World';
@@ -507,13 +507,13 @@ export class MainScene extends Phaser.Scene {
 
             // 5 스테이지마다 interstitial 광고 (수익 채널 — 게임 흐름 자연스러운 break)
             if (this.currentStage > 1 && this.currentStage % 5 === 0) {
-                PokiSDK.gameplayStop();
-                void PokiSDK.commercialBreak().then(() => {
+                AdSDK.gameplayStop();
+                void AdSDK.commercialBreak().then(() => {
                     ApiClient.trackEvent('ad_view', {
                         placement: 'stage_interstitial',
                         stage: this.currentStage,
                     });
-                    PokiSDK.gameplayStart();
+                    AdSDK.gameplayStart();
                 });
             }
 
@@ -597,8 +597,8 @@ export class MainScene extends Phaser.Scene {
         window.addEventListener('stage_clear', stageClearInternalHandler);
 
         this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
-            // Poki: 게임플레이 종료 — 광고 표시 허용
-            PokiSDK.gameplayStop();
+            // 게임플레이 종료 — 광고 표시 허용
+            AdSDK.gameplayStop();
             window.removeEventListener('play_sound', soundHandler);
             window.removeEventListener('combo_cast', comboCastHandler);
             window.removeEventListener('enemy_killed', enemyKilledHandler);
@@ -623,8 +623,8 @@ export class MainScene extends Phaser.Scene {
         this.spawnDungeonProps();
         window.dispatchEvent(new CustomEvent('game_started'));
 
-        // Poki: 게임플레이 시작 — 광고 차단 시점
-        PokiSDK.gameplayStart();
+        // 게임플레이 시작 — 광고 차단 시점
+        AdSDK.gameplayStart();
     }
 
     private buildMap(stage: number) {
