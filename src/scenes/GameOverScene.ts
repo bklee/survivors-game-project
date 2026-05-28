@@ -55,7 +55,7 @@ export class GameOverScene extends Phaser.Scene {
                 height / 2 - 80,
                 I18n.t('gameover_essence', { amount: finalEssence, total: totalEssence }),
                 {
-                    fontFamily: '"MedievalSharp", cursive',
+                    fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
                     fontSize: '32px',
                     color: '#ffd700',
                     align: 'center',
@@ -73,7 +73,7 @@ export class GameOverScene extends Phaser.Scene {
 
         this.add
             .text(width / 2, height / 2 + 150, I18n.t('gameover_retry'), {
-                fontFamily: '"MedievalSharp", cursive',
+                fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
                 fontSize: '40px',
                 color: '#ffffff',
                 fontStyle: 'bold',
@@ -108,7 +108,7 @@ export class GameOverScene extends Phaser.Scene {
         // 6. 부활 버튼 — 광고 보면 부활. 게임당 무한 (매 사망마다 다시 표시).
         const reviveBtn = this.add
             .text(width / 2, height / 2 + 60, I18n.t('gameover_revive_ad'), {
-                fontFamily: '"MedievalSharp", cursive',
+                fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
                 fontSize: '24px',
                 color: '#ffd700',
                 backgroundColor: '#333333',

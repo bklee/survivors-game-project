@@ -87,6 +87,7 @@ export class UIScene extends Phaser.Scene {
 
         this.stageLevelText = this.add
             .text(10, 10, 'Stage 1', {
+                fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
                 fontSize: '40px',
                 color: '#ffff00',
                 fontStyle: 'bold',
@@ -100,7 +101,7 @@ export class UIScene extends Phaser.Scene {
 
         this.coinText = this.add
             .text(10, 115, '0', {
-                fontFamily: '"MedievalSharp", cursive',
+                fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
                 fontSize: '40px',
                 color: '#ffffff',
                 fontStyle: 'bold',
@@ -115,6 +116,7 @@ export class UIScene extends Phaser.Scene {
             .setOrigin(0, 0.5);
         this.statsText = this.add
             .text(10, 170, this.getStatsString(), {
+                fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
                 fontSize: '32px',
                 color: '#00ff00',
                 backgroundColor: '#00000088',
@@ -144,7 +146,7 @@ export class UIScene extends Phaser.Scene {
             .setDepth(20);
         this.hpText = this.add
             .text(hpX + fullWidth / 2, 0, '100 / 100', {
-                fontFamily: '"MedievalSharp", cursive',
+                fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
                 fontSize: '20px',
                 color: '#ffffff',
                 fontStyle: 'bold',
@@ -167,7 +169,7 @@ export class UIScene extends Phaser.Scene {
             .setDepth(20);
         this.mpText = this.add
             .text(hpX + fullWidth / 2, 0, '100 / 100', {
-                fontFamily: '"MedievalSharp", cursive',
+                fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
                 fontSize: '20px',
                 color: '#ffffff',
                 fontStyle: 'bold',
@@ -188,7 +190,7 @@ export class UIScene extends Phaser.Scene {
             .setDepth(20);
         this.expLabel = this.add
             .text(hpX + fullWidth / 2, 0, 'Level 1', {
-                fontFamily: '"MedievalSharp", cursive',
+                fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
                 fontSize: '20px',
                 color: '#ffffff',
                 fontStyle: 'bold',
@@ -211,6 +213,7 @@ export class UIScene extends Phaser.Scene {
             .setOrigin(0, 0.5);
         this.bossHpText = this.add
             .text(0, 0, 'BOSS HP', {
+                fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
                 fontSize: '20px',
                 color: '#ffffff',
                 fontStyle: 'bold',
@@ -261,6 +264,7 @@ export class UIScene extends Phaser.Scene {
         // Buttons
         const muteBtn = this.add
             .text(1210, 170, '🔊', {
+                fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
                 fontSize: '32px',
                 color: '#ffffff',
                 backgroundColor: '#00000088',
@@ -271,6 +275,7 @@ export class UIScene extends Phaser.Scene {
 
         const pauseBtn = this.add
             .text(1270, 170, '⏸', {
+                fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
                 fontSize: '32px',
                 color: '#ffffff',
                 backgroundColor: '#00000088',
@@ -286,7 +291,7 @@ export class UIScene extends Phaser.Scene {
             .setDepth(900);
         const pauseText = this.add
             .text(640, 300, 'PAUSED', {
-                fontFamily: '"MedievalSharp", cursive',
+                fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
                 fontSize: '72px',
                 color: '#ffd700',
                 fontStyle: 'bold',
@@ -305,7 +310,7 @@ export class UIScene extends Phaser.Scene {
             .setDepth(901);
         const resumeBtnText = this.add
             .text(640, 400, '▶ RESUME', {
-                fontFamily: '"MedievalSharp", cursive',
+                fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
                 fontSize: '32px',
                 color: '#ffffff',
                 fontStyle: 'bold',
@@ -322,7 +327,7 @@ export class UIScene extends Phaser.Scene {
             .setDepth(901);
         const quitBtnText = this.add
             .text(640, 480, '🏠 MAIN MENU', {
-                fontFamily: '"MedievalSharp", cursive',
+                fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
                 fontSize: '32px',
                 color: '#ff9999',
                 fontStyle: 'bold',
@@ -386,6 +391,7 @@ export class UIScene extends Phaser.Scene {
 
         this.bossWarningText = this.add
             .text(640, 360, 'BOSS APPROACHING!', {
+                fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
                 fontSize: '72px',
                 color: '#ff0000',
                 fontStyle: 'bold',
@@ -398,6 +404,7 @@ export class UIScene extends Phaser.Scene {
 
         this.stageClearText = this.add
             .text(640, 360, 'STAGE CLEAR!', {
+                fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
                 fontSize: '96px',
                 color: '#ffff00',
                 fontStyle: 'bold',
@@ -843,7 +850,7 @@ export class UIScene extends Phaser.Scene {
             .setAlpha(0);
         const outroText = this.add
             .text(centerX, centerY, tr(outro), {
-                fontFamily: '"MedievalSharp", cursive',
+                fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
                 fontSize: '30px',
                 color: '#ffd700',
                 align: 'center',
@@ -894,6 +901,7 @@ export class UIScene extends Phaser.Scene {
             .setText(`STAGE ${this.currentStage} CLEAR!`);
         const reward = this.add
             .text(640, 240, 'BATTLE REWARD:\nALL STATS +10%', {
+                fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
                 fontSize: '24px',
                 color: '#00ff00',
                 align: 'center',
@@ -905,7 +913,7 @@ export class UIScene extends Phaser.Scene {
         // === 🛒 Shop ===
         const shopHeader = this.add
             .text(640, 320, '🛒  SHOP', {
-                fontFamily: '"MedievalSharp", cursive',
+                fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
                 fontSize: '22px',
                 color: '#ffd700',
                 fontStyle: 'bold',
@@ -994,7 +1002,7 @@ export class UIScene extends Phaser.Scene {
                 .setInteractive({ useHandCursor: true });
             const text = this.add
                 .text(bx, btnY, `${item.icon} ${item.label}\n💰 ${item.cost}`, {
-                    fontFamily: '"MedievalSharp", cursive',
+                    fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
                     fontSize: '15px',
                     color: '#ffd700',
                     align: 'center',
@@ -1020,6 +1028,7 @@ export class UIScene extends Phaser.Scene {
         // 코인 표시 (현재 보유)
         const coinNote = this.add
             .text(640, 445, `💰 보유: ${globalStats.totalCoins}`, {
+                fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
                 fontSize: '17px',
                 color: '#ffffff',
             })
@@ -1038,7 +1047,7 @@ export class UIScene extends Phaser.Scene {
             .setInteractive({ useHandCursor: true });
         const continueText = this.add
             .text(640, 500, 'Continue ▶', {
-                fontFamily: '"MedievalSharp", cursive',
+                fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
                 fontSize: '22px',
                 color: '#ffffff',
                 fontStyle: 'bold',
@@ -1088,7 +1097,7 @@ export class UIScene extends Phaser.Scene {
                 200,
                 I18n.t('synergy_discovered_toast', { name: synergy.name }),
                 {
-                    fontFamily: '"MedievalSharp", cursive',
+                    fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
                     fontSize: '32px',
                     color: '#ffd700',
                     align: 'center',
@@ -1115,7 +1124,7 @@ export class UIScene extends Phaser.Scene {
         // 챕터 이름 — 큰 텍스트
         const nameText = this.add
             .text(centerX, 280, tr(chapter.name), {
-                fontFamily: '"MedievalSharp", cursive',
+                fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
                 fontSize: '44px',
                 color: '#ffd700',
                 fontStyle: 'bold',
@@ -1130,7 +1139,7 @@ export class UIScene extends Phaser.Scene {
         // Lore — 작은 텍스트
         const loreText = this.add
             .text(centerX, 340, tr(chapter.lore), {
-                fontFamily: '"MedievalSharp", cursive',
+                fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
                 fontSize: '22px',
                 color: '#ffffff',
                 align: 'center',
@@ -1173,7 +1182,7 @@ export class UIScene extends Phaser.Scene {
         const y = this.scale.height - 180;
         const text = this.add
             .text(centerX, y, tr(lore), {
-                fontFamily: '"MedievalSharp", cursive',
+                fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
                 fontSize: '24px',
                 color: '#ff6b6b',
                 fontStyle: 'italic',
@@ -1221,7 +1230,7 @@ export class UIScene extends Phaser.Scene {
         // 펄스 효과로 시선 유도.
         const text = this.add
             .text(centerX, y, tr(msg), {
-                fontFamily: '"MedievalSharp", cursive',
+                fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
                 fontSize: '52px',
                 color: '#ff3344',
                 fontStyle: 'bold',

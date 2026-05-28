@@ -19,7 +19,7 @@ export class CodexScene extends Phaser.Scene {
 
         this.add
             .text(width / 2, 40, I18n.t('codex_title', { found: discovered.length, total }), {
-                fontFamily: '"MedievalSharp", cursive',
+                fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
                 fontSize: '36px',
                 color: '#ffd700',
                 fontStyle: 'bold',
@@ -69,6 +69,7 @@ export class CodexScene extends Phaser.Scene {
                 const elementIcons = syn.elements.map((e) => ELEMENT_INFO[e].icon).join(' ');
                 this.add
                     .text(x, y - 38, elementIcons, {
+                        fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
                         fontSize: '22px',
                     })
                     .setOrigin(0.5);
@@ -76,7 +77,7 @@ export class CodexScene extends Phaser.Scene {
                 // 시너지 이름 — MedievalSharp 유지 (장식성), 골드 + stroke 로 대비 강화
                 this.add
                     .text(x, y - 10, syn.name, {
-                        fontFamily: '"MedievalSharp", cursive',
+                        fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
                         fontSize: '20px',
                         color: '#ffd700',
                         fontStyle: 'bold',
@@ -88,7 +89,7 @@ export class CodexScene extends Phaser.Scene {
                 // 설명 — sans-serif 로 가독성 우선 (MedievalSharp 는 본문에 적합하지 않음)
                 this.add
                     .text(x, y + 28, tr(syn.description), {
-                        fontFamily: 'Arial, sans-serif',
+                        fontFamily: '"Cinzel Decorative", "MedievalSharp", Arial, sans-serif',
                         fontSize: '14px',
                         color: '#ffffff',
                         stroke: '#000000',
@@ -103,12 +104,14 @@ export class CodexScene extends Phaser.Scene {
                 const elementIcons = syn.elements.map((e) => ELEMENT_INFO[e].icon).join(' ');
                 this.add
                     .text(x, y - 20, elementIcons, {
+                        fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
                         fontSize: '20px',
                     })
                     .setOrigin(0.5)
                     .setAlpha(0.35);
                 this.add
                     .text(x, y + 18, '???', {
+                        fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
                         fontSize: '26px',
                         color: '#555555',
                         fontStyle: 'bold',
@@ -119,6 +122,7 @@ export class CodexScene extends Phaser.Scene {
 
         const back = this.add
             .text(width / 2, height - 30, I18n.t('common_back'), {
+                fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
                 fontSize: '24px',
                 color: '#ffffff',
                 backgroundColor: '#222222',
