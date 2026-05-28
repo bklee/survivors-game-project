@@ -1,6 +1,21 @@
 import './errorLogger';
 import Phaser from 'phaser';
-import { PokiSDK } from './integrations/PokiSDK';
+
+// GameDistribution SDK 동적 로드 — VITE_GD_GAME_ID 가 설정된 경우에만 활성화
+const GD_GAME_ID = import.meta.env.VITE_GD_GAME_ID || '';
+if (GD_GAME_ID) {
+    (window as Window).GD_OPTIONS = {
+        gameId: GD_GAME_ID,
+        onEvent: (event: Record<string, unknown>) => console.log('[GD]', event['name'], event),
+    };
+    const s = document.createElement('script');
+    s.src = 'https://html5.api.gamedistribution.com/main.min.js';
+    s.async = true;
+    document.head.appendChild(s);
+} else {
+    console.warn('[GD] VITE_GD_GAME_ID not set — running without GameDistribution SDK');
+}
+import { AdSDK } from './integrations/AdSDK';
 import { ApiClient } from './integrations/ApiClient';
 import { MetaProgress } from './core/MetaProgress';
 import { CHARACTERS } from './constants/CharacterConfig';
@@ -58,9 +73,9 @@ window.addEventListener('appinstalled', () => {
     ApiClient.trackEvent('pwa_install');
 });
 
-PokiSDK.init().then(() => {
+AdSDK.init().then(() => {
     new Phaser.Game(config);
-    setTimeout(() => PokiSDK.gameLoadingFinished(), 1000);
+    setTimeout(() => AdSDK.gameLoadingFinished(), 1000);
 });
 
 // 디버그 — Shift+T: 모든 캐릭터 unlock. CHARACTERS 의 key 는 대문자, char.id 는 소문자.

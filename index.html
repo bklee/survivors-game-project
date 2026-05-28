@@ -8,7 +8,6 @@
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#FFD700">
   <link rel="apple-touch-icon" href="/icon-192.png">
-  <script src="https://game-cdn.poki.com/scripts/v2/poki-sdk.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap" rel="stylesheet">
@@ -79,7 +78,7 @@
 // localStorage 키로 1회만 실행. v4 마커가 없는 모든 device 가 다음 진입 시 자동 cleanup.
 (function () {
     if (!('serviceWorker' in navigator)) return;
-    if (window.top !== window.self) return; // iframe (Poki) skip
+    if (window.top !== window.self) return; // iframe 환경 skip
     const HEAL_KEY = 'survivors_sw_heal_v4';
     if (localStorage.getItem(HEAL_KEY)) return;
     navigator.serviceWorker.getRegistrations().then(function (regs) {
@@ -94,7 +93,7 @@
     }).catch(function () { localStorage.setItem(HEAL_KEY, '1'); });
 })();
 
-// Service Worker 는 자체 도메인에서만 등록. Poki iframe 환경에서는 skip.
+// Service Worker 는 자체 도메인에서만 등록. iframe 환경에서는 skip.
 // localhost / 127.0.0.1 (dev 모드) 에서도 skip — vite proxy 와 SW 의 fetch
 // 가로채기가 충돌하여 CORS/301 에러 유발 (사용자 device 진단으로 확정).
 const isInIframe = window.top !== window.self;
