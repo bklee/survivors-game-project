@@ -171,7 +171,11 @@ export class QuestPanelScene extends Phaser.Scene {
             .text(
                 x - rowW / 2 + 15,
                 y + 14,
-                `${q.current_value} / ${q.target_value}  •  +${q.reward_essence} 정수`,
+                I18n.t('quest_progress_reward', {
+                    current: q.current_value,
+                    target: q.target_value,
+                    essence: q.reward_essence,
+                }),
                 {
                     fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
                     fontSize: '15px',
