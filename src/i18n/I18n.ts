@@ -43,9 +43,9 @@ export class I18n {
     }
 
     /** 문자열 가져오기. {var} 자리는 vars 객체로 치환. */
-    static t(key: StringKey, vars?: Record<string, string | number>): string {
-        const entry = STRINGS[key];
-        let s = entry[this.lang] || entry.ko;
+    static t(key: string, vars?: Record<string, string | number>): string {
+        const entry = STRINGS[key as StringKey];
+        let s: string = (entry?.[this.lang] || entry?.ko) ?? key;
         if (vars) {
             for (const [k, v] of Object.entries(vars)) {
                 s = s.replace(new RegExp(`\\{${k}\\}`, 'g'), String(v));
