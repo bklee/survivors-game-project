@@ -87,11 +87,11 @@ export class UIScene extends Phaser.Scene {
 
         this.stageLevelText = this.add
             .text(10, 10, 'Stage 1', {
-                fontSize: '56px',
+                fontSize: '40px',
                 color: '#ffff00',
                 fontStyle: 'bold',
                 stroke: '#000000',
-                strokeThickness: 8,
+                strokeThickness: 6,
             })
             .setOrigin(0, 0);
 
@@ -101,17 +101,17 @@ export class UIScene extends Phaser.Scene {
         this.coinText = this.add
             .text(10, 115, '0', {
                 fontFamily: '"MedievalSharp", cursive',
-                fontSize: '56px',
+                fontSize: '40px',
                 color: '#ffffff',
                 fontStyle: 'bold',
                 stroke: '#000000',
-                strokeThickness: 10,
+                strokeThickness: 7,
             })
             .setOrigin(0, 0.5);
 
         this.coinIcon = this.add
             .image(this.coinText.x + this.coinText.width + 20, 115, 'dungeon', 'coin_f0')
-            .setScale(5.0)
+            .setScale(3.5)
             .setOrigin(0, 0.5);
         this.statsText = this.add
             .text(10, 170, this.getStatsString(), {
