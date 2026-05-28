@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { PokiSDK } from '../integrations/PokiSDK';
+import { AdSDK } from '../integrations/AdSDK';
 import { ApiClient } from '../integrations/ApiClient';
 import { I18n, tr } from '../i18n/I18n';
 import { StringKey } from '../i18n/strings';
@@ -215,7 +215,7 @@ export class UpgradeScene extends Phaser.Scene {
             if (extraCardUsed) return;
             extraCardUsed = true;
             extraCardBtn.disableInteractive().setAlpha(0.5);
-            const success = await PokiSDK.rewardedBreak();
+            const success = await AdSDK.rewardedBreak();
             ApiClient.trackEvent(success ? 'ad_view' : 'ad_skip', {
                 placement: 'extra_card',
             });
