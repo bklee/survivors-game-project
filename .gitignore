@@ -1,7 +1,9 @@
 node_modules/
 dist/
 dist-poki/
+dist-gd/
 survivors-poki.zip
+survivors-gd.zip
 .DS_Store
 *.log
 
