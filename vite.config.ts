@@ -1,10 +1,11 @@
 import { defineConfig } from 'vite';
 
 // Base path 분기:
-//   - npm run build (production)  → base '/survivors/' (games.blocktalker.co.kr/survivors/)
-//   - npm run dev                 → base '/' (localhost:3000/)
+//   - npm run build (production)        → base '/survivors/' (games.blocktalker.co.kr/survivors/)
+//   - npm run build -- --mode gd        → base './' (GameDistribution CDN 호스팅용 zip)
+//   - npm run dev                       → base '/' (localhost:3000/)
 export default defineConfig(({ mode }) => {
-    const base = mode === 'production' ? '/survivors/' : '/';
+    const base = mode === 'gd' ? './' : mode === 'production' ? '/survivors/' : '/';
     return {
         base,
         server: {

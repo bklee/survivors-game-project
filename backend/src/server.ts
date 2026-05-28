@@ -20,10 +20,23 @@ app.use(
     }),
 );
 
-// CORS (단순 — 게임 도메인만 허용. 추후 미들웨어 패키지 고려)
+// CORS — 콤마 구분 다중 origin 지원 (e.g. "https://games.blocktalker.co.kr,https://revision.gamedistribution.com").
+// GameDistribution CDN 등 외부 호스팅에서도 백엔드 API 호출 가능하게.
+// '*' 단독 시 wildcard (개발용). 그 외엔 요청 Origin 이 화이트리스트에 있을 때만 echo.
 app.use((req, res, next) => {
-    const allowed = process.env.CORS_ORIGIN || '*';
-    res.setHeader('Access-Control-Allow-Origin', allowed);
+    const corsRaw = process.env.CORS_ORIGIN || '*';
+    const corsAllowList = corsRaw
+        .split(',')
+        .map((s) => s.trim())
+        .filter(Boolean);
+    const isWildcard = corsAllowList.length === 1 && corsAllowList[0] === '*';
+    const origin = (req.headers.origin as string) || '';
+    if (isWildcard) {
+        res.setHeader('Access-Control-Allow-Origin', '*');
+    } else if (origin && corsAllowList.includes(origin)) {
+        res.setHeader('Access-Control-Allow-Origin', origin);
+        res.setHeader('Vary', 'Origin');
+    }
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, X-Signature');
     if (req.method === 'OPTIONS') return res.sendStatus(204);
