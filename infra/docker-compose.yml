@@ -67,6 +67,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?password required}
       LS_WEBHOOK_SECRET: ${LS_WEBHOOK_SECRET:-}
       CORS_ORIGIN: ${CORS_ORIGIN:-https://games.blocktalker.co.kr}
+      ADMIN_AUTH: ${ADMIN_AUTH}
       PORT: 3001
       NODE_ENV: production
     expose:
