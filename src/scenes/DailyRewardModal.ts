@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { ApiClient, type DailyRewardStatus } from '../integrations/ApiClient';
 import { MetaProgress } from '../core/MetaProgress';
+import { I18n } from '../i18n/I18n';
 
 // Day 1~7 보상 (서버와 동일 — 미리보기용. 권위는 서버 응답)
 // 2026-05-21 사용자 요청으로 10배 상향. Day 7 = 1000 essence + 10000 coins.
@@ -73,7 +74,7 @@ export class DailyRewardModal extends Phaser.Scene {
 
         // 타이틀
         this.add
-            .text(width / 2, height / 2 - modalH / 2 + 40, '매일 보상', {
+            .text(width / 2, height / 2 - modalH / 2 + 40, I18n.t('daily_reward_title'), {
                 fontFamily: '"MedievalSharp", cursive',
                 fontSize: '38px',
                 color: '#ffd700',
@@ -85,9 +86,9 @@ export class DailyRewardModal extends Phaser.Scene {
         const canClaim = this.statusData.can_claim;
         const streakLine = canClaim
             ? this.statusData.streak_count <= 1
-                ? '오늘이 첫 보상!'
-                : `오늘 받으면 ${this.statusData.streak_count}일째 연속`
-            : `연속 ${this.statusData.streak_count}일째 — 내일 KST 자정 이후 가능`;
+                ? I18n.t('daily_reward_first')
+                : I18n.t('daily_reward_streak_next', { n: this.statusData.streak_count })
+            : I18n.t('daily_reward_streak_done', { n: this.statusData.streak_count });
         this.add
             .text(width / 2, height / 2 - modalH / 2 + 78, streakLine, {
                 fontFamily: '"MedievalSharp", cursive',
@@ -179,11 +180,15 @@ export class DailyRewardModal extends Phaser.Scene {
                 .setStrokeStyle(3, 0xffd700)
                 .setInteractive({ useHandCursor: true });
 
-            const previewLabel = `받기 (+${this.statusData.preview_reward.essence}E${
+            const previewLabel =
                 this.statusData.preview_reward.coins > 0
-                    ? `, +${this.statusData.preview_reward.coins}C`
-                    : ''
-            })`;
+                    ? I18n.t('daily_reward_claim_with_coins', {
+                          e: this.statusData.preview_reward.essence,
+                          c: this.statusData.preview_reward.coins,
+                      })
+                    : I18n.t('daily_reward_claim', {
+                          e: this.statusData.preview_reward.essence,
+                      });
             this.claimBtnText = this.add
                 .text(width / 2, claimY, previewLabel, {
                     fontFamily: '"MedievalSharp", cursive',
@@ -206,7 +211,7 @@ export class DailyRewardModal extends Phaser.Scene {
                 .setStrokeStyle(2, 0x666666);
             // setInteractive 호출 안 함 — 비활성 상태
             this.claimBtnText = this.add
-                .text(width / 2, claimY, '오늘은 이미 받았어요', {
+                .text(width / 2, claimY, I18n.t('daily_reward_already_today'), {
                     fontFamily: '"MedievalSharp", cursive',
                     fontSize: '22px',
                     color: '#999999',
@@ -232,21 +237,21 @@ export class DailyRewardModal extends Phaser.Scene {
     private async handleClaim() {
         if (this.claiming) return;
         this.claiming = true;
-        this.claimBtnText!.setText('받는 중...');
+        this.claimBtnText!.setText(I18n.t('daily_reward_claiming'));
         this.claimBtnBg!.setFillStyle(0x222222);
 
         const result = await ApiClient.claimDailyReward();
 
         if (!result) {
             this.claiming = false;
-            this.claimBtnText!.setText('네트워크 오류 — 다시 시도');
+            this.claimBtnText!.setText(I18n.t('daily_reward_network_error'));
             this.claimBtnBg!.setFillStyle(0x5a2020);
             return;
         }
 
         if (!result.ok) {
             // already_claimed 등 — 모달 닫기
-            this.claimBtnText!.setText('이미 받았습니다');
+            this.claimBtnText!.setText(I18n.t('daily_reward_already'));
             this.time.delayedCall(800, () => this.close());
             return;
         }
@@ -273,9 +278,12 @@ export class DailyRewardModal extends Phaser.Scene {
         }
 
         this.claimBtnText!.setText(
-            `+${result.granted.essence}E${
-                result.granted.coins > 0 ? ` +${result.granted.coins}C` : ''
-            } 받음!`,
+            result.granted.coins > 0
+                ? I18n.t('daily_reward_received_with_coins', {
+                      e: result.granted.essence,
+                      c: result.granted.coins,
+                  })
+                : I18n.t('daily_reward_received', { e: result.granted.essence }),
         );
         this.claimBtnBg!.setFillStyle(0x2d5a20);
 

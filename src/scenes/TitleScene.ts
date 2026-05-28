@@ -41,18 +41,21 @@ export class TitleScene extends Phaser.Scene {
         maskG.fillGradientStyle(0x000000, 0x000000, 0x000000, 0x000000, 0.95, 0.95, 0.0, 0.0);
         maskG.fillRect(0, 0, width, 220);
 
-        // 새 게임 타이틀 — 화면 상단 중앙
+        // 새 게임 타이틀 — 화면 상단 중앙, 2 행 (MAGICKA / SURVIVORS)
+        // 앤티크 청동 (#b08d57) — 차분한 브론즈 톤. 다크 브론즈 shadow 로 깊이감.
         const titleTextObj = this.add
-            .text(width / 2, 90, 'MAGICKA SURVIVORS', {
+            .text(width / 2, 180, 'MAGICKA\nSURVIVORS', {
                 fontFamily: '"MedievalSharp", cursive',
-                fontSize: '64px',
-                color: '#ffd700',
+                fontSize: '80px',
+                color: '#b08d57',
                 fontStyle: 'bold',
-                stroke: '#000000',
-                strokeThickness: 8,
-                shadow: { offsetX: 3, offsetY: 3, color: '#5a3300', blur: 16, fill: true },
+                stroke: '#1a0e00',
+                strokeThickness: 10,
+                align: 'center',
+                shadow: { offsetX: 3, offsetY: 3, color: '#4a3520', blur: 18, fill: true },
             })
-            .setOrigin(0.5);
+            .setOrigin(0.5)
+            .setLetterSpacing(8);
         this.tweens.add({
             targets: titleTextObj,
             y: titleTextObj.y - 6,
@@ -121,7 +124,7 @@ export class TitleScene extends Phaser.Scene {
 
         // 매일 보상 아이콘 (lang 버튼 y=20, 일일 퀘스트 버튼 y=70 아래 y=120). 클릭 시 popup launch.
         this.dailyBtn = this.add
-            .text(width - 20, 120, '🎁 매일 보상', {
+            .text(width - 20, 120, I18n.t('daily_reward_btn'), {
                 fontFamily: '"MedievalSharp", cursive',
                 fontSize: '20px',
                 color: '#ffd700',
@@ -268,10 +271,10 @@ export class TitleScene extends Phaser.Scene {
     private updateDailyBtnState(canClaim: boolean): void {
         if (!this.dailyBtn) return;
         if (canClaim) {
-            this.dailyBtn.setText('🎁 매일 보상');
+            this.dailyBtn.setText(I18n.t('daily_reward_btn'));
             this.dailyBtn.setColor('#ffd700');
         } else {
-            this.dailyBtn.setText('✅ 매일 보상');
+            this.dailyBtn.setText(I18n.t('daily_reward_btn_done'));
             this.dailyBtn.setColor('#44cc44');
         }
     }
