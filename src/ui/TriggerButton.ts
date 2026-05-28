@@ -33,12 +33,16 @@ export class TriggerButton {
         this.circle.setScrollFactor(0); // 자식 전파 보정
         this.container.add(this.circle);
 
-        this.label = scene.add.text(0, 0, '⚡', { fontSize: '28px' });
+        this.label = scene.add.text(0, 0, '⚡', {
+            fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
+            fontSize: '28px',
+        });
         this.label.setOrigin(0.5);
         this.label.setScrollFactor(0);
         this.container.add(this.label);
 
         this.cooldownText = scene.add.text(0, 0, '', {
+            fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
             fontSize: '16px',
             color: '#ffffff',
             fontStyle: 'bold',

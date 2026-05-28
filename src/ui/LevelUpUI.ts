@@ -35,7 +35,11 @@ export class LevelUpUI {
 
             // Add dummy text
             const txt = this.scene.add
-                .text(cardX, -100, `Card ${i + 1}`, { fontSize: '24px', color: '#fff' })
+                .text(cardX, -100, `Card ${i + 1}`, {
+                    fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
+                    fontSize: '24px',
+                    color: '#fff',
+                })
                 .setOrigin(0.5);
             this.container.add(txt);
         }
