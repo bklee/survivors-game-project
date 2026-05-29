@@ -354,19 +354,22 @@ export class UIScene extends Phaser.Scene {
 
         // 음소거 토글 — 게임 전체 sound mute. 아이콘은 "다음 동작" 패턴
         // (현재 muted → 🔊 표시 = '누르면 소리 켜짐'). 사용자 기대 일치.
+        // 로컬 isMuted state 사용 — 첫 user gesture 시 Phaser sound.mute setter 가
+        // unlock 절차와 race 되어 getter 가 옛 값 반환하던 케이스 회피. UI 는 항상
+        // 우리 state 기준으로 갱신.
+        let isMuted = this.sound.mute;
         const updateMuteBtn = () => {
-            const muted = this.sound.mute;
-            muteBtn.setText(muted ? '🔊' : '🔇');
-            muteBtn.setColor(muted ? '#ffffff' : '#888888');
+            muteBtn.setText(isMuted ? '🔇' : '🔊');
+            muteBtn.setColor(isMuted ? '#888888' : '#ffffff');
         };
         updateMuteBtn();
         muteBtn.on('pointerdown', () => {
-            this.sound.mute = !this.sound.mute;
-            // 이미 재생 중인 BGM/SFX 에도 즉시 적용 (Phaser SoundManager.mute setter 보강).
-            const muted = this.sound.mute;
+            isMuted = !isMuted;
+            this.sound.mute = isMuted;
+            // 이미 재생 중인 BGM/SFX 에도 즉시 적용.
             this.sound
                 .getAllPlaying()
-                .forEach((s) => ((s as unknown as { mute: boolean }).mute = muted));
+                .forEach((s) => ((s as unknown as { mute: boolean }).mute = isMuted));
             updateMuteBtn();
         });
 
