@@ -73,7 +73,16 @@ window.addEventListener('appinstalled', () => {
     ApiClient.trackEvent('pwa_install');
 });
 
-AdSDK.init().then(() => {
+// 웹폰트 (Cinzel Decorative / Jua / MedievalSharp) 가 로드된 후 Phaser 시작.
+// Phaser canvas Text 는 CSS font-display: swap 의 swap event 를 안 받아
+// 폰트 다운로드 전에 그려지면 이후 fallback 폰트 그대로 유지됨 — 게임 진입 시
+// 영문/한글 폰트 적용 안 되는 원인.
+const fontReady =
+    typeof document !== 'undefined' && (document as Document & { fonts?: FontFaceSet }).fonts
+        ? (document as Document & { fonts: FontFaceSet }).fonts.ready
+        : Promise.resolve();
+
+Promise.all([AdSDK.init(), fontReady]).then(() => {
     new Phaser.Game(config);
     setTimeout(() => AdSDK.gameLoadingFinished(), 1000);
 });
