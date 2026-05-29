@@ -273,6 +273,10 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                 const fIdx = Math.floor(Animation.timer[eid] / (1000 / rate)) % 4;
                 textureKey = 'dungeon';
                 frameName = `coin_f${fIdx}`;
+            } else if (typeId === 37) {
+                // Hole — 단순 image (frame 없음). default 분기로 빠지면
+                // 'hole_idle_X' frame 이름 생성되어 "Texture hole has no frame" 오류.
+                frameName = '';
             } else if (typeId === 100) {
                 // Spell Fire Animation (Wizard Attack)
                 const rate = 12;
