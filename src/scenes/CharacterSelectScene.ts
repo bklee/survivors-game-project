@@ -76,10 +76,10 @@ export class CharacterSelectScene extends Phaser.Scene {
         const charIds = Object.keys(CHARACTERS);
 
         // 동적 레이아웃 — 한 줄 최대 cols 개, 마지막 줄은 자동 중앙 정렬.
-        // 7 캐릭터 = 첫 줄 4 + 둘째 줄 3 (center). 화면 720px 안에 들어가도록 카드 축소.
+        // 6 캐릭터 = 첫 줄 3 + 둘째 줄 3 (3x2).
         const cardWidth = 200;
         const cardHeight = 260;
-        const cols = 4;
+        const cols = 3;
         const gapX = 24;
         const gapY = 18;
         const startY = 150 + cardHeight / 2; // 첫 줄 top = 150
