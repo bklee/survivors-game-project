@@ -43,7 +43,7 @@ export class LeaderboardScene extends Phaser.Scene {
         // 타이틀
         this.add
             .text(width / 2, 50, I18n.t('leaderboard_title'), {
-                fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
+                fontFamily: '"Cinzel Decorative", "Jua", "MedievalSharp", cursive',
                 fontSize: '44px',
                 color: '#ffd700',
                 fontStyle: 'bold',
@@ -55,7 +55,7 @@ export class LeaderboardScene extends Phaser.Scene {
         // 뒤로 버튼
         const backBtn = this.add
             .text(30, 30, I18n.t('leaderboard_back'), {
-                fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
+                fontFamily: '"Cinzel Decorative", "Jua", "MedievalSharp", cursive',
                 fontSize: '22px',
                 color: '#ffffff',
                 backgroundColor: '#00000088',
@@ -91,7 +91,7 @@ export class LeaderboardScene extends Phaser.Scene {
                 .setInteractive({ useHandCursor: true });
             const text = this.add
                 .text(x, tabY, I18n.t(cfg.labelKey), {
-                    fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
+                    fontFamily: '"Cinzel Decorative", "Jua", "MedievalSharp", cursive',
                     fontSize: '20px',
                     color: isActive ? '#ffd700' : '#aaaaaa',
                     fontStyle: 'bold',
@@ -133,7 +133,7 @@ export class LeaderboardScene extends Phaser.Scene {
             this.addToGroup(
                 this.add
                     .text(width / 2, 360, I18n.t('leaderboard_loading'), {
-                        fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
+                        fontFamily: '"Cinzel Decorative", "Jua", "MedievalSharp", cursive',
                         fontSize: '24px',
                         color: '#aaaaaa',
                     })
@@ -145,7 +145,7 @@ export class LeaderboardScene extends Phaser.Scene {
         if (this.state === 'error') {
             const errText = this.add
                 .text(width / 2, 360, I18n.t('leaderboard_error'), {
-                    fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
+                    fontFamily: '"Cinzel Decorative", "Jua", "MedievalSharp", cursive',
                     fontSize: '22px',
                     color: '#ff6666',
                     backgroundColor: '#330000',
@@ -166,7 +166,7 @@ export class LeaderboardScene extends Phaser.Scene {
             this.addToGroup(
                 this.add
                     .text(width / 2, 360, I18n.t('leaderboard_empty'), {
-                        fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
+                        fontFamily: '"Cinzel Decorative", "Jua", "MedievalSharp", cursive',
                         fontSize: '22px',
                         color: '#888888',
                     })
@@ -193,7 +193,7 @@ export class LeaderboardScene extends Phaser.Scene {
         let cursorX = width / 2 - totalW / 2;
 
         const headerStyle: Phaser.Types.GameObjects.Text.TextStyle = {
-            fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
+            fontFamily: '"Cinzel Decorative", "Jua", "MedievalSharp", cursive',
             fontSize: '18px',
             color: '#ffd700',
             fontStyle: 'bold',
@@ -257,7 +257,7 @@ export class LeaderboardScene extends Phaser.Scene {
         let cursorX = width / 2 - totalW / 2;
         const textColor = isMe ? '#ffd700' : '#dddddd';
         const cellStyle: Phaser.Types.GameObjects.Text.TextStyle = {
-            fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
+            fontFamily: '"Cinzel Decorative", "Jua", "MedievalSharp", cursive',
             fontSize: '18px',
             color: textColor,
         };
@@ -320,7 +320,7 @@ export class LeaderboardScene extends Phaser.Scene {
 
         const text = this.add
             .text(width / 2, height - 50, label, {
-                fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
+                fontFamily: '"Cinzel Decorative", "Jua", "MedievalSharp", cursive',
                 fontSize: '20px',
                 color: me ? '#ffd700' : '#888888',
                 fontStyle: 'bold',
