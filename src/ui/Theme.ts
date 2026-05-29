@@ -66,13 +66,15 @@ export const PALETTE_NUM = {
  * - mono: 숫자/스코어 (선택). 현재 미사용.
  *
  * Google Fonts (OFL 라이선스 — 상용 자유):
- *   - Cinzel Decorative: 대형 로마 세리프, 디아블로2 메인 UI 와 유사
- *   - MedievalSharp: 현재 body 폰트 유지 (이미 다수 씬에서 사용)
- *   - UnifrakturCook: 고딕 블랙레터 (선택 — 보스 등 강조 시 사용 가능)
+ *   - Cinzel Decorative: 대형 로마 세리프, 라틴 글리프 (디아블로2 풍)
+ *   - Jua: 한글 둥근 고딕 (캐주얼, 친근감, 가독성 좋음)
+ *   - MedievalSharp: 라틴 폴백 (이미 다수 씬에서 사용)
+ *
+ * 폴백 체인: 라틴은 Cinzel, 한글은 Jua, 그 외는 시스템 serif.
  */
 export const FONTS = {
-    title: '"Cinzel Decorative", "MedievalSharp", serif',
-    body: '"Cinzel Decorative", "MedievalSharp", cursive',
+    title: '"Cinzel Decorative", "Jua", "MedievalSharp", serif',
+    body: '"Cinzel Decorative", "Jua", "MedievalSharp", cursive',
     mono: 'monospace',
 } as const;
 

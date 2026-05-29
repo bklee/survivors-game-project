@@ -34,7 +34,7 @@ export class TriggerButton {
         this.container.add(this.circle);
 
         this.label = scene.add.text(0, 0, '⚡', {
-            fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
+            fontFamily: '"Cinzel Decorative", "Jua", "MedievalSharp", cursive',
             fontSize: '28px',
         });
         this.label.setOrigin(0.5);
@@ -42,7 +42,7 @@ export class TriggerButton {
         this.container.add(this.label);
 
         this.cooldownText = scene.add.text(0, 0, '', {
-            fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
+            fontFamily: '"Cinzel Decorative", "Jua", "MedievalSharp", cursive',
             fontSize: '16px',
             color: '#ffffff',
             fontStyle: 'bold',

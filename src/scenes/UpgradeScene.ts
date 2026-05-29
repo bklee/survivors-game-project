@@ -123,7 +123,7 @@ export class UpgradeScene extends Phaser.Scene {
         bg.setDepth(0);
 
         const title = this.add.text(this.scale.width / 2, 80, I18n.t('upgrade_title'), {
-            fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
+            fontFamily: '"Cinzel Decorative", "Jua", "MedievalSharp", cursive',
             fontSize: '32px',
             color: '#ffd700',
             fontStyle: 'bold',
@@ -159,7 +159,7 @@ export class UpgradeScene extends Phaser.Scene {
         const rerollBtnY = cardY + cardHeight / 2 + 100;
         const rerollBtn = this.add
             .text(this.scale.width / 2, rerollBtnY, `🎲 재추첨  💰 ${REROLL_COST}`, {
-                fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
+                fontFamily: '"Cinzel Decorative", "Jua", "MedievalSharp", cursive',
                 fontSize: '22px',
                 color: '#ffaa00',
                 backgroundColor: '#3a2a1a',
@@ -234,7 +234,7 @@ export class UpgradeScene extends Phaser.Scene {
         const extraBtnY = cardY + cardHeight / 2 + 45; // 카드 하단에서 적당히
         const extraCardBtn = this.add
             .text(this.scale.width / 2, extraBtnY, '🎬  ' + I18n.t('upgrade_extra_card_ad'), {
-                fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
+                fontFamily: '"Cinzel Decorative", "Jua", "MedievalSharp", cursive',
                 fontSize: '24px',
                 color: '#ffd700',
                 backgroundColor: '#1e1e1e',
@@ -408,14 +408,14 @@ export class UpgradeScene extends Phaser.Scene {
         container.add(bg);
 
         const icon = this.add.text(0, -80, data.icon, {
-            fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
+            fontFamily: '"Cinzel Decorative", "Jua", "MedievalSharp", cursive',
             fontSize: '64px',
         });
         icon.setOrigin(0.5);
         container.add(icon);
 
         const titleText = this.add.text(0, 0, data.title, {
-            fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
+            fontFamily: '"Cinzel Decorative", "Jua", "MedievalSharp", cursive',
             fontSize: '20px',
             color: isEvolution ? '#ffd700' : isRelic ? '#ff6b00' : '#ffffff',
             fontStyle: 'bold',
@@ -424,7 +424,7 @@ export class UpgradeScene extends Phaser.Scene {
         container.add(titleText);
 
         const descText = this.add.text(0, 60, data.description, {
-            fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
+            fontFamily: '"Cinzel Decorative", "Jua", "MedievalSharp", cursive',
             fontSize: '14px',
             color: '#cccccc',
             wordWrap: { width: w - 20 },
@@ -479,7 +479,7 @@ export class UpgradeScene extends Phaser.Scene {
         // 화면 상단 안내 — '카드 1장 더 선택!'
         this.add
             .text(this.scale.width / 2, 180, I18n.t('upgrade_pick_one_more'), {
-                fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
+                fontFamily: '"Cinzel Decorative", "Jua", "MedievalSharp", cursive',
                 fontSize: '24px',
                 color: '#ffd700',
                 fontStyle: 'bold',

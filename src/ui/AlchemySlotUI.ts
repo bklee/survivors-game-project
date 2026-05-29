@@ -47,7 +47,7 @@ export class AlchemySlotUI {
                 i * (SLOT_SIZE + SLOT_GAP) + SLOT_SIZE / 2,
                 '?',
                 {
-                    fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
+                    fontFamily: '"Cinzel Decorative", "Jua", "MedievalSharp", cursive',
                     fontSize: '24px',
                     color: '#888888',
                 },
@@ -62,7 +62,7 @@ export class AlchemySlotUI {
         // origin (1, 0.5) = 우측 정렬, 슬롯 왼쪽에서 좌측으로 텍스트 펼침
         this.synergyNameText = scene.add
             .text(-12, SLOT_SIZE * 0.5, '', {
-                fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
+                fontFamily: '"Cinzel Decorative", "Jua", "MedievalSharp", cursive',
                 fontSize: '20px',
                 fontStyle: 'bold',
                 color: '#ffd700',
@@ -76,7 +76,7 @@ export class AlchemySlotUI {
 
         this.synergyDescText = scene.add
             .text(-12, SLOT_SIZE * 1.4, '', {
-                fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
+                fontFamily: '"Cinzel Decorative", "Jua", "MedievalSharp", cursive',
                 fontSize: '12px',
                 color: '#cccccc',
                 align: 'right',
