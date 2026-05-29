@@ -1,10 +1,12 @@
-const CACHE_NAME = 'magicka-surv-v3';
+const CACHE_NAME = 'magicka-surv-v4';
+// 상대 경로 — SW 가 /survivors/sw.js 로 호스팅돼도 origin root (/) 가 아닌
+// scope 기준으로 풀려 nginx 가 정상 응답. 이전 절대경로는 root '/' 가 404 였음.
 const PRECACHE_URLS = [
-    '/',
-    '/index.html',
-    '/manifest.json',
-    '/icon-192.png',
-    '/icon-512.png',
+    './',
+    './index.html',
+    './manifest.json',
+    './icon-192.png',
+    './icon-512.png',
 ];
 
 self.addEventListener('install', (event) => {
