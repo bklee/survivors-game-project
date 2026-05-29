@@ -258,18 +258,24 @@ export class UIScene extends Phaser.Scene {
             .setVisible(false)
             .setDepth(850)
             .setInteractive();
+        // visible=false 일 때도 Phaser 는 input 받음 → muteBtn/pauseBtn 등 우상단
+        // 버튼 클릭이 가로채여 minimap 만 켜졌던 버그 fix. minimap toggle 동기.
+        this.minimapOverlay.disableInteractive();
 
         mmHitArea.on('pointerdown', () => this.toggleMinimap());
         this.minimapOverlay.on('pointerdown', () => this.toggleMinimap());
 
         // Buttons
+        // padding 키워 default hit area 자체를 확대 (Phaser 의 text hit area 는
+        // padding 영역까지 포함). origin (1, 0) 환경에서 명시 hitArea Rectangle
+        // 을 잘못 잡았던 직전 버그 (좌표계 반전) fix — 단일 setInteractive 만.
         const muteBtn = this.add
             .text(1210, 170, '🔊', {
                 fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
                 fontSize: '32px',
                 color: '#ffffff',
                 backgroundColor: '#00000088',
-                padding: { x: 8, y: 4 },
+                padding: { x: 16, y: 10 },
             })
             .setOrigin(1, 0)
             .setInteractive({ useHandCursor: true });
@@ -346,24 +352,17 @@ export class UIScene extends Phaser.Scene {
             quitBtnText.setVisible(v);
         };
 
-        // 음소거 토글 — 게임 전체 sound mute. 초기 상태 동기화 + 클릭 시 토글.
-        // 아이콘만 보면 🔊 / 🔇 차이가 작아 식별 어려움 → 색도 변경 (off 시 회색).
+        // 음소거 토글 — 게임 전체 sound mute. 아이콘은 "다음 동작" 패턴
+        // (현재 muted → 🔊 표시 = '누르면 소리 켜짐'). 사용자 기대 일치.
         const updateMuteBtn = () => {
             const muted = this.sound.mute;
-            muteBtn.setText(muted ? '🔇' : '🔊');
-            muteBtn.setColor(muted ? '#888888' : '#ffffff');
+            muteBtn.setText(muted ? '🔊' : '🔇');
+            muteBtn.setColor(muted ? '#ffffff' : '#888888');
         };
         updateMuteBtn();
-        // Hit area 보강 — 텍스트 bounding 보다 패딩 영역까지 명시. 첫 클릭 빗나감 방지.
-        muteBtn.setInteractive(
-            new Phaser.Geom.Rectangle(-8, -6, muteBtn.width + 16, muteBtn.height + 12),
-            Phaser.Geom.Rectangle.Contains,
-        );
-        muteBtn.input!.cursor = 'pointer';
         muteBtn.on('pointerdown', () => {
             this.sound.mute = !this.sound.mute;
             // 이미 재생 중인 BGM/SFX 에도 즉시 적용 (Phaser SoundManager.mute setter 보강).
-            // BaseSound 추상엔 mute 없지만 WebAudioSound 등 구체 클래스엔 존재.
             const muted = this.sound.mute;
             this.sound
                 .getAllPlaying()
@@ -545,7 +544,7 @@ export class UIScene extends Phaser.Scene {
 
         if (this.isMinimapEnlarged) {
             ms.scene.pause();
-            this.minimapOverlay.setVisible(true).setAlpha(0);
+            this.minimapOverlay.setVisible(true).setAlpha(0).setInteractive();
             this.tweens.add({ targets: this.minimapOverlay, alpha: 0.6, duration: 300 });
             this.tweens.add({
                 targets: this.minimapContainer,
@@ -561,7 +560,9 @@ export class UIScene extends Phaser.Scene {
                 targets: this.minimapOverlay,
                 alpha: 0,
                 duration: 300,
-                onComplete: () => this.minimapOverlay.setVisible(false),
+                onComplete: () => {
+                    this.minimapOverlay.setVisible(false).disableInteractive();
+                },
             });
             this.tweens.add({
                 targets: this.minimapContainer,
