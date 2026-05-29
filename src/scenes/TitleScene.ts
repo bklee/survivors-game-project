@@ -60,7 +60,7 @@ export class TitleScene extends Phaser.Scene {
         // Home Button (Top Left)
         const homeBtn = this.add
             .text(20, 20, I18n.t('title_home'), {
-                fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
+                fontFamily: '"Cinzel Decorative", "Jua", "MedievalSharp", cursive',
                 fontSize: '24px',
                 color: '#ffffff',
                 backgroundColor: '#00000088',
@@ -78,7 +78,7 @@ export class TitleScene extends Phaser.Scene {
         // 언어 토글 (Top Right) — Home 버튼과 같은 fontSize/padding 으로 수평 정렬, 가시성 강화.
         const langBtn = this.add
             .text(width - 20, 20, I18n.getLang() === 'ko' ? '🌐 EN' : '🌐 한국어', {
-                fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
+                fontFamily: '"Cinzel Decorative", "Jua", "MedievalSharp", cursive',
                 fontSize: '24px',
                 color: '#ffd700',
                 fontStyle: 'bold',
@@ -100,7 +100,7 @@ export class TitleScene extends Phaser.Scene {
         // 일일 퀘스트 아이콘 (lang 버튼 왼쪽). 클릭 시 popup 으로 launch.
         const questBtn = this.add
             .text(width - 20, 70, '📜 ' + I18n.t('quest_panel_title'), {
-                fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
+                fontFamily: '"Cinzel Decorative", "Jua", "MedievalSharp", cursive',
                 fontSize: '20px',
                 color: '#ffd700',
                 backgroundColor: '#000000bb',
@@ -117,7 +117,7 @@ export class TitleScene extends Phaser.Scene {
         // 매일 보상 아이콘 (lang 버튼 y=20, 일일 퀘스트 버튼 y=70 아래 y=120). 클릭 시 popup launch.
         this.dailyBtn = this.add
             .text(width - 20, 120, I18n.t('daily_reward_btn'), {
-                fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
+                fontFamily: '"Cinzel Decorative", "Jua", "MedievalSharp", cursive',
                 fontSize: '20px',
                 color: '#ffd700',
                 backgroundColor: '#000000bb',
@@ -144,7 +144,7 @@ export class TitleScene extends Phaser.Scene {
 
         const startText = this.add
             .text(width / 2, startY, I18n.t('title_start'), {
-                fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
+                fontFamily: '"Cinzel Decorative", "Jua", "MedievalSharp", cursive',
                 fontSize: '40px',
                 color: '#ffffff',
                 fontStyle: 'bold',
@@ -217,7 +217,7 @@ export class TitleScene extends Phaser.Scene {
 
             this.add
                 .text(x, subY, I18n.t(labelKey), {
-                    fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
+                    fontFamily: '"Cinzel Decorative", "Jua", "MedievalSharp", cursive',
                     fontSize: '22px',
                     color: colors.text,
                     fontStyle: 'bold',

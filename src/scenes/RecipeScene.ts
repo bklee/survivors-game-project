@@ -23,7 +23,7 @@ export class RecipeScene extends Phaser.Scene {
 
         this.add
             .text(width / 2, 80, 'ALCHEMY ENCYCLOPEDIA', {
-                fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
+                fontFamily: '"Cinzel Decorative", "Jua", "MedievalSharp", cursive',
                 fontSize: '42px',
                 color: '#00ffff',
                 fontStyle: 'bold',
@@ -37,12 +37,12 @@ export class RecipeScene extends Phaser.Scene {
         RECIPES.forEach((r, i) => {
             const y = startY + i * 50;
             this.add.text(col1X, y, r.name, {
-                fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
+                fontFamily: '"Cinzel Decorative", "Jua", "MedievalSharp", cursive',
                 fontSize: '24px',
                 color: '#ffd700',
             });
             this.add.text(col2X, y, r.combo, {
-                fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
+                fontFamily: '"Cinzel Decorative", "Jua", "MedievalSharp", cursive',
                 fontSize: '24px',
                 color: '#ffffff',
             });
@@ -50,7 +50,7 @@ export class RecipeScene extends Phaser.Scene {
 
         const closeBtn = this.add
             .text(width / 2, height - 80, '[ PRESS E OR CLICK TO CLOSE ]', {
-                fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
+                fontFamily: '"Cinzel Decorative", "Jua", "MedievalSharp", cursive',
                 fontSize: '28px',
                 color: '#aaaaaa',
             })

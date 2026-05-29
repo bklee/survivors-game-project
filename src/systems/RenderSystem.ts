@@ -415,7 +415,7 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                     if (!label) {
                         label = _scene.add
                             .text(0, 0, '분신', {
-                                fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
+                                fontFamily: '"Cinzel Decorative", "Jua", "MedievalSharp", cursive',
                                 fontSize: '16px',
                                 color: '#aaddff',
                                 fontStyle: 'bold',
@@ -441,7 +441,7 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                     if (!label) {
                         label = _scene.add
                             .text(0, 0, '분열', {
-                                fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
+                                fontFamily: '"Cinzel Decorative", "Jua", "MedievalSharp", cursive',
                                 fontSize: '18px',
                                 color: '#ff8866',
                                 fontStyle: 'bold',
