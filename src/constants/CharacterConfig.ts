@@ -61,20 +61,6 @@ export const CHARACTERS: Record<string, CharacterData> = {
             run: { x: 192, y: 68, w: 16, h: 28, count: 4 },
         },
     },
-    DRUID: {
-        name: 'Druid',
-        id: 'druid',
-        description: {
-            ko: '자연의 술사. 가시 덩굴 발사.',
-            en: 'Nature druid. Fires thorn vines.',
-        },
-        unlockCost: 3000,
-        baseStats: { health: 90, speed: 105, damage: 1.2, mana: 100 },
-        frames: {
-            idle: { x: 128, y: 132, w: 16, h: 28, count: 4 },
-            run: { x: 192, y: 132, w: 16, h: 28, count: 4 },
-        },
-    },
     LIZARD: {
         name: 'Lizard',
         id: 'lizard',
