@@ -135,7 +135,7 @@ export class DailyRewardModal extends Phaser.Scene {
                 this.add
                     .text(cx, cy - 10, '✓', {
                         fontFamily: '"Cinzel Decorative", "Jua", "MedievalSharp", cursive',
-                        fontSize: '28px',
+                        fontSize: '56px',
                         color: '#44cc44',
                         fontStyle: 'bold',
                     })
@@ -271,7 +271,7 @@ export class DailyRewardModal extends Phaser.Scene {
             this.add
                 .text(cell.cx, cell.cy - 10, '✓', {
                     fontFamily: '"Cinzel Decorative", "Jua", "MedievalSharp", cursive',
-                    fontSize: '28px',
+                    fontSize: '56px',
                     color: '#44cc44',
                     fontStyle: 'bold',
                 })
