@@ -51,7 +51,7 @@ export class QuestPanelScene extends Phaser.Scene {
 
         this.add
             .text(width / 2, height / 2 - modalH / 2 + 30, I18n.t('quest_panel_title'), {
-                fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
+                fontFamily: '"Cinzel Decorative", "Jua", "MedievalSharp", cursive',
                 fontSize: '32px',
                 color: '#ffd700',
                 fontStyle: 'bold',
@@ -61,7 +61,7 @@ export class QuestPanelScene extends Phaser.Scene {
         // 닫기 X
         const closeBtn = this.add
             .text(width / 2 + modalW / 2 - 30, height / 2 - modalH / 2 + 20, '✕', {
-                fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
+                fontFamily: '"Cinzel Decorative", "Jua", "MedievalSharp", cursive',
                 fontSize: '24px',
                 color: '#aaaaaa',
             })
@@ -96,7 +96,7 @@ export class QuestPanelScene extends Phaser.Scene {
             this.addToGroup(
                 this.add
                     .text(width / 2, height / 2, '...', {
-                        fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
+                        fontFamily: '"Cinzel Decorative", "Jua", "MedievalSharp", cursive',
                         fontSize: '28px',
                         color: '#888888',
                     })
@@ -108,7 +108,7 @@ export class QuestPanelScene extends Phaser.Scene {
         if (this.state === 'error') {
             const errText = this.add
                 .text(width / 2, height / 2, '네트워크 오류 — 다시 시도', {
-                    fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
+                    fontFamily: '"Cinzel Decorative", "Jua", "MedievalSharp", cursive',
                     fontSize: '20px',
                     color: '#ff6666',
                     backgroundColor: '#330000',
@@ -133,7 +133,7 @@ export class QuestPanelScene extends Phaser.Scene {
                 height / 2 + 130,
                 I18n.t('quest_panel_combo', { coins: this.comboBonusCoins }),
                 {
-                    fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
+                    fontFamily: '"Cinzel Decorative", "Jua", "MedievalSharp", cursive',
                     fontSize: '18px',
                     color: this.comboClaimed ? '#ffd700' : '#aaaaaa',
                     fontStyle: this.comboClaimed ? 'bold' : 'normal',
@@ -158,7 +158,7 @@ export class QuestPanelScene extends Phaser.Scene {
         // 설명
         const desc = this.add
             .text(x - rowW / 2 + 15, y - 12, I18n.t(q.description_key), {
-                fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
+                fontFamily: '"Cinzel Decorative", "Jua", "MedievalSharp", cursive',
                 fontSize: '18px',
                 color: '#ffffff',
                 fontStyle: 'bold',
@@ -177,7 +177,7 @@ export class QuestPanelScene extends Phaser.Scene {
                     essence: q.reward_essence,
                 }),
                 {
-                    fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
+                    fontFamily: '"Cinzel Decorative", "Jua", "MedievalSharp", cursive',
                     fontSize: '15px',
                     color: q.completed ? '#ffd700' : '#aaaaaa',
                 },
@@ -212,7 +212,7 @@ export class QuestPanelScene extends Phaser.Scene {
 
         const btnText = this.add
             .text(x + rowW / 2 - 60, y, btnLabel, {
-                fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
+                fontFamily: '"Cinzel Decorative", "Jua", "MedievalSharp", cursive',
                 fontSize: '16px',
                 color: btnTextColor,
                 fontStyle: 'bold',

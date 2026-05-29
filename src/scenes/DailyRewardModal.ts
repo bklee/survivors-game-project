@@ -92,7 +92,7 @@ export class DailyRewardModal extends Phaser.Scene {
             : I18n.t('daily_reward_streak_done', { n: this.statusData.streak_count });
         this.add
             .text(width / 2, height / 2 - modalH / 2 + 78, streakLine, {
-                fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
+                fontFamily: '"Cinzel Decorative", "Jua", "MedievalSharp", cursive',
                 fontSize: '20px',
                 color: '#cccccc',
             })
@@ -134,7 +134,7 @@ export class DailyRewardModal extends Phaser.Scene {
             if (isPast) {
                 this.add
                     .text(cx, cy - 10, '✓', {
-                        fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
+                        fontFamily: '"Cinzel Decorative", "Jua", "MedievalSharp", cursive',
                         fontSize: '28px',
                         color: '#44cc44',
                         fontStyle: 'bold',
@@ -145,7 +145,7 @@ export class DailyRewardModal extends Phaser.Scene {
             // Day 라벨
             this.add
                 .text(cx, cy - 28, `Day ${day}`, {
-                    fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
+                    fontFamily: '"Cinzel Decorative", "Jua", "MedievalSharp", cursive',
                     fontSize: '18px',
                     color: isToday ? '#ffd700' : '#aaaaaa',
                     fontStyle: 'bold',
@@ -157,7 +157,7 @@ export class DailyRewardModal extends Phaser.Scene {
             const coinText = reward.coins > 0 ? `+${reward.coins}C` : '';
             this.add
                 .text(cx, cy + 2, essenceText, {
-                    fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
+                    fontFamily: '"Cinzel Decorative", "Jua", "MedievalSharp", cursive',
                     fontSize: '20px',
                     color: isToday ? '#ffffff' : '#888888',
                 })
@@ -165,7 +165,7 @@ export class DailyRewardModal extends Phaser.Scene {
             if (coinText) {
                 this.add
                     .text(cx, cy + 28, coinText, {
-                        fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
+                        fontFamily: '"Cinzel Decorative", "Jua", "MedievalSharp", cursive',
                         fontSize: '16px',
                         color: isToday ? '#ffd700' : '#776633',
                     })
@@ -192,7 +192,7 @@ export class DailyRewardModal extends Phaser.Scene {
                       });
             this.claimBtnText = this.add
                 .text(width / 2, claimY, previewLabel, {
-                    fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
+                    fontFamily: '"Cinzel Decorative", "Jua", "MedievalSharp", cursive',
                     fontSize: '24px',
                     color: '#ffffff',
                     fontStyle: 'bold',
@@ -213,7 +213,7 @@ export class DailyRewardModal extends Phaser.Scene {
             // setInteractive 호출 안 함 — 비활성 상태
             this.claimBtnText = this.add
                 .text(width / 2, claimY, I18n.t('daily_reward_already_today'), {
-                    fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
+                    fontFamily: '"Cinzel Decorative", "Jua", "MedievalSharp", cursive',
                     fontSize: '22px',
                     color: '#999999',
                     fontStyle: 'bold',
@@ -224,7 +224,7 @@ export class DailyRewardModal extends Phaser.Scene {
         // 닫기 (X)
         const closeBtn = this.add
             .text(width / 2 + modalW / 2 - 30, height / 2 - modalH / 2 + 20, '✕', {
-                fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
+                fontFamily: '"Cinzel Decorative", "Jua", "MedievalSharp", cursive',
                 fontSize: '28px',
                 color: '#aaaaaa',
             })
@@ -270,7 +270,7 @@ export class DailyRewardModal extends Phaser.Scene {
         if (cell) {
             this.add
                 .text(cell.cx, cell.cy - 10, '✓', {
-                    fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
+                    fontFamily: '"Cinzel Decorative", "Jua", "MedievalSharp", cursive',
                     fontSize: '28px',
                     color: '#44cc44',
                     fontStyle: 'bold',

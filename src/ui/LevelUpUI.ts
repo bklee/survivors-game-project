@@ -36,7 +36,7 @@ export class LevelUpUI {
             // Add dummy text
             const txt = this.scene.add
                 .text(cardX, -100, `Card ${i + 1}`, {
-                    fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
+                    fontFamily: '"Cinzel Decorative", "Jua", "MedievalSharp", cursive',
                     fontSize: '24px',
                     color: '#fff',
                 })

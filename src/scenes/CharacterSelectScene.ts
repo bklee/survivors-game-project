@@ -33,7 +33,7 @@ export class CharacterSelectScene extends Phaser.Scene {
         // Title
         this.add
             .text(width / 2, 70, I18n.t('char_select_title'), {
-                fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
+                fontFamily: '"Cinzel Decorative", "Jua", "MedievalSharp", cursive',
                 fontSize: '56px',
                 color: '#ffd700',
                 fontStyle: 'bold',
@@ -51,7 +51,7 @@ export class CharacterSelectScene extends Phaser.Scene {
         // 정수 + 영구 코인 — 우측 상단 위아래 stack. 잘림 방지 위해 padding 30 + stroke + 폰트 22.
         this.add
             .text(width - 30, 60, I18n.t('char_select_essence', { amount: myEssence }), {
-                fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
+                fontFamily: '"Cinzel Decorative", "Jua", "MedievalSharp", cursive',
                 fontSize: '22px',
                 color: '#aaddff',
                 fontStyle: 'bold',
@@ -63,7 +63,7 @@ export class CharacterSelectScene extends Phaser.Scene {
 
         this.add
             .text(width - 30, 105, `🪙 ${meta.coins}`, {
-                fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
+                fontFamily: '"Cinzel Decorative", "Jua", "MedievalSharp", cursive',
                 fontSize: '22px',
                 color: '#ffd700',
                 fontStyle: 'bold',
@@ -146,7 +146,7 @@ export class CharacterSelectScene extends Phaser.Scene {
             // 이름 — 카드 상단
             this.add
                 .text(x, y - 105, char.name, {
-                    fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
+                    fontFamily: '"Cinzel Decorative", "Jua", "MedievalSharp", cursive',
                     fontSize: '20px',
                     color: isUnlocked ? '#ffd700' : '#555555',
                     fontStyle: 'bold',
@@ -159,7 +159,7 @@ export class CharacterSelectScene extends Phaser.Scene {
                 const statsText = `HP: ${char.baseStats.health}  SPD: ${char.baseStats.speed}\nDMG: ×${char.baseStats.damage}`;
                 this.add
                     .text(x, y + 70, statsText, {
-                        fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
+                        fontFamily: '"Cinzel Decorative", "Jua", "MedievalSharp", cursive',
                         fontSize: '15px',
                         color: '#aaaaaa',
                         align: 'center',
@@ -175,7 +175,7 @@ export class CharacterSelectScene extends Phaser.Scene {
                         y + 45,
                         I18n.t('char_select_locked', { cost: char.unlockCost ?? '?' }),
                         {
-                            fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
+                            fontFamily: '"Cinzel Decorative", "Jua", "MedievalSharp", cursive',
                             fontSize: '17px',
                             color: '#888888',
                         },
@@ -186,7 +186,7 @@ export class CharacterSelectScene extends Phaser.Scene {
                 if (canAfford) {
                     this.add
                         .text(x, y + 78, I18n.t('char_select_unlock'), {
-                            fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
+                            fontFamily: '"Cinzel Decorative", "Jua", "MedievalSharp", cursive',
                             fontSize: '14px',
                             color: '#ffd700',
                         })
@@ -195,7 +195,7 @@ export class CharacterSelectScene extends Phaser.Scene {
                 } else {
                     this.add
                         .text(x, y + 78, I18n.t('char_select_short'), {
-                            fontFamily: '"Cinzel Decorative", "MedievalSharp", cursive',
+                            fontFamily: '"Cinzel Decorative", "Jua", "MedievalSharp", cursive',
                             fontSize: '14px',
                             color: '#554444',
                         })
