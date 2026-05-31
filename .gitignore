@@ -39,3 +39,9 @@ deploy.exp.local
 .idea/
 Thumbs.db
 .gstack/
+
+# Internal docs / planning artifacts (로컬 유지, 추적 제외)
+docs/
+design/
+research/
+SECURITY.md
