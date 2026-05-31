@@ -23,8 +23,8 @@ export const createPhysicsSystem = (dungeon: DungeonGenerator) => {
             for (let i = 0; i < ents.length; i++) {
                 const eid = ents[i];
 
-                let nextX = Position.x[eid] + Velocity.x[eid] * deltaSec;
-                let nextY = Position.y[eid] + Velocity.y[eid] * deltaSec;
+                const nextX = Position.x[eid] + Velocity.x[eid] * deltaSec;
+                const nextY = Position.y[eid] + Velocity.y[eid] * deltaSec;
 
                 // 1. Wall Collision (Dungeon)
                 let canMoveX = dungeon.isFloorRect(nextX, Position.y[eid], 12, 12);
@@ -33,7 +33,10 @@ export const createPhysicsSystem = (dungeon: DungeonGenerator) => {
                 // 2. Door Collision (Entities)
                 for (let j = 0; j < doors.length; j++) {
                     const doorEid = doors[j];
-                    if (SpriteInfo.textureIndex[doorEid] === 41 && Interactive.isActivated[doorEid] === 0) {
+                    if (
+                        SpriteInfo.textureIndex[doorEid] === 41 &&
+                        Interactive.isActivated[doorEid] === 0
+                    ) {
                         // Closed Door: Block like a wall
                         const dx = nextX - Position.x[doorEid];
                         const dy = Position.y[eid] - Position.y[doorEid];
