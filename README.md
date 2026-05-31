@@ -1,10 +1,10 @@
-# Survivors Game
+# Magicka Survivors
 
-Vampire Survivors 스타일의 탑다운 액션 로그라이트 웹 게임. Phaser 3 + bitECS 아키텍처로 구축한 PWA 게임입니다.
+Vampire Survivors 스타일의 탑다운 액션 로그라이트 웹 게임. Phaser 3 + bitECS 아키텍처로 구축한 PWA 게임입니다. (코드 저장소명: `survivors-game-project`)
 
 ## 개요
 
-**Magicka Survivors**는 GameDistribution 플랫폼을 통해 배포되는 웹 기반 액션 게임입니다. 6개 캐릭터, 6가지 원소(Fire, Ice, Lightning, Poison, Earth, Air)의 연금술 시너지, 유물 시스템, 메타 스킬트리 등 게임플레이 깊이를 갖추고 있습니다.
+GameDistribution 플랫폼을 통해 배포되는 웹 기반 액션 게임입니다. 6개 캐릭터, 6가지 원소(Fire, Ice, Lightning, Poison, Earth, Air)의 연금술 시너지, 유물 시스템, 메타 스킬트리 등 게임플레이 깊이를 갖추고 있습니다.
 
 - **플랫폼**: 웹 기반 PWA (모바일 가로모드 지원)
 - **엔진**: Phaser 3.88 + bitECS (ECS 아키텍처)
@@ -177,7 +177,7 @@ survivors-game-project/
 │   └── .env.example
 │
 ├── public/                  # PWA 정적 자산
-│   ├── manifest.json        # PWA 메니페스트
+│   ├── manifest.json        # PWA 매니페스트
 │   ├── sw.js                # 서비스 워커
 │   ├── icon-192.png
 │   ├── icon-512.png
@@ -203,7 +203,7 @@ bitECS를 사용하여 게임 객체를 데이터 지향적으로 관리합니�
 - **Systems**: 매 프레임마다 실행되는 로직 (물리 갱신, 렌더링, 전투 계산 등)
 - **World**: 모든 엔티티와 컴포넌트를 관리하는 중앙 저장소
 
-이 구조는 높은 성능과 확장성을 제공합니다.
+데이터가 메모리에 연속 배치(SoA)되어 캐시 친화적이며, 다수 엔티티를 효율적으로 처리합니다.
 
 ## 게임 시스템
 
@@ -267,7 +267,7 @@ bitECS를 사용하여 게임 객체를 데이터 지향적으로 관리합니�
 
 ### 웹 앱 설치
 
-`public/manifest.json`에 정의된 PWA 메니페스트에 따라 모바일 기기에 앱으로 설치할 수 있습니다:
+`public/manifest.json`에 정의된 PWA 매니페스트에 따라 모바일 기기에 앱으로 설치할 수 있습니다:
 - 앱 이름: "Magicka Survivors"
 - 표시 모드: fullscreen
 - 방향: landscape (가로 모드 강제)
@@ -301,7 +301,7 @@ SDK는 게임 로드 완료 시 콜백하여 광고 및 분석을 지원합니�
 - `/api/daily-reward/*` — 일일 보상
 - `/api/quests/*` — 퀘스트 조회/완료
 - `/api/ls-webhook` — Lemon Squeezy 결제 webhook (HMAC 검증)
-- `/api/admin/*` — 운영 admin 대시보드(읽기 전용)
+- `/api/admin/*` — 관리자(admin) 대시보드 (읽기 전용)
 
 PostgreSQL 16 데이터베이스에 연결하여 플레이어 데이터를 영구 저장합니다.
 
@@ -364,7 +364,7 @@ npm run lint       # ESLint 검사 (typescript-eslint)
 npm run format     # Prettier로 자동 포맷
 ```
 
-커밋 시 자동으로 포맷 및 린트 검사가 실행됩니다 (husky + lint-staged).
+위 검사는 husky + lint-staged 로 커밋 시 자동 실행됩니다(상단 [사용 가능한 스크립트](#사용-가능한-스크립트) 참고).
 
 ## 문서
 
