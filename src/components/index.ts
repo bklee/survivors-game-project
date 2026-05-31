@@ -45,7 +45,6 @@ export const Boss = defineComponent();
 export const BossClone = defineComponent();
 export const BossSplit = defineComponent();
 export const EnemyProjectile = defineComponent();
-export const Chest = defineComponent();
 export const Scale = defineComponent({ value: Types.f32 });
 
 // Weapons & Magic
@@ -81,12 +80,3 @@ export const ActionState = defineComponent({
     attackTimer: Types.f32,
     attackDuration: Types.f32,
 });
-
-// Alchemy system components
-export { AlchemySlot, SynergyEffect } from './alchemy';
-
-// Weapon evolution component
-export { WeaponEvolution } from './weapon';
-
-// Relic component
-export { Relic } from './relic';
