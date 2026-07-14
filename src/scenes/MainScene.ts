@@ -226,7 +226,6 @@ export class MainScene extends Phaser.Scene {
             this.selectedCharId === 'wizard' ||
             this.selectedCharId === 'elf' ||
             this.selectedCharId === 'necromancer' ||
-            this.selectedCharId === 'druid' ||
             this.selectedCharId === 'lizard'
         ) {
             addComponent(world, Mana, this.playerId);
@@ -238,7 +237,6 @@ export class MainScene extends Phaser.Scene {
         if (this.selectedCharId === 'knight') charTypeId = 0;
         else if (this.selectedCharId === 'elf') charTypeId = 2;
         else if (this.selectedCharId === 'necromancer') charTypeId = 3;
-        else if (this.selectedCharId === 'druid') charTypeId = 4;
         else if (this.selectedCharId === 'lizard') charTypeId = 5;
         else if (this.selectedCharId === 'dwarf') charTypeId = 6; // dwarf 전용 스프라이트
 
