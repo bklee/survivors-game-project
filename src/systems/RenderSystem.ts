@@ -108,8 +108,6 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
             else if (typeId === 1) charKey = 'wizard';
             else if (typeId === 2) charKey = 'elf';
             else if (typeId === 3) charKey = 'necromancer';
-            else if (typeId === 4)
-                charKey = 'wizard'; // druid: wizard 프레임 재사용
             else if (typeId === 5) charKey = 'lizard';
             else if (typeId === 6) charKey = 'dwarf';
             else if (typeId === 10) charKey = 'imp';
@@ -498,8 +496,6 @@ export const createRenderSystem = (_scene: Phaser.Scene, blitter: Phaser.GameObj
                         // 캐릭터별 tint 적용
                         if (typeId === 3) {
                             sprite.setTint(0x9c27b0); // necromancer: 보라색
-                        } else if (typeId === 4) {
-                            sprite.setTint(0x4caf50); // druid: 녹색
                         } else {
                             // lizard (typeId 5) 는 원래 sprite 색 유지
                             sprite.clearTint();
