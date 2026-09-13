@@ -2,6 +2,7 @@
 .env
 .env.*
 !.env.example
+!.env.deploy.example
 *.key
 *.pem
 *.p12
@@ -24,6 +25,9 @@ config.local.*
 # 비밀값이 포함될 수 있는 배포/인증 스크립트
 setup_key.exp
 deploy.exp.local
+
+# deploy 생성물
+.ssh_known_hosts
 
 # 에이전트 세션 상태 (로컬 전용)
 .omc/
