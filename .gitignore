@@ -1,13 +1,4 @@
-node_modules/
-dist/
-dist-poki/
-dist-gd/
-survivors-poki.zip
-survivors-gd.zip
-.DS_Store
-*.log
-
-# Secrets / Credentials (NEVER COMMIT)
+# 배포 자격증명 (커밋 금지) — 예시 템플릿만 추적
 .env
 .env.*
 !.env.example
@@ -30,17 +21,34 @@ config.local.*
 *-secret
 *-secret.*
 
-# Deployment / Auth scripts with potential secrets
+# 비밀값이 포함될 수 있는 배포/인증 스크립트
 setup_key.exp
 deploy.exp.local
 
-# Editor / OS
+# 에이전트 세션 상태 (로컬 전용)
+.omc/
+
+# OS / 에디터 부산물
+.DS_Store
 .vscode/
 .idea/
 Thumbs.db
 .gstack/
 
-# Internal docs / planning artifacts (로컬 유지, 추적 제외)
+# Node
+node_modules/
+
+# 빌드 산출물
+dist/
+dist-poki/
+dist-gd/
+survivors-poki.zip
+survivors-gd.zip
+
+# 로그
+*.log
+
+# 내부 문서 / 기획 산출물 (로컬 유지, 추적 제외)
 docs/
 design/
 research/
