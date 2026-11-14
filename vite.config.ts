@@ -1,25 +1,22 @@
 import { defineConfig } from 'vite';
 
 // Base path 분기:
-//   - npm run build (production)        → base '/survivors/' (games.blocktalker.co.kr/survivors/)
+//   - npm run build (production)        → base '/' (survivors.blocktalker.co.kr 서브도메인 루트)
 //   - npm run build -- --mode gd        → base './' (GameDistribution CDN 호스팅용 zip)
 //   - npm run dev                       → base '/' (localhost:3000/)
 export default defineConfig(({ mode }) => {
-    const base = mode === 'gd' ? './' : mode === 'production' ? '/survivors/' : '/';
+    const base = mode === 'gd' ? './' : '/';
     return {
         base,
         server: {
             port: 3000,
             // dev 환경에서 /api/* 호출은 prod backend 로 proxy.
-            // ApiClient 가 base URL 기준으로 /api 호출인데 dev 모드는 로컬 backend 없어
-            // vite default 가 HTML 반환 → JSON 파싱 실패. proxy 로 정상화.
             proxy: {
                 '/api': {
-                    target: 'https://games.blocktalker.co.kr',
+                    target: 'https://survivors.blocktalker.co.kr',
                     changeOrigin: true,
                     secure: true,
                     followRedirects: true,
-                    rewrite: (path) => `/survivors${path}`,
                 },
             },
         },
